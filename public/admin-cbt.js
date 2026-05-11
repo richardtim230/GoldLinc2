@@ -129,7 +129,7 @@ function showExams() {
 }
 
 async function loadExamsTable() {
-  const exams = await fetch('https://examguard-8rxe.onrender.com/api/exam').then(r => r.json()).catch(() => []);
+  const exams = await fetch('https://goldlincschools.onrender.com/api/exam').then(r => r.json()).catch(() => []);
   const table = document.getElementById('examsTable');
   if (!Array.isArray(exams) || exams.length === 0) {
     table.innerHTML = `<div class="text-center text-gray-500 mt-12">No exams found.</div>`; 
@@ -195,8 +195,8 @@ window.showScheduleExam = showScheduleExam;
 // 2. Upload Exam
 async function showUploadExam() {
   document.getElementById('pageTitle').textContent = 'Upload New Exam';
-  const classes = await fetch('https://examguard-8rxe.onrender.com/api/classes').then(r => r.json()).catch(() => []);
-  const subjects = await fetch('https://examguard-8rxe.onrender.com/api/subjects').then(r => r.json()).catch(() => []);
+  const classes = await fetch('https://goldlincschools.onrender.com/api/classes').then(r => r.json()).catch(() => []);
+  const subjects = await fetch('https://goldlincschools.onrender.com/api/subjects').then(r => r.json()).catch(() => []);
   document.getElementById('contentArea').innerHTML = `
     <h2 class="text-2xl font-bold mb-5 text-[#22305a]">Upload New Exam</h2>
     <form id="uploadExamForm" class="space-y-6 max-w-2xl">
@@ -391,7 +391,7 @@ async function showUploadExam() {
       if (!file) return;
       const formData = new FormData();
       formData.append('image', file);
-      const res = await fetch('https://examguard-8rxe.onrender.com/api/upload/image', { method: 'POST', body: formData });
+      const res = await fetch('https://goldlincschools.onrender.com/api/upload/image', { method: 'POST', body: formData });
       const data = await res.json();
       if(data.url){
         const range = quill.getSelection();
@@ -490,7 +490,7 @@ async function showUploadExam() {
         `<div class="text-blue-600">Uploading...</div>`;
 
       try {
-        const res = await fetch('https://examguard-8rxe.onrender.com/api/exam', {
+        const res = await fetch('https://goldlincschools.onrender.com/api/exam', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -531,7 +531,7 @@ async function showScheduleExam() {
     </div>
   `;
 
-  const exams = await fetch('https://examguard-8rxe.onrender.com/api/exam').then(r => r.json()).catch(() => []);
+  const exams = await fetch('https://goldlincschools.onrender.com/api/exam').then(r => r.json()).catch(() => []);
 
   document.getElementById('contentArea').innerHTML = `
     <h2 class="text-2xl font-bold mb-5 text-[#22305a]">Schedule & Merge Exams</h2>
@@ -611,7 +611,7 @@ async function showScheduleExam() {
     previewDiv.innerHTML = `<div class="flex items-center text-blue-600 font-semibold py-4"><i class="fa fa-spinner fa-spin"></i> Merging questions...</div>`;
 
     const questionSets = await Promise.all(selected.map(id =>
-      fetch(`https://examguard-8rxe.onrender.com/api/exam/${id}`).then(r => r.json())
+      fetch(`https://goldlincschools.onrender.com/api/exam/${id}`).then(r => r.json())
     ));
 
     mergedQuestions = [];
@@ -656,7 +656,7 @@ async function showScheduleExam() {
       return;
     }
 
-    const firstExam = await fetch(`https://examguard-8rxe.onrender.com/api/exam/${selected[0]}`).then(r => r.json());
+    const firstExam = await fetch(`https://goldlincschools.onrender.com/api/exam/${selected[0]}`).then(r => r.json());
     const classId = firstExam.class || firstExam.classId;
     const subjectId = firstExam.subject || firstExam.subjectId;
 
@@ -675,7 +675,7 @@ async function showScheduleExam() {
     };
     
     try {
-      const res = await fetch('https://examguard-8rxe.onrender.com/api/exam/merge', {
+      const res = await fetch('https://goldlincschools.onrender.com/api/exam/merge', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -747,7 +747,7 @@ async function showResults() {
     </div>
   `;
 
-  const results = await fetch('https://examguard-8rxe.onrender.com/api/result').then(r => r.json()).catch(() => []);
+  const results = await fetch('https://goldlincschools.onrender.com/api/result').then(r => r.json()).catch(() => []);
   
   const loader = document.getElementById('resultsLoading');
   const container = document.getElementById('resultsContainer');
@@ -1016,7 +1016,7 @@ async function showStudentActivity() {
     <h2 class="text-2xl font-bold mb-5 text-[#22305a]">Student Activity</h2>
     <div id="activityTable" class="overflow-auto"></div>
   `;
-  const acts = await fetch('https://examguard-8rxe.onrender.com/api/activity').then(r => r.json()).catch(() => []);
+  const acts = await fetch('https://goldlincschools.onrender.com/api/activity').then(r => r.json()).catch(() => []);
   const table = document.getElementById('activityTable');
   if (!Array.isArray(acts) || acts.length === 0) {
     table.innerHTML = `<div class="text-center text-gray-500 mt-12">No activity found.</div>`; 
@@ -1058,7 +1058,7 @@ async function showStudentActivity() {
 // ============ ACTION HANDLERS ============
 
 window.viewExam = async function(id) {
-  const ex = await fetch(`https://examguard-8rxe.onrender.com/api/exam/${id}`).then(r=>r.json());
+  const ex = await fetch(`https://goldlincschools.onrender.com/api/exam/${id}`).then(r=>r.json());
   if(ex.error){alert(ex.error); return;}
   
   // ✅ Display exam code in detail view
@@ -1108,7 +1108,7 @@ window.editExam = async function(id) {
 
 window.deleteExam = async function(id) {
   if (!confirm('Delete this exam?')) return;
-  const res = await fetch(`https://examguard-8rxe.onrender.com/api/exam/${id}`,{method:'DELETE'}).then(r=>r.json());
+  const res = await fetch(`https://goldlincschools.onrender.com/api/exam/${id}`,{method:'DELETE'}).then(r=>r.json());
   if(res.error){alert(res.error);} else {showExams();}
 }
 
@@ -1119,7 +1119,7 @@ window.stopExam = async function(id) {
 }
 
 window.viewResult = async function(id) {
-  const r = await fetch(`https://examguard-8rxe.onrender.com/api/result/${id}`).then(r=>r.json());
+  const r = await fetch(`https://goldlincschools.onrender.com/api/result/${id}`).then(r=>r.json());
   if(r.error){alert(r.error); return;}
   document.getElementById('contentArea').innerHTML = `
     <h2 class="text-2xl font-bold mb-5 text-[#22305a]">Result Detail</h2>
@@ -1137,7 +1137,7 @@ window.viewResult = async function(id) {
 
 window.deleteResult = async function(id) {
   if (!confirm('Delete this result?')) return;
-  const res = await fetch(`https://examguard-8rxe.onrender.com/api/result/${id}`, { method: 'DELETE' }).then(r => r.json()).catch(() => ({}));
+  const res = await fetch(`https://goldlincschools.onrender.com/api/result/${id}`, { method: 'DELETE' }).then(r => r.json()).catch(() => ({}));
   if (res.error) {
     alert(res.error);
   } else {
@@ -1146,7 +1146,7 @@ window.deleteResult = async function(id) {
 }
 
 window.viewActivity = async function(id) {
-  const a = await fetch(`https://examguard-8rxe.onrender.com/api/activity/${id}`).then(r=>r.json());
+  const a = await fetch(`https://goldlincschools.onrender.com/api/activity/${id}`).then(r=>r.json());
   if(a.error){alert(a.error); return;}
   document.getElementById('contentArea').innerHTML = `
     <h2 class="text-2xl font-bold mb-5 text-[#22305a]">Student Activity Detail</h2>
