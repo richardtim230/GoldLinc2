@@ -1100,7 +1100,7 @@ window.viewExam = async function(id) {
 }
 
 window.editExam = async function(id) {
-  const ex = await fetch(`https://examguard-8rxe.onrender.com/api/exam/${id}`).then(r=>r.json());
+  const ex = await fetch(`https://goldlincschools.onrender.com/api/exam/${id}`).then(r=>r.json());
   if(ex.error){alert(ex.error); return;}
   alert('Edit Exam is not implemented for advanced question editor. Please delete and re-upload for now.');
   showExams();
@@ -1114,7 +1114,7 @@ window.deleteExam = async function(id) {
 
 window.stopExam = async function(id) {
   if (!confirm('Stop this exam for all students?')) return;
-  await fetch(`https://examguard-8rxe.onrender.com/api/exam/${id}/stop`,{method:'POST'});
+  await fetch(`https://goldlincschools.onrender.com/api/exam/${id}/stop`,{method:'POST'});
   showExams();
 }
 
