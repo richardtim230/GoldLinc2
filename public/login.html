@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ExamGuard International School| Portal Login</title>
+  <title>Gold and Linc Schools| Portal Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Google Fonts: Inter for body, Montserrat for headings -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@800&display=swap" rel="stylesheet">
@@ -382,7 +382,7 @@
       <div class="logo">
         <img src="mainlogo.png" alt="School Logo" style="width:100%;height:100%;">
       </div>
-      <h1>EXAMGUARD INTERNATIONAL SCHOOL</h1>
+      <h1>GOLD AND LINC SCHOOLS</h1>
       <div class="info-row">
         <i class="fa fa-envelope"></i>
         richardexam6@gmail.com
@@ -495,7 +495,7 @@
           // ✅ NEW: Try parent login first if it looks like an email
           if (isEmail) {
             try {
-              const parentRes = await fetch('https://examguard-8rxe.onrender.com/api/parents/login', {
+              const parentRes = await fetch('https://goldlincschools.onrender.com/api/parents/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: emailOrReg, password }),
@@ -528,7 +528,7 @@
             ? { email: emailOrReg, password }
             : { regNo: emailOrReg, password };
 
-          const res = await fetch('https://examguard-8rxe.onrender.com/api/auth/login', {
+          const res = await fetch('https://goldlincschools.onrender.com/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
