@@ -126,7 +126,7 @@ function isDateInRange(dateToCheck, startDate, endDate) {
 
 // ============ DYNAMIC CONTENT LOADERS ============
 
-// 1. Exams List - WITH EXAM CODES
+// 1. Exams List - WITH EXAM CODES AND LOADER
 function showExams() {
   document.getElementById('pageTitle').textContent = 'All Exams';
   document.getElementById('contentArea').innerHTML = `
@@ -134,69 +134,98 @@ function showExams() {
       <h2 class="text-2xl font-bold text-[#22305a]">All Exams</h2>
       <button class="cbt-btn" onclick="showUploadExam()"><i class="fa fa-plus mr-1"></i> Upload Exam</button>
     </div>
-    <div id="examsTable" class="overflow-auto"></div>
+    <div id="examsLoading" class="flex items-center justify-center py-16 bg-gradient-to-br from-[#f8f9fb] to-[#eef2f8] rounded-xl border border-[#d4e0f1]">
+      <div class="text-center">
+        <i class="fa fa-spinner fa-spin fa-3x text-[#2647a6] mb-4"></i>
+        <p class="text-[#2647a6] font-semibold text-lg">Loading exams...</p>
+        <p class="text-gray-500 text-sm mt-2">Please wait while we fetch your exams</p>
+      </div>
+    </div>
+    <div id="examsContainer" style="display: none;">
+      <div id="examsTable" class="overflow-auto"></div>
+    </div>
   `;
   loadExamsTable();
 }
 
 async function loadExamsTable() {
   const exams = await fetch('https://goldlincschools.onrender.com/api/exam').then(r => r.json()).catch(() => []);
+  
+  const loader = document.getElementById('examsLoading');
+  const container = document.getElementById('examsContainer');
   const table = document.getElementById('examsTable');
+  
+  if (loader) loader.style.display = 'none';
+  if (container) container.style.display = 'block';
+  
   if (!Array.isArray(exams) || exams.length === 0) {
-    table.innerHTML = `<div class="text-center text-gray-500 mt-12">No exams found.</div>`; 
+    table.innerHTML = `
+      <div class="text-center py-16 bg-gradient-to-br from-[#f8f9fb] to-[#eef2f8] rounded-xl border border-dashed border-[#cbd5e1]">
+        <i class="fa fa-inbox fa-3x text-gray-400 mb-4"></i>
+        <p class="text-gray-600 font-semibold text-lg">No exams found</p>
+        <p class="text-gray-500 text-sm mt-2">Create your first exam to get started</p>
+      </div>
+    `;
     return;
   }
-  let html = `<table class="min-w-full border text-left">
-    <thead class="bg-[#f6f8fa] text-[#2647a6]">
-      <tr>
-        <th class="p-3">#</th>
-        <th class="p-3">Title</th>
-        <th class="p-3">Class</th>
-        <th class="p-3">Subject</th>
-        <th class="p-3">Exam Code</th>
-        <th class="p-3">Scheduled</th>
-        <th class="p-3">Status</th>
-        <th class="p-3">Actions</th>
-      </tr>
-    </thead>
-    <tbody>`;
+
+  let html = `<div class="overflow-x-auto rounded-lg border border-[#e2e8f0] shadow-sm">
+    <table class="w-full text-left text-sm">
+      <thead class="bg-gradient-to-r from-[#2647a6] to-[#1d35a0] text-white font-semibold">
+        <tr>
+          <th class="px-4 py-3">#</th>
+          <th class="px-4 py-3">Title</th>
+          <th class="px-4 py-3">Class</th>
+          <th class="px-4 py-3">Subject</th>
+          <th class="px-4 py-3">Exam Code</th>
+          <th class="px-4 py-3">Scheduled</th>
+          <th class="px-4 py-3">Status</th>
+          <th class="px-4 py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[#e2e8f0]">`;
+
   for (let i = 0; i < exams.length; i++) {
     const ex = exams[i];
-    // ✅ Display exam code with copy button
     const codeDisplay = ex.examCode 
       ? `<div class="flex items-center gap-2">
-           <code style="background:#e3f2fd; padding:4px 8px; border-radius:4px; font-weight:bold; color:#2647a6;">
+           <code class="bg-blue-100 text-blue-700 px-2 py-1 rounded font-bold text-xs">
              ${ex.examCode}
            </code>
-           <button class="text-blue-500 hover:text-blue-700" title="Copy Code" onclick="copyToClipboard('${ex.examCode}', this)">
+           <button class="text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-1 rounded" title="Copy Code" onclick="copyToClipboard('${ex.examCode}', this)">
              <i class="fa fa-copy"></i>
            </button>
          </div>`
-      : '<span class="text-gray-400">No Code</span>';
+      : '<span class="text-gray-400 text-xs">No Code</span>';
     
-    html += `<tr class="border-b hover:bg-[#e9f0fe]">
-      <td class="p-3 font-bold text-[#2647a6]">${i + 1}</td>
-      <td class="p-3 font-semibold">${ex.title}</td>
-      <td class="p-3">${ex.className || ''}</td>
-      <td class="p-3">${ex.subjectName || ''}</td>
-      <td class="p-3">${codeDisplay}</td>
-      <td class="p-3">${ex.scheduledFor ? new Date(ex.scheduledFor).toLocaleString() : '-'}</td>
-      <td class="p-3">
-        <span style="background:${ex.status === 'Active' ? '#d4edda' : '#fff3e0'}; 
-                     color:${ex.status === 'Active' ? '#155724' : '#e65100'};
-                     padding:4px 8px; border-radius:4px; font-weight:bold;">
+    const statusColor = ex.status === 'Active' 
+      ? 'bg-green-100 text-green-700' 
+      : 'bg-amber-100 text-amber-700';
+    
+    html += `<tr class="hover:bg-[#f8f9fc] transition-colors">
+      <td class="px-4 py-3 font-bold text-[#2647a6]">${i + 1}</td>
+      <td class="px-4 py-3 font-medium text-gray-900">${ex.title}</td>
+      <td class="px-4 py-3 text-gray-700">${ex.className || '-'}</td>
+      <td class="px-4 py-3 text-gray-700">${ex.subjectName || '-'}</td>
+      <td class="px-4 py-3">${codeDisplay}</td>
+      <td class="px-4 py-3 text-gray-600 text-xs">${ex.scheduledFor ? new Date(ex.scheduledFor).toLocaleDateString() : '-'}</td>
+      <td class="px-4 py-3">
+        <span class="px-3 py-1 rounded-full text-xs font-semibold ${statusColor}">
           ${ex.status || 'Draft'}
         </span>
       </td>
-      <td class="p-3 flex gap-1 flex-wrap">
-        <button title="View" class="text-blue-700" onclick="viewExam('${ex._id}')"><i class="fa fa-eye"></i></button>
-        <button title="Edit" class="text-green-600" onclick="editExam('${ex._id}')"><i class="fa fa-edit"></i></button>
-        <button title="Delete" class="text-red-600" onclick="deleteExam('${ex._id}')"><i class="fa fa-trash"></i></button>
-        <button title="Stop" class="text-yellow-600" onclick="stopExam('${ex._id}')"><i class="fa fa-stop"></i></button>
+      <td class="px-4 py-3">
+        <div class="flex items-center gap-2">
+          <button title="View" class="text-blue-600 hover:bg-blue-50 p-2 rounded" onclick="viewExam('${ex._id}')"><i class="fa fa-eye"></i></button>
+          <button title="Edit" class="text-green-600 hover:bg-green-50 p-2 rounded" onclick="editExam('${ex._id}')"><i class="fa fa-edit"></i></button>
+          <button title="Delete" class="text-red-600 hover:bg-red-50 p-2 rounded" onclick="deleteExam('${ex._id}')"><i class="fa fa-trash"></i></button>
+          <button title="Stop" class="text-amber-600 hover:bg-amber-50 p-2 rounded" onclick="stopExam('${ex._id}')"><i class="fa fa-stop"></i></button>
+        </div>
       </td>
     </tr>`;
   }
-  html += `</tbody></table>`;
+  
+  html += `</tbody></table></div>`;
   table.innerHTML = html;
 }
 
@@ -209,38 +238,40 @@ async function showUploadExam() {
   const classes = await fetch('https://goldlincschools.onrender.com/api/classes').then(r => r.json()).catch(() => []);
   const subjects = await fetch('https://goldlincschools.onrender.com/api/subjects').then(r => r.json()).catch(() => []);
   document.getElementById('contentArea').innerHTML = `
-    <h2 class="text-2xl font-bold mb-5 text-[#22305a]">Upload New Exam</h2>
-    <form id="uploadExamForm" class="space-y-6 max-w-2xl">
+    <h2 class="text-2xl font-bold mb-6 text-[#22305a]">Upload New Exam</h2>
+    <form id="uploadExamForm" class="space-y-6 max-w-3xl">
       <div class="form-group">
-        <label>Title <span class="text-red-500">*</span></label>
-        <input name="title" required class="block w-full rounded border px-3 py-2 mt-1"/>
+        <label class="block text-gray-700 font-semibold mb-2">Title <span class="text-red-500">*</span></label>
+        <input name="title" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="form-group">
+          <label class="block text-gray-700 font-semibold mb-2">Class <span class="text-red-500">*</span></label>
+          <select name="class" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <option value="">Select Class</option>
+            ${classes.map(c => `<option value="${c._id}">${c.name}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="block text-gray-700 font-semibold mb-2">Subject <span class="text-red-500">*</span></label>
+          <select name="subject" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <option value="">Select Subject</option>
+            ${subjects.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+          </select>
+        </div>
       </div>
       <div class="form-group">
-        <label>Class <span class="text-red-500">*</span></label>
-        <select name="class" required class="block w-full rounded border px-3 py-2 mt-1">
-          <option value="">Select Class</option>
-          ${classes.map(c => `<option value="${c._id}">${c.name}</option>`).join('')}
-        </select>
+        <label class="block text-gray-700 font-semibold mb-2">Duration (minutes) <span class="text-red-500">*</span></label>
+        <input name="duration" type="number" min="1" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
       </div>
       <div class="form-group">
-        <label>Subject <span class="text-red-500">*</span></label>
-        <select name="subject" required class="block w-full rounded border px-3 py-2 mt-1">
-          <option value="">Select Subject</option>
-          ${subjects.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
-        </select>
+        <label class="block text-gray-700 font-semibold mb-3">Questions <span class="text-red-500">*</span></label>
+        <div id="questionsList" class="space-y-4"></div>
+        <button type="button" class="cbt-btn mt-4" id="addQuestionBtn"><i class="fa fa-plus mr-2"></i> Add Question</button>
       </div>
-      <div class="form-group">
-        <label>Duration (minutes) <span class="text-red-500">*</span></label>
-        <input name="duration" type="number" min="1" required class="block w-full rounded border px-3 py-2 mt-1"/>
-      </div>
-      <div class="form-group">
-        <label>Questions <span class="text-red-500">*</span></label>
-        <div id="questionsList"></div>
-        <button type="button" class="cbt-btn mt-2" id="addQuestionBtn"><i class="fa fa-plus mr-1"></i> Add Question</button>
-      </div>
-      <button type="submit" class="cbt-btn mt-2"><i class="fa fa-upload mr-1"></i> Upload Exam</button>
+      <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-6 rounded-lg transition-all"><i class="fa fa-upload mr-2"></i> Upload Exam</button>
     </form>
-    <div id="uploadExamMsg" class="mt-4"></div>
+    <div id="uploadExamMsg" class="mt-6"></div>
   `;
 
   let questions = [];
@@ -251,21 +282,25 @@ async function showUploadExam() {
     qlist.innerHTML = '';
     questions.forEach((q, qi) => {
       qlist.innerHTML += `
-      <div class="border rounded-xl bg-[#f9fafd] p-4 mb-5" data-question-idx="${qi}">
-        <div class="flex items-center justify-between mb-2">
-          <div class="font-semibold text-lg text-[#2647a6]">Question ${qi + 1}</div>
-          <button type="button" class="text-red-600" onclick="removeQuestion(${qi})"><i class="fa fa-trash"></i></button>
+      <div class="border-2 border-gray-200 rounded-xl bg-white p-6 hover:shadow-md transition-shadow" data-question-idx="${qi}">
+        <div class="flex items-center justify-between mb-4">
+          <div class="font-bold text-lg text-[#2647a6]">Question ${qi + 1}</div>
+          <button type="button" class="text-red-600 hover:bg-red-50 p-2 rounded-lg transition" onclick="removeQuestion(${qi})"><i class="fa fa-trash"></i></button>
         </div>
-        <label>Question Text:</label>
-        <div id="qtext-quill-${qi}" class="quill-editor mb-2"></div>
-        <label>Score: </label>
-        <input type="number" min="1" value="${q.score || 1}" class="score-input block w-24 mb-3 border rounded px-2 py-1" placeholder="Score" />
-        <label>Options:</label>
-        <div id="optionsList-${qi}" class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1 mb-2"></div>
-        <button type="button" class="cbt-btn" onclick="addOption(${qi})"><i class="fa fa-plus mr-1"></i> Add Option</button>
-        <div class="mt-4 p-3 bg-white rounded border">
-          <label style="margin-bottom: 12px;">Select Correct Answer(s) <span class="text-red-500">*</span></label>
-          <div id="correctAnswersCheckboxes-${qi}" class="flex flex-col gap-2"></div>
+        <label class="block text-gray-700 font-semibold mb-2">Question Text:</label>
+        <div id="qtext-quill-${qi}" class="quill-editor mb-4 bg-white"></div>
+        <div class="flex items-end gap-4 mb-4">
+          <div class="flex-1">
+            <label class="block text-gray-700 font-semibold mb-2">Score:</label>
+            <input type="number" min="1" value="${q.score || 1}" class="score-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Score" />
+          </div>
+        </div>
+        <label class="block text-gray-700 font-semibold mb-3">Options:</label>
+        <div id="optionsList-${qi}" class="space-y-3 mb-4"></div>
+        <button type="button" class="cbt-btn mb-4" onclick="addOption(${qi})"><i class="fa fa-plus mr-1"></i> Add Option</button>
+        <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <label class="block text-gray-700 font-semibold mb-3">Select Correct Answer(s) <span class="text-red-500">*</span></label>
+          <div id="correctAnswersCheckboxes-${qi}" class="grid grid-cols-2 gap-3"></div>
         </div>
       </div>
       `;
@@ -318,12 +353,12 @@ async function showUploadExam() {
     olist.innerHTML = '';
     (questions[qi].options||[]).forEach((opt, oi) => {
       olist.innerHTML += `
-        <div class="border rounded p-2 mb-1 bg-white flex flex-col gap-1 relative" data-option-idx="${oi}">
-          <div class="flex items-center justify-between mb-1">
-            <span class="font-bold">Option ${String.fromCharCode(65+oi)}</span>
-            <button type="button" class="text-red-600" onclick="removeOption(${qi},${oi})"><i class="fa fa-trash"></i></button>
+        <div class="border border-gray-200 rounded-lg p-4 bg-gray-50" data-option-idx="${oi}">
+          <div class="flex items-center justify-between mb-3">
+            <span class="font-semibold text-gray-700">Option ${String.fromCharCode(65+oi)}</span>
+            <button type="button" class="text-red-600 hover:bg-red-50 p-2 rounded transition" onclick="removeOption(${qi},${oi})"><i class="fa fa-trash"></i></button>
           </div>
-          <div id="q${qi}-opt-quill-${oi}" class="quill-editor"></div>
+          <div id="q${qi}-opt-quill-${oi}" class="quill-editor bg-white"></div>
         </div>
       `;
     });
@@ -354,9 +389,9 @@ async function showUploadExam() {
     (questions[qi].options||[]).forEach((opt, oi) => {
       const isChecked = questions[qi].answer.includes(oi);
       checkboxContainer.innerHTML += `
-        <label class="option-checkbox">
-          <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleCorrectAnswer(${qi}, ${oi})">
-          <span>Option ${String.fromCharCode(65+oi)}</span>
+        <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-100 cursor-pointer transition">
+          <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleCorrectAnswer(${qi}, ${oi})" class="w-4 h-4">
+          <span class="text-gray-700 font-medium">Option ${String.fromCharCode(65+oi)}</span>
         </label>
       `;
     });
@@ -444,13 +479,13 @@ async function showUploadExam() {
 
       if (!title || !classId || !subjectId || !duration) {
         document.getElementById('uploadExamMsg').innerHTML =
-          `<div class="text-red-600">All exam fields are required.</div>`; 
+          `<div class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">All exam fields are required.</div>`; 
         return;
       }
 
       if (!questions.length) {
         document.getElementById('uploadExamMsg').innerHTML =
-          `<div class="text-red-600">Add at least one question.</div>`; 
+          `<div class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">Add at least one question.</div>`; 
         return;
       }
 
@@ -458,25 +493,25 @@ async function showUploadExam() {
       for (let [i, q] of questions.entries()) {
         if (!q.text || !(q.options && q.options.length >= 2)) {
           document.getElementById('uploadExamMsg').innerHTML =
-            `<div class="text-red-600">Question ${i+1} must have text and at least 2 options.</div>`; 
+            `<div class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">Question ${i+1} must have text and at least 2 options.</div>`; 
           return;
         }
         for (let [j, o] of (q.options || []).entries()) {
           if (!o.value) {
             document.getElementById('uploadExamMsg').innerHTML =
-              `<div class="text-red-600">Question ${i+1} Option ${String.fromCharCode(65+j)} cannot be empty.</div>`; 
+              `<div class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">Question ${i+1} Option ${String.fromCharCode(65+j)} cannot be empty.</div>`; 
             return;
           }
         }
         if (!Array.isArray(q.answer) || q.answer.length === 0) {
           document.getElementById('uploadExamMsg').innerHTML =
-            `<div class="text-red-600">Select at least one correct answer for Question ${i+1}.</div>`; 
+            `<div class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">Select at least one correct answer for Question ${i+1}.</div>`; 
           return;
         }
         for (let ans of q.answer) {
           if (typeof ans !== 'number' || ans < 0 || ans >= q.options.length) {
             document.getElementById('uploadExamMsg').innerHTML =
-              `<div class="text-red-600">Invalid correct answer selection for Question ${i+1}.</div>`; 
+              `<div class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">Invalid correct answer selection for Question ${i+1}.</div>`; 
               return;
           }
         }
@@ -498,7 +533,7 @@ async function showUploadExam() {
       const submitBtn = uploadForm.querySelector('button[type="submit"]');
       submitBtn.disabled = true;
       document.getElementById('uploadExamMsg').innerHTML =
-        `<div class="text-blue-600">Uploading...</div>`;
+        `<div class="p-4 bg-blue-50 border border-blue-200 text-blue-700 rounded-lg flex items-center gap-2"><i class="fa fa-spinner fa-spin"></i> Uploading...</div>`;
 
       try {
         const res = await fetch('https://goldlincschools.onrender.com/api/exam', {
@@ -511,10 +546,10 @@ async function showUploadExam() {
 
         if (data.error) {
           document.getElementById('uploadExamMsg').innerHTML =
-            `<div class="text-red-600">${data.error}</div>`;
+            `<div class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">${data.error}</div>`;
         } else {
           document.getElementById('uploadExamMsg').innerHTML =
-            `<div class="text-green-600">✅ Exam uploaded successfully.</div>`;
+            `<div class="p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg font-semibold">✅ Exam uploaded successfully.</div>`;
 
           uploadForm.reset();
           questions = [];
@@ -523,7 +558,7 @@ async function showUploadExam() {
       } catch (err) {
         console.error(err);
         document.getElementById('uploadExamMsg').innerHTML =
-          `<div class="text-red-600">Network or server error.</div>`;
+          `<div class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">Network or server error.</div>`;
       } finally {
         submitBtn.disabled = false;
       }
@@ -535,71 +570,76 @@ async function showUploadExam() {
 async function showScheduleExam() {
   document.getElementById('pageTitle').textContent = 'Schedule & Merge Exams';
   document.getElementById('contentArea').innerHTML = `
-    <h2 class="text-2xl font-bold mb-5 text-[#22305a]">Schedule & Merge Exams</h2>
-    <div id="schedule-loader" class="flex items-center justify-center py-10">
-      <i class="fa fa-spinner fa-spin fa-2x text-blue-400"></i>
-      <span class="ml-3 text-blue-700 font-bold">Loading exams...</span>
+    <h2 class="text-2xl font-bold mb-6 text-[#22305a]">Schedule & Merge Exams</h2>
+    <div class="flex items-center justify-center py-16 bg-gradient-to-br from-[#f8f9fb] to-[#eef2f8] rounded-xl border border-[#d4e0f1]">
+      <div class="text-center">
+        <i class="fa fa-spinner fa-spin fa-3x text-[#2647a6] mb-4"></i>
+        <p class="text-[#2647a6] font-semibold text-lg">Loading exams...</p>
+      </div>
     </div>
   `;
 
   const exams = await fetch('https://goldlincschools.onrender.com/api/exam').then(r => r.json()).catch(() => []);
 
   document.getElementById('contentArea').innerHTML = `
-    <h2 class="text-2xl font-bold mb-5 text-[#22305a]">Schedule & Merge Exams</h2>
-    <form id="mergeScheduleExamForm" class="space-y-4 max-w-4xl">
+    <h2 class="text-2xl font-bold mb-6 text-[#22305a]">Schedule & Merge Exams</h2>
+    <form id="mergeScheduleExamForm" class="space-y-6 max-w-4xl">
       <div class="form-group">
-        <label>Select Exams to Merge <span class="text-red-500">*</span></label>
-        <div id="examsCheckboxContainer" class="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <label class="block text-gray-700 font-semibold mb-3">Select Exams to Merge <span class="text-red-500">*</span></label>
+        <div id="examsCheckboxContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-6 bg-gradient-to-br from-gray-50 to-blue-50 rounded-lg border-2 border-gray-200 max-h-72 overflow-y-auto">
           <!-- Checkboxes will be populated here -->
         </div>
-        <small class="block mt-2 text-gray-600">Select two or more exams to merge their questions.</small>
+        <small class="block mt-3 text-gray-600"><i class="fa fa-info-circle mr-1"></i>Select two or more exams to merge their questions.</small>
       </div>
-      <div id="mergedQuestionsPreview" class="mt-4"></div>
-      <div class="form-group mt-4">
-        <label>New Exam Title <span class="text-red-500">*</span></label>
-        <input type="text" name="mergedTitle" id="mergedTitle" class="block w-full rounded border px-3 py-2 mt-1" required />
+      <div id="mergedQuestionsPreview" class="mt-6"></div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="form-group">
+          <label class="block text-gray-700 font-semibold mb-2">New Exam Title <span class="text-red-500">*</span></label>
+          <input type="text" name="mergedTitle" id="mergedTitle" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+        </div>
+        <div class="form-group">
+          <label class="block text-gray-700 font-semibold mb-2">Duration (minutes) <span class="text-red-500">*</span></label>
+          <input type="number" name="duration" id="mergedDuration" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" min="1" required />
+        </div>
       </div>
-      <div class="form-group mt-4">
-        <label>Duration (minutes) <span class="text-red-500">*</span></label>
-        <input type="number" name="duration" id="mergedDuration" class="block w-full rounded border px-3 py-2 mt-1" min="1" required />
+      <div class="form-group">
+        <label class="block text-gray-700 font-semibold mb-2">Schedule Date & Time <span class="text-red-500">*</span></label>
+        <input name="scheduledFor" type="datetime-local" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
       </div>
-      <div class="form-group mt-4">
-        <label>Schedule Date & Time <span class="text-red-500">*</span></label>
-        <input name="scheduledFor" type="datetime-local" required class="block w-full rounded border px-3 py-2 mt-1"/>
-      </div>
-      <!-- ✅ EXAM CODE DISPLAY -->
-      <div class="form-group mt-4 p-4 bg-blue-50 border border-blue-200 rounded">
-        <label>Exam Code <span class="text-gray-500">(Auto-generated)</span></label>
-        <div class="flex items-center gap-2 mt-2">
-          <code id="generatedExamCode" style="background:#fff; padding:8px 12px; border-radius:4px; font-weight:bold; color:#2647a6; flex:1;">
+      <div class="form-group p-6 bg-blue-50 border-2 border-blue-200 rounded-lg">
+        <label class="block text-gray-800 font-semibold mb-3">Exam Code <span class="text-gray-500 font-normal">(Auto-generated)</span></label>
+        <div class="flex items-center gap-3">
+          <code id="generatedExamCode" class="flex-1 bg-white px-4 py-2 rounded-lg font-bold text-blue-700 border border-blue-300">
             -
           </code>
-          <button type="button" class="px-3 py-2 bg-blue-600 text-white rounded text-sm" onclick="copyToClipboard(document.getElementById('generatedExamCode').textContent, this)">
-            <i class="fa fa-copy"></i> Copy
+          <button type="button" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition" onclick="copyToClipboard(document.getElementById('generatedExamCode').textContent, this)">
+            <i class="fa fa-copy mr-2"></i> Copy
           </button>
         </div>
-        <small style="display:block; margin-top:8px; color:#666;">This code will be generated when you schedule the exam.</small>
+        <small class="block mt-3 text-gray-600"><i class="fa fa-lightbulb mr-1"></i>This code will be generated when you schedule the exam.</small>
       </div>
-      <button type="submit" class="cbt-btn mt-2 flex items-center" id="schedule-submit-btn">
-        <span><i class="fa fa-calendar mr-1"></i> Schedule Merged Exam</span>
+      <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-6 rounded-lg transition-all flex items-center justify-center" id="schedule-submit-btn">
+        <i class="fa fa-calendar mr-2"></i> <span>Schedule Merged Exam</span>
         <span id="schedule-submit-spinner" style="display:none;" class="ml-2"><i class="fa fa-spinner fa-spin"></i></span>
       </button>
     </form>
-    <div id="mergeExamMsg" class="mt-4"></div>
+    <div id="mergeExamMsg" class="mt-6"></div>
   `;
 
   // Populate checkboxes
   const checkboxContainer = document.getElementById('examsCheckboxContainer');
   if (Array.isArray(exams) && exams.length > 0) {
     checkboxContainer.innerHTML = exams.map(exam => `
-      <label class="option-checkbox">
-        <input type="checkbox" name="examIds" value="${exam._id}" class="exam-checkbox" data-title="${exam.title}">
-        <span class="font-medium">${exam.title}</span>
-        <div class="text-sm text-gray-600">${exam.className} - ${exam.subjectName || 'N/A'}</div>
+      <label class="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-400 hover:shadow-sm cursor-pointer transition">
+        <input type="checkbox" name="examIds" value="${exam._id}" class="exam-checkbox w-5 h-5 mt-1" data-title="${exam.title}">
+        <div class="flex-1">
+          <div class="font-semibold text-gray-900">${exam.title}</div>
+          <div class="text-sm text-gray-600">${exam.className} - ${exam.subjectName || 'N/A'}</div>
+        </div>
       </label>
     `).join('');
   } else {
-    checkboxContainer.innerHTML = `<div class="text-gray-500 col-span-full">No exams available to merge.</div>`;
+    checkboxContainer.innerHTML = `<div class="col-span-full text-center py-6 text-gray-500"><i class="fa fa-inbox mb-2 text-2xl"></i><p>No exams available to merge.</p></div>`;
   }
 
   let mergedQuestions = [];
@@ -614,12 +654,12 @@ async function showScheduleExam() {
     const previewDiv = document.getElementById('mergedQuestionsPreview');
     
     if (selected.length < 1) {
-      previewDiv.innerHTML = "<div class='text-gray-500 p-4'>Select two or more exams to see merged preview.</div>";
+      previewDiv.innerHTML = "<div class='text-center py-8 text-gray-500'><i class='fa fa-search text-2xl mb-2'></i><p>Select two or more exams to see merged preview.</p></div>";
       mergedQuestions = [];
       return;
     }
 
-    previewDiv.innerHTML = `<div class="flex items-center text-blue-600 font-semibold py-4"><i class="fa fa-spinner fa-spin"></i> Merging questions...</div>`;
+    previewDiv.innerHTML = `<div class="flex items-center text-blue-600 font-semibold py-6"><i class="fa fa-spinner fa-spin mr-2"></i> Merging questions...</div>`;
 
     const questionSets = await Promise.all(selected.map(id =>
       fetch(`https://goldlincschools.onrender.com/api/exam/${id}`).then(r => r.json())
@@ -633,15 +673,15 @@ async function showScheduleExam() {
     });
 
     previewDiv.innerHTML = `
-      <div class="mt-4">
-        <div class="font-semibold text-[#22305a] mb-3">📋 Merged Questions Preview (${mergedQuestions.length} questions)</div>
+      <div class="mt-6">
+        <div class="font-bold text-lg text-[#22305a] mb-4"><i class="fa fa-list mr-2"></i>Merged Questions Preview (${mergedQuestions.length} questions)</div>
         ${mergedQuestions.map((q, idx) => `
-          <div class="mb-2 p-3 bg-[#f8fafc] rounded border flex items-start gap-3">
-            <div class="text-gray-500 font-bold mt-1">${idx + 1}.</div>
+          <div class="mb-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 flex items-start gap-4">
+            <div class="text-gray-600 font-bold min-w-8">${idx + 1}.</div>
             <div class="flex-1">
-              <div class="font-semibold text-[#22305a]">From: <span class="text-blue-700">${q.sourceExamTitle}</span></div>
-              <div class="mb-2 text-gray-800">${q.text}</div>
-              <ol class="list-decimal ml-5 text-sm">${(q.options || []).map((o, oi) => `<li class="text-gray-700">${o.value || o}</li>`).join('')}</ol>
+              <div class="font-semibold text-[#22305a] mb-1">Source: <span class="text-blue-600">${q.sourceExamTitle}</span></div>
+              <div class="mb-3 text-gray-800">${q.text}</div>
+              <ol class="list-decimal ml-5 text-sm space-y-1">${(q.options || []).map((o, oi) => `<li class="text-gray-700">${o.value || o}</li>`).join('')}</ol>
             </div>
           </div>
         `).join('')}
@@ -654,7 +694,7 @@ async function showScheduleExam() {
     const selected = Array.from(document.querySelectorAll('.exam-checkbox:checked')).map(cb => cb.value);
     
     if (selected.length < 1) {
-      document.getElementById('mergeExamMsg').innerHTML = `<div class="text-red-600">Please select at least 2 exams to merge.</div>`;
+      document.getElementById('mergeExamMsg').innerHTML = `<div class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">Please select at least 2 exams to merge.</div>`;
       return;
     }
 
@@ -663,7 +703,7 @@ async function showScheduleExam() {
     const scheduledFor = document.querySelector('[name="scheduledFor"]').value;
 
     if (!mergedTitle || !duration || !scheduledFor) {
-      document.getElementById('mergeExamMsg').innerHTML = `<div class="text-red-600">Please fill in all required fields.</div>`;
+      document.getElementById('mergeExamMsg').innerHTML = `<div class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">Please fill in all required fields.</div>`;
       return;
     }
 
@@ -697,27 +737,26 @@ async function showScheduleExam() {
       spinner.style.display = 'none';
 
       if (data.success) {
-        // ✅ Display generated exam code
         if (data.examCode) {
           document.getElementById('generatedExamCode').textContent = data.examCode;
           document.getElementById('mergeExamMsg').innerHTML = `
-            <div class="text-green-600 p-3 bg-green-50 rounded border border-green-200">
-              ✅ Merged exam scheduled successfully!<br>
-              <strong>Exam Code:</strong> <code style="background:#fff; padding:4px 8px; border-radius:3px; color:#2647a6; font-weight:bold;">${data.examCode}</code>
+            <div class="p-4 bg-green-50 border border-green-300 text-green-800 rounded-lg">
+              <div class="font-bold mb-2">✅ Merged exam scheduled successfully!</div>
+              <div><strong>Exam Code:</strong> <code class="bg-white px-2 py-1 rounded text-green-700 font-bold">${data.examCode}</code></div>
             </div>
           `;
         } else {
-          document.getElementById('mergeExamMsg').innerHTML = `<div class="text-green-600">✅ Merged exam scheduled!</div>`;
+          document.getElementById('mergeExamMsg').innerHTML = `<div class="p-4 bg-green-50 border border-green-300 text-green-800 rounded-lg font-semibold">✅ Merged exam scheduled!</div>`;
         }
         setTimeout(showExams, 1500);
       } else {
-        document.getElementById('mergeExamMsg').innerHTML = `<div class="text-red-600">${data.error || 'Failed to merge exams.'}</div>`;
+        document.getElementById('mergeExamMsg').innerHTML = `<div class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">${data.error || 'Failed to merge exams.'}</div>`;
       }
     } catch (err) {
       console.error(err);
       submitBtn.disabled = false;
       spinner.style.display = 'none';
-      document.getElementById('mergeExamMsg').innerHTML = `<div class="text-red-600">Network error.</div>`;
+      document.getElementById('mergeExamMsg').innerHTML = `<div class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">Network error.</div>`;
     }
   };
 }
@@ -729,29 +768,31 @@ async function showResults() {
     <div class="flex items-center justify-between mb-7">
       <h2 class="text-2xl font-bold text-[#22305a]">Student Results</h2>
     </div>
-    <div id="resultsLoading" class="results-loader">
-      <i class="fa fa-spinner fa-spin fa-2x text-blue-400"></i>
-      <span class="text-blue-700 font-bold">Loading results...</span>
+    <div id="resultsLoading" class="flex items-center justify-center py-16 bg-gradient-to-br from-[#f8f9fb] to-[#eef2f8] rounded-xl border border-[#d4e0f1]">
+      <div class="text-center">
+        <i class="fa fa-spinner fa-spin fa-3x text-[#2647a6] mb-4"></i>
+        <p class="text-[#2647a6] font-semibold text-lg">Loading results...</p>
+        <p class="text-gray-500 text-sm mt-2">Please wait while we fetch your results</p>
+      </div>
     </div>
     <div id="resultsContainer" style="display: none;">
       <div class="filters-section mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-        <input type="text" id="searchInput" placeholder="🔍 Search by student name..." class="block w-full rounded border px-3 py-2">
-        <select id="classFilter" class="block w-full rounded border px-3 py-2">
+        <input type="text" id="searchInput" placeholder="🔍 Search by student..." class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <select id="classFilter" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
           <option value="">All Classes</option>
         </select>
-        <select id="subjectFilter" class="block w-full rounded border px-3 py-2">
+        <select id="subjectFilter" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
           <option value="">All Subjects</option>
         </select>
-        <input type="date" id="dateFromFilter" class="block w-full rounded border px-3 py-2" placeholder="From Date">
-        <input type="date" id="dateToFilter" class="block w-full rounded border px-3 py-2" placeholder="To Date">
+        <input type="date" id="dateFromFilter" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <input type="date" id="dateToFilter" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
       </div>
-      <div class="flex gap-2 mb-6 flex-wrap">
-        <button class="cbt-btn" onclick="resetResultsFilters()"><i class="fa fa-redo mr-1"></i> Reset Filters</button>
-        <button class="cbt-btn" style="background: #28a745;" onclick="exportResultsToPDF()"><i class="fa fa-file-pdf mr-1"></i> Export PDF</button>
+      <div class="flex gap-3 mb-6 flex-wrap">
+        <button class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition" onclick="resetResultsFilters()"><i class="fa fa-redo mr-2"></i> Reset Filters</button>
+        <button class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition" onclick="exportResultsToPDF()"><i class="fa fa-file-pdf mr-2"></i> Export PDF</button>
       </div>
-      <div id="resultsInfo" class="results-info"></div>
-      <div id="resultsTable" class="table-wrapper"></div>
-      <!-- Hidden PDF content -->
+      <div id="resultsInfo" class="mb-4 text-sm font-semibold text-gray-700"></div>
+      <div id="resultsTable" class="overflow-auto"></div>
       <div id="pdfContent" style="display: none;"></div>
     </div>
   `;
@@ -764,7 +805,12 @@ async function showResults() {
   if (container) container.style.display = 'block';
 
   if (!Array.isArray(results) || results.length === 0) {
-    document.getElementById('resultsTable').innerHTML = `<div class="text-center text-gray-500 mt-12">No results found.</div>`; 
+    document.getElementById('resultsTable').innerHTML = `
+      <div class="text-center py-16 bg-gradient-to-br from-[#f8f9fb] to-[#eef2f8] rounded-xl border border-dashed border-[#cbd5e1]">
+        <i class="fa fa-inbox fa-3x text-gray-400 mb-4"></i>
+        <p class="text-gray-600 font-semibold text-lg">No results found</p>
+      </div>
+    `;
     return;
   }
 
@@ -886,49 +932,55 @@ async function showResults() {
     const info = document.getElementById('resultsInfo');
     
     if (dataToRender.length === 0) {
-      table.innerHTML = `<div class="text-center text-gray-500 mt-12">No results match your filters.</div>`;
-      info.innerHTML = `<span>Showing 0 results</span>`;
+      table.innerHTML = `
+        <div class="text-center py-12 bg-gradient-to-br from-[#f8f9fb] to-[#eef2f8] rounded-lg border border-dashed border-[#cbd5e1]">
+          <i class="fa fa-search text-2xl text-gray-400 mb-2"></i>
+          <p class="text-gray-600">No results match your filters.</p>
+        </div>
+      `;
+      info.innerHTML = `<span class="text-gray-600">Showing 0 results</span>`;
       document.getElementById('pdfContent').innerHTML = generatePDFContent([]);
       return;
     }
 
-    info.innerHTML = `<span><i class="fa fa-info-circle"></i> Showing ${dataToRender.length} result(s)</span>`;
+    info.innerHTML = `<span class="text-gray-700"><i class="fa fa-check-circle text-green-600 mr-2"></i> Showing ${dataToRender.length} result(s)</span>`;
 
-    let html = `<table class="min-w-full border text-left">
-      <thead class="bg-[#f6f8fa] text-[#2647a6]">
-        <tr>
-          <th class="p-3">#</th>
-          <th class="p-3">Student</th>
-          <th class="p-3">Class</th>
-          <th class="p-3">Subject</th>
-          <th class="p-3">Exam Title</th>
-          <th class="p-3">Score</th>
-          <th class="p-3">Started</th>
-          <th class="p-3">Finished</th>
-          <th class="p-3">Details</th>
-          <th class="p-3">Delete</th>
-        </tr>
-      </thead>
-      <tbody>`;
+    let html = `<div class="overflow-x-auto rounded-lg border border-[#e2e8f0] shadow-sm">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-gradient-to-r from-[#2647a6] to-[#1d35a0] text-white font-semibold">
+          <tr>
+            <th class="px-4 py-3">#</th>
+            <th class="px-4 py-3">Student</th>
+            <th class="px-4 py-3">Class</th>
+            <th class="px-4 py-3">Subject</th>
+            <th class="px-4 py-3">Exam Title</th>
+            <th class="px-4 py-3">Score</th>
+            <th class="px-4 py-3">Started</th>
+            <th class="px-4 py-3">Finished</th>
+            <th class="px-4 py-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[#e2e8f0]">`;
     
     dataToRender.forEach((r, idx) => {
-      html += `<tr class="border-b hover:bg-[#f9fafc]">
-        <td class="p-3 font-bold text-[#2647a6]">${idx + 1}</td>
-        <td class="p-3">${r.studentName || 'N/A'}</td>
-        <td class="p-3">${r.className || 'N/A'}</td>
-        <td class="p-3">${r.subjectName || 'N/A'}</td>
-        <td class="p-3">${r.examTitle || 'N/A'}</td>
-        <td class="p-3 font-semibold text-green-600">${r.score || 0} / ${r.total || 0}</td>
-        <td class="p-3 text-sm">${r.startedAt ? new Date(r.startedAt).toLocaleString() : '-'}</td>
-        <td class="p-3 text-sm">${r.finishedAt ? new Date(r.finishedAt).toLocaleString() : '-'}</td>
-        <td class="p-3"><button class="text-blue-700" onclick="viewResult('${r._id}')"><i class="fa fa-eye"></i></button></td>
-        <td class="p-3"><button class="text-red-600" title="Delete Result" onclick="deleteResult('${r._id}')"><i class="fa fa-trash"></i></button></td>
+      html += `<tr class="hover:bg-[#f8f9fc] transition-colors">
+        <td class="px-4 py-3 font-bold text-[#2647a6]">${idx + 1}</td>
+        <td class="px-4 py-3 font-medium text-gray-900">${r.studentName || 'N/A'}</td>
+        <td class="px-4 py-3 text-gray-700">${r.className || 'N/A'}</td>
+        <td class="px-4 py-3 text-gray-700">${r.subjectName || 'N/A'}</td>
+        <td class="px-4 py-3 text-gray-700">${r.examTitle || 'N/A'}</td>
+        <td class="px-4 py-3 font-bold text-green-600">${r.score || 0} / ${r.total || 0}</td>
+        <td class="px-4 py-3 text-xs text-gray-600">${r.startedAt ? new Date(r.startedAt).toLocaleString() : '-'}</td>
+        <td class="px-4 py-3 text-xs text-gray-600">${r.finishedAt ? new Date(r.finishedAt).toLocaleString() : '-'}</td>
+        <td class="px-4 py-3 flex gap-2">
+          <button class="text-blue-600 hover:bg-blue-50 p-2 rounded transition" title="View Details" onclick="viewResult('${r._id}')"><i class="fa fa-eye"></i></button>
+          <button class="text-red-600 hover:bg-red-50 p-2 rounded transition" title="Delete" onclick="deleteResult('${r._id}')"><i class="fa fa-trash"></i></button>
+        </td>
       </tr>`;
     });
-    html += `</tbody></table>`;
+    html += `</tbody></table></div>`;
     table.innerHTML = html;
 
-    // Update PDF content
     document.getElementById('pdfContent').innerHTML = generatePDFContent(dataToRender);
   }
 
@@ -972,19 +1024,16 @@ async function showResults() {
     }
 
     try {
-      // Show loading state
       const exportBtn = event.target.closest('button');
       const originalHTML = exportBtn.innerHTML;
-      exportBtn.innerHTML = '<i class="fa fa-spinner fa-spin mr-1"></i> Generating PDF...';
+      exportBtn.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i> Generating...';
       exportBtn.disabled = true;
 
-      // Create container for html2pdf
       const element = document.createElement('div');
       element.innerHTML = pdfContent;
       element.style.padding = '20px';
       element.style.backgroundColor = '#ffffff';
 
-      // Configure html2pdf options
       const opt = {
         margin: [10, 10, 10, 10],
         filename: `exam-results-${new Date().toISOString().split('T')[0]}.pdf`,
@@ -1003,17 +1052,15 @@ async function showResults() {
         }
       };
 
-      // Generate and download PDF
       await html2pdf().set(opt).from(element).save();
 
-      // Restore button
       exportBtn.innerHTML = originalHTML;
       exportBtn.disabled = false;
     } catch (err) {
       console.error('PDF generation error:', err);
       alert('Error generating PDF: ' + err.message);
       const exportBtn = event.target.closest('button');
-      exportBtn.innerHTML = '<i class="fa fa-file-pdf mr-1"></i> Export PDF';
+      exportBtn.innerHTML = '<i class="fa fa-file-pdf mr-2"></i> Export PDF';
       exportBtn.disabled = false;
     }
   }
@@ -1024,7 +1071,6 @@ async function showResults() {
   document.getElementById('dateFromFilter').addEventListener('change', applyFilters);
   document.getElementById('dateToFilter').addEventListener('change', applyFilters);
 
-  // Initial render
   renderResultsTable(filteredResults);
 }
 
@@ -1032,46 +1078,68 @@ async function showResults() {
 async function showStudentActivity() {
   document.getElementById('pageTitle').textContent = 'Student Activity';
   document.getElementById('contentArea').innerHTML = `
-    <h2 class="text-2xl font-bold mb-5 text-[#22305a]">Student Activity</h2>
-    <div id="activityTable" class="overflow-auto"></div>
+    <h2 class="text-2xl font-bold mb-6 text-[#22305a]">Student Activity</h2>
+    <div class="flex items-center justify-center py-16 bg-gradient-to-br from-[#f8f9fb] to-[#eef2f8] rounded-xl border border-[#d4e0f1]">
+      <div class="text-center">
+        <i class="fa fa-spinner fa-spin fa-3x text-[#2647a6] mb-4"></i>
+        <p class="text-[#2647a6] font-semibold text-lg">Loading activity...</p>
+      </div>
+    </div>
   `;
   const acts = await fetch('https://goldlincschools.onrender.com/api/activity').then(r => r.json()).catch(() => []);
-  const table = document.getElementById('activityTable');
+  
   if (!Array.isArray(acts) || acts.length === 0) {
-    table.innerHTML = `<div class="text-center text-gray-500 mt-12">No activity found.</div>`; 
+    document.getElementById('contentArea').innerHTML = `
+      <h2 class="text-2xl font-bold mb-6 text-[#22305a]">Student Activity</h2>
+      <div class="text-center py-16 bg-gradient-to-br from-[#f8f9fb] to-[#eef2f8] rounded-xl border border-dashed border-[#cbd5e1]">
+        <i class="fa fa-inbox fa-3x text-gray-400 mb-4"></i>
+        <p class="text-gray-600 font-semibold text-lg">No activity found</p>
+      </div>
+    `;
     return;
   }
-  let html = `<table class="min-w-full border text-left">
-    <thead class="bg-[#f6f8fa] text-[#2647a6]">
-      <tr>
-        <th class="p-3">#</th>
-        <th class="p-3">Student</th>
-        <th class="p-3">Class</th>
-        <th class="p-3">Exam</th>
-        <th class="p-3">Started</th>
-        <th class="p-3">Finished</th>
-        <th class="p-3">Status</th>
-        <th class="p-3">Actions</th>
-      </tr>
-    </thead>
-    <tbody>`;
+
+  let html = `<div class="overflow-x-auto rounded-lg border border-[#e2e8f0] shadow-sm">
+    <table class="w-full text-left text-sm">
+      <thead class="bg-gradient-to-r from-[#2647a6] to-[#1d35a0] text-white font-semibold">
+        <tr>
+          <th class="px-4 py-3">#</th>
+          <th class="px-4 py-3">Student</th>
+          <th class="px-4 py-3">Class</th>
+          <th class="px-4 py-3">Exam</th>
+          <th class="px-4 py-3">Started</th>
+          <th class="px-4 py-3">Finished</th>
+          <th class="px-4 py-3">Status</th>
+          <th class="px-4 py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[#e2e8f0]">`;
+  
   for (let i = 0; i < acts.length; i++) {
     const a = acts[i];
-    html += `<tr class="border-b">
-      <td class="p-3 font-bold text-[#2647a6]">${i + 1}</td>
-      <td class="p-3">${a.studentName}</td>
-      <td class="p-3">${a.className}</td>
-      <td class="p-3">${a.examTitle}</td>
-      <td class="p-3">${a.startedAt ? new Date(a.startedAt).toLocaleString() : '-'}</td>
-      <td class="p-3">${a.finishedAt ? new Date(a.finishedAt).toLocaleString() : '-'}</td>
-      <td class="p-3">${a.status || ''}</td>
-      <td class="p-3">
-        <button title="View" class="text-blue-700" onclick="viewActivity('${a._id}')"><i class="fa fa-eye"></i></button>
+    html += `<tr class="hover:bg-[#f8f9fc] transition-colors">
+      <td class="px-4 py-3 font-bold text-[#2647a6]">${i + 1}</td>
+      <td class="px-4 py-3 font-medium text-gray-900">${a.studentName}</td>
+      <td class="px-4 py-3 text-gray-700">${a.className}</td>
+      <td class="px-4 py-3 text-gray-700">${a.examTitle}</td>
+      <td class="px-4 py-3 text-xs text-gray-600">${a.startedAt ? new Date(a.startedAt).toLocaleString() : '-'}</td>
+      <td class="px-4 py-3 text-xs text-gray-600">${a.finishedAt ? new Date(a.finishedAt).toLocaleString() : '-'}</td>
+      <td class="px-4 py-3">
+        <span class="px-3 py-1 rounded-full text-xs font-semibold ${a.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">
+          ${a.status || 'Pending'}
+        </span>
+      </td>
+      <td class="px-4 py-3">
+        <button class="text-blue-600 hover:bg-blue-50 p-2 rounded transition" title="View" onclick="viewActivity('${a._id}')"><i class="fa fa-eye"></i></button>
       </td>
     </tr>`;
   }
-  html += `</tbody></table>`;
-  table.innerHTML = html;
+  html += `</tbody></table></div>`;
+  
+  document.getElementById('contentArea').innerHTML = `
+    <h2 class="text-2xl font-bold mb-6 text-[#22305a]">Student Activity</h2>
+    ${html}
+  `;
 }
 
 // ============ ACTION HANDLERS ============
@@ -1080,41 +1148,50 @@ window.viewExam = async function(id) {
   const ex = await fetch(`https://goldlincschools.onrender.com/api/exam/${id}`).then(r=>r.json());
   if(ex.error){alert(ex.error); return;}
   
-  // ✅ Display exam code in detail view
   const codeDisplay = ex.examCode 
-    ? `<div class="mb-3 p-3 bg-blue-50 border border-blue-200 rounded">
-         <b>Exam Code:</b> 
-         <code style="background:#fff; padding:4px 8px; border-radius:3px; color:#2647a6; font-weight:bold; margin-left:8px;">
+    ? `<div class="mb-4 p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
+         <b class="text-gray-800">Exam Code:</b> 
+         <code class="ml-3 bg-white px-3 py-1 rounded text-blue-700 font-bold">
            ${ex.examCode}
          </code>
-         <button class="ml-2 px-2 py-1 bg-blue-600 text-white rounded text-xs" onclick="copyToClipboard('${ex.examCode}', this)">
-           <i class="fa fa-copy"></i> Copy
+         <button class="ml-3 px-3 py-1 bg-blue-600 text-white rounded text-sm font-semibold" onclick="copyToClipboard('${ex.examCode}', this)">
+           <i class="fa fa-copy mr-1"></i> Copy
          </button>
        </div>`
-    : '<div class="mb-3 text-gray-500">No code generated yet.</div>';
+    : '<div class="mb-4 text-gray-500">No code generated yet.</div>';
   
   document.getElementById('contentArea').innerHTML = `
-    <h2 class="text-2xl font-bold mb-5 text-[#22305a]">Exam Detail</h2>
-    <div class="mb-3"><b>Title:</b> ${ex.title}</div>
-    <div class="mb-3"><b>Class:</b> ${ex.className}</div>
-    <div class="mb-3"><b>Subject:</b> ${ex.subjectName}</div>
-    <div class="mb-3"><b>Duration:</b> ${ex.duration} mins</div>
-    <div class="mb-3"><b>Status:</b> ${ex.status}</div>
-    <div class="mb-3"><b>Scheduled:</b> ${ex.scheduledFor ? new Date(ex.scheduledFor).toLocaleString() : '-'}</div>
-    ${codeDisplay}
-    <div class="mb-3"><b>Questions:</b>${Array.isArray(ex.questions) ? ex.questions.map((q,i) => `
-      <div class="mb-2">
-        <b>Q${i+1} (${q.score||1} mark):</b> <div class="border rounded p-2 mb-1 bg-[#f9fafd]">${q.text}</div>
-        <div class="ml-3">Options:
-          <ol class="list-decimal ml-4">
-          ${(q.options||[]).map((o,oi)=>`<li class="${(Array.isArray(q.answer) ? q.answer.includes(oi) : oi==q.answer)?'text-green-700 font-bold':''}">${o.value || o}</li>`).join('')}
-          </ol>
-        </div>
-        <div class="ml-3">Correct: <b>${Array.isArray(q.answer) ? q.answer.map(idx => String.fromCharCode(65 + idx)).join(', ') : String.fromCharCode(65 + (q.answer||0))}</b></div>
-      </div>
-    `).join('') : ''}
+    <div class="mb-6">
+      <button class="text-blue-600 hover:text-blue-800 font-semibold mb-4" onclick="showExams()"><i class="fa fa-arrow-left mr-2"></i>Back to Exams</button>
+      <h2 class="text-2xl font-bold text-[#22305a]">Exam Detail</h2>
     </div>
-    <button class="cbt-btn" onclick="showExams()"><i class="fa fa-arrow-left mr-1"></i> Back to Exams</button>
+    <div class="max-w-3xl bg-white rounded-lg border border-gray-200 p-6 space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><b class="text-gray-700">Title:</b> <span class="text-gray-900">${ex.title}</span></div>
+        <div><b class="text-gray-700">Class:</b> <span class="text-gray-900">${ex.className}</span></div>
+        <div><b class="text-gray-700">Subject:</b> <span class="text-gray-900">${ex.subjectName}</span></div>
+        <div><b class="text-gray-700">Duration:</b> <span class="text-gray-900">${ex.duration} mins</span></div>
+        <div><b class="text-gray-700">Status:</b> <span class="px-3 py-1 rounded-full text-xs font-semibold ${ex.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${ex.status}</span></div>
+        <div><b class="text-gray-700">Scheduled:</b> <span class="text-gray-900">${ex.scheduledFor ? new Date(ex.scheduledFor).toLocaleString() : '-'}</span></div>
+      </div>
+      ${codeDisplay}
+    </div>
+    <div class="mt-8">
+      <h3 class="text-xl font-bold text-[#22305a] mb-4">Questions (${Array.isArray(ex.questions) ? ex.questions.length : 0})</h3>
+      ${Array.isArray(ex.questions) ? ex.questions.map((q,i) => `
+        <div class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+          <div class="font-bold text-lg text-[#22305a] mb-2">Q${i+1} <span class="text-sm font-normal text-gray-600">(${q.score||1} mark)</span></div>
+          <div class="mb-3 p-3 bg-white rounded border border-gray-200">${q.text}</div>
+          <div class="ml-4">
+            <div class="font-semibold text-gray-700 mb-2">Options:</div>
+            <ol class="list-decimal ml-5 space-y-1">
+            ${(q.options||[]).map((o,oi)=>`<li class="${(Array.isArray(q.answer) ? q.answer.includes(oi) : oi==q.answer)?'text-green-700 font-bold bg-green-50 px-2 py-1 rounded':''}">${o.value || o}</li>`).join('')}
+            </ol>
+          </div>
+          <div class="ml-4 mt-3 text-sm"><span class="font-semibold text-gray-700">Correct:</span> <b class="text-green-600">${Array.isArray(q.answer) ? q.answer.map(idx => String.fromCharCode(65 + idx)).join(', ') : String.fromCharCode(65 + (q.answer||0))}</b></div>
+        </div>
+      `).join('') : ''}
+    </div>
   `;
 }
 
@@ -1141,16 +1218,27 @@ window.viewResult = async function(id) {
   const r = await fetch(`https://goldlincschools.onrender.com/api/result/${id}`).then(r=>r.json());
   if(r.error){alert(r.error); return;}
   document.getElementById('contentArea').innerHTML = `
-    <h2 class="text-2xl font-bold mb-5 text-[#22305a]">Result Detail</h2>
-    <div class="mb-3"><b>Student:</b> ${r.studentName}</div>
-    <div class="mb-3"><b>Class:</b> ${r.className}</div>
-    <div class="mb-3"><b>Subject:</b> ${r.subjectName}</div>
-    <div class="mb-3"><b>Exam Title:</b> ${r.examTitle}</div>
-    <div class="mb-3"><b>Score:</b> <span class="text-green-600 font-bold">${r.score} / ${r.total}</span></div>
-    <div class="mb-3"><b>Started:</b> ${r.startedAt ? new Date(r.startedAt).toLocaleString() : '-'}</div>
-    <div class="mb-3"><b>Finished:</b> ${r.finishedAt ? new Date(r.finishedAt).toLocaleString() : '-'}</div>
-    <div class="mb-3"><b>Answers:</b><pre class="bg-[#f8fafc] rounded p-3 text-sm overflow-auto">${JSON.stringify(r.answers, null, 2)}</pre></div>
-    <button class="cbt-btn" onclick="showResults()"><i class="fa fa-arrow-left mr-1"></i> Back to Results</button>
+    <div class="mb-6">
+      <button class="text-blue-600 hover:text-blue-800 font-semibold mb-4" onclick="showResults()"><i class="fa fa-arrow-left mr-2"></i>Back to Results</button>
+      <h2 class="text-2xl font-bold text-[#22305a]">Result Detail</h2>
+    </div>
+    <div class="max-w-3xl bg-white rounded-lg border border-gray-200 p-6 space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><b class="text-gray-700">Student:</b> <span class="text-gray-900">${r.studentName}</span></div>
+        <div><b class="text-gray-700">Class:</b> <span class="text-gray-900">${r.className}</span></div>
+        <div><b class="text-gray-700">Subject:</b> <span class="text-gray-900">${r.subjectName}</span></div>
+        <div><b class="text-gray-700">Exam Title:</b> <span class="text-gray-900">${r.examTitle}</span></div>
+        <div><b class="text-gray-700">Started:</b> <span class="text-gray-900 text-sm">${r.startedAt ? new Date(r.startedAt).toLocaleString() : '-'}</span></div>
+        <div><b class="text-gray-700">Finished:</b> <span class="text-gray-900 text-sm">${r.finishedAt ? new Date(r.finishedAt).toLocaleString() : '-'}</span></div>
+      </div>
+      <div class="pt-4 border-t border-gray-200">
+        <div class="text-lg"><b class="text-gray-700">Score:</b> <span class="text-green-600 font-bold text-2xl">${r.score} / ${r.total}</span></div>
+      </div>
+    </div>
+    <div class="mt-8">
+      <h3 class="text-xl font-bold text-[#22305a] mb-4">Student Answers</h3>
+      <pre class="bg-gray-100 rounded-lg p-6 overflow-auto text-sm text-gray-800 border border-gray-300">${JSON.stringify(r.answers, null, 2)}</pre>
+    </div>
   `;
 }
 
@@ -1168,15 +1256,24 @@ window.viewActivity = async function(id) {
   const a = await fetch(`https://goldlincschools.onrender.com/api/activity/${id}`).then(r=>r.json());
   if(a.error){alert(a.error); return;}
   document.getElementById('contentArea').innerHTML = `
-    <h2 class="text-2xl font-bold mb-5 text-[#22305a]">Student Activity Detail</h2>
-    <div class="mb-3"><b>Student:</b> ${a.studentName}</div>
-    <div class="mb-3"><b>Class:</b> ${a.className}</div>
-    <div class="mb-3"><b>Exam:</b> ${a.examTitle}</div>
-    <div class="mb-3"><b>Started:</b> ${a.startedAt ? new Date(a.startedAt).toLocaleString() : '-'}</div>
-    <div class="mb-3"><b>Finished:</b> ${a.finishedAt ? new Date(a.finishedAt).toLocaleString() : '-'}</div>
-    <div class="mb-3"><b>Status:</b> ${a.status}</div>
-    <div class="mb-3"><b>Activity Log:</b><pre class="bg-[#f8fafc] rounded p-3 text-sm overflow-auto">${JSON.stringify(a.activityLog, null, 2)}</pre></div>
-    <button class="cbt-btn" onclick="showStudentActivity()"><i class="fa fa-arrow-left mr-1"></i> Back to Activity</button>
+    <div class="mb-6">
+      <button class="text-blue-600 hover:text-blue-800 font-semibold mb-4" onclick="showStudentActivity()"><i class="fa fa-arrow-left mr-2"></i>Back to Activity</button>
+      <h2 class="text-2xl font-bold text-[#22305a]">Student Activity Detail</h2>
+    </div>
+    <div class="max-w-3xl bg-white rounded-lg border border-gray-200 p-6 space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><b class="text-gray-700">Student:</b> <span class="text-gray-900">${a.studentName}</span></div>
+        <div><b class="text-gray-700">Class:</b> <span class="text-gray-900">${a.className}</span></div>
+        <div><b class="text-gray-700">Exam:</b> <span class="text-gray-900">${a.examTitle}</span></div>
+        <div><b class="text-gray-700">Status:</b> <span class="px-3 py-1 rounded-full text-xs font-semibold ${a.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${a.status}</span></div>
+        <div><b class="text-gray-700">Started:</b> <span class="text-gray-900 text-sm">${a.startedAt ? new Date(a.startedAt).toLocaleString() : '-'}</span></div>
+        <div><b class="text-gray-700">Finished:</b> <span class="text-gray-900 text-sm">${a.finishedAt ? new Date(a.finishedAt).toLocaleString() : '-'}</span></div>
+      </div>
+    </div>
+    <div class="mt-8">
+      <h3 class="text-xl font-bold text-[#22305a] mb-4">Activity Log</h3>
+      <pre class="bg-gray-100 rounded-lg p-6 overflow-auto text-sm text-gray-800 border border-gray-300">${JSON.stringify(a.activityLog, null, 2)}</pre>
+    </div>
   `;
 }
 
