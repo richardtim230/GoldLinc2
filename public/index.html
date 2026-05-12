@@ -1,1113 +1,259 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Gold and Linc Schools</title>
-  <meta name="viewport" content="width=device-width, initial-scale=0.80">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Inter + Playfair Display for academic elegance -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<!-- FontAwesome (if not already included) -->
+  
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- TopBar -->
+  <div class="topbar">
+    <div class="school-logo">
+      <img src="logo-1679575828 (1).jpeg" alt="Gold and Linc Schools Logo">
+    </div>
+    <span class="school-name">Gold and Linc Schools</span>
+  </div>
+  <!-- Navigation -->
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="brand">MENU</div>
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+      <i class="fa fa-bars"></i>
+    </button>
+    <ul class="nav-list" id="navList">
+      <li><a href="login.html" class="nav-portal">Portal Login <i class="fa fa-sign-in-alt"></i></a></li>
+      <li><a href="#" class="active">Home</a></li>
+      <li><a href="#">Admission</a></li>
+      <li><a href="#">Research</a></li>
+      <li><a href="#">Student</a></li>
+      <li><a href="#">Programs</a></li>
+      <li><a href="#">Administration</a></li>
+      <li><a href="#">Links</a></li>
+      <li><a href="#">Notice</a></li>
+      <li><a href="#">About Us</a></li>
+      
+    </ul>
+  </div>
+</nav>
+
+
+  
+  
+  <!-- Hero Section -->
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-overlay"></div>
+  <div class="hero-images">
+    <img src="slider_image_01-1679459700.png?auto=format&fit=crop&w=1400&q=80" class="hero-img active" alt="Hero 1">
+    <img src="images (3).jpeg?auto=format&fit=crop&w=1400&q=80" class="hero-img" alt="Hero 2">
+    <img src="student in the lab 900 x 600.webp?auto=format&fit=crop&w=1400&q=80" class="hero-img" alt="Hero 3">
+  </div>
+  <div class="hero-content">
+    <h1 class="hero-title">Gold & Linc Schools</h1>
+    <p class="hero-subtitle">Behind Irenitemi Hotel, Testing Ground Area<br>Off Osogbo Road, Ilesa, Osun State</p>
+    <p class="hero-motto">“For A Solid Begining.”</p>
+  </div>
+</div>
+<!-- Carousel Section -->
+<section class="carousel-section">
+  <div class="carousel-images" id="carouselImages" style="position:relative;">
+    <div class="carousel-slide">
+      <img class="carousel-image" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80" alt="Campus 1">
+      <div class="carousel-caption">
+        <div class="caption-title">Gold and Linc Schools Welcomes New Students!</div>
+        <div class="caption-text">Orientation for the 2025/2026 Academic Year was a huge success.</div>
+      </div>
+    </div>
+    <div class="carousel-slide">
+      <img class="carousel-image" src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1200&q=80" alt="Campus 2">
+      <div class="carousel-caption">
+        <div class="caption-title">Science Fair 2025</div>
+        <div class="caption-text">Students impress judges with innovative projects and experiments.</div>
+      </div>
+    </div>
+    <div class="carousel-slide">
+      <img class="carousel-image" src="https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=1200&q=80" alt="Event 1">
+      <div class="carousel-caption">
+        <div class="caption-title">Annual Sports Day Highlights</div>
+        <div class="caption-text">Inter-house competitions foster teamwork and school spirit.</div>
+      </div>
+    </div>
+    <div class="carousel-slide">
+      <img class="carousel-image" src="https://images.unsplash.com/photo-1517520287167-4bbf64a00d66?auto=format&fit=crop&w=1200&q=80" alt="Graduation">
+      <div class="carousel-caption">
+        <div class="caption-title">Congratulations to Our Graduates</div>
+        <div class="caption-text">Celebrating excellence and achievement in academics.</div>
+      </div>
+    </div>
+  </div>
+  <div class="carousel-controls">
+    <button class="carousel-btn" id="carouselPrev"><i class="fa fa-chevron-left"></i></button>
+    <button class="carousel-btn" id="carouselNext"><i class="fa fa-chevron-right"></i></button>
+  </div>
+  <div class="carousel-dots" id="carouselDots"></div>
   <style>
-    :root {
-      --navy: #061728;
-      --green: #217353;
-      --gold: #ffe08a;
-      --white: #ffffff;
-      --muted: rgba(255,255,255,0.85);
-      --panel-mid: #213a55;
-      --panel-right: #566770;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    html, body {
-      overflow-x: hidden;
-      scroll-behavior: smooth;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      color: var(--white);
-      background: #000;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-
-    /* ================= HEADER ================= */
-    header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 99px;
-      background: var(--navy);
-      z-index: 1000;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-
-    .nav-container {
-      max-width: 1400px;
-      height: 100%;
-      margin: 0 auto;
-      padding: 0 40px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 30px;
-      font-weight: 700;
-      color: var(--gold);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .logo img {
-      height: 50px;
-      width: auto;
-    }
-
-    nav {
-      display: flex;
-      align-items: center;
-      gap: 22px;
-    }
-
-    nav ul {
-      list-style: none;
-      display: flex;
-      gap: 34px;
-      font-size: 14px;
-      font-weight: 500;
-      margin: 0;
-      padding: 0;
-    }
-
-    nav a {
-      color: var(--white);
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-
-    nav a:hover {
-      color: var(--gold);
-    }
-
-    .nav-cta {
-      background: var(--gold);
-      color: var(--navy);
-      padding: 16px 28px;
-      font-size: 13px;
-      font-weight: 600;
-      text-decoration: none;
-      border-radius: 4px;
-      transition: all 0.3s;
-    }
-
-    .nav-cta:hover {
-      box-shadow: 0 6px 20px rgba(255,224,138,0.2);
-      transform: translateY(-2px);
-    }
-
-    .nav-login-btn {
-      background: var(--white);
-      color: var(--navy);
-      padding: 14px 24px;
-      font-size: 13px;
-      font-weight: 600;
-      text-decoration: none;
-      border-radius: 4px;
-      border: 1px solid var(--navy);
-      transition: all 0.3s;
-    }
-
-    .nav-login-btn:hover {
-      background: var(--navy);
-      color: var(--white);
-      box-shadow: 0 6px 20px rgba(6,23,40,0.12);
-    }
-
-    /* Mobile menu toggle */
-    .nav-toggle {
-      display: none;
-      background: transparent;
-      border: none;
-      padding: 8px;
-      cursor: pointer;
-      color: var(--white);
-      z-index: 1101;
-    }
-
-    .nav-toggle svg .line {
-      fill: var(--white);
-      transition: transform 0.28s ease, opacity 0.18s ease;
-    }
-
-    /* ================= HERO ================= */
-    .hero {
-      min-height: 100vh;
-      padding-top: 96px;
-      background: linear-gradient(rgba(6,23,40,0.72), rgba(6,23,40,0.72)), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 600'%3E%3Crect fill='%23061728' width='1200' height='600'/%3E%3C/svg%3E");
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      display: flex;
-      align-items: center;
-      position: relative;
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: radial-gradient(circle at 20% 50%, rgba(33,115,83,0.1) 0%, transparent 50%),
-                  radial-gradient(circle at 80% 80%, rgba(14,74,48,0.1) 0%, transparent 50%);
-      pointer-events: none;
-    }
-
-    .hero-inner {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 40px;
-      width: 100%;
-      position: relative;
-      z-index: 1;
-    }
-
-    .breadcrumb {
-      color: var(--gold);
-      font-size: 14px;
-      margin-bottom: 28px;
-      letter-spacing: 0.5px;
-    }
-
-    .hero h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 64px;
-      font-weight: 600;
-      margin-bottom: 18px;
-      color: var(--white);
-      text-shadow: 0 2px 6px rgba(0,0,0,0.5);
-    }
-
-    .hero h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 24px;
-      font-weight: 400;
-      margin-bottom: 34px;
-      color: var(--white);
-    }
-
-    .hero p {
-      max-width: 640px;
-      font-size: 17px;
-      line-height: 1.75;
-      color: var(--muted);
-      margin-bottom: 44px;
-    }
-
-    .hero-location {
-      font-size: 14px;
-      color: var(--gold);
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* ================= BUTTONS ================= */
-    .hero-actions {
-      display: flex;
-      gap: 22px;
-      margin-bottom: 90px;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      padding: 16px 34px;
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      border: none;
-      border-radius: 4px;
-      transition: all 0.3s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn-primary {
-      background: var(--gold);
-      color: var(--navy);
-    }
-
-    .btn-primary:hover {
-      box-shadow: 0 8px 25px rgba(255,224,138,0.3);
-      transform: translateY(-2px);
-    }
-
-    .btn-outline {
-      background: transparent;
-      color: var(--white);
-      border: 1px solid rgba(255,255,255,0.6);
-    }
-
-    .btn-outline:hover {
-      background: rgba(255,255,255,0.1);
-      border-color: var(--white);
-    }
-
-    /* ================= STATS ================= */
-    .stats {
-      display: flex;
-      gap: 80px;
-      font-family: 'Playfair Display', serif;
-      margin-bottom: 28px;
-      align-items: baseline;
-      flex-wrap: wrap;
-    }
-
-    .stats > div {
-      text-align: center;
-    }
-
-    .stat-number {
-      font-size: 34px;
-      font-weight: 700;
-      margin-bottom: 6px;
-      color: var(--white);
-      letter-spacing: 0.4px;
-    }
-
-    .stat-label {
-      font-size: 16px;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      opacity: 0.95;
-      color: var(--muted);
-    }
-
-    /* ================= PANELS ================= */
-    .hero-panels {
-      display: flex;
-      width: 100vw;
-      margin-left: calc(50% - 50vw);
-      gap: 0;
-      overflow: hidden;
-      box-sizing: border-box;
-      border-top: 4px solid rgba(255,255,255,0.02);
-    }
-
-    .panel {
-      flex: 1;
-      padding: 64px 72px;
-      min-height: 260px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .panel--left {
-      background: var(--gold);
-      color: var(--navy);
-    }
-
-    .panel--mid {
-      background: var(--green);
-      color: var(--white);
-      border-left: 4px solid rgba(0,0,0,0.06);
-    }
-
-    .panel--right {
-      background: #0e4a30;
-      color: var(--white);
-      border-left: 4px solid rgba(0,0,0,0.05);
-    }
-
-    .panel h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 18px;
-      color: inherit;
-    }
-
-    .panel p {
-      font-size: 16px;
-      line-height: 1.8;
-      max-width: 520px;
-      margin-bottom: 28px;
-      opacity: 0.98;
-      color: inherit;
-    }
-
-    .discover-btn {
-      display: inline-block;
-      padding: 14px 28px;
-      text-decoration: none;
-      font-weight: 700;
-      letter-spacing: 0.6px;
-      background: transparent;
-      cursor: pointer;
-      border-radius: 3px;
-      transition: all 0.3s;
-    }
-
-    .panel--left .discover-btn {
-      color: var(--navy);
-      border: 2px solid rgba(6,23,40,0.14);
-      background: rgba(255,255,255,0.02);
-    }
-
-    .panel--left .discover-btn:hover {
-      background: rgba(255,255,255,0.1);
-    }
-
-    .panel--mid .discover-btn,
-    .panel--right .discover-btn {
-      color: var(--white);
-      border: 2px solid rgba(255,255,255,0.18);
-      background: rgba(255,255,255,0.02);
-    }
-
-    .panel--mid .discover-btn:hover,
-    .panel--right .discover-btn:hover {
-      background: rgba(255,255,255,0.1);
-    }
-
-    /* ================= SECTIONS ================= */
-    section {
-      padding: 72px 0;
-    }
-
-    .section-container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 40px;
-    }
-
-    /* Carousel Section */
-    .carousel-section {
-      background: #f8f9fb;
-      color: #0b2033;
-    }
-
-    .carousel-wrapper {
-      position: relative;
-      overflow: hidden;
-      border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-    }
-
-    .carousel-images {
-      display: flex;
-      transition: transform 0.6s ease-in-out;
-    }
-
     .carousel-slide {
       min-width: 100%;
       position: relative;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
     }
-
-    .carousel-image {
-      width: 100%;
-      height: 400px;
-      object-fit: cover;
-      display: block;
-    }
-
     .carousel-caption {
       position: absolute;
-      left: 50%;
-      top: 50%;
+      left: 50%; top: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(33, 115, 83, 0.9);
+      background: rgba(33, 115, 83, 0.77);
       color: #fff;
       text-align: center;
       border-radius: 13px;
-      padding: 28px 32px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      padding: 18px 22px 13px 22px;
+      box-shadow: 0 3px 22px #0004;
       z-index: 2;
-      max-width: 85vw;
-      min-width: 250px;
-      animation: fadeInCaption 0.6s;
+      max-width: 89vw;
+      min-width: 180px;
+      width: 65vw;
+      animation: fadeInCaption .6s;
     }
-
-    @keyframes fadeInCaption {
-      from {
-        opacity: 0;
-        transform: translate(-50%, -35%);
-      }
-      to {
-        opacity: 1;
-        transform: translate(-50%, -50%);
-      }
-    }
-
+    @keyframes fadeInCaption { from { opacity:0;transform:translate(-50%,-40%);} to{opacity:1;transform:translate(-50%,-50%);} }
     .carousel-caption .caption-title {
       font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
+      font-size: 1.30rem;
       font-weight: 800;
-      margin-bottom: 8px;
-      color: var(--gold);
-      letter-spacing: 0.01em;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      margin-bottom: 5px;
+      color: #ffe08a;
+      letter-spacing: .01em;
+      text-shadow:0 1px 7px #0e3b1f77;
     }
-
     .carousel-caption .caption-text {
-      font-size: 1.05rem;
+      font-size: 1.01rem;
       color: #fffce7;
       font-weight: 500;
-      text-shadow: 0 1px 6px rgba(0,0,0,0.2);
+      text-shadow:0 1px 5px #0e3b1f55;
     }
-
-    .carousel-controls {
-      position: absolute;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 12px;
-      z-index: 3;
+    @media (max-width: 700px) {
+      .carousel-caption { padding: 10px 6vw 8px 6vw; width: 89vw; font-size:.99rem; }
+      .carousel-caption .caption-title {font-size:1.08rem;}
+      .carousel-caption .caption-text {font-size:.97rem;}
     }
-
-    .carousel-btn {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.9);
-      border: none;
-      cursor: pointer;
-      color: var(--navy);
-      font-size: 18px;
-      transition: all 0.3s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .carousel-btn:hover {
-      background: var(--gold);
-      transform: scale(1.1);
-    }
-
-    .carousel-dots {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      padding: 20px;
-      background: rgba(0,0,0,0.02);
-    }
-
-    .carousel-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: rgba(0,0,0,0.2);
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .carousel-dot.active {
-      background: var(--green);
-      width: 28px;
-      border-radius: 5px;
-    }
-
-    /* Stats Section */
-    .stats-section {
-      background: linear-gradient(135deg, #217353 0%, #0e4a30 100%);
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 40px;
-    }
-
-    .stat-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 40px 20px;
-    }
-
-    .stat-icon {
-      font-size: 48px;
-      color: var(--gold);
-      margin-bottom: 16px;
-    }
-
-    .stat-value {
-      font-family: 'Playfair Display', serif;
-      font-size: 36px;
-      font-weight: 700;
-      color: var(--white);
-      margin-bottom: 8px;
-    }
-
-    .stat-label {
-      font-size: 14px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    /* About Section */
-    .about-section {
-      background: #f8f9fb;
-      color: #0b2033;
-    }
-
-    .about-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-      align-items: center;
-    }
-
-    .about-main h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 36px;
-      font-weight: 700;
-      margin-bottom: 24px;
-      color: var(--navy);
-    }
-
-    .about-main p {
-      font-size: 16px;
-      line-height: 1.8;
-      margin-bottom: 24px;
-      color: #374151;
-    }
-
-    .about-list {
-      list-style: none;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-
-    .about-list li {
-      padding: 12px 0;
-      padding-left: 32px;
-      position: relative;
-      color: #0b2033;
-      font-weight: 500;
-    }
-
-    .about-list li::before {
-      content: '✓';
-      position: absolute;
-      left: 0;
-      color: var(--green);
-      font-weight: bold;
-      font-size: 20px;
-    }
-
-    .quick-links-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-    }
-
-    .quick-link {
-      padding: 16px;
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      text-decoration: none;
-      color: var(--navy);
-      font-weight: 600;
-      font-size: 14px;
-      transition: all 0.3s;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .quick-link:hover {
-      background: var(--green);
-      color: white;
-      border-color: var(--green);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(33,115,83,0.2);
-    }
-
-    /* Gallery Section */
-    .gallery-section {
-      background: var(--white);
-      color: #0b2033;
-    }
-
-    .gallery-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 36px;
-      font-weight: 700;
-      margin-bottom: 48px;
-      text-align: center;
-      color: var(--navy);
-    }
-
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 24px;
-    }
-
-    .gallery-img {
-      width: 100%;
-      height: 250px;
-      object-fit: cover;
-      border-radius: 12px;
-      transition: all 0.3s;
-      cursor: pointer;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-    }
-
-    .gallery-img:hover {
-      transform: scale(1.05);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-    }
-
-    /* Testimonials */
-    .testimonial-section {
-      background: #f8f9fb;
-      color: #0b2033;
-    }
-
-    .testimonial-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 36px;
-      font-weight: 700;
-      margin-bottom: 48px;
-      text-align: center;
-      color: var(--navy);
-    }
-
-    .testimonial-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 32px;
-    }
-
-    .testimonial-card {
-      background: white;
-      padding: 32px;
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-      transition: all 0.3s;
-    }
-
-    .testimonial-card:hover {
-      box-shadow: 0 12px 40px rgba(0,0,0,0.12);
-      transform: translateY(-4px);
-    }
-
-    .testimonial-quote {
-      font-size: 16px;
-      line-height: 1.8;
-      color: #374151;
-      margin-bottom: 24px;
-      font-style: italic;
-    }
-
-    .testimonial-person {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .testimonial-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .testimonial-name {
-      font-weight: 600;
-      color: var(--navy);
-    }
-
-    .testimonial-role {
-      font-size: 13px;
-      color: #6b7280;
-    }
-
-    /* Footer */
-    .footer {
-      background: linear-gradient(90deg, #217353 0%, #0e4a30 100%);
-      color: var(--white);
-      padding: 56px 0 24px 0;
-      border-top: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .footer-content {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 48px;
-      margin-bottom: 32px;
-    }
-
-    .footer-section h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 18px;
-      margin-bottom: 16px;
-      color: var(--gold);
-    }
-
-    .footer-links {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .footer-links a {
-      color: var(--muted);
-      text-decoration: none;
-      transition: all 0.3s;
-      font-size: 14px;
-    }
-
-    .footer-links a:hover {
-      color: var(--gold);
-      padding-left: 8px;
-    }
-
-    .footer-copy {
-      text-align: center;
-      padding-top: 24px;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      color: rgba(255,255,255,0.7);
-      font-size: 14px;
-    }
-
-    /* ================= RESPONSIVE ================= */
-    @media (max-width: 1100px) {
-      .hero h1 { font-size: 44px; }
-      .hero h2 { font-size: 20px; }
-      .stats { gap: 36px; }
-      .hero-panels { flex-direction: column; }
-      .panel { padding: 40px 28px; }
-      .about-grid { grid-template-columns: 1fr; gap: 40px; }
-    }
-
-    @media (max-width: 980px) {
-      .nav-toggle { display: inline-flex; align-items: center; justify-content: center; }
-
-      nav {
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 99px;
-        background: var(--navy);
-        padding: 18px 20px;
-        display: none;
-        flex-direction: column;
-        gap: 12px;
-        box-shadow: 0 18px 40px rgba(2,11,24,0.2);
-        z-index: 1100;
-      }
-
-      nav.open {
-        display: flex;
-        animation: navFade 0.18s ease both;
-      }
-
-      @keyframes navFade {
-        from { opacity: 0; transform: translateY(-6px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-
-      nav ul {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-      }
-
-      .nav-cta {
-        align-self: stretch;
-        display: inline-flex;
-        justify-content: center;
-      }
-
-      .nav-toggle.open svg .line:nth-child(1) {
-        transform: translateY(5px) rotate(45deg);
-      }
-      .nav-toggle.open svg .line:nth-child(2) {
-        opacity: 0;
-      }
-      .nav-toggle.open svg .line:nth-child(3) {
-        transform: translateY(-5px) rotate(-45deg);
-      }
-
-      body.no-scroll {
-        overflow: hidden;
-      }
-
-      .logo { font-size: 24px; }
-      .logo img { height: 40px; }
-    }
-
-    @media (max-width: 520px) {
-      .hero {
-        padding-top: 80px;
-        min-height: auto;
-      }
-
-      .hero h1 { font-size: 32px; }
-      .hero p { font-size: 15px; }
-      .hero-actions { flex-direction: column; gap: 12px; }
-      .stat-number { font-size: 24px; }
-      .stat-label { font-size: 13px; }
-      .panel { padding: 32px 20px; }
-      .panel h3 { font-size: 22px; }
-      .panel p { font-size: 14px; }
-      .section-container { padding: 0 20px; }
-      .carousel-image { height: 280px; }
-      .carousel-caption { padding: 20px; }
-      .carousel-caption .caption-title { font-size: 1.1rem; }
-      .about-list { gap: 12px; }
-      .quick-links-grid { grid-template-columns: 1fr; }
+    @media (max-width:400px){
+      .carousel-caption{padding:6px 2vw 5px 2vw;}
+      .carousel-caption .caption-title {font-size:1rem;}
     }
   </style>
-</head>
-
-<body>
-
-<!-- HEADER -->
-<header>
-  <div class="nav-container">
-    <div class="logo">
-      <img src="logo-1679575828 (1).jpeg" alt="Gold and Linc Schools">
-      <span>Gold & Linc</span>
-    </div>
-
-    <button class="nav-toggle" aria-controls="main-nav" aria-expanded="false" aria-label="Open menu">
-      <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
-        <rect class="line" x="3" y="6" width="18" height="2" rx="1"></rect>
-        <rect class="line" x="3" y="11" width="18" height="2" rx="1"></rect>
-        <rect class="line" x="3" y="16" width="18" height="2" rx="1"></rect>
-      </svg>
-    </button>
-
-    <nav id="main-nav" aria-label="Primary navigation">
-      <ul>
-        <li><a href="#about">About Us</a></li>
-        <li><a href="#programs">Programs</a></li>
-        <li><a href="#gallery">Gallery</a></li>
-        <li><a href="#testimonials">Testimonials</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-      <a class="nav-cta" href="#inquiry">Inquiry</a>
-      <a class="nav-login-btn" href="login.html">Portal Login</a>
-    </nav>
-  </div>
-</header>
-
-<!-- HERO SECTION -->
-<section class="hero">
-  <div class="hero-inner">
-    <div class="hero-location">
-      <i class="fas fa-map-marker-alt"></i>
-      Behind Irenitemi Hotel, Ilesa, Osun State
-    </div>
-
-    <h1>Gold & Linc Schools</h1>
-    <h2>Learn with passion. Live with intention.</h2>
-
-    <p>
-      For a solid beginning in academic excellence and personal development. Gold & Linc Schools is committed to nurturing talent, fostering innovation, and advancing research in technology and the sciences through a dynamic faculty and state-of-the-art facilities.
-    </p>
-
-    <div class="hero-actions">
-      <button class="btn btn-primary">
-        <i class="fas fa-envelope"></i> Inquiry
-      </button>
-      <button class="btn btn-outline">
-        <i class="fas fa-book"></i> Our Programs
-      </button>
-    </div>
-
-    <div class="stats">
-      <div>
-        <div class="stat-number">5,420</div>
-        <div class="stat-label">Total Graduates</div>
-      </div>
-      <div>
-        <div class="stat-number">2,840</div>
-        <div class="stat-label">Current Students</div>
-      </div>
-      <div>
-        <div class="stat-number">185</div>
-        <div class="stat-label">Faculty Members</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- THREE-PANEL SECTION -->
-  <div class="hero-panels">
-    <div class="panel panel--left">
-      <h3>Academic Excellence</h3>
-      <p>
-        Our curriculum is designed to foster critical thinking, creativity, and collaboration. With state-of-the-art laboratories and cutting-edge learning resources, we empower students to excel in their academic pursuits.
-      </p>
-      <a class="discover-btn" href="#about">Discover More</a>
-    </div>
-
-    <div class="panel panel--mid">
-      <h3>Our Programs</h3>
-      <p>
-        Explore our diverse range of programs including Science, Technology, Humanities, and professional development courses. Each program is tailored to inspire curiosity and prepare students for global success.
-      </p>
-      <a class="discover-btn" href="#programs">Discover More</a>
-    </div>
-
-    <div class="panel panel--right">
-      <h3>Student Life</h3>
-      <p>
-        Beyond the classroom, our vibrant community offers student clubs, sports, cultural events, and mentorship programs. We cultivate an environment where every student can discover their passion and unlock their potential.
-      </p>
-      <a class="discover-btn" href="#events">Discover More</a>
-    </div>
-  </div>
+  
 </section>
-
-<!-- CAROUSEL SECTION -->
-<section class="carousel-section">
-  <div class="section-container">
-    <div class="carousel-wrapper">
-      <div class="carousel-images" id="carouselImages">
-        <div class="carousel-slide">
-          <img class="carousel-image" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80" alt="Campus">
-          <div class="carousel-caption">
-            <div class="caption-title">Welcome to Our Campus</div>
-            <div class="caption-text">Experience excellence in a vibrant learning environment</div>
-          </div>
-        </div>
-        <div class="carousel-slide">
-          <img class="carousel-image" src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1200&q=80" alt="Science Fair">
-          <div class="carousel-caption">
-            <div class="caption-title">Science Fair 2025</div>
-            <div class="caption-text">Students showcase innovative projects and groundbreaking research</div>
-          </div>
-        </div>
-        <div class="carousel-slide">
-          <img class="carousel-image" src="https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=1200&q=80" alt="Sports">
-          <div class="carousel-caption">
-            <div class="caption-title">Annual Sports Day</div>
-            <div class="caption-text">Celebrating teamwork, discipline, and school spirit</div>
-          </div>
-        </div>
-        <div class="carousel-slide">
-          <img class="carousel-image" src="https://images.unsplash.com/photo-1517520287167-4bbf64a00d66?auto=format&fit=crop&w=1200&q=80" alt="Graduation">
-          <div class="carousel-caption">
-            <div class="caption-title">Celebrating Success</div>
-            <div class="caption-text">Honoring graduates and their achievements</div>
-          </div>
-        </div>
-      </div>
-      <div class="carousel-controls">
-        <button class="carousel-btn" id="carouselPrev"><i class="fas fa-chevron-left"></i></button>
-        <button class="carousel-btn" id="carouselNext"><i class="fas fa-chevron-right"></i></button>
-      </div>
-    </div>
-    <div class="carousel-dots" id="carouselDots"></div>
-  </div>
-</section>
-
-<!-- STATS SECTION -->
-<section class="stats-section" id="stats">
-  <div class="section-container">
+  <!-- Stats Section -->
+  <section class="stats-section">
     <div class="stat-card">
-      <span class="stat-icon"><i class="fas fa-graduation-cap"></i></span>
+      <span class="stat-icon"><i class="fa fa-graduation-cap"></i></span>
       <span class="stat-value">5,420</span>
       <span class="stat-label">Total Graduates</span>
     </div>
     <div class="stat-card">
-      <span class="stat-icon"><i class="fas fa-users"></i></span>
+      <span class="stat-icon"><i class="fa fa-users"></i></span>
       <span class="stat-value">2,840</span>
       <span class="stat-label">Current Students</span>
     </div>
     <div class="stat-card">
-      <span class="stat-icon"><i class="fas fa-chalkboard-teacher"></i></span>
+      <span class="stat-icon"><i class="fa fa-chalkboard-teacher"></i></span>
       <span class="stat-value">185</span>
-      <span class="stat-label">Faculty Members</span>
+      <span class="stat-label">Faculty</span>
     </div>
-  </div>
-</section>
-
-<!-- ABOUT SECTION -->
-<section class="about-section" id="about">
-  <div class="section-container">
-    <div class="about-grid">
-      <div class="about-main">
-        <h2>About Gold & Linc Schools</h2>
-        <p>
-          Founded on principles of academic excellence and character development, Gold & Linc Schools has been a beacon of educational innovation for years. Our commitment extends beyond the classroom, fostering critical thinking, creativity, and ethical leadership.
-        </p>
-        <p>
-          With state-of-the-art facilities, experienced faculty, and a global perspective, we prepare students to thrive in an increasingly complex world. Our holistic approach to education ensures that every student develops not just intellectually, but emotionally and socially as well.
-        </p>
-        <ul class="about-list">
-          <li>Cutting-edge Research Labs & Technology Centers</li>
-          <li>Industry Partnerships & Internship Opportunities</li>
-          <li>Global Alumni Network of 5,400+ Graduates</li>
-          <li>Active Student Clubs & Societies</li>
-          <li>Comprehensive Scholarships & Financial Aid</li>
-          <li>Experienced and Dedicated Faculty</li>
-        </ul>
-      </div>
-      <div class="about-side">
-        <div style="margin-bottom: 32px;">
-          <h3 style="font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 16px; color: var(--navy);">Quick Links</h3>
-          <div class="quick-links-grid">
-            <a class="quick-link" href="#"><i class="fas fa-calendar-alt"></i> Academic Calendar</a>
-            <a class="quick-link" href="#"><i class="fas fa-book"></i> Library Portal</a>
-            <a class="quick-link" href="login.html"><i class="fas fa-user-graduate"></i> Student Portal</a>
-            <a class="quick-link" href="#"><i class="fas fa-users"></i> Faculty Directory</a>
-            <a class="quick-link" href="#contact"><i class="fas fa-phone"></i> Contact Us</a>
-            <a class="quick-link" href="#"><i class="fas fa-question-circle"></i> FAQ</a>
-          </div>
-        </div>
+  </section>
+  <!-- Our Pride Section -->
+  <section class="pride-section">
+    <img class="pride-img" src="https://images.unsplash.com/photo-1517520287167-4bbf64a00d66?auto=format&fit=crop&w=400&q=80" alt="Graduate">
+    <div class="pride-info">
+      <div class="pride-title">Our Pride</div>
+      <div class="pride-name">Aloba Kehinde</div>
+      <div class="pride-text">
+        Awarded as the Best Graduate of 2025, Aloba Kehinde is a symbol of the excellence and innovation Gold and Linc Schools cultivates. Her research in Artificial Intelligence has made a significant impact in the industry.
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- GALLERY SECTION -->
-<section class="gallery-section" id="gallery">
-  <div class="section-container">
-    <h2 class="gallery-title">Gallery</h2>
+  
+  
+  <!-- Proprietor's Welcome Message Section -->
+<section class="welcome-section">
+  <div class="welcome-container">
+    <div class="welcome-image animate-fade-slide">
+    
+      <img src="administrative_message_1-1679483040.png?auto=format&fit=crop&w=400&q=80" alt="Proprietor" />
+    </div>
+    <div class="welcome-content animate-fade-slide">
+      <h2 class="welcome-title">A Welcome Message from the Proprietor</h2>
+      <p class="welcome-text">
+        Dear Students, Parents, and Visitors,<br /><br />
+        It is my great pleasure to welcome you to Gold and Linc Schools. We are more than just an institution — we are a community built on a foundation of integrity, academic excellence, and character development.
+        <br /><br />
+        As the proprietor, my commitment is to provide an inspiring environment where students are empowered to become forward-thinking leaders of tomorrow. Thank you for being part of our vision. We are honored to have you on this journey with us.
+        <br /><br />
+        Warm regards,<br />
+        <strong>Mr. Festus A. Adeniyi</strong><br />
+        Proprietor, Gold and Linc Schools
+      </p>
+    </div>
+  </div>
+        </section>
+        
+  <!-- About Section & Quick Links -->
+  <section class="about-section" id="about">
+    <div class="about-main">
+  <h2 class="about-title">About Gold & Linc Schools</h2>
+  <p class="about-text">
+    Gold & Linc Schools is committed to nurturing talent, fostering innovation, and advancing research in technology and the sciences. 
+    With a dynamic faculty, state-of-the-art facilities, and a vibrant student community, Gold & Linc Schools is at the forefront of education and scientific discovery.
+  </p>
+  <ul class="about-list">
+    <li>Cutting-edge Research Labs</li>
+    <li>Industry Partnerships & Internships</li>
+    <li>Global Alumni Network</li>
+    <li>Student Clubs & Societies</li>
+    <li>Scholarships & Financial Aid</li>
+  </ul>
+    </div>
+                                   
+    <div class="about-side">
+      <div class="quick-title"><i class="fa fa-bolt"></i> Quick Links</div>
+      <div class="quick-links-grid">
+        <a class="quick-link" href="#"><i class="fa fa-calendar-alt"></i> Academic Calendar</a>
+        <a class="quick-link" href="#"><i class="fa fa-book"></i> Library</a>
+        <a class="quick-link" href="#"><i class="fa fa-user-graduate"></i> Student Portal</a>
+        <a class="quick-link" href="#"><i class="fa fa-users-cog"></i> Faculty Directory</a>
+        <a class="quick-link" href="#"><i class="fa fa-phone"></i> Contact Us</a>
+        <a class="quick-link" href="#"><i class="fa fa-question-circle"></i> FAQ</a>
+      </div>
+    </div>
+  </section>
+  <!-- Gallery Section -->
+  <section class="gallery-section">
+    <div class="gallery-title">Gallery</div>
     <div class="gallery-grid">
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=500&q=80" alt="Campus">
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=500&q=80" alt="Laboratory">
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=500&q=80" alt="Sports">
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1517520287167-4bbf64a00d66?auto=format&fit=crop&w=500&q=80" alt="Classroom">
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=500&q=80" alt="Library">
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=500&q=80" alt="Activities">
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80" alt="Gallery">
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80" alt="Gallery">
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=400&q=80" alt="Gallery">
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1517520287167-4bbf64a00d66?auto=format&fit=crop&w=400&q=80" alt="Gallery">
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80" alt="Gallery">
     </div>
-  </div>
-</section>
-
-<!-- TESTIMONIALS SECTION -->
-<section class="testimonial-section" id="testimonials">
-  <div class="section-container">
-    <h2 class="testimonial-title">What Our Students & Parents Say</h2>
+  </section>
+  <!-- Testimonials Section -->
+  <section class="testimonial-section">
+    <div class="testimonial-title">What Our Students &amp; Parents Say</div>
     <div class="testimonial-list">
       <div class="testimonial-card">
         <div class="testimonial-quote">
-          "Gold and Linc Schools gave my child the foundation for academic and personal success. The teachers are caring, facilities are world-class, and the school culture is exceptional!"
+          Gold and Linc Schools gave my child the foundation for academic and personal success. The teachers are caring and the facilities are top-notch!
         </div>
         <div class="testimonial-person">
           <img class="testimonial-avatar" src="https://randomuser.me/api/portraits/men/83.jpg" alt="Parent">
@@ -1119,10 +265,10 @@
       </div>
       <div class="testimonial-card">
         <div class="testimonial-quote">
-          "As a student, I enjoyed every moment at Gold and Linc Schools. The environment is motivating, opportunities are endless, and friendships formed here last a lifetime."
+          As a student, I enjoyed every moment at Gold and Linc Schools. The environment is motivating and the opportunities are endless.
         </div>
         <div class="testimonial-person">
-          <img class="testimonial-avatar" src="https://randomuser.me/api/portraits/women/55.jpg" alt="Alumnus">
+          <img class="testimonial-avatar" src="https://randomuser.me/api/portraits/women/55.jpg" alt="Student">
           <div>
             <div class="testimonial-name">Tosin Balogun</div>
             <div class="testimonial-role">Alumnus</div>
@@ -1131,7 +277,7 @@
       </div>
       <div class="testimonial-card">
         <div class="testimonial-quote">
-          "The science and tech programs are truly world-class. The hands-on learning approach, mentorship, and industry exposure prepared me well for university and beyond."
+          The science and tech programs at Gold and Linc are truly world class. I recommend this school to everyone!
         </div>
         <div class="testimonial-person">
           <img class="testimonial-avatar" src="https://randomuser.me/api/portraits/men/59.jpg" alt="Parent">
@@ -1142,119 +288,181 @@
         </div>
       </div>
     </div>
+  </section>
+
+          <!-- Vision & Mission Section -->
+<section class="vm-section">
+  <div class="vm-wrapper">
+    <div class="vm-card">
+      <div class="vm-icon"><i class="fas fa-eye"></i></div>
+      <h2 class="vm-title">Vision Statement</h2>
+      <p class="vm-text">
+        To be a beacon of excellence in education, cultivating innovative thinkers, ethical leaders, and global citizens prepared to shape the future with courage and compassion.
+      </p>
+    </div>
+
+    <div class="vm-card">
+      <div class="vm-icon"><i class="fas fa-bullseye"></i></div>
+      <h2 class="vm-title">Mission Statement</h2>
+      <p class="vm-text">
+        Our mission is to provide transformative education through critical inquiry, practical knowledge, and a commitment to service — empowering students to thrive in a complex, interconnected world.
+      </p>
+    </div>
   </div>
 </section>
 
-<!-- FOOTER -->
-<footer class="footer" id="contact">
-  <div class="section-container">
-    <div class="footer-content">
-      <div class="footer-section">
-        <h3>About Gold & Linc</h3>
-        <div class="footer-links">
-          <a href="#about">Our Story</a>
-          <a href="#programs">Programs</a>
-          <a href="#gallery">Gallery</a>
-          <a href="#testimonials">Testimonials</a>
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+
+<!-- Modals -->
+<div id="modal1" class="modal">
+  <div class="modal-content">
+    <span class="close" data-modal="modal1">&times;</span>
+    <h2>Prof. Dr. Anwar Hossain</h2>
+    <p>Dr. Hossain has over 20 years of experience in AI and machine learning, mentoring hundreds of students worldwide and leading cutting-edge research in predictive modeling and smart systems.</p>
+  </div>
+</div>
+
+<div id="modal2" class="modal">
+  <div class="modal-content">
+    <span class="close" data-modal="modal2">&times;</span>
+    <h2>Dr. Rina Das</h2>
+    <p>Dr. Rina Das is a top cybersecurity scholar specializing in network security, cryptographic systems, and enterprise risk assessment. She’s also passionate about women in tech advocacy.</p>
+  </div>
+</div>
+
+<!-- FontAwesome (for icons) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+  
+  <!-- News & Events Section -->
+  <section class="news-section" id="news">
+    <div class="news-title">News &amp; Events</div>
+    <div class="news-list">
+      <div class="news-card">
+        <img class="news-img" src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80" alt="Event">
+        <div class="news-headline">AI Symposium 2025</div>
+        <div class="news-date">12 June 2025</div>
+        <div class="news-text">Join us for the annual AI Symposium featuring leading researchers and industry experts.</div>
+      </div>
+      <div class="news-card">
+        <img class="news-img" src="https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=400&q=80" alt="Event">
+        <div class="news-headline">Student Hackathon</div>
+        <div class="news-date">30 May 2025</div>
+        <div class="news-text">Congratulations to all participants of the Gold and Linc Hackathon! Winners have been announced.</div>
+      </div>
+      <div class="news-card">
+        <img class="news-img" src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80" alt="Event">
+        <div class="news-headline">New Research Grants</div>
+        <div class="news-date">25 May 2025</div>
+        <div class="news-text">Our faculty received new funding for groundbreaking projects in cybersecurity.</div>
+      </div>
+    </div>
+  </section>
+      <!-- Footer -->
+  <footer class="footer" style="background: linear-gradient(90deg, #217353 0%, #0e4a30 100%);
+    color: #fff; padding: 28px 0 12px 0; text-align: center; font-size: 1.06rem; border-top-left-radius: 20px; border-top-right-radius: 20px; margin-top: 0;">
+    <div style="max-width:1100px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;padding:0 4vw;">
+      <!-- Left: Logo + Motto -->
+      <div style="flex:1 1 175px;min-width:150px;display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <img src="logo-1679575828 (1).jpeg" alt="Gold and Linc Schools Logo"
+             style="width:38px;height:38px;border-radius:11px;background:#fff;box-shadow:0 1px 7px #0001;">
+        <div style="text-align:left;">
+          <div style="font-family:'Playfair Display',serif;font-size:1.06rem;font-weight:800;letter-spacing:.03em;color:#fff;">
+            Gold and Linc Schools
+          </div>
+          <div style="font-size:0.96rem;color:#ffe08a;letter-spacing:.015em;">
+            For sound learning.
+          </div>
         </div>
       </div>
-      <div class="footer-section">
-        <h3>Quick Links</h3>
-        <div class="footer-links">
-          <a href="login.html">Student Portal</a>
-          <a href="#">Faculty Directory</a>
-          <a href="#">Academic Calendar</a>
-          <a href="#">Library</a>
+      <!-- Center: Links & Contact, now in column on small screens -->
+      <div style="flex:2 1 260px;min-width:180px;display:flex;flex-direction:column;align-items:center;">
+        <div class="footer-links" style="display:flex;gap:15px;justify-content:center;margin-bottom: 9px;flex-wrap:wrap;">
+          <a href="#" style="color:#ffe08a;text-decoration:none;font-weight:600;font-size:.98rem;"><i class="fa fa-user-shield"></i> Privacy Policy</a>
+          <a href="#" style="color:#ffe08a;text-decoration:none;font-weight:600;font-size:.98rem;"><i class="fa fa-scroll"></i> Terms</a>
+          <a href="#" style="color:#ffe08a;text-decoration:none;font-weight:600;font-size:.98rem;"><i class="fa fa-envelope"></i> Contact</a>
+          <a href="#" style="color:#ffe08a;text-decoration:none;font-weight:600;font-size:.98rem;"><i class="fa fa-question-circle"></i> FAQ</a>
+        </div>
+        <div style="height:1px;width:90%;background:#fff3;max-width:280px;margin-bottom:8px;"></div>
+        <div class="footer-contact" style="font-size:0.97rem;color:#ffe8be;line-height:1.5;">
+          <span style="display:inline-block;margin-bottom:2px;">
+            <i class="fa fa-map-marker-alt"></i>
+            Behind Irenitemi Hotel, Testing Ground Area, Off Osogbo Road, Ilesa, Osun State
+          </span><br>
+          <span>
+            <i class="fa fa-envelope"></i>
+            <a href="mailto:goldlincschools@gmail.com" style="color:#ffe08a;text-decoration:underline;">goldlincschools@gmail.com</a>
+            &nbsp;|&nbsp;
+            <i class="fa fa-phone"></i>
+            <a href="tel:08034430941" style="color:#ffe08a;text-decoration:underline;">08034430941</a>
+          </span>
         </div>
       </div>
-      <div class="footer-section">
-        <h3>Contact Us</h3>
-        <div class="footer-links">
-          <a href="tel:08034430941"><i class="fas fa-phone"></i> 0803 443 0941</a>
-          <a href="mailto:goldlincschools@gmail.com"><i class="fas fa-envelope"></i> goldlincschools@gmail.com</a>
-          <a href="#"><i class="fas fa-map-marker-alt"></i> Ilesa, Osun State</a>
-        </div>
-      </div>
-      <div class="footer-section">
-        <h3>Follow Us</h3>
-        <div class="footer-links" style="display: flex; gap: 16px;">
-          <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
-          <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
-          <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+      <!-- Right: Newsletter & Socials -->
+      <div style="flex:1 1 160px;min-width:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:5px;">
+        <form id="newsletterForm" style="margin-bottom:8px;width:100%;max-width:210px;">
+          <label for="newsletterEmail" style="font-size:.97rem;color:#ffe08a;font-weight:600;letter-spacing:.01em;">Subscribe to our newsletter</label>
+          <div style="display:flex;gap:5px;margin-top:5px;">
+            <input type="email" id="newsletterEmail" name="newsletterEmail" required placeholder="Your email"
+              style="padding:5px 8px;border-radius:6px;border:1px solid #ffe08a;font-size:.97rem;outline:none;width:78%;background:#fffbe7;">
+            <button type="submit" style="background:var(--accent);color:var(--primary);border:none;border-radius:6px;padding:5px 12px;font-weight:700;font-size:.96rem;cursor:pointer;"><i class="fa fa-paper-plane"></i></button>
+          </div>
+          <div id="newsletterMsg" style="color:#ffe08a;font-size:.94rem;height:16px;margin-top:3px;"></div>
+        </form>
+        <div style="font-size:.99rem;color:#ffe08a;margin-bottom:4px;margin-top:2px;">Connect</div>
+        <div style="display:flex;gap:10px;justify-content:center;">
+          <a href="#" title="Facebook" style="color:#ffe08a;font-size:1.22rem;"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" title="Twitter" style="color:#ffe08a;font-size:1.22rem;"><i class="fab fa-twitter"></i></a>
+          <a href="#" title="Instagram" style="color:#ffe08a;font-size:1.22rem;"><i class="fab fa-instagram"></i></a>
+          <a href="#" title="LinkedIn" style="color:#ffe08a;font-size:1.22rem;"><i class="fab fa-linkedin-in"></i></a>
         </div>
       </div>
     </div>
-  </div>
-  <div class="footer-copy">
-    &copy; 2025 Gold and Linc Schools. All rights reserved. | <a href="#" style="color: var(--gold); text-decoration: none;">Privacy Policy</a> | <a href="#" style="color: var(--gold); text-decoration: none;">Terms of Service</a>
-  </div>
-</footer>
-
-<!-- SCRIPTS -->
-<script>
-  // Mobile menu toggle
-  (function () {
-    const btn = document.querySelector('.nav-toggle');
-    const nav = document.getElementById('main-nav');
-
-    if (!btn || !nav) return;
-
-    function setOpen(isOpen) {
-      btn.setAttribute('aria-expanded', String(isOpen));
-      btn.classList.toggle('open', isOpen);
-      nav.classList.toggle('open', isOpen);
-      document.body.classList.toggle('no-scroll', isOpen);
-    }
-
-    btn.addEventListener('click', () => {
-      const expanded = btn.getAttribute('aria-expanded') === 'true';
-      setOpen(!expanded);
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && nav.classList.contains('open')) {
-        setOpen(false);
-        btn.focus();
+    <div class="footer-copy" style="color:#e0ede6;font-size:0.96rem;margin-top:16px;">
+      &copy; 2025 Gold and Linc Schools. All rights reserved.
+    </div>
+    <style>
+      @media (max-width: 700px) {
+        .footer > div[style^="max-width"] {
+          flex-direction: column !important;
+          align-items: stretch !important;
+          padding: 0 4vw;
+        }
+        .footer .footer-links { justify-content: flex-start !important; gap: 11px !important;}
+        .footer .footer-contact { text-align: left;}
+        .footer-copy {margin-top: 19px !important;}
       }
-    });
-
-    window.addEventListener('resize', () => {
-      if (window.innerWidth > 980 && nav.classList.contains('open')) {
-        setOpen(false);
-      }
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!nav.classList.contains('open')) return;
-      if (!nav.contains(e.target) && !btn.contains(e.target)) {
-        setOpen(false);
-      }
-    });
-
-    // Close menu when nav link is clicked
-    nav.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        setOpen(false);
-      });
-    });
-  })();
-
-  // Carousel functionality
-  (function () {
+    </style>
+    <script>
+      // Newsletter fake handler
+      document.getElementById('newsletterForm').onsubmit = function(e) {
+        e.preventDefault();
+        var msg = document.getElementById('newsletterMsg');
+        var email = document.getElementById('newsletterEmail').value;
+        if(email && email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+          msg.innerText = "Thank you for subscribing!";
+          setTimeout(()=>{ msg.innerText = ""; document.getElementById('newsletterForm').reset(); }, 2600);
+        } else {
+          msg.innerText = "Please enter a valid email.";
+        }
+      };
+    </script>
+  </footer>
+  <!-- Carousel Script -->
+  <script>
     const carouselImages = document.getElementById('carouselImages');
-    const images = carouselImages.querySelectorAll('.carousel-slide');
+    const images = carouselImages.querySelectorAll('.carousel-image');
     const prevBtn = document.getElementById('carouselPrev');
     const nextBtn = document.getElementById('carouselNext');
     const dotsContainer = document.getElementById('carouselDots');
-    let current = 0;
-    let interval;
+    let current = 0, interval;
 
     function showSlide(idx) {
-      if (idx < 0) idx = images.length - 1;
+      if (idx < 0) idx = images.length-1;
       if (idx >= images.length) idx = 0;
       carouselImages.style.transform = `translateX(-${idx * 100}%)`;
-      document.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+      dotsContainer.querySelectorAll('.carousel-dot').forEach((dot, i) => {
         dot.classList.toggle('active', i === idx);
       });
       current = idx;
@@ -1263,15 +471,15 @@
     function nextSlide() { showSlide(current + 1); }
     function prevSlide() { showSlide(current - 1); }
 
-    prevBtn.addEventListener('click', prevSlide);
-    nextBtn.addEventListener('click', nextSlide);
+    prevBtn.onclick = prevSlide;
+    nextBtn.onclick = nextSlide;
 
-    // Create dots
+    // Dots navigation
     dotsContainer.innerHTML = '';
     for (let i = 0; i < images.length; i++) {
       let dot = document.createElement('div');
       dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
-      dot.addEventListener('click', () => showSlide(i));
+      dot.onclick = () => showSlide(i);
       dotsContainer.appendChild(dot);
     }
 
@@ -1282,12 +490,11 @@
     function stopCarousel() {
       clearInterval(interval);
     }
-
     carouselImages.addEventListener('mouseenter', stopCarousel);
     carouselImages.addEventListener('mouseleave', startCarousel);
     startCarousel();
 
-    // Touch support
+    // For responsive mobile swipe (bonus)
     let startX = 0, endX = 0;
     carouselImages.addEventListener('touchstart', e => startX = e.touches[0].clientX);
     carouselImages.addEventListener('touchmove', e => endX = e.touches[0].clientX);
@@ -1298,8 +505,76 @@
       }
       startX = endX = 0;
     });
-  })();
-</script>
+    document.addEventListener('DOMContentLoaded', () => {
+  // Modal handling
+  document.querySelectorAll('.faculty-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const id = card.dataset.modal;
+      document.getElementById(id).style.display = 'flex';
+    });
+  });
 
+  document.querySelectorAll('.close').forEach(close => {
+    close.addEventListener('click', () => {
+      const id = close.dataset.modal;
+      document.getElementById(id).style.display = 'none';
+    });
+  });
+
+  window.addEventListener('click', e => {
+    document.querySelectorAll('.modal').forEach(modal => {
+      if (e.target === modal) modal.style.display = 'none';
+    });
+  });
+
+  // Slider navigation
+  const list = document.querySelector('.faculty-list');
+  document.querySelector('.prev').addEventListener('click', () => list.scrollBy({ left: -300, behavior: 'smooth' }));
+  document.querySelector('.next').addEventListener('click', () => list.scrollBy({ left: 300, behavior: 'smooth' }));
+});
+// Responsive Navigation Toggle
+document.addEventListener('DOMContentLoaded', () => {
+  const menuBtn = document.getElementById('menuToggle');
+  const navList = document.getElementById('navList');
+
+  menuBtn.addEventListener('click', () => {
+    navList.classList.toggle('show');
+  });
+});
+  // Scroll-triggered fade+slide animation
+document.addEventListener('DOMContentLoaded', () => {
+  const animatedElements = document.querySelectorAll('.animate-fade-slide');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.3 });
+
+  animatedElements.forEach(el => observer.observe(el));
+});
+    
+document.addEventListener('DOMContentLoaded', function() {
+  const images = document.querySelectorAll('.hero-img');
+  let current = 0;
+  const interval = 6000; // 6 seconds per image
+
+  function showImage(index) {
+    images.forEach((img, i) => {
+      img.classList.toggle('active', i === index);
+    });
+  }
+
+  setInterval(() => {
+    current = (current + 1) % images.length;
+    showImage(current);
+  }, interval);
+
+  showImage(current); // show first image initially
+});
+
+  </script>
 </body>
 </html>
