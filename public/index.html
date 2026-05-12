@@ -3,19 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <title>Gold and Linc Schools</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=0.80">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <style>
     :root {
       --navy: #061728;
-      --gold: #ffb400;
+      --green: #217353;
+      --gold: #ffe08a;
       --white: #ffffff;
       --muted: rgba(255,255,255,0.85);
       --panel-mid: #213a55;
       --panel-right: #566770;
-      --green-primary: #217353;
-      --green-dark: #0e4a30;
     }
 
     * {
@@ -26,11 +25,12 @@
 
     html, body {
       overflow-x: hidden;
+      scroll-behavior: smooth;
     }
 
     body {
       font-family: 'Inter', sans-serif;
-      color: #fff;
+      color: var(--white);
       background: #000;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
@@ -61,16 +61,16 @@
 
     .logo {
       font-family: 'Playfair Display', serif;
-      font-size: 28px;
+      font-size: 30px;
       font-weight: 700;
       color: var(--gold);
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
 
     .logo img {
-      height: 40px;
+      height: 50px;
       width: auto;
     }
 
@@ -102,8 +102,8 @@
 
     .nav-cta {
       background: var(--gold);
-      color: #000;
-      padding: 14px 26px;
+      color: var(--navy);
+      padding: 16px 28px;
       font-size: 13px;
       font-weight: 600;
       text-decoration: none;
@@ -112,10 +112,29 @@
     }
 
     .nav-cta:hover {
-      background: #ffc107;
-      box-shadow: 0 6px 20px rgba(255,180,0,0.2);
+      box-shadow: 0 6px 20px rgba(255,224,138,0.2);
+      transform: translateY(-2px);
     }
 
+    .nav-login-btn {
+      background: var(--white);
+      color: var(--navy);
+      padding: 14px 24px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 4px;
+      border: 1px solid var(--navy);
+      transition: all 0.3s;
+    }
+
+    .nav-login-btn:hover {
+      background: var(--navy);
+      color: var(--white);
+      box-shadow: 0 6px 20px rgba(6,23,40,0.12);
+    }
+
+    /* Mobile menu toggle */
     .nav-toggle {
       display: none;
       background: transparent;
@@ -123,6 +142,7 @@
       padding: 8px;
       cursor: pointer;
       color: var(--white);
+      z-index: 1101;
     }
 
     .nav-toggle svg .line {
@@ -134,16 +154,13 @@
     .hero {
       min-height: 100vh;
       padding-top: 96px;
-      background: linear-gradient(rgba(6,23,40,0.72), rgba(6,23,40,0.72)),
-                  url("../oaugate-1140x570.jpg");
+      background: linear-gradient(rgba(6,23,40,0.72), rgba(6,23,40,0.72)), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 600'%3E%3Crect fill='%23061728' width='1200' height='600'/%3E%3C/svg%3E");
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
       display: flex;
       align-items: center;
-      flex-direction: column;
       position: relative;
-      overflow: hidden;
     }
 
     .hero::before {
@@ -153,8 +170,8 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: radial-gradient(circle at top right, rgba(33, 115, 83, 0.15) 0%, transparent 50%),
-                  radial-gradient(circle at bottom left, rgba(14, 74, 48, 0.1) 0%, transparent 50%);
+      background: radial-gradient(circle at 20% 50%, rgba(33,115,83,0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(14,74,48,0.1) 0%, transparent 50%);
       pointer-events: none;
     }
 
@@ -164,7 +181,7 @@
       padding: 0 40px;
       width: 100%;
       position: relative;
-      z-index: 2;
+      z-index: 1;
     }
 
     .breadcrumb {
@@ -172,19 +189,15 @@
       font-size: 14px;
       margin-bottom: 28px;
       letter-spacing: 0.5px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
     .hero h1 {
       font-family: 'Playfair Display', serif;
       font-size: 64px;
-      font-weight: 700;
+      font-weight: 600;
       margin-bottom: 18px;
       color: var(--white);
-      text-shadow: 0 2px 8px rgba(0,0,0,0.4);
-      line-height: 1.2;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.5);
     }
 
     .hero h2 {
@@ -201,6 +214,15 @@
       line-height: 1.75;
       color: var(--muted);
       margin-bottom: 44px;
+    }
+
+    .hero-location {
+      font-size: 14px;
+      color: var(--gold);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     /* ================= BUTTONS ================= */
@@ -220,31 +242,30 @@
       border: none;
       border-radius: 4px;
       transition: all 0.3s;
-      text-decoration: none;
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .btn-primary {
       background: var(--gold);
-      color: #061728;
+      color: var(--navy);
     }
 
     .btn-primary:hover {
-      background: #ffc107;
-      box-shadow: 0 8px 24px rgba(255,180,0,0.25);
+      box-shadow: 0 8px 25px rgba(255,224,138,0.3);
       transform: translateY(-2px);
     }
 
     .btn-outline {
       background: transparent;
       color: var(--white);
-      border: 2px solid rgba(255,255,255,0.6);
+      border: 1px solid rgba(255,255,255,0.6);
     }
 
     .btn-outline:hover {
       background: rgba(255,255,255,0.1);
       border-color: var(--white);
-      box-shadow: 0 8px 24px rgba(255,255,255,0.1);
     }
 
     /* ================= STATS ================= */
@@ -262,7 +283,7 @@
     }
 
     .stat-number {
-      font-size: 44px;
+      font-size: 34px;
       font-weight: 700;
       margin-bottom: 6px;
       color: var(--white);
@@ -277,7 +298,7 @@
       color: var(--muted);
     }
 
-    /* ================= MERGED PANELS ================= */
+    /* ================= PANELS ================= */
     .hero-panels {
       display: flex;
       width: 100vw;
@@ -291,7 +312,7 @@
     .panel {
       flex: 1;
       padding: 64px 72px;
-      min-height: 280px;
+      min-height: 260px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -303,13 +324,13 @@
     }
 
     .panel--mid {
-      background: var(--panel-mid);
+      background: var(--green);
       color: var(--white);
       border-left: 4px solid rgba(0,0,0,0.06);
     }
 
     .panel--right {
-      background: var(--panel-right);
+      background: #0e4a30;
       color: var(--white);
       border-left: 4px solid rgba(0,0,0,0.05);
     }
@@ -341,194 +362,366 @@
       cursor: pointer;
       border-radius: 3px;
       transition: all 0.3s;
-      width: fit-content;
     }
 
     .panel--left .discover-btn {
       color: var(--navy);
-      border: 2px solid rgba(6,23,40,0.2);
-      background: rgba(255,255,255,0.08);
+      border: 2px solid rgba(6,23,40,0.14);
+      background: rgba(255,255,255,0.02);
     }
 
     .panel--left .discover-btn:hover {
-      background: rgba(255,255,255,0.15);
-      box-shadow: 0 4px 12px rgba(6,23,40,0.15);
+      background: rgba(255,255,255,0.1);
     }
 
     .panel--mid .discover-btn,
     .panel--right .discover-btn {
       color: var(--white);
-      border: 2px solid rgba(255,255,255,0.25);
-      background: rgba(255,255,255,0.05);
+      border: 2px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.02);
     }
 
     .panel--mid .discover-btn:hover,
     .panel--right .discover-btn:hover {
-      background: rgba(255,255,255,0.12);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      background: rgba(255,255,255,0.1);
     }
 
-    /* ================= FEATURES SECTION ================= */
-    .features-section {
-      background: #f3f4f6;
-      padding: 56px 0;
-      font-family: 'Inter', sans-serif;
-      color: #111827;
-    }
-
-    .features-section .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 40px;
-      box-sizing: border-box;
-    }
-
-    .features-header {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      margin-bottom: 48px;
-      flex-wrap: wrap;
-    }
-
-    .features-header h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 32px;
-      margin: 0;
-      font-weight: 700;
-      color: #0b2033;
-    }
-
-    .features-sub {
-      font-size: 14px;
-      color: #4b5563;
-      margin-left: 8px;
-    }
-
-    .features-cta {
-      margin-left: auto;
-      display: inline-block;
-      text-decoration: none;
-      color: #0b2033;
-      border: 1.5px solid #0b2033;
-      padding: 12px 24px;
-      font-weight: 600;
-      border-radius: 4px;
-      background: transparent;
-      transition: all 0.3s;
-    }
-
-    .features-cta:hover {
-      background: #0b2033;
-      color: #fff;
-      box-shadow: 0 6px 20px rgba(11,32,51,0.12);
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 32px;
-      align-items: start;
-    }
-
-    .feature-card {
-      background: white;
-      border-radius: 12px;
-      padding: 32px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-      transition: all 0.3s;
-    }
-
-    .feature-card:hover {
-      box-shadow: 0 12px 32px rgba(0,0,0,0.12);
-      transform: translateY(-4px);
-    }
-
-    .feature-icon {
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, var(--green-primary), var(--green-dark));
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      color: white;
-    }
-
-    .feature-card h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 20px;
-      margin: 0;
-      color: #0b2033;
-      font-weight: 700;
-    }
-
-    .feature-card p {
-      font-size: 14px;
-      color: #4b5563;
-      line-height: 1.6;
-      margin: 0;
-    }
-
-    /* ================= TESTIMONIALS ================= */
-    .testimonials-section {
-      background: white;
+    /* ================= SECTIONS ================= */
+    section {
       padding: 72px 0;
     }
 
-    .testimonials-section .container {
+    .section-container {
       max-width: 1400px;
       margin: 0 auto;
       padding: 0 40px;
-      box-sizing: border-box;
     }
 
-    .testimonials-header {
+    /* Carousel Section */
+    .carousel-section {
+      background: #f8f9fb;
+      color: #0b2033;
+    }
+
+    .carousel-wrapper {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+
+    .carousel-images {
+      display: flex;
+      transition: transform 0.6s ease-in-out;
+    }
+
+    .carousel-slide {
+      min-width: 100%;
+      position: relative;
+    }
+
+    .carousel-image {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .carousel-caption {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(33, 115, 83, 0.9);
+      color: #fff;
       text-align: center;
-      margin-bottom: 56px;
+      border-radius: 13px;
+      padding: 28px 32px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      z-index: 2;
+      max-width: 85vw;
+      min-width: 250px;
+      animation: fadeInCaption 0.6s;
     }
 
-    .testimonials-header h2 {
+    @keyframes fadeInCaption {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -35%);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+      }
+    }
+
+    .carousel-caption .caption-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: var(--gold);
+      letter-spacing: 0.01em;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .carousel-caption .caption-text {
+      font-size: 1.05rem;
+      color: #fffce7;
+      font-weight: 500;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.2);
+    }
+
+    .carousel-controls {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      z-index: 3;
+    }
+
+    .carousel-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.9);
+      border: none;
+      cursor: pointer;
+      color: var(--navy);
+      font-size: 18px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .carousel-btn:hover {
+      background: var(--gold);
+      transform: scale(1.1);
+    }
+
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      padding: 20px;
+      background: rgba(0,0,0,0.02);
+    }
+
+    .carousel-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .carousel-dot.active {
+      background: var(--green);
+      width: 28px;
+      border-radius: 5px;
+    }
+
+    /* Stats Section */
+    .stats-section {
+      background: linear-gradient(135deg, #217353 0%, #0e4a30 100%);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 40px;
+    }
+
+    .stat-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .stat-icon {
+      font-size: 48px;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .stat-value {
       font-family: 'Playfair Display', serif;
       font-size: 36px;
       font-weight: 700;
-      color: #0b2033;
-      margin-bottom: 12px;
+      color: var(--white);
+      margin-bottom: 8px;
     }
 
-    .testimonials-grid {
+    .stat-label {
+      font-size: 14px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* About Section */
+    .about-section {
+      background: #f8f9fb;
+      color: #0b2033;
+    }
+
+    .about-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .about-main h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: var(--navy);
+    }
+
+    .about-main p {
+      font-size: 16px;
+      line-height: 1.8;
+      margin-bottom: 24px;
+      color: #374151;
+    }
+
+    .about-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .about-list li {
+      padding: 12px 0;
+      padding-left: 32px;
+      position: relative;
+      color: #0b2033;
+      font-weight: 500;
+    }
+
+    .about-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--green);
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .quick-links-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .quick-link {
+      padding: 16px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--navy);
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .quick-link:hover {
+      background: var(--green);
+      color: white;
+      border-color: var(--green);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(33,115,83,0.2);
+    }
+
+    /* Gallery Section */
+    .gallery-section {
+      background: var(--white);
+      color: #0b2033;
+    }
+
+    .gallery-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 48px;
+      text-align: center;
+      color: var(--navy);
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+    }
+
+    .gallery-img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      border-radius: 12px;
+      transition: all 0.3s;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+
+    .gallery-img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    }
+
+    /* Testimonials */
+    .testimonial-section {
+      background: #f8f9fb;
+      color: #0b2033;
+    }
+
+    .testimonial-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 48px;
+      text-align: center;
+      color: var(--navy);
+    }
+
+    .testimonial-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 32px;
     }
 
     .testimonial-card {
-      background: #f9fafb;
-      border-radius: 12px;
+      background: white;
       padding: 32px;
-      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
       transition: all 0.3s;
     }
 
     .testimonial-card:hover {
-      background: white;
-      border-color: var(--green-primary);
-      box-shadow: 0 8px 24px rgba(33,115,83,0.1);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+      transform: translateY(-4px);
     }
 
     .testimonial-quote {
       font-size: 16px;
-      color: #374151;
       line-height: 1.8;
+      color: #374151;
       margin-bottom: 24px;
       font-style: italic;
     }
 
-    .testimonial-author {
+    .testimonial-person {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -543,149 +736,75 @@
 
     .testimonial-name {
       font-weight: 600;
-      color: #0b2033;
-      font-size: 14px;
-    }
-
-    .testimonial-role {
-      font-size: 12px;
-      color: #6b7280;
-    }
-
-    /* ================= CTA SECTION ================= */
-    .cta-section {
-      background: linear-gradient(135deg, var(--green-primary) 0%, var(--green-dark) 100%);
-      padding: 80px 40px;
-      text-align: center;
-      color: white;
-    }
-
-    .cta-section h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 44px;
-      font-weight: 700;
-      margin-bottom: 24px;
-    }
-
-    .cta-section p {
-      font-size: 18px;
-      margin-bottom: 36px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      opacity: 0.95;
-    }
-
-    .cta-buttons {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .cta-btn {
-      padding: 14px 32px;
-      font-size: 14px;
-      font-weight: 600;
-      text-decoration: none;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .cta-btn-primary {
-      background: var(--gold);
       color: var(--navy);
     }
 
-    .cta-btn-primary:hover {
-      background: #ffc107;
-      box-shadow: 0 8px 24px rgba(255,180,0,0.3);
-      transform: translateY(-2px);
+    .testimonial-role {
+      font-size: 13px;
+      color: #6b7280;
     }
 
-    .cta-btn-secondary {
-      background: rgba(255,255,255,0.2);
-      color: white;
-      border: 2px solid white;
+    /* Footer */
+    .footer {
+      background: linear-gradient(90deg, #217353 0%, #0e4a30 100%);
+      color: var(--white);
+      padding: 56px 0 24px 0;
+      border-top: 1px solid rgba(255,255,255,0.1);
     }
 
-    .cta-btn-secondary:hover {
-      background: rgba(255,255,255,0.3);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-    }
-
-    /* ================= FOOTER ================= */
-    footer {
-      background: linear-gradient(90deg, var(--green-primary) 0%, var(--green-dark) 100%);
-      color: white;
-      padding: 56px 0 20px;
-      border-top-left-radius: 20px;
-      border-top-right-radius: 20px;
-    }
-
-    footer .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 40px;
-      box-sizing: border-box;
-    }
-
-    .footer-grid {
+    .footer-content {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 40px;
-      margin-bottom: 40px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 48px;
+      margin-bottom: 32px;
     }
 
-    .footer-col h4 {
+    .footer-section h3 {
       font-family: 'Playfair Display', serif;
-      font-size: 16px;
-      font-weight: 700;
+      font-size: 18px;
       margin-bottom: 16px;
       color: var(--gold);
     }
 
-    .footer-col ul {
-      list-style: none;
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    .footer-col li {
-      margin-bottom: 12px;
-    }
-
-    .footer-col a {
-      color: rgba(255,255,255,0.85);
+    .footer-links a {
+      color: var(--muted);
       text-decoration: none;
-      transition: color 0.3s;
-    }
-
-    .footer-col a:hover {
-      color: var(--gold);
-    }
-
-    .footer-bottom {
-      border-top: 1px solid rgba(255,255,255,0.1);
-      padding-top: 20px;
-      text-align: center;
+      transition: all 0.3s;
       font-size: 14px;
-      color: rgba(255,255,255,0.8);
+    }
+
+    .footer-links a:hover {
+      color: var(--gold);
+      padding-left: 8px;
+    }
+
+    .footer-copy {
+      text-align: center;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.7);
+      font-size: 14px;
     }
 
     /* ================= RESPONSIVE ================= */
     @media (max-width: 1100px) {
-      .hero h1 { font-size: 48px; }
+      .hero h1 { font-size: 44px; }
       .hero h2 { font-size: 20px; }
-      .stats { gap: 40px; }
-      .panel { padding: 48px 40px; }
-      .features-grid { grid-template-columns: repeat(2, 1fr); }
-      .testimonials-grid { grid-template-columns: repeat(2, 1fr); }
-      .footer-grid { grid-template-columns: repeat(2, 1fr); }
+      .stats { gap: 36px; }
+      .hero-panels { flex-direction: column; }
+      .panel { padding: 40px 28px; }
+      .about-grid { grid-template-columns: 1fr; gap: 40px; }
     }
 
     @media (max-width: 980px) {
-      .nav-toggle { display: inline-flex; align-items: center; justify-content: center; z-index: 1101; }
+      .nav-toggle { display: inline-flex; align-items: center; justify-content: center; }
+
       nav {
         position: absolute;
         left: 0;
@@ -699,18 +818,29 @@
         box-shadow: 0 18px 40px rgba(2,11,24,0.2);
         z-index: 1100;
       }
+
       nav.open {
         display: flex;
         animation: navFade 0.18s ease both;
       }
+
       @keyframes navFade {
         from { opacity: 0; transform: translateY(-6px); }
         to { opacity: 1; transform: translateY(0); }
       }
+
       nav ul {
+        display: flex;
         flex-direction: column;
         gap: 14px;
       }
+
+      .nav-cta {
+        align-self: stretch;
+        display: inline-flex;
+        justify-content: center;
+      }
+
       .nav-toggle.open svg .line:nth-child(1) {
         transform: translateY(5px) rotate(45deg);
       }
@@ -720,40 +850,51 @@
       .nav-toggle.open svg .line:nth-child(3) {
         transform: translateY(-5px) rotate(-45deg);
       }
+
       body.no-scroll {
         overflow: hidden;
       }
-      .hero-panels { flex-direction: column; width: 100%; margin-left: 0; }
+
+      .logo { font-size: 24px; }
+      .logo img { height: 40px; }
     }
 
-    @media (max-width: 620px) {
-      .hero h1 { font-size: 36px; }
+    @media (max-width: 520px) {
+      .hero {
+        padding-top: 80px;
+        min-height: auto;
+      }
+
+      .hero h1 { font-size: 32px; }
       .hero p { font-size: 15px; }
       .hero-actions { flex-direction: column; gap: 12px; }
-      .btn { width: 100%; text-align: center; }
-      .stat-number { font-size: 32px; }
-      .stat-label { font-size: 12px; }
+      .stat-number { font-size: 24px; }
+      .stat-label { font-size: 13px; }
       .panel { padding: 32px 20px; }
-      .features-grid { grid-template-columns: 1fr; }
-      .testimonials-grid { grid-template-columns: 1fr; }
-      .footer-grid { grid-template-columns: 1fr; }
-      .features-header { flex-direction: column; align-items: flex-start; }
-      .features-cta { margin-left: 0; width: 100%; }
+      .panel h3 { font-size: 22px; }
+      .panel p { font-size: 14px; }
+      .section-container { padding: 0 20px; }
+      .carousel-image { height: 280px; }
+      .carousel-caption { padding: 20px; }
+      .carousel-caption .caption-title { font-size: 1.1rem; }
+      .about-list { gap: 12px; }
+      .quick-links-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
+
 <body>
 
 <!-- HEADER -->
 <header>
   <div class="nav-container">
     <div class="logo">
-      <i class="fas fa-graduation-cap" style="color: var(--gold);"></i>
-      Gold & Linc
+      <img src="logo-1679575828 (1).jpeg" alt="Gold and Linc Schools">
+      <span>Gold & Linc</span>
     </div>
 
     <button class="nav-toggle" aria-controls="main-nav" aria-expanded="false" aria-label="Open menu">
-      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+      <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
         <rect class="line" x="3" y="6" width="18" height="2" rx="1"></rect>
         <rect class="line" x="3" y="11" width="18" height="2" rx="1"></rect>
         <rect class="line" x="3" y="16" width="18" height="2" rx="1"></rect>
@@ -764,11 +905,12 @@
       <ul>
         <li><a href="#about">About Us</a></li>
         <li><a href="#programs">Programs</a></li>
-        <li><a href="#admissions">Admissions</a></li>
+        <li><a href="#gallery">Gallery</a></li>
         <li><a href="#testimonials">Testimonials</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
-      <a class="nav-cta" href="login.html">PORTAL LOGIN</a>
+      <a class="nav-cta" href="#inquiry">Inquiry</a>
+      <a class="nav-login-btn" href="login.html">Portal Login</a>
     </nav>
   </div>
 </header>
@@ -776,149 +918,223 @@
 <!-- HERO SECTION -->
 <section class="hero">
   <div class="hero-inner">
-    <div class="breadcrumb">
-      <i class="fas fa-star" style="color: var(--gold);"></i>
-      Excellence in Education
+    <div class="hero-location">
+      <i class="fas fa-map-marker-alt"></i>
+      Behind Irenitemi Hotel, Ilesa, Osun State
     </div>
 
     <h1>Gold & Linc Schools</h1>
-    <h2>For a Solid Beginning</h2>
+    <h2>Learn with passion. Live with intention.</h2>
 
     <p>
-      Empowering students with world-class education, innovative learning experiences, and exceptional mentorship. 
-      We cultivate future leaders prepared to excel in a dynamic global landscape.
+      For a solid beginning in academic excellence and personal development. Gold & Linc Schools is committed to nurturing talent, fostering innovation, and advancing research in technology and the sciences through a dynamic faculty and state-of-the-art facilities.
     </p>
 
     <div class="hero-actions">
-      <a href="#admissions" class="btn btn-primary">APPLY NOW</a>
-      <a href="#programs" class="btn btn-outline">EXPLORE PROGRAMS</a>
+      <button class="btn btn-primary">
+        <i class="fas fa-envelope"></i> Inquiry
+      </button>
+      <button class="btn btn-outline">
+        <i class="fas fa-book"></i> Our Programs
+      </button>
     </div>
 
     <div class="stats">
       <div>
+        <div class="stat-number">5,420</div>
+        <div class="stat-label">Total Graduates</div>
+      </div>
+      <div>
         <div class="stat-number">2,840</div>
-        <div class="stat-label">Students</div>
+        <div class="stat-label">Current Students</div>
       </div>
       <div>
         <div class="stat-number">185</div>
-        <div class="stat-label">Faculty</div>
-      </div>
-      <div>
-        <div class="stat-number">50+</div>
-        <div class="stat-label">Programs</div>
-      </div>
-      <div>
-        <div class="stat-number">98%</div>
-        <div class="stat-label">Success Rate</div>
+        <div class="stat-label">Faculty Members</div>
       </div>
     </div>
   </div>
 
-  <!-- PANELS -->
+  <!-- THREE-PANEL SECTION -->
   <div class="hero-panels">
     <div class="panel panel--left">
       <h3>Academic Excellence</h3>
       <p>
-        Rigorous curriculum designed to challenge and inspire. Our faculty combines traditional pedagogy with cutting-edge teaching methodologies.
+        Our curriculum is designed to foster critical thinking, creativity, and collaboration. With state-of-the-art laboratories and cutting-edge learning resources, we empower students to excel in their academic pursuits.
       </p>
-      <a class="discover-btn" href="#programs">LEARN MORE</a>
+      <a class="discover-btn" href="#about">Discover More</a>
     </div>
 
     <div class="panel panel--mid">
-      <h3>World-Class Facilities</h3>
+      <h3>Our Programs</h3>
       <p>
-        State-of-the-art classrooms, laboratories, libraries, and recreational spaces. Every corner designed to enhance the learning experience.
+        Explore our diverse range of programs including Science, Technology, Humanities, and professional development courses. Each program is tailored to inspire curiosity and prepare students for global success.
       </p>
-      <a class="discover-btn" href="#facilities">LEARN MORE</a>
+      <a class="discover-btn" href="#programs">Discover More</a>
     </div>
 
     <div class="panel panel--right">
-      <h3>Holistic Development</h3>
+      <h3>Student Life</h3>
       <p>
-        Beyond academics, we nurture character, leadership, and critical thinking. Sports, arts, and co-curricular activities enrich student life.
+        Beyond the classroom, our vibrant community offers student clubs, sports, cultural events, and mentorship programs. We cultivate an environment where every student can discover their passion and unlock their potential.
       </p>
-      <a class="discover-btn" href="#development">LEARN MORE</a>
+      <a class="discover-btn" href="#events">Discover More</a>
     </div>
   </div>
 </section>
 
-<!-- FEATURES SECTION -->
-<section class="features-section" id="programs">
-  <div class="container">
-    <div class="features-header">
-      <h2>Our Programs</h2>
-      <div class="features-sub">Comprehensive pathways for every student</div>
-      <a class="features-cta" href="#programs">VIEW ALL PROGRAMS</a>
+<!-- CAROUSEL SECTION -->
+<section class="carousel-section">
+  <div class="section-container">
+    <div class="carousel-wrapper">
+      <div class="carousel-images" id="carouselImages">
+        <div class="carousel-slide">
+          <img class="carousel-image" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80" alt="Campus">
+          <div class="carousel-caption">
+            <div class="caption-title">Welcome to Our Campus</div>
+            <div class="caption-text">Experience excellence in a vibrant learning environment</div>
+          </div>
+        </div>
+        <div class="carousel-slide">
+          <img class="carousel-image" src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1200&q=80" alt="Science Fair">
+          <div class="carousel-caption">
+            <div class="caption-title">Science Fair 2025</div>
+            <div class="caption-text">Students showcase innovative projects and groundbreaking research</div>
+          </div>
+        </div>
+        <div class="carousel-slide">
+          <img class="carousel-image" src="https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=1200&q=80" alt="Sports">
+          <div class="carousel-caption">
+            <div class="caption-title">Annual Sports Day</div>
+            <div class="caption-text">Celebrating teamwork, discipline, and school spirit</div>
+          </div>
+        </div>
+        <div class="carousel-slide">
+          <img class="carousel-image" src="https://images.unsplash.com/photo-1517520287167-4bbf64a00d66?auto=format&fit=crop&w=1200&q=80" alt="Graduation">
+          <div class="carousel-caption">
+            <div class="caption-title">Celebrating Success</div>
+            <div class="caption-text">Honoring graduates and their achievements</div>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-controls">
+        <button class="carousel-btn" id="carouselPrev"><i class="fas fa-chevron-left"></i></button>
+        <button class="carousel-btn" id="carouselNext"><i class="fas fa-chevron-right"></i></button>
+      </div>
     </div>
+    <div class="carousel-dots" id="carouselDots"></div>
+  </div>
+</section>
 
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">
-          <i class="fas fa-book"></i>
-        </div>
-        <h3>Primary School</h3>
-        <p>Foundation-focused curriculum building strong fundamentals in core subjects with emphasis on creative thinking.</p>
-      </div>
+<!-- STATS SECTION -->
+<section class="stats-section" id="stats">
+  <div class="section-container">
+    <div class="stat-card">
+      <span class="stat-icon"><i class="fas fa-graduation-cap"></i></span>
+      <span class="stat-value">5,420</span>
+      <span class="stat-label">Total Graduates</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon"><i class="fas fa-users"></i></span>
+      <span class="stat-value">2,840</span>
+      <span class="stat-label">Current Students</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon"><i class="fas fa-chalkboard-teacher"></i></span>
+      <span class="stat-value">185</span>
+      <span class="stat-label">Faculty Members</span>
+    </div>
+  </div>
+</section>
 
-      <div class="feature-card">
-        <div class="feature-icon">
-          <i class="fas fa-flask"></i>
-        </div>
-        <h3>Secondary School</h3>
-        <p>Advanced curriculum with specialized tracks in science, humanities, and commerce to prepare for university.</p>
+<!-- ABOUT SECTION -->
+<section class="about-section" id="about">
+  <div class="section-container">
+    <div class="about-grid">
+      <div class="about-main">
+        <h2>About Gold & Linc Schools</h2>
+        <p>
+          Founded on principles of academic excellence and character development, Gold & Linc Schools has been a beacon of educational innovation for years. Our commitment extends beyond the classroom, fostering critical thinking, creativity, and ethical leadership.
+        </p>
+        <p>
+          With state-of-the-art facilities, experienced faculty, and a global perspective, we prepare students to thrive in an increasingly complex world. Our holistic approach to education ensures that every student develops not just intellectually, but emotionally and socially as well.
+        </p>
+        <ul class="about-list">
+          <li>Cutting-edge Research Labs & Technology Centers</li>
+          <li>Industry Partnerships & Internship Opportunities</li>
+          <li>Global Alumni Network of 5,400+ Graduates</li>
+          <li>Active Student Clubs & Societies</li>
+          <li>Comprehensive Scholarships & Financial Aid</li>
+          <li>Experienced and Dedicated Faculty</li>
+        </ul>
       </div>
+      <div class="about-side">
+        <div style="margin-bottom: 32px;">
+          <h3 style="font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 16px; color: var(--navy);">Quick Links</h3>
+          <div class="quick-links-grid">
+            <a class="quick-link" href="#"><i class="fas fa-calendar-alt"></i> Academic Calendar</a>
+            <a class="quick-link" href="#"><i class="fas fa-book"></i> Library Portal</a>
+            <a class="quick-link" href="login.html"><i class="fas fa-user-graduate"></i> Student Portal</a>
+            <a class="quick-link" href="#"><i class="fas fa-users"></i> Faculty Directory</a>
+            <a class="quick-link" href="#contact"><i class="fas fa-phone"></i> Contact Us</a>
+            <a class="quick-link" href="#"><i class="fas fa-question-circle"></i> FAQ</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-      <div class="feature-card">
-        <div class="feature-icon">
-          <i class="fas fa-microscope"></i>
-        </div>
-        <h3>Research & Innovation</h3>
-        <p>Cutting-edge research programs and innovation labs fostering entrepreneurial thinking and scientific curiosity.</p>
-      </div>
+<!-- GALLERY SECTION -->
+<section class="gallery-section" id="gallery">
+  <div class="section-container">
+    <h2 class="gallery-title">Gallery</h2>
+    <div class="gallery-grid">
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=500&q=80" alt="Campus">
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=500&q=80" alt="Laboratory">
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=500&q=80" alt="Sports">
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1517520287167-4bbf64a00d66?auto=format&fit=crop&w=500&q=80" alt="Classroom">
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=500&q=80" alt="Library">
+      <img class="gallery-img" src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=500&q=80" alt="Activities">
     </div>
   </div>
 </section>
 
 <!-- TESTIMONIALS SECTION -->
-<section class="testimonials-section" id="testimonials">
-  <div class="container">
-    <div class="testimonials-header">
-      <h2>What Our Community Says</h2>
-    </div>
-
-    <div class="testimonials-grid">
+<section class="testimonial-section" id="testimonials">
+  <div class="section-container">
+    <h2 class="testimonial-title">What Our Students & Parents Say</h2>
+    <div class="testimonial-list">
       <div class="testimonial-card">
         <div class="testimonial-quote">
-          "Gold & Linc Schools transformed my daughter's academic journey. The personalized attention and world-class facilities are outstanding."
+          "Gold and Linc Schools gave my child the foundation for academic and personal success. The teachers are caring, facilities are world-class, and the school culture is exceptional!"
         </div>
-        <div class="testimonial-author">
-          <img src="https://randomuser.me/api/portraits/women/1.jpg" alt="Parent" class="testimonial-avatar">
+        <div class="testimonial-person">
+          <img class="testimonial-avatar" src="https://randomuser.me/api/portraits/men/83.jpg" alt="Parent">
           <div>
-            <div class="testimonial-name">Mrs. Olayinka Adeyemi</div>
+            <div class="testimonial-name">Mr. John Adebayo</div>
             <div class="testimonial-role">Parent</div>
           </div>
         </div>
       </div>
-
       <div class="testimonial-card">
         <div class="testimonial-quote">
-          "My time here was incredible. I gained not just knowledge but lifelong friendships and confidence to pursue my dreams."
+          "As a student, I enjoyed every moment at Gold and Linc Schools. The environment is motivating, opportunities are endless, and friendships formed here last a lifetime."
         </div>
-        <div class="testimonial-author">
-          <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="Student" class="testimonial-avatar">
+        <div class="testimonial-person">
+          <img class="testimonial-avatar" src="https://randomuser.me/api/portraits/women/55.jpg" alt="Alumnus">
           <div>
             <div class="testimonial-name">Tosin Balogun</div>
-            <div class="testimonial-role">Alumni</div>
+            <div class="testimonial-role">Alumnus</div>
           </div>
         </div>
       </div>
-
       <div class="testimonial-card">
         <div class="testimonial-quote">
-          "The faculty here genuinely cares about student development. I recommend Gold & Linc to every parent looking for quality education."
+          "The science and tech programs are truly world-class. The hands-on learning approach, mentorship, and industry exposure prepared me well for university and beyond."
         </div>
-        <div class="testimonial-author">
-          <img src="https://randomuser.me/api/portraits/men/3.jpg" alt="Parent" class="testimonial-avatar">
+        <div class="testimonial-person">
+          <img class="testimonial-avatar" src="https://randomuser.me/api/portraits/men/59.jpg" alt="Parent">
           <div>
             <div class="testimonial-name">Chief Adeyemi</div>
             <div class="testimonial-role">Parent</div>
@@ -929,90 +1145,77 @@
   </div>
 </section>
 
-<!-- CTA SECTION -->
-<section class="cta-section" id="admissions">
-  <h2>Ready to Start Your Journey?</h2>
-  <p>Join thousands of students who have transformed their lives through Gold & Linc Schools' comprehensive education.</p>
-  <div class="cta-buttons">
-    <button class="cta-btn cta-btn-primary" onclick="document.querySelector('.nav-cta').click()">Apply Now</button>
-    <a href="#contact" class="cta-btn cta-btn-secondary">Contact Us</a>
-  </div>
-</section>
-
 <!-- FOOTER -->
-<footer>
-  <div class="container">
-    <div class="footer-grid">
-      <div class="footer-col">
-        <h4>About</h4>
-        <ul>
-          <li><a href="#about">Our Story</a></li>
-          <li><a href="#about">Mission & Vision</a></li>
-          <li><a href="#about">Faculty</a></li>
-          <li><a href="#about">Careers</a></li>
-        </ul>
+<footer class="footer" id="contact">
+  <div class="section-container">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>About Gold & Linc</h3>
+        <div class="footer-links">
+          <a href="#about">Our Story</a>
+          <a href="#programs">Programs</a>
+          <a href="#gallery">Gallery</a>
+          <a href="#testimonials">Testimonials</a>
+        </div>
       </div>
-
-      <div class="footer-col">
-        <h4>Programs</h4>
-        <ul>
-          <li><a href="#programs">Primary School</a></li>
-          <li><a href="#programs">Secondary School</a></li>
-          <li><a href="#programs">Research</a></li>
-          <li><a href="#programs">Special Programs</a></li>
-        </ul>
+      <div class="footer-section">
+        <h3>Quick Links</h3>
+        <div class="footer-links">
+          <a href="login.html">Student Portal</a>
+          <a href="#">Faculty Directory</a>
+          <a href="#">Academic Calendar</a>
+          <a href="#">Library</a>
+        </div>
       </div>
-
-      <div class="footer-col">
-        <h4>Support</h4>
-        <ul>
-          <li><a href="#contact">Contact</a></li>
-          <li><a href="#contact">Admissions</a></li>
-          <li><a href="#contact">FAQ</a></li>
-          <li><a href="#contact">Portal</a></li>
-        </ul>
+      <div class="footer-section">
+        <h3>Contact Us</h3>
+        <div class="footer-links">
+          <a href="tel:08034430941"><i class="fas fa-phone"></i> 0803 443 0941</a>
+          <a href="mailto:goldlincschools@gmail.com"><i class="fas fa-envelope"></i> goldlincschools@gmail.com</a>
+          <a href="#"><i class="fas fa-map-marker-alt"></i> Ilesa, Osun State</a>
+        </div>
       </div>
-
-      <div class="footer-col">
-        <h4>Connect</h4>
-        <ul>
-          <li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i> Facebook</a></li>
-          <li><a href="#" target="_blank"><i class="fab fa-twitter"></i> Twitter</a></li>
-          <li><a href="#" target="_blank"><i class="fab fa-instagram"></i> Instagram</a></li>
-          <li><a href="#" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a></li>
-        </ul>
+      <div class="footer-section">
+        <h3>Follow Us</h3>
+        <div class="footer-links" style="display: flex; gap: 16px;">
+          <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+        </div>
       </div>
     </div>
-
-    <div class="footer-bottom">
-      <p>&copy; 2025 Gold and Linc Schools. All rights reserved. | <a href="#" style="color: var(--gold);">Privacy Policy</a></p>
-    </div>
+  </div>
+  <div class="footer-copy">
+    &copy; 2025 Gold and Linc Schools. All rights reserved. | <a href="#" style="color: var(--gold); text-decoration: none;">Privacy Policy</a> | <a href="#" style="color: var(--gold); text-decoration: none;">Terms of Service</a>
   </div>
 </footer>
 
+<!-- SCRIPTS -->
 <script>
   // Mobile menu toggle
-  const navToggle = document.querySelector('.nav-toggle');
-  const nav = document.getElementById('main-nav');
+  (function () {
+    const btn = document.querySelector('.nav-toggle');
+    const nav = document.getElementById('main-nav');
 
-  if (navToggle && nav) {
+    if (!btn || !nav) return;
+
     function setOpen(isOpen) {
-      navToggle.setAttribute('aria-expanded', String(isOpen));
-      navToggle.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
-      navToggle.classList.toggle('open', isOpen);
+      btn.setAttribute('aria-expanded', String(isOpen));
+      btn.classList.toggle('open', isOpen);
       nav.classList.toggle('open', isOpen);
       document.body.classList.toggle('no-scroll', isOpen);
     }
 
-    navToggle.addEventListener('click', () => {
-      const expanded = navToggle.getAttribute('aria-expanded') === 'true';
+    btn.addEventListener('click', () => {
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
       setOpen(!expanded);
     });
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && nav.classList.contains('open')) {
         setOpen(false);
-        navToggle.focus();
+        btn.focus();
       }
     });
 
@@ -1024,16 +1227,78 @@
 
     document.addEventListener('click', (e) => {
       if (!nav.classList.contains('open')) return;
-      if (!nav.contains(e.target) && !navToggle.contains(e.target)) {
+      if (!nav.contains(e.target) && !btn.contains(e.target)) {
         setOpen(false);
       }
     });
 
-    // Close menu when clicking links
+    // Close menu when nav link is clicked
     nav.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => setOpen(false));
+      link.addEventListener('click', () => {
+        setOpen(false);
+      });
     });
-  }
+  })();
+
+  // Carousel functionality
+  (function () {
+    const carouselImages = document.getElementById('carouselImages');
+    const images = carouselImages.querySelectorAll('.carousel-slide');
+    const prevBtn = document.getElementById('carouselPrev');
+    const nextBtn = document.getElementById('carouselNext');
+    const dotsContainer = document.getElementById('carouselDots');
+    let current = 0;
+    let interval;
+
+    function showSlide(idx) {
+      if (idx < 0) idx = images.length - 1;
+      if (idx >= images.length) idx = 0;
+      carouselImages.style.transform = `translateX(-${idx * 100}%)`;
+      document.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i === idx);
+      });
+      current = idx;
+    }
+
+    function nextSlide() { showSlide(current + 1); }
+    function prevSlide() { showSlide(current - 1); }
+
+    prevBtn.addEventListener('click', prevSlide);
+    nextBtn.addEventListener('click', nextSlide);
+
+    // Create dots
+    dotsContainer.innerHTML = '';
+    for (let i = 0; i < images.length; i++) {
+      let dot = document.createElement('div');
+      dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+      dot.addEventListener('click', () => showSlide(i));
+      dotsContainer.appendChild(dot);
+    }
+
+    // Auto-advance
+    function startCarousel() {
+      interval = setInterval(nextSlide, 5000);
+    }
+    function stopCarousel() {
+      clearInterval(interval);
+    }
+
+    carouselImages.addEventListener('mouseenter', stopCarousel);
+    carouselImages.addEventListener('mouseleave', startCarousel);
+    startCarousel();
+
+    // Touch support
+    let startX = 0, endX = 0;
+    carouselImages.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+    carouselImages.addEventListener('touchmove', e => endX = e.touches[0].clientX);
+    carouselImages.addEventListener('touchend', () => {
+      if (startX && endX) {
+        if (startX - endX > 50) nextSlide();
+        else if (endX - startX > 50) prevSlide();
+      }
+      startX = endX = 0;
+    });
+  })();
 </script>
 
 </body>
