@@ -113,6 +113,17 @@ function copyToClipboard(text, btn = null) {
   });
 }
 
+// Date range filter helper
+function isDateInRange(dateToCheck, startDate, endDate) {
+  const checkDate = new Date(dateToCheck).setHours(0, 0, 0, 0);
+  const start = startDate ? new Date(startDate).setHours(0, 0, 0, 0) : null;
+  const end = endDate ? new Date(endDate).setHours(23, 59, 59, 999) : null;
+  
+  if (start && checkDate < start) return false;
+  if (end && checkDate > end) return false;
+  return true;
+}
+
 // ============ DYNAMIC CONTENT LOADERS ============
 
 // 1. Exams List - WITH EXAM CODES
@@ -711,7 +722,7 @@ async function showScheduleExam() {
   };
 }
 
-// 4. Results with filtering, search, and PDF export
+// 4. Results with filtering, search, date range, and PDF export
 async function showResults() {
   document.getElementById('pageTitle').textContent = 'Student CBT Results';
   document.getElementById('contentArea').innerHTML = `
@@ -723,21 +734,19 @@ async function showResults() {
       <span class="text-blue-700 font-bold">Loading results...</span>
     </div>
     <div id="resultsContainer" style="display: none;">
-      <div class="filters-section mb-6">
-        <div class="filter-input">
-          <input type="text" id="searchInput" placeholder="🔍 Search by student name or exam..." class="block w-full rounded border px-3 py-2">
-        </div>
-        <div class="filter-select">
-          <select id="classFilter" class="block w-full rounded border px-3 py-2">
-            <option value="">All Classes</option>
-          </select>
-        </div>
-        <div class="filter-select">
-          <select id="subjectFilter" class="block w-full rounded border px-3 py-2">
-            <option value="">All Subjects</option>
-          </select>
-        </div>
-        <button class="cbt-btn" onclick="resetResultsFilters()"><i class="fa fa-redo mr-1"></i> Reset</button>
+      <div class="filters-section mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <input type="text" id="searchInput" placeholder="🔍 Search by student name..." class="block w-full rounded border px-3 py-2">
+        <select id="classFilter" class="block w-full rounded border px-3 py-2">
+          <option value="">All Classes</option>
+        </select>
+        <select id="subjectFilter" class="block w-full rounded border px-3 py-2">
+          <option value="">All Subjects</option>
+        </select>
+        <input type="date" id="dateFromFilter" class="block w-full rounded border px-3 py-2" placeholder="From Date">
+        <input type="date" id="dateToFilter" class="block w-full rounded border px-3 py-2" placeholder="To Date">
+      </div>
+      <div class="flex gap-2 mb-6 flex-wrap">
+        <button class="cbt-btn" onclick="resetResultsFilters()"><i class="fa fa-redo mr-1"></i> Reset Filters</button>
         <button class="cbt-btn" style="background: #28a745;" onclick="exportResultsToPDF()"><i class="fa fa-file-pdf mr-1"></i> Export PDF</button>
       </div>
       <div id="resultsInfo" class="results-info"></div>
@@ -784,6 +793,8 @@ async function showResults() {
   function generatePDFContent(dataToRender) {
     const classFilter = document.getElementById('classFilter').value || 'All Classes';
     const subjectFilter = document.getElementById('subjectFilter').value || 'All Subjects';
+    const dateFrom = document.getElementById('dateFromFilter').value || 'All';
+    const dateTo = document.getElementById('dateToFilter').value || 'All';
     const currentDate = new Date().toLocaleString();
 
     if (dataToRender.length === 0) {
@@ -813,6 +824,7 @@ async function showResults() {
         <div style="margin-bottom: 20px; background: #f3f4f6; padding: 12px; border-radius: 6px;">
           <p style="margin: 5px 0; font-size: 13px;"><strong>Class Filter:</strong> ${classFilter}</p>
           <p style="margin: 5px 0; font-size: 13px;"><strong>Subject Filter:</strong> ${subjectFilter}</p>
+          <p style="margin: 5px 0; font-size: 13px;"><strong>Date Range:</strong> ${dateFrom} to ${dateTo}</p>
           <p style="margin: 5px 0; font-size: 13px;"><strong>Total Results:</strong> ${dataToRender.length}</p>
         </div>
 
@@ -924,6 +936,8 @@ async function showResults() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
     const classValue = document.getElementById('classFilter').value;
     const subjectValue = document.getElementById('subjectFilter').value;
+    const dateFrom = document.getElementById('dateFromFilter').value;
+    const dateTo = document.getElementById('dateToFilter').value;
 
     filteredResults = results.filter(r => {
       const matchesSearch = !searchTerm || 
@@ -931,8 +945,9 @@ async function showResults() {
         r.examTitle.toLowerCase().includes(searchTerm);
       const matchesClass = !classValue || r.className === classValue;
       const matchesSubject = !subjectValue || r.subjectName === subjectValue;
+      const matchesDate = isDateInRange(r.finishedAt || r.startedAt, dateFrom, dateTo);
       
-      return matchesSearch && matchesClass && matchesSubject;
+      return matchesSearch && matchesClass && matchesSubject && matchesDate;
     });
 
     renderResultsTable(filteredResults);
@@ -942,6 +957,8 @@ async function showResults() {
     document.getElementById('searchInput').value = '';
     document.getElementById('classFilter').value = '';
     document.getElementById('subjectFilter').value = '';
+    document.getElementById('dateFromFilter').value = '';
+    document.getElementById('dateToFilter').value = '';
     filteredResults = [...results];
     renderResultsTable(filteredResults);
   }
@@ -1004,6 +1021,8 @@ async function showResults() {
   document.getElementById('searchInput').addEventListener('input', applyFilters);
   document.getElementById('classFilter').addEventListener('change', applyFilters);
   document.getElementById('subjectFilter').addEventListener('change', applyFilters);
+  document.getElementById('dateFromFilter').addEventListener('change', applyFilters);
+  document.getElementById('dateToFilter').addEventListener('change', applyFilters);
 
   // Initial render
   renderResultsTable(filteredResults);
