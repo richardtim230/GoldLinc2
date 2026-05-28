@@ -1,580 +1,677 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Gold and Linc Schools</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Inter + Playfair Display for academic elegance -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-<!-- FontAwesome (if not already included) -->
-  
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <!-- TopBar -->
-  <div class="topbar">
-    <div class="school-logo">
-      <img src="logo-1679575828 (1).jpeg" alt="Gold and Linc Schools Logo">
-    </div>
-    <span class="school-name">Gold and Linc Schools</span>
-  </div>
-  <!-- Navigation -->
-<nav class="navbar">
-  <div class="nav-container">
-    <div class="brand">MENU</div>
-    <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
-      <i class="fa fa-bars"></i>
-    </button>
-    <ul class="nav-list" id="navList">
-      <li><a href="login.html" class="nav-portal">Portal Login <i class="fa fa-sign-in-alt"></i></a></li>
-      <li><a href="#" class="active">Home</a></li>
-      <li><a href="#">Admission</a></li>
-      <li><a href="#">Research</a></li>
-      <li><a href="#">Student</a></li>
-      <li><a href="#">Programs</a></li>
-      <li><a href="#">Administration</a></li>
-      <li><a href="#">Links</a></li>
-      <li><a href="#">Notice</a></li>
-      <li><a href="#">About Us</a></li>
-      
-    </ul>
-  </div>
-</nav>
-
-
-  
-  
-  <!-- Hero Section -->
-
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-overlay"></div>
-  <div class="hero-images">
-    <img src="slider_image_01-1679459700.png?auto=format&fit=crop&w=1400&q=80" class="hero-img active" alt="Hero 1">
-    <img src="images (3).jpeg?auto=format&fit=crop&w=1400&q=80" class="hero-img" alt="Hero 2">
-    <img src="student in the lab 900 x 600.webp?auto=format&fit=crop&w=1400&q=80" class="hero-img" alt="Hero 3">
-  </div>
-  <div class="hero-content">
-    <h1 class="hero-title">Gold & Linc Schools</h1>
-    <p class="hero-subtitle">Behind Irenitemi Hotel, Testing Ground Area<br>Off Osogbo Road, Ilesa, Osun State</p>
-    <p class="hero-motto">“For A Solid Begining.”</p>
-  </div>
-</div>
-<!-- Carousel Section -->
-<section class="carousel-section">
-  <div class="carousel-images" id="carouselImages" style="position:relative;">
-    <div class="carousel-slide">
-      <img class="carousel-image" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80" alt="Campus 1">
-      <div class="carousel-caption">
-        <div class="caption-title">Gold and Linc Schools Welcomes New Students!</div>
-        <div class="caption-text">Orientation for the 2025/2026 Academic Year was a huge success.</div>
-      </div>
-    </div>
-    <div class="carousel-slide">
-      <img class="carousel-image" src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1200&q=80" alt="Campus 2">
-      <div class="carousel-caption">
-        <div class="caption-title">Science Fair 2025</div>
-        <div class="caption-text">Students impress judges with innovative projects and experiments.</div>
-      </div>
-    </div>
-    <div class="carousel-slide">
-      <img class="carousel-image" src="https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=1200&q=80" alt="Event 1">
-      <div class="carousel-caption">
-        <div class="caption-title">Annual Sports Day Highlights</div>
-        <div class="caption-text">Inter-house competitions foster teamwork and school spirit.</div>
-      </div>
-    </div>
-    <div class="carousel-slide">
-      <img class="carousel-image" src="https://images.unsplash.com/photo-1517520287167-4bbf64a00d66?auto=format&fit=crop&w=1200&q=80" alt="Graduation">
-      <div class="carousel-caption">
-        <div class="caption-title">Congratulations to Our Graduates</div>
-        <div class="caption-text">Celebrating excellence and achievement in academics.</div>
-      </div>
-    </div>
-  </div>
-  <div class="carousel-controls">
-    <button class="carousel-btn" id="carouselPrev"><i class="fa fa-chevron-left"></i></button>
-    <button class="carousel-btn" id="carouselNext"><i class="fa fa-chevron-right"></i></button>
-  </div>
-  <div class="carousel-dots" id="carouselDots"></div>
-  <style>
-    .carousel-slide {
-      min-width: 100%;
-      position: relative;
-      display: flex;
-      align-items: stretch;
-      justify-content: center;
-    }
-    .carousel-caption {
-      position: absolute;
-      left: 50%; top: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(33, 115, 83, 0.77);
-      color: #fff;
-      text-align: center;
-      border-radius: 13px;
-      padding: 18px 22px 13px 22px;
-      box-shadow: 0 3px 22px #0004;
-      z-index: 2;
-      max-width: 89vw;
-      min-width: 180px;
-      width: 65vw;
-      animation: fadeInCaption .6s;
-    }
-    @keyframes fadeInCaption { from { opacity:0;transform:translate(-50%,-40%);} to{opacity:1;transform:translate(-50%,-50%);} }
-    .carousel-caption .caption-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.30rem;
-      font-weight: 800;
-      margin-bottom: 5px;
-      color: #ffe08a;
-      letter-spacing: .01em;
-      text-shadow:0 1px 7px #0e3b1f77;
-    }
-    .carousel-caption .caption-text {
-      font-size: 1.01rem;
-      color: #fffce7;
-      font-weight: 500;
-      text-shadow:0 1px 5px #0e3b1f55;
-    }
-    @media (max-width: 700px) {
-      .carousel-caption { padding: 10px 6vw 8px 6vw; width: 89vw; font-size:.99rem; }
-      .carousel-caption .caption-title {font-size:1.08rem;}
-      .carousel-caption .caption-text {font-size:.97rem;}
-    }
-    @media (max-width:400px){
-      .carousel-caption{padding:6px 2vw 5px 2vw;}
-      .carousel-caption .caption-title {font-size:1rem;}
-    }
-  </style>
-  
-</section>
-  <!-- Stats Section -->
-  <section class="stats-section">
-    <div class="stat-card">
-      <span class="stat-icon"><i class="fa fa-graduation-cap"></i></span>
-      <span class="stat-value">5,420</span>
-      <span class="stat-label">Total Graduates</span>
-    </div>
-    <div class="stat-card">
-      <span class="stat-icon"><i class="fa fa-users"></i></span>
-      <span class="stat-value">2,840</span>
-      <span class="stat-label">Current Students</span>
-    </div>
-    <div class="stat-card">
-      <span class="stat-icon"><i class="fa fa-chalkboard-teacher"></i></span>
-      <span class="stat-value">185</span>
-      <span class="stat-label">Faculty</span>
-    </div>
-  </section>
-  <!-- Our Pride Section -->
-  <section class="pride-section">
-    <img class="pride-img" src="https://images.unsplash.com/photo-1517520287167-4bbf64a00d66?auto=format&fit=crop&w=400&q=80" alt="Graduate">
-    <div class="pride-info">
-      <div class="pride-title">Our Pride</div>
-      <div class="pride-name">Aloba Kehinde</div>
-      <div class="pride-text">
-        Awarded as the Best Graduate of 2025, Aloba Kehinde is a symbol of the excellence and innovation Gold and Linc Schools cultivates. Her research in Artificial Intelligence has made a significant impact in the industry.
-      </div>
-    </div>
-  </section>
-
-  
-  
-  <!-- Proprietor's Welcome Message Section -->
-<section class="welcome-section">
-  <div class="welcome-container">
-    <div class="welcome-image animate-fade-slide">
-    
-      <img src="administrative_message_1-1679483040.png?auto=format&fit=crop&w=400&q=80" alt="Proprietor" />
-    </div>
-    <div class="welcome-content animate-fade-slide">
-      <h2 class="welcome-title">A Welcome Message from the Proprietor</h2>
-      <p class="welcome-text">
-        Dear Students, Parents, and Visitors,<br /><br />
-        It is my great pleasure to welcome you to Gold and Linc Schools. We are more than just an institution — we are a community built on a foundation of integrity, academic excellence, and character development.
-        <br /><br />
-        As the proprietor, my commitment is to provide an inspiring environment where students are empowered to become forward-thinking leaders of tomorrow. Thank you for being part of our vision. We are honored to have you on this journey with us.
-        <br /><br />
-        Warm regards,<br />
-        <strong>Mr. Festus A. Adeniyi</strong><br />
-        Proprietor, Gold and Linc Schools
-      </p>
-    </div>
-  </div>
-        </section>
-        
-  <!-- About Section & Quick Links -->
-  <section class="about-section" id="about">
-    <div class="about-main">
-  <h2 class="about-title">About Gold & Linc Schools</h2>
-  <p class="about-text">
-    Gold & Linc Schools is committed to nurturing talent, fostering innovation, and advancing research in technology and the sciences. 
-    With a dynamic faculty, state-of-the-art facilities, and a vibrant student community, Gold & Linc Schools is at the forefront of education and scientific discovery.
-  </p>
-  <ul class="about-list">
-    <li>Cutting-edge Research Labs</li>
-    <li>Industry Partnerships & Internships</li>
-    <li>Global Alumni Network</li>
-    <li>Student Clubs & Societies</li>
-    <li>Scholarships & Financial Aid</li>
-  </ul>
-    </div>
-                                   
-    <div class="about-side">
-      <div class="quick-title"><i class="fa fa-bolt"></i> Quick Links</div>
-      <div class="quick-links-grid">
-        <a class="quick-link" href="#"><i class="fa fa-calendar-alt"></i> Academic Calendar</a>
-        <a class="quick-link" href="#"><i class="fa fa-book"></i> Library</a>
-        <a class="quick-link" href="#"><i class="fa fa-user-graduate"></i> Student Portal</a>
-        <a class="quick-link" href="#"><i class="fa fa-users-cog"></i> Faculty Directory</a>
-        <a class="quick-link" href="#"><i class="fa fa-phone"></i> Contact Us</a>
-        <a class="quick-link" href="#"><i class="fa fa-question-circle"></i> FAQ</a>
-      </div>
-    </div>
-  </section>
-  <!-- Gallery Section -->
-  <section class="gallery-section">
-    <div class="gallery-title">Gallery</div>
-    <div class="gallery-grid">
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80" alt="Gallery">
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80" alt="Gallery">
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=400&q=80" alt="Gallery">
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1517520287167-4bbf64a00d66?auto=format&fit=crop&w=400&q=80" alt="Gallery">
-      <img class="gallery-img" src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80" alt="Gallery">
-    </div>
-  </section>
-  <!-- Testimonials Section -->
-  <section class="testimonial-section">
-    <div class="testimonial-title">What Our Students &amp; Parents Say</div>
-    <div class="testimonial-list">
-      <div class="testimonial-card">
-        <div class="testimonial-quote">
-          Gold and Linc Schools gave my child the foundation for academic and personal success. The teachers are caring and the facilities are top-notch!
-        </div>
-        <div class="testimonial-person">
-          <img class="testimonial-avatar" src="https://randomuser.me/api/portraits/men/83.jpg" alt="Parent">
-          <div>
-            <div class="testimonial-name">Mr. John Adebayo</div>
-            <div class="testimonial-role">Parent</div>
-          </div>
-        </div>
-      </div>
-      <div class="testimonial-card">
-        <div class="testimonial-quote">
-          As a student, I enjoyed every moment at Gold and Linc Schools. The environment is motivating and the opportunities are endless.
-        </div>
-        <div class="testimonial-person">
-          <img class="testimonial-avatar" src="https://randomuser.me/api/portraits/women/55.jpg" alt="Student">
-          <div>
-            <div class="testimonial-name">Tosin Balogun</div>
-            <div class="testimonial-role">Alumnus</div>
-          </div>
-        </div>
-      </div>
-      <div class="testimonial-card">
-        <div class="testimonial-quote">
-          The science and tech programs at Gold and Linc are truly world class. I recommend this school to everyone!
-        </div>
-        <div class="testimonial-person">
-          <img class="testimonial-avatar" src="https://randomuser.me/api/portraits/men/59.jpg" alt="Parent">
-          <div>
-            <div class="testimonial-name">Chief Adeyemi</div>
-            <div class="testimonial-role">Parent</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-          <!-- Vision & Mission Section -->
-<section class="vm-section">
-  <div class="vm-wrapper">
-    <div class="vm-card">
-      <div class="vm-icon"><i class="fas fa-eye"></i></div>
-      <h2 class="vm-title">Vision Statement</h2>
-      <p class="vm-text">
-        To be a beacon of excellence in education, cultivating innovative thinkers, ethical leaders, and global citizens prepared to shape the future with courage and compassion.
-      </p>
-    </div>
-
-    <div class="vm-card">
-      <div class="vm-icon"><i class="fas fa-bullseye"></i></div>
-      <h2 class="vm-title">Mission Statement</h2>
-      <p class="vm-text">
-        Our mission is to provide transformative education through critical inquiry, practical knowledge, and a commitment to service — empowering students to thrive in a complex, interconnected world.
-      </p>
-    </div>
-  </div>
-</section>
-
-<!-- Font Awesome for icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-
-<!-- Modals -->
-<div id="modal1" class="modal">
-  <div class="modal-content">
-    <span class="close" data-modal="modal1">&times;</span>
-    <h2>Prof. Dr. Anwar Hossain</h2>
-    <p>Dr. Hossain has over 20 years of experience in AI and machine learning, mentoring hundreds of students worldwide and leading cutting-edge research in predictive modeling and smart systems.</p>
-  </div>
-</div>
-
-<div id="modal2" class="modal">
-  <div class="modal-content">
-    <span class="close" data-modal="modal2">&times;</span>
-    <h2>Dr. Rina Das</h2>
-    <p>Dr. Rina Das is a top cybersecurity scholar specializing in network security, cryptographic systems, and enterprise risk assessment. She’s also passionate about women in tech advocacy.</p>
-  </div>
-</div>
-
-<!-- FontAwesome (for icons) -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
-  
-  <!-- News & Events Section -->
-  <section class="news-section" id="news">
-    <div class="news-title">News &amp; Events</div>
-    <div class="news-list">
-      <div class="news-card">
-        <img class="news-img" src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80" alt="Event">
-        <div class="news-headline">AI Symposium 2025</div>
-        <div class="news-date">12 June 2025</div>
-        <div class="news-text">Join us for the annual AI Symposium featuring leading researchers and industry experts.</div>
-      </div>
-      <div class="news-card">
-        <img class="news-img" src="https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=400&q=80" alt="Event">
-        <div class="news-headline">Student Hackathon</div>
-        <div class="news-date">30 May 2025</div>
-        <div class="news-text">Congratulations to all participants of the Gold and Linc Hackathon! Winners have been announced.</div>
-      </div>
-      <div class="news-card">
-        <img class="news-img" src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80" alt="Event">
-        <div class="news-headline">New Research Grants</div>
-        <div class="news-date">25 May 2025</div>
-        <div class="news-text">Our faculty received new funding for groundbreaking projects in cybersecurity.</div>
-      </div>
-    </div>
-  </section>
-      <!-- Footer -->
-  <footer class="footer" style="background: linear-gradient(90deg, #217353 0%, #0e4a30 100%);
-    color: #fff; padding: 28px 0 12px 0; text-align: center; font-size: 1.06rem; border-top-left-radius: 20px; border-top-right-radius: 20px; margin-top: 0;">
-    <div style="max-width:1100px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;padding:0 4vw;">
-      <!-- Left: Logo + Motto -->
-      <div style="flex:1 1 175px;min-width:150px;display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-        <img src="logo-1679575828 (1).jpeg" alt="Gold and Linc Schools Logo"
-             style="width:38px;height:38px;border-radius:11px;background:#fff;box-shadow:0 1px 7px #0001;">
-        <div style="text-align:left;">
-          <div style="font-family:'Playfair Display',serif;font-size:1.06rem;font-weight:800;letter-spacing:.03em;color:#fff;">
-            Gold and Linc Schools
-          </div>
-          <div style="font-size:0.96rem;color:#ffe08a;letter-spacing:.015em;">
-            For sound learning.
-          </div>
-        </div>
-      </div>
-      <!-- Center: Links & Contact, now in column on small screens -->
-      <div style="flex:2 1 260px;min-width:180px;display:flex;flex-direction:column;align-items:center;">
-        <div class="footer-links" style="display:flex;gap:15px;justify-content:center;margin-bottom: 9px;flex-wrap:wrap;">
-          <a href="#" style="color:#ffe08a;text-decoration:none;font-weight:600;font-size:.98rem;"><i class="fa fa-user-shield"></i> Privacy Policy</a>
-          <a href="#" style="color:#ffe08a;text-decoration:none;font-weight:600;font-size:.98rem;"><i class="fa fa-scroll"></i> Terms</a>
-          <a href="#" style="color:#ffe08a;text-decoration:none;font-weight:600;font-size:.98rem;"><i class="fa fa-envelope"></i> Contact</a>
-          <a href="#" style="color:#ffe08a;text-decoration:none;font-weight:600;font-size:.98rem;"><i class="fa fa-question-circle"></i> FAQ</a>
-        </div>
-        <div style="height:1px;width:90%;background:#fff3;max-width:280px;margin-bottom:8px;"></div>
-        <div class="footer-contact" style="font-size:0.97rem;color:#ffe8be;line-height:1.5;">
-          <span style="display:inline-block;margin-bottom:2px;">
-            <i class="fa fa-map-marker-alt"></i>
-            Behind Irenitemi Hotel, Testing Ground Area, Off Osogbo Road, Ilesa, Osun State
-          </span><br>
-          <span>
-            <i class="fa fa-envelope"></i>
-            <a href="mailto:goldlincschools@gmail.com" style="color:#ffe08a;text-decoration:underline;">goldlincschools@gmail.com</a>
-            &nbsp;|&nbsp;
-            <i class="fa fa-phone"></i>
-            <a href="tel:08034430941" style="color:#ffe08a;text-decoration:underline;">08034430941</a>
-          </span>
-        </div>
-      </div>
-      <!-- Right: Newsletter & Socials -->
-      <div style="flex:1 1 160px;min-width:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:5px;">
-        <form id="newsletterForm" style="margin-bottom:8px;width:100%;max-width:210px;">
-          <label for="newsletterEmail" style="font-size:.97rem;color:#ffe08a;font-weight:600;letter-spacing:.01em;">Subscribe to our newsletter</label>
-          <div style="display:flex;gap:5px;margin-top:5px;">
-            <input type="email" id="newsletterEmail" name="newsletterEmail" required placeholder="Your email"
-              style="padding:5px 8px;border-radius:6px;border:1px solid #ffe08a;font-size:.97rem;outline:none;width:78%;background:#fffbe7;">
-            <button type="submit" style="background:var(--accent);color:var(--primary);border:none;border-radius:6px;padding:5px 12px;font-weight:700;font-size:.96rem;cursor:pointer;"><i class="fa fa-paper-plane"></i></button>
-          </div>
-          <div id="newsletterMsg" style="color:#ffe08a;font-size:.94rem;height:16px;margin-top:3px;"></div>
-        </form>
-        <div style="font-size:.99rem;color:#ffe08a;margin-bottom:4px;margin-top:2px;">Connect</div>
-        <div style="display:flex;gap:10px;justify-content:center;">
-          <a href="#" title="Facebook" style="color:#ffe08a;font-size:1.22rem;"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" title="Twitter" style="color:#ffe08a;font-size:1.22rem;"><i class="fab fa-twitter"></i></a>
-          <a href="#" title="Instagram" style="color:#ffe08a;font-size:1.22rem;"><i class="fab fa-instagram"></i></a>
-          <a href="#" title="LinkedIn" style="color:#ffe08a;font-size:1.22rem;"><i class="fab fa-linkedin-in"></i></a>
-        </div>
-      </div>
-    </div>
-    <div class="footer-copy" style="color:#e0ede6;font-size:0.96rem;margin-top:16px;">
-      &copy; 2025 Gold and Linc Schools. All rights reserved.
-    </div>
-    <style>
-      @media (max-width: 700px) {
-        .footer > div[style^="max-width"] {
-          flex-direction: column !important;
-          align-items: stretch !important;
-          padding: 0 4vw;
-        }
-        .footer .footer-links { justify-content: flex-start !important; gap: 11px !important;}
-        .footer .footer-contact { text-align: left;}
-        .footer-copy {margin-top: 19px !important;}
-      }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.850">
+    <title>Gold and Linc Schools | For Sound Learning</title>
+    <!-- Tailwind CSS & Flowbite via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <!-- Google Fonts for professional typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,400;0,700;1,300&display=swap" rel="stylesheet">
     <script>
-      // Newsletter fake handler
-      document.getElementById('newsletterForm').onsubmit = function(e) {
-        e.preventDefault();
-        var msg = document.getElementById('newsletterMsg');
-        var email = document.getElementById('newsletterEmail').value;
-        if(email && email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-          msg.innerText = "Thank you for subscribing!";
-          setTimeout(()=>{ msg.innerText = ""; document.getElementById('newsletterForm').reset(); }, 2600);
-        } else {
-          msg.innerText = "Please enter a valid email.";
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7', // Primary Sky Blue
+                            800: '#075985', // Accent Deep Blue
+                            900: '#0c4a6e', // Dark Crest
+                        },
+                        gold: {
+                            500: '#d97706',
+                            600: '#b45309',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    }
+                }
+            }
         }
-      };
     </script>
-  </footer>
-  <!-- Carousel Script -->
-  <script>
-    const carouselImages = document.getElementById('carouselImages');
-    const images = carouselImages.querySelectorAll('.carousel-image');
-    const prevBtn = document.getElementById('carouselPrev');
-    const nextBtn = document.getElementById('carouselNext');
-    const dotsContainer = document.getElementById('carouselDots');
-    let current = 0, interval;
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
 
-    function showSlide(idx) {
-      if (idx < 0) idx = images.length-1;
-      if (idx >= images.length) idx = 0;
-      carouselImages.style.transform = `translateX(-${idx * 100}%)`;
-      dotsContainer.querySelectorAll('.carousel-dot').forEach((dot, i) => {
-        dot.classList.toggle('active', i === idx);
-      });
-      current = idx;
-    }
+    <!-- 1. TOP INFO BANNER -->
+    <div class="bg-brand-900 text-white text-xs py-2 px-4 sm:px-6 lg:px-8 hidden md:flex justify-between items-center border-b border-brand-800">
+        <div class="flex items-center space-x-6">
+            <span class="flex items-center"><svg class="w-4 h-4 mr-2 text-brand-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>08034430941</span>
+            <span class="flex items-center"><svg class="w-4 h-4 mr-2 text-brand-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>goldlincschools@gmail.com</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <a href="#" class="hover:text-brand-100 transition-colors">Portals: Parents</a>
+            <span class="text-brand-500">|</span>
+            <a href="#" class="hover:text-brand-100 transition-colors">Students</a>
+            <span class="text-brand-500">|</span>
+            <a href="#" class="hover:text-brand-100 transition-colors">Staff</a>
+        </div>
+    </div>
 
-    function nextSlide() { showSlide(current + 1); }
-    function prevSlide() { showSlide(current - 1); }
+    <!-- 2. STICKY NAVIGATION BAR -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20">
+                <div class="flex-shrink-0 flex items-center">
+                    
+<div class="flex items-center space-x-3">
+    <div class="bg-white p-1 rounded-lg shadow-sm border border-gray-100 flex items-center justify-center">
+        <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779961202/editor-uploads/frngf21mg4fcrnmccobm.png" class="h-12 w-auto object-contain" alt="Gold and Linc Schools Logo">
+    </div>
+    <div>
+        <span class="block text-xl font-bold text-brand-900 tracking-tight uppercase font-serif">Gold & Linc</span>
+        <span class="block text-xs uppercase tracking-widest text-gray-500 -mt-1">Schools</span>
+    </div>
+</div>
 
-    prevBtn.onclick = prevSlide;
-    nextBtn.onclick = nextSlide;
+                </div>
+                
+                <!-- Desktop Navigation Links -->
+                <div class="hidden lg:flex items-center space-x-7">
+                    <a href="#" class="text-brand-900 font-medium border-b-2 border-brand-500 px-1 pt-1 text-sm tracking-wide">Home</a>
+                    
+                    <!-- About Dropdown trigger -->
+                    <button id="aboutDropdownLink" data-dropdown-toggle="aboutDropdown" class="flex items-center justify-between w-full py-2 pr-4 pl-3 text-sm font-medium text-gray-700 hover:text-brand-500 lg:p-0 lg:w-auto">About <svg class="w-2.5 h-2.5 ml-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/></svg></button>
+                    <div id="aboutDropdown" class="z-10 hidden font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
+                        <ul class="py-2 text-sm text-gray-700" aria-labelledby="aboutDropdownLink">
+                            <li><a href="#proprietor-address" class="block px-4 py-2 hover:bg-gray-100">Proprietor's Address</a></li>
+                            <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Our Mission & Values</a></li>
+                            <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Campus Facilities</a></li>
+                        </ul>
+                    </div>
 
-    // Dots navigation
-    dotsContainer.innerHTML = '';
-    for (let i = 0; i < images.length; i++) {
-      let dot = document.createElement('div');
-      dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
-      dot.onclick = () => showSlide(i);
-      dotsContainer.appendChild(dot);
-    }
+                    <!-- Academics Dropdown trigger -->
+                    <button id="academicsDropdownLink" data-dropdown-toggle="academicsDropdown" class="flex items-center justify-between w-full py-2 pr-4 pl-3 text-sm font-medium text-gray-700 hover:text-brand-500 lg:p-0 lg:w-auto">Academics <svg class="w-2.5 h-2.5 ml-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/></svg></button>
+                    <div id="academicsDropdown" class="z-10 hidden font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-48">
+                        <ul class="py-2 text-sm text-gray-700" aria-labelledby="academicsDropdownLink">
+                            <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Primary Education</a></li>
+                            <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Secondary Education</a></li>
+                        </ul>
+                    </div>
 
-    // Auto-advance
-    function startCarousel() {
-      interval = setInterval(nextSlide, 5000);
-    }
-    function stopCarousel() {
-      clearInterval(interval);
-    }
-    carouselImages.addEventListener('mouseenter', stopCarousel);
-    carouselImages.addEventListener('mouseleave', startCarousel);
-    startCarousel();
+                    <a href="#" class="text-gray-600 hover:text-brand-500 font-medium text-sm tracking-wide transition-colors">Campus Life</a>
+                    <a href="#gallery" class="text-gray-600 hover:text-brand-500 font-medium text-sm tracking-wide transition-colors">Gallery</a>
+                    <a href="#" class="text-gray-600 hover:text-brand-500 font-medium text-sm tracking-wide transition-colors">Admissions</a>
+                    <a href="#" class="text-gray-600 hover:text-brand-500 font-medium text-sm tracking-wide transition-colors">Contact</a>
+                </div>
 
-    // For responsive mobile swipe (bonus)
-    let startX = 0, endX = 0;
-    carouselImages.addEventListener('touchstart', e => startX = e.touches[0].clientX);
-    carouselImages.addEventListener('touchmove', e => endX = e.touches[0].clientX);
-    carouselImages.addEventListener('touchend', () => {
-      if (startX && endX) {
-        if (startX - endX > 50) nextSlide();
-        else if (endX - startX > 50) prevSlide();
-      }
-      startX = endX = 0;
-    });
-    document.addEventListener('DOMContentLoaded', () => {
-  // Modal handling
-  document.querySelectorAll('.faculty-card').forEach(card => {
-    card.addEventListener('click', () => {
-      const id = card.dataset.modal;
-      document.getElementById(id).style.display = 'flex';
-    });
-  });
+                <!-- Desktop CTAs (Portal Login & Enquire Now) -->
+                <div class="hidden lg:flex items-center space-x-4">
+                    <a href="#" class="inline-flex items-center justify-center px-4 py-2.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-all duration-200">
+                        <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
+                        Portal Login
+                    </a>
+                    <a href="#enquire" class="inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-md text-white bg-gold-600 hover:bg-gold-500 shadow transition-all duration-200">
+                        Enquire Now
+                    </a>
+                </div>
 
-  document.querySelectorAll('.close').forEach(close => {
-    close.addEventListener('click', () => {
-      const id = close.dataset.modal;
-      document.getElementById(id).style.display = 'none';
-    });
-  });
+                <!-- Mobile menu button -->
+                <div class="flex items-center lg:hidden">
+                    <button data-collapse-toggle="mobile-menu" type="button" class="inline-flex items-center p-2 ml-1 text-sm text-gray-500 rounded-lg lg:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Open main menu</span>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
 
-  window.addEventListener('click', e => {
-    document.querySelectorAll('.modal').forEach(modal => {
-      if (e.target === modal) modal.style.display = 'none';
-    });
-  });
+        <!-- Mobile Menu Stack -->
+        <div class="hidden lg:hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-gray-100 shadow-inner">
+                <a href="#" class="bg-brand-50 text-brand-900 block px-3 py-2.5 rounded-md text-base font-medium">Home</a>
+                <a href="#" class="text-gray-600 hover:bg-gray-50 block px-3 py-2.5 rounded-md text-base font-medium">About</a>
+                <a href="#" class="text-gray-600 hover:bg-gray-50 block px-3 py-2.5 rounded-md text-base font-medium">Academics</a>
+                <a href="#" class="text-gray-600 hover:bg-gray-50 block px-3 py-2.5 rounded-md text-base font-medium">Campus Life</a>
+                <a href="#gallery" class="text-gray-600 hover:bg-gray-50 block px-3 py-2.5 rounded-md text-base font-medium">Gallery</a>
+                <a href="#" class="text-gray-600 hover:bg-gray-50 block px-3 py-2.5 rounded-md text-base font-medium">Admissions</a>
+                <a href="#" class="text-gray-600 hover:bg-gray-50 block px-3 py-2.5 rounded-md text-base font-medium">Contact</a>
+                <div class="pt-4 pb-2 px-3 space-y-3">
+                    <a href="#" class="w-full flex items-center justify-center px-5 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 shadow-sm">
+                        <svg class="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
+                        Portal Login
+                    </a>
+                    <a href="#enquire" class="w-full block text-center px-5 py-3 text-base font-medium rounded-md text-white bg-gold-600 hover:bg-gold-500 shadow">Enquire Now</a>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-  // Slider navigation
-  const list = document.querySelector('.faculty-list');
-  document.querySelector('.prev').addEventListener('click', () => list.scrollBy({ left: -300, behavior: 'smooth' }));
-  document.querySelector('.next').addEventListener('click', () => list.scrollBy({ left: 300, behavior: 'smooth' }));
-});
-// Responsive Navigation Toggle
-document.addEventListener('DOMContentLoaded', () => {
-  const menuBtn = document.getElementById('menuToggle');
-  const navList = document.getElementById('navList');
+    <!-- 3. HERO CAROUSEL SECTION -->
+    <header class="relative bg-brand-900 overflow-hidden">
+        <div id="default-carousel" class="relative w-full h-[65vh] sm:h-[75vh]" data-carousel="slide">
+            <div class="relative h-full overflow-hidden">
+                <!-- Slide 1 -->
+                <div class="hidden duration-700 ease-in-out" data-carousel-item>
+                    <div class="absolute inset-0 bg-black/50 z-10"></div>
+                    <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779958516/editor-uploads/p4crybw60hfgfooi1co2.png?auto=format&fit=crop&q=80&w=1920" class="absolute block w-full h-full object-cover" alt="Campus Life">
+                    <div class="absolute inset-0 flex flex-col items-center justify-center z-20 text-center px-4 max-w-4xl mx-auto">
+                        <span class="text-gold-500 font-semibold tracking-widest uppercase mb-3 text-xs sm:text-sm">Welcome to Gold and Linc Schools</span>
+                        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-bold text-white font-serif tracking-tight leading-tight mb-6">Empowering Leaders of Tomorrow</h1>
+                        <p class="text-base sm:text-xl text-gray-200 max-w-2xl font-light mb-8">Behind Irenitemi Hotel, Testing Ground Area, Off Osogbo Road, Ilesa, Osun State. "For A Solid Beginning."</p>
+                        <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                            <a href="#" class="bg-brand-500 hover:bg-brand-800 text-white font-medium px-8 py-3.5 rounded-md transition shadow-lg">Discover Academics</a>
+                            <a href="#" class="border-2 border-white text-white hover:bg-white hover:text-brand-900 font-medium px-8 py-3.5 rounded-md transition">Virtual Tour</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Slide 2 -->
+                <div class="hidden duration-700 ease-in-out" data-carousel-item>
+                    <div class="absolute inset-0 bg-black/55 z-10"></div>
+                    <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779958703/editor-uploads/kqk2q6hon5xk3ec10uup.png?auto=format&fit=crop&q=80&w=1920" class="absolute block w-full h-full object-cover" alt="Science Laboratory">
+                    <div class="absolute inset-0 flex flex-col items-center justify-center z-20 text-center px-4 max-w-4xl mx-auto">
+                        <span class="text-gold-500 font-semibold tracking-widest uppercase mb-3 text-xs sm:text-sm">For Sound Learning</span>
+                        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-bold text-white font-serif tracking-tight leading-tight mb-6">Celebrating Excellence and Achievement</h1>
+                        <p class="text-base sm:text-xl text-gray-200 max-w-2xl font-light mb-8">Our state-of-the-art facilities and dedicated teachers foster an environment built on integrity.</p>
+                        <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                            <a href="#" class="bg-brand-500 hover:bg-brand-800 text-white font-medium px-8 py-3.5 rounded-md transition shadow-lg">Explore Facilities</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="absolute z-30 flex space-x-3 -translate-x-1/2 bottom-8 left-1/2">
+                <button type="button" class="w-3 h-3 rounded-full" aria-current="true" aria-label="Slide 1" data-carousel-slide-to="0"></button>
+                <button type="button" class="w-3 h-3 rounded-full" aria-current="false" aria-label="Slide 2" data-carousel-slide-to="1"></button>
+            </div>
+        </div>
+    </header>
 
-  menuBtn.addEventListener('click', () => {
-    navList.classList.toggle('show');
-  });
-});
-  // Scroll-triggered fade+slide animation
-document.addEventListener('DOMContentLoaded', () => {
-  const animatedElements = document.querySelectorAll('.animate-fade-slide');
+    <!-- 4. FLOATING QUICK ACTION BAR -->
+    <section class="relative z-30 max-w-6xl mx-auto px-4 -mt-16 sm:-mt-20">
+        <div class="bg-white rounded-xl shadow-xl border border-gray-100 grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100 overflow-hidden">
+            <div class="p-6 sm:p-8 hover:bg-brand-50 transition-colors group">
+                <div class="flex items-start space-x-4">
+                    <div class="text-brand-500 group-hover:scale-110 transition-transform"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
+                    <div>
+                        <h3 class="text-lg font-bold text-brand-900 font-serif">Book a School Tour</h3>
+                        <p class="text-sm text-gray-600 mt-1">Experience our beautiful modern school grounds firsthand.</p>
+                        <a href="#" class="text-brand-500 font-semibold text-sm inline-flex items-center mt-3 hover:underline">Schedule Visit &rarr;</a>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 sm:p-8 hover:bg-brand-50 transition-colors group">
+                <div class="flex items-start space-x-4">
+                    <div class="text-brand-500 group-hover:scale-110 transition-transform"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div>
+                    <div>
+                        <h3 class="text-lg font-bold text-brand-900 font-serif">Admissions Open</h3>
+                        <p class="text-sm text-gray-600 mt-1">Applications are open for the upcoming academic session.</p>
+                        <a href="#" class="text-brand-500 font-semibold text-sm inline-flex items-center mt-3 hover:underline">Apply Online &rarr;</a>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 sm:p-8 hover:bg-brand-50 transition-colors group">
+                <div class="flex items-start space-x-4">
+                    <div class="text-brand-500 group-hover:scale-110 transition-transform"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg></div>
+                    <div>
+                        <h3 class="text-lg font-bold text-brand-900 font-serif">Request Prospectus</h3>
+                        <p class="text-sm text-gray-600 mt-1">Download our digital information kit for full details.</p>
+                        <a href="#" class="text-brand-500 font-semibold text-sm inline-flex items-center mt-3 hover:underline">Download PDF &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
-    });
-  }, { threshold: 0.3 });
+    <!-- 5. WELCOME ADDRESS FROM THE PROPRIETOR -->
+    <section id="proprietor-address" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 scroll-mt-10">
+        <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden p-8 sm:p-12 lg:p-16 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            <div class="lg:col-span-4 text-center lg:text-left">
+                <div class="relative inline-block lg:block">
+                    <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779958763/editor-uploads/pww5m46k9g46gj8lqm4q.png?auto=format&fit=crop&q=80&w=600" class="rounded-xl shadow-md w-64 h-80 object-cover mx-auto lg:mx-0 object-top border-4 border-brand-50" alt="School Proprietor Portrait">
+                    <div class="absolute -bottom-4 -right-4 bg-gold-600 text-white py-2 px-4 rounded-md shadow-lg text-xs font-semibold tracking-wider uppercase hidden sm:block">Office of the Proprietor</div>
+                </div>
+            </div>
+            <div class="lg:col-span-8 space-y-6">
+                <div>
+                    <span class="text-brand-500 font-bold uppercase tracking-wider text-xs block mb-1">Leadership Perspective</span>
+                    <h2 class="text-3xl font-bold text-brand-900 font-serif">A Welcome Message from the Proprietor</h2>
+                    <p class="text-gray-500 text-sm italic font-medium mt-1">Dear Students, Parents, and Visitors,</p>
+                </div>
+                <div class="text-gray-600 text-base leading-relaxed space-y-4">
+                    <p>It is my great pleasure to welcome you to Gold and Linc Schools. We are more than just an institution — we are a community built on a foundation of integrity, academic excellence, and character development.</p>
+                    <p>As the proprietor, my commitment is to provide an inspiring environment where students are empowered to become forward-thinking leaders of tomorrow. Thank you for being part of our vision. We are honored to have you on this journey with us.</p>
+                </div>
+                <div class="pt-2">
+                    <p class="text-sm font-semibold text-gray-500 italic mb-1">Warm regards,</p>
+                    <h4 class="text-lg font-bold text-brand-900 font-serif">Mr. Festus A. Adeniyi</h4>
+                    <p class="text-xs text-gray-500 uppercase tracking-widest font-semibold">Proprietor, Gold and Linc Schools</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  animatedElements.forEach(el => observer.observe(el));
-});
+    <!-- 6. CORE PILLARS / WELCOME SECTION -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <span class="text-brand-500 font-bold uppercase tracking-wider text-xs">Our Educational Foundations</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-brand-900 font-serif mt-2 mb-6">A Legacy of Holistic Development and Academic Mastery</h2>
+                <p class="text-gray-600 text-base leading-relaxed mb-6">At Gold and Linc Schools, we provide a holistic education framework built on foundational sound learning. Our balanced curriculum maps core subjects, visual reasoning models, sports training configurations, and character tracking elements.</p>
+                <p class="text-gray-600 text-base leading-relaxed mb-8">We prepare students to stand tall in external exams, manage real-world situations gracefully, and approach future career tracks with absolute competence, discipline, and high individual integrity.</p>
+                
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="text-gold-500"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+                        <span class="font-medium text-brand-900">Sound Learning</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="text-gold-500"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+                        <span class="font-medium text-brand-900">Character Dev</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="text-gold-500"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+                        <span class="font-medium text-brand-900">Science Classrooms</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="text-gold-500"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+                        <span class="font-medium text-brand-900">Solid Foundations</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="relative mt-10 lg:mt-0">
+                <div class="absolute -top-4 -left-4 w-72 h-72 bg-brand-100 rounded-lg -z-10 filter blur-xl opacity-70"></div>
+                <div class="absolute -bottom-4 -right-4 w-72 h-72 bg-gold-50 rounded-lg -z-10 filter blur-xl opacity-70"></div>
+                <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779959783/editor-uploads/ivb8dvhivu1dljyyrlwv.png?auto=format&fit=crop&q=80&w=1000" class="rounded-xl shadow-lg w-full object-cover h-[450px]" alt="Students learning in library">
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. ACADEMIC PROGRAMMES / TABS -->
+    <section class="bg-gray-100 border-y border-gray-200 py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-brand-500 font-bold uppercase tracking-wider text-xs">Structured For Progress</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-brand-900 font-serif mt-2">Academic Framework Built For Excellence</h2>
+                <p class="text-gray-600 mt-4 text-base">We drive optimized curricula metrics across our standard childhood and advanced secondary study groups.</p>
+            </div>
+
+            <!-- Flowbite Tabs Component Container -->
+            <div class="md:flex">
+                <ul class="flex-column space-y-4 space-x-0 md:space-x-0 md:space-y-4 text-sm font-medium text-gray-500 md:me-4 mb-4 md:mb-0 w-full md:w-64 shrink-0" id="programTabs" data-tabs-toggle="#programTabsContent" role="tablist">
+                    <li role="presentation">
+                        <button class="inline-block p-4 rounded-lg w-full text-left border-l-4 transition-all" id="primary-tab" data-tabs-target="#primary-panel" type="button" role="tab" aria-controls="primary-panel" aria-selected="true">
+                            <span class="block font-bold text-base">Primary School</span>
+                            <span class="text-xs text-gray-400">Nursery & Basic Cycles</span>
+                        </button>
+                    </li>
+                    <li role="presentation">
+                        <button class="inline-block p-4 rounded-lg w-full text-left border-l-4 transition-all" id="middle-tab" data-tabs-target="#middle-panel" type="button" role="tab" aria-controls="middle-panel" aria-selected="false">
+                            <span class="block font-bold text-base">Secondary School</span>
+                            <span class="text-xs text-gray-400">Junior & Senior Lines</span>
+                        </button>
+                    </li>
+                </ul>
+                <div id="programTabsContent" class="p-6 bg-white border border-gray-200 text-medium text-gray-500 rounded-lg w-full shadow-sm">
+                    <!-- Panel 1 -->
+                    <div class="hidden" id="primary-panel" role="tabpanel" aria-labelledby="primary-tab">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h3 class="text-2xl font-bold text-brand-900 font-serif mb-4">A Solid Beginning for Young Minds</h3>
+                                <p class="text-gray-600 mb-6 leading-relaxed">Our primary tier provides foundational numeracy, social adaptation metrics, basic writing structures, and child care mechanics. We prioritize setting strong, clean intellectual footsteps early.</p>
+                                <ul class="space-y-2 mb-6">
+                                    <li class="flex items-center text-sm text-gray-700"><span class="w-1.5 h-1.5 bg-brand-500 rounded-full mr-2.5"></span>Creative literacy maps</li>
+                                    <li class="flex items-center text-sm text-gray-700"><span class="w-1.5 h-1.5 bg-brand-500 rounded-full mr-2.5"></span>Basic behavioral monitoring</li>
+                                    <li class="flex items-center text-sm text-gray-700"><span class="w-1.5 h-1.5 bg-brand-500 rounded-full mr-2.5"></span>Introductory science setups</li>
+                                </ul>
+                                <a href="#" class="text-brand-500 font-semibold text-sm hover:underline">Explore Primary Curriculum &rarr;</a>
+                            </div>
+                            <div>
+                                <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779959604/editor-uploads/snv7eshr25jrxloigfs5.png?auto=format&fit=crop&q=80&w=800" class="rounded-lg object-cover h-64 w-full shadow-sm" alt="Primary students">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Panel 2 -->
+                    <div class="hidden" id="middle-panel" role="tabpanel" aria-labelledby="middle-tab">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h3 class="text-2xl font-bold text-brand-900 font-serif mb-4">Sound Learning & Rigorous Academic Track</h3>
+                                <p class="text-gray-600 mb-6 leading-relaxed">Our secondary cycle features intensive lecture pipelines, technical experimental processes, advanced mathematics fields, and complete support protocols tailored for future career milestones.</p>
+                                <ul class="space-y-2 mb-6">
+                                    <li class="flex items-center text-sm text-gray-700"><span class="w-1.5 h-1.5 bg-brand-500 rounded-full mr-2.5"></span>Complete Laboratory modules</li>
+                                    <li class="flex items-center text-sm text-gray-700"><span class="w-1.5 h-1.5 bg-brand-500 rounded-full mr-2.5"></span>Advanced examination testing banks</li>
+                                    <li class="flex items-center text-sm text-gray-700"><span class="w-1.5 h-1.5 bg-brand-500 rounded-full mr-2.5"></span>Leadership & Career mentoring blocks</li>
+                                </ul>
+                                <a href="#" class="text-brand-500 font-semibold text-sm hover:underline">Explore Secondary School Pathways &rarr;</a>
+                            </div>
+                            <div>
+                                <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779959670/editor-uploads/rmqoxibi4udypm8rweym.png?auto=format&fit=crop&q=80&w=800" class="rounded-lg object-cover h-64 w-full shadow-sm" alt="Secondary school classroom">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. METRICS & COUNTERS -->
+    <section class="bg-brand-900 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+                <div>
+                    <span class="block text-4xl sm:text-5xl font-extrabold text-gold-500 font-serif">100%</span>
+                    <span class="block text-xs uppercase tracking-widest text-brand-100 mt-2 font-medium">Excellence Driven</span>
+                </div>
+                <div>
+                    <span class="block text-4xl sm:text-5xl font-extrabold text-gold-500 font-serif">Integrity</span>
+                    <span class="block text-xs uppercase tracking-widest text-brand-100 mt-2 font-medium">Core Value Pillar</span>
+                </div>
+                <div>
+                    <span class="block text-4xl sm:text-5xl font-extrabold text-gold-500 font-serif">Modern</span>
+                    <span class="block text-xs uppercase tracking-widest text-brand-100 mt-2 font-medium">Science Classrooms</span>
+                </div>
+                <div>
+                    <span class="block text-4xl sm:text-5xl font-extrabold text-gold-500 font-serif">Solid</span>
+                    <span class="block text-xs uppercase tracking-widest text-brand-100 mt-2 font-medium">Character Architecture</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. MULTI-CATEGORY CAMPUS GALLERY SECTION -->
+    <section id="gallery" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 scroll-mt-10">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+            <span class="text-brand-500 font-bold uppercase tracking-wider text-xs">Campus Windows</span>
+            <h2 class="text-3xl sm:text-4xl font-bold text-brand-900 font-serif mt-2">Moments from Across Our Community</h2>
+            <p class="text-gray-600 mt-3 text-sm">Explore our official visual assets spanning learning modules, sports excellence, and creative spaces.</p>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="flex items-center justify-center flex-wrap mb-8 gap-2">
+            <button type="button" onclick="filterGallery('all')" class="gallery-filter-btn active text-xs font-semibold uppercase tracking-wider rounded-full px-5 py-2 border transition-all">All Photos</button>
+            <button type="button" onclick="filterGallery('academics')" class="gallery-filter-btn text-xs font-semibold uppercase tracking-wider rounded-full px-5 py-2 border transition-all">Academics & Labs</button>
+            <button type="button" onclick="filterGallery('campus')" class="gallery-filter-btn text-xs font-semibold uppercase tracking-wider rounded-full px-5 py-2 border transition-all">Campus Grounds</button>
+            <button type="button" onclick="filterGallery('athletics')" class="gallery-filter-btn text-xs font-semibold uppercase tracking-wider rounded-full px-5 py-2 border transition-all">Athletics & Life</button>
+        </div>
+
+        <!-- Gallery Matrix Container -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="gallery-grid">
+            <!-- Item 1 -->
+            <div class="gallery-item academics relative overflow-hidden rounded-xl shadow-sm group bg-gray-200 aspect-[4/3]">
+                <img src="https://images.unsplash.com/photo-1564981797816-1043664bf78d?auto=format&fit=crop&q=80&w=600" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Advanced modules">
+                <div class="absolute inset-0 bg-gradient-to-t from-brand-900/80 via-brand-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                    <div>
+                        <span class="text-gold-500 text-xs uppercase tracking-wider font-bold">Academics</span>
+                        <h4 class="text-white font-serif font-bold text-base mt-1">Science Exploration Lab</h4>
+                    </div>
+                </div>
+            </div>
+            <!-- Item 2 -->
+            <div class="gallery-item campus relative overflow-hidden rounded-xl shadow-sm group bg-gray-200 aspect-[4/3]">
+                <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=600" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Main architectural view">
+                <div class="absolute inset-0 bg-gradient-to-t from-brand-900/80 via-brand-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                    <div>
+                        <span class="text-gold-500 text-xs uppercase tracking-wider font-bold">Campus</span>
+                        <h4 class="text-white font-serif font-bold text-base mt-1">Main Gate Entry View</h4>
+                    </div>
+                </div>
+            </div>
+            <!-- Item 3 -->
+            <div class="gallery-item athletics relative overflow-hidden rounded-xl shadow-sm group bg-gray-200 aspect-[4/3]">
+                <img src="https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&q=80&w=600" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Track operations">
+                <div class="absolute inset-0 bg-gradient-to-t from-brand-900/80 via-brand-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                    <div>
+                        <span class="text-gold-500 text-xs uppercase tracking-wider font-bold">Athletics</span>
+                        <h4 class="text-white font-serif font-bold text-base mt-1">Sports Training Fields</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. RECENT NEWS / EVENTS -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12">
+            <div>
+                <span class="text-brand-500 font-bold uppercase tracking-wider text-xs">Stay Informed</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-brand-900 font-serif mt-2">Latest Campus Updates</h2>
+            </div>
+            <a href="#" class="text-brand-500 font-semibold hover:underline mt-4 md:mt-0 inline-flex items-center">View All Updates <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Article Card 1 -->
+            <article class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden flex flex-col justify-between">
+                <div>
+                    <img src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&q=80&w=600" class="h-48 w-full object-cover" alt="Science Fair">
+                    <div class="p-6">
+                        <span class="text-xs font-semibold text-gold-600 uppercase tracking-wider block mb-2">Academic Excellence</span>
+                        <h3 class="text-xl font-bold text-brand-900 font-serif leading-tight mb-3 hover:text-brand-500"><a href="#">Congratulations to Our Graduates!</a></h3>
+                        <p class="text-gray-600 text-sm line-clamp-3">Celebrating supreme excellence and outstanding academic achievements across our senior exit streams this session.</p>
+                    </div>
+                </div>
+                <div class="p-6 pt-0 border-t border-gray-50 flex items-center justify-between text-xs text-gray-500">
+                    <span>May 24, 2026</span>
+                    <span>3 Min Read</span>
+                </div>
+            </article>
+
+            <!-- Article Card 2 -->
+            <article class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden flex flex-col justify-between">
+                <div>
+                    <img src="https://images.unsplash.com/photo-1460518451285-cd7afdf114d8?auto=format&fit=crop&q=80&w=600" class="h-48 w-full object-cover" alt="Arts Center">
+                    <div class="p-6">
+                        <span class="text-xs font-semibold text-gold-600 uppercase tracking-wider block mb-2">Character Development</span>
+                        <h3 class="text-xl font-bold text-brand-900 font-serif leading-tight mb-3 hover:text-brand-500"><a href="#">Building Integrity Beyond Books</a></h3>
+                        <p class="text-gray-600 text-sm line-clamp-3">A review of our newly optimized peer mentorship guidelines aimed at improving empathy, accountability, and strong civic value paths.</p>
+                    </div>
+                </div>
+                <div class="p-6 pt-0 border-t border-gray-50 flex items-center justify-between text-xs text-gray-500">
+                    <span>May 18, 2026</span>
+                    <span>4 Min Read</span>
+                </div>
+            </article>
+
+            <!-- Article Card 3 -->
+            <article class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden flex flex-col justify-between">
+                <div>
+                    <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=600" class="h-48 w-full object-cover" alt="Parent Seminar">
+                    <div class="p-6">
+                        <span class="text-xs font-semibold text-gold-600 uppercase tracking-wider block mb-2">Admissions</span>
+                        <h3 class="text-xl font-bold text-brand-900 font-serif leading-tight mb-3 hover:text-brand-500"><a href="#">Enrolment Open For General Primary Streams</a></h3>
+                        <p class="text-gray-600 text-sm line-clamp-3">Prospective families can now pick up official evaluation binders from our central registry branch point at Testing Ground.</p>
+                    </div>
+                </div>
+                <div class="p-6 pt-0 border-t border-gray-50 flex items-center justify-between text-xs text-gray-500">
+                    <span>May 12, 2026</span>
+                    <span>2 Min Read</span>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- 11. TESTIMONIALS SLIDER SECTION -->
+    <section class="bg-brand-50 border-y border-brand-100 py-20">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <span class="text-brand-500 font-bold uppercase tracking-wider text-xs">Community Voices</span>
+            <h2 class="text-3xl font-bold text-brand-900 font-serif mt-2 mb-12">What Our Community Says</h2>
+            
+            <div id="testimonial-carousel" class="relative w-full bg-white rounded-xl shadow-md p-8 sm:p-12 border border-gray-100" data-carousel="static">
+                <div class="relative h-64 sm:h-48 overflow-hidden">
+                    <!-- Item 1 -->
+                    <div class="hidden duration-700 ease-in-out" data-carousel-item>
+                        <p class="text-lg sm:text-xl text-gray-700 italic font-serif leading-relaxed max-w-3xl mx-auto">"The absolute emphasis on integrity and character tracking metrics makes this school exceptional. My children are building solid learning skills that show up clearly in their daily habits."</p>
+                        <div class="mt-6 flex items-center justify-center space-x-3">
+                            <div class="font-bold text-brand-900 text-sm">Alaba Olayemi</div>
+                            <div class="text-gray-400 text-xs">|</div>
+                            <div class="text-gray-500 text-xs">Basic 4 Parent</div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-prev>
+                    <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 group-hover:bg-gray-200 text-gray-600"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></span>
+                </button>
+                <button type="button" class="absolute top-0 right-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-next>
+                    <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 group-hover:bg-gray-200 text-gray-600"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 12. LEAD ENQUIRY FORM / CTA SECTION -->
+    <section id="enquire" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 scroll-mt-10">
+        <div class="bg-brand-900 rounded-2xl shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-0">
+            <div class="p-8 sm:p-12 lg:p-16 lg:col-span-5 flex flex-col justify-center text-white bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-brand-800 via-brand-900 to-brand-900">
+                <span class="text-gold-500 font-bold uppercase tracking-wider text-xs">Join Our Family</span>
+                <h2 class="text-3xl font-bold font-serif mt-2 mb-4">Begin Your Child's Journey with Us</h2>
+                <p class="text-brand-100 text-sm leading-relaxed mb-6">Complete our initial open enquiry form block. Our administrative team will reach out directly within 24 hours to guide you through evaluation steps and facility tours.</p>
+                <div class="space-y-4 text-xs text-brand-100">
+                    <div class="flex items-center"><svg class="w-5 h-5 mr-3 text-gold-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>Data handled securely under Institutional Policy standards.</div>
+                </div>
+            </div>
+            
+            <div class="p-8 sm:p-12 lg:p-16 bg-white lg:col-span-7">
+                <form class="space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Parent First Name *</label>
+                            <input type="text" required class="w-full bg-gray-50 border border-gray-200 rounded p-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Parent Last Name *</label>
+                            <input type="text" required class="w-full bg-gray-50 border border-gray-200 rounded p-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none transition-all">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Email Address *</label>
+                            <input type="email" required class="w-full bg-gray-50 border border-gray-200 rounded p-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Contact Number *</label>
+                            <input type="tel" required class="w-full bg-gray-50 border border-gray-200 rounded p-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none transition-all">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Target Grade *</label>
+                        <select required class="w-full bg-gray-50 border border-gray-200 rounded p-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none transition-all text-gray-600">
+                            <option value="">Select Grade Stream...</option>
+                            <option value="primary">Primary Section</option>
+                            <option value="secondary">Secondary Section</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Additional Comments</label>
+                        <textarea rows="3" class="w-full bg-gray-50 border border-gray-200 rounded p-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none transition-all"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-brand-500 hover:bg-brand-800 text-white font-semibold p-4 rounded text-sm shadow tracking-wide transition-all uppercase">Submit Official Enquiry</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- 13. FOOTER -->
+    <footer class="bg-gray-900 text-gray-400 border-t border-gray-800 pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+            <div>
+                <div class="flex items-center space-x-3 mb-6">
+    <div class="bg-white p-1 rounded border border-gray-800 flex items-center justify-center">
+        <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779961202/editor-uploads/frngf21mg4fcrnmccobm.png" class="h-10 w-auto object-contain" alt="Gold and Linc Schools Footer Logo">
+    </div>
+    <span class="text-lg font-bold text-white font-serif uppercase tracking-wider">Gold & Linc</span>
+</div>
+
+                <p class="text-sm leading-relaxed mb-4">Dedicated to building educational foundations centered on integrity, character transformation, and clear sound learning models.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="hover:text-white transition-colors"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10s-10 4.477-10 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"></path></svg></a>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="text-sm font-semibold uppercase tracking-wider text-white mb-6">Academic Divisions</h4>
+                <ul class="space-y-3 text-sm">
+                    <li><a href="#" class="hover:text-white transition-colors">Primary Section</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Secondary Section</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Character Action Programs</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-sm font-semibold uppercase tracking-wider text-white mb-6">Quick Portal Links</h4>
+                <ul class="space-y-3 text-sm">
+                    <li><a href="#" class="hover:text-white transition-colors">Application Desk</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Terms & Operations</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">FAQ</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-sm font-semibold uppercase tracking-wider text-white mb-6">Contact Matrix</h4>
+                <p class="text-sm mb-2 text-gray-300">Behind Irenitemi Hotel, Testing Ground Area,</p>
+                <p class="text-sm mb-4 text-gray-300">Off Osogbo Road, Ilesa, Osun State.</p>
+                <p class="text-sm text-white font-medium">T: 08034430941</p>
+                <p class="text-sm text-white font-medium">E: goldlincschools@gmail.com</p>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 border-t border-gray-800 flex flex-col sm:flex-row justify-between items-center text-xs">
+            <p>&copy; 2025 Gold and Linc Schools. All rights reserved.</p>
+            <div class="flex space-x-6 mt-4 sm:mt-0">
+                <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+                <a href="#" class="hover:text-white transition-colors">Terms of Operations</a>
+                <a href="#" class="hover:text-white transition-colors">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Flowbite Interactive Logic Script Bundle -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
     
-document.addEventListener('DOMContentLoaded', function() {
-  const images = document.querySelectorAll('.hero-img');
-  let current = 0;
-  const interval = 6000; // 6 seconds per image
+    <!-- Custom Engine logic script for explicit elements -->
+    <script>
+        function filterGallery(category) {
+            const buttons = document.querySelectorAll('.gallery-filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
 
-  function showImage(index) {
-    images.forEach((img, i) => {
-      img.classList.toggle('active', i === index);
-    });
-  }
+            const items = document.querySelectorAll('.gallery-item');
+            items.forEach(item => {
+                if (category === 'all' || item.classList.contains(category)) {
+                    item.style.display = 'block';
+                    setTimeout(() => { item.style.opacity = '1'; }, 10);
+                } else {
+                    item.style.opacity = '0';
+                    setTimeout(() => { item.style.display = 'none'; }, 300);
+                }
+            });
+        }
+    </script>
 
-  setInterval(() => {
-    current = (current + 1) % images.length;
-    showImage(current);
-  }, interval);
+    <style>
+        #programTabs button[aria-selected="true"] {
+            background-color: #ffffff !important;
+            color: #0c4a6e !important;
+            border-color: #0284c7 !important;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        }
+        #programTabs button[aria-selected="false"] {
+            border-color: transparent !important;
+        }
 
-  showImage(current); // show first image initially
-});
-
-  </script>
+        .gallery-filter-btn {
+            border-color: #e5e7eb;
+            background-color: #ffffff;
+            color: #4b5563;
+        }
+        .gallery-filter-btn:hover {
+            background-color: #f3f4f6;
+            color: #0c4a6e;
+        }
+        .gallery-filter-btn.active {
+            background-color: #0c4a6e !important;
+            color: #ffffff !important;
+            border-color: #0c4a6e !important;
+        }
+        .gallery-item {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+    </style>
 </body>
 </html>
