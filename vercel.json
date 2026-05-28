@@ -14,8 +14,8 @@
     { "source": "/testsession", "destination": "/test.html" },
     { "source": "/campus-news-update", "destination": "/blog-details.html" },
         { "source": "/dashboard", "destination": "/buyer_dash.html" },
-            { "source": "/css-lecturemanual", "destination": "/wweeek2.html" },
-        { "source": "/MainStudentDashboard", "destination": "/student_dashoard.html" }
+            { "source": "/admissions", "destination": "/admissions.html" },
+        { "source": "/schedule-visit", "destination": "/schedule.html" }
     
     
   ],
