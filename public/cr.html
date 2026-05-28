@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gold and Linc Schools | Central Result Checking Portal</title>
+    <!-- Tailwind CSS & Flowbite via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <!-- Google Fonts for professional typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,400;0,700;1,300&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7', // Primary Sky Blue
+                            800: '#075985', // Accent Deep Blue
+                            900: '#0c4a6e', // Dark Crest
+                        },
+                        gold: {
+                            500: '#d97706',
+                            600: '#b45309',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased flex flex-col min-h-screen">
+
+    <!-- 1. PORTAL HEADER BAR -->
+    <header class="bg-brand-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white p-1 rounded flex items-center justify-center">
+                    <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779961202/editor-uploads/frngf21mg4fcrnmccobm.png" class="h-8 w-auto object-contain" alt="Gold and Linc Schools Logo">
+                </div>
+                <div>
+                    <span class="block text-sm font-bold tracking-tight uppercase font-serif">Gold & Linc Schools</span>
+                    <span class="block text-[10px] text-brand-100 uppercase tracking-widest -mt-0.5 font-sans font-semibold">Student Evaluation Desk</span>
+                </div>
+            </div>
+            <div>
+                <a href="index.html" class="text-xs font-semibold text-brand-100 hover:text-white flex items-center bg-brand-800 px-3 py-1.5 rounded transition">
+                    <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Back to Main Site
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. PORTAL BODY CONTAINER -->
+    <main class="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-brand-50 to-gray-50">
+        <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+            
+            <!-- Branding Accent Context -->
+            <div class="text-center">
+                <div class="mx-auto h-16 w-16 bg-brand-50 rounded-full flex items-center justify-center border border-brand-100 mb-4">
+                    <svg class="w-8 h-8 text-brand-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold font-serif text-brand-900 uppercase tracking-tight">Check Report Card</h2>
+                <p class="mt-2 text-xs text-gray-500 max-w-xs mx-auto">Provide official credentials below to securely fetch terminal academic records from the registry.</p>
+            </div>
+
+            <!-- Verification Action Form -->
+            <form class="mt-8 space-y-5" action="#" method="POST" onsubmit="handleResultFetch(event)">
+                
+                <!-- Academic Stream Category -->
+                <div>
+                    <label for="stream" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Schooling Category</label>
+                    <select id="stream" name="stream" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-medium text-gray-700 focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none transition-all">
+                        <option value="" disabled selected>-- Choose Academic Track --</option>
+                        <option value="primary">Primary Stream Module</option>
+                        <option value="secondary">Secondary Stream Track</option>
+                    </select>
+                </div>
+
+                <!-- Academic Session / Term Trackers -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="session" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Academic Session</label>
+                        <select id="session" name="session" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-medium text-gray-700 focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none transition-all">
+                            <option value="2025-2026">2025/2026</option>
+                            <option value="2024-2025">2024/2025</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="term" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Evaluation Term</label>
+                        <select id="term" name="term" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-medium text-gray-700 focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none transition-all">
+                            <option value="1">1st Term</option>
+                            <option value="2">2nd Term</option>
+                            <option value="3">3rd Term</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Unique Student Registration Identifier -->
+                <div>
+                    <label for="student-id" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Student Admission Number</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-xs font-mono text-gray-400 uppercase">GLS/</span>
+                        </div>
+                        <input id="student-id" name="studentId" type="text" required placeholder="2024/048" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 pl-12 text-sm font-mono text-gray-700 focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none transition-all placeholder-gray-300">
+                    </div>
+                </div>
+
+                <!-- Security Verification Pin / Scratchcard Access Field -->
+                <div>
+                    <label for="pin" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Access PIN / Passcode</label>
+                    <input id="pin" name="pin" type="password" required placeholder="••••••••" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-mono text-gray-700 focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none transition-all placeholder-gray-300">
+                </div>
+
+                <!-- Action Button -->
+                <div class="pt-2">
+                    <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-brand-900 hover:bg-brand-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 shadow-md transition-all uppercase tracking-wider">
+                        Generate Report Sheet
+                    </button>
+                </div>
+            </form>
+
+            <!-- Client Loading State Feedback (Hidden initially) -->
+            <div id="processingState" class="hidden text-center space-y-2 pt-2 animate-pulse">
+                <div class="inline-block animate-spin rounded-full h-5 w-5 border-2 border-brand-500 border-t-transparent"></div>
+                <p class="text-xs font-semibold text-brand-900">Querying central ledger systems...</p>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- 3. FOOTAL CONTROL ANCHOR -->
+    <footer class="bg-white border-t border-gray-200 py-6 text-center text-xs text-gray-500">
+        <p>&copy; 2026 Gold and Linc Schools. Secure Portal Node | Behind Irenitemi Hotel, Ilesa, Osun State.</p>
+    </footer>
+
+    <!-- Interactive Proof of Concept Action Script -->
+    <script>
+        function handleResultFetch(event) {
+            event.preventDefault();
+            const processor = document.getElementById('processingState');
+            
+            // Show loading placeholder feedback
+            processor.classList.remove('hidden');
+            
+            // Simulation metric for client demonstration context
+            setTimeout(() => {
+                processor.classList.add('hidden');
+                alert("Database System Check:\nConnection established successfully! Integrate this front-end module with your grading script or school API endpoints to populate real student marks sheets.");
+            }, 1200);
+        }
+    </script>
+</body>
+</html>
