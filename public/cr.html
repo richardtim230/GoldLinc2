@@ -217,19 +217,21 @@
                                     <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-2">Session *</label>
                                     <select id="session" required class="w-full bg-gray-50 border border-gray-200 rounded p-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none transition">
                                         <option value="">Select Session...</option>
-                                        <option value="2025-2026">2025/2026</option>
-                                        <option value="2024-2025">2024/2025</option>
-                                        <option value="2023-2024">2023/2024</option>
-                                        <option value="2022-2023">2022/2023</option>
+                                        <option value="2027-2028">2027-2028</option>
+                                        <option value="2026-2027">2026-2027</option>
+                                        <option value="2025-2026">2025-2026</option>
+                                        <option value="2024-2025">2024-2025</option>
+                                        <option value="2023-2024">2023-2024</option>
+                                        <option value="2022-2023">2022-2023</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-2">Term *</label>
                                     <select id="term" required class="w-full bg-gray-50 border border-gray-200 rounded p-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none transition">
                                         <option value="">Select Term...</option>
-                                        <option value="1st-term">1st Term</option>
-                                        <option value="2nd-term">2nd Term</option>
-                                        <option value="3rd-term">3rd Term</option>
+                                        <option value="FIRST TERM">FIRST TERM</option>
+                                        <option value="SECOND TERM">SECOND TERM</option>
+                                        <option value="THIRD TERM">THIRD TERM</option>
                                     </select>
                                 </div>
                             </div>
@@ -238,18 +240,25 @@
                                 <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-2">Class/Grade *</label>
                                 <select id="studentClass" required class="w-full bg-gray-50 border border-gray-200 rounded p-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none transition">
                                     <option value="">Select Your Class...</option>
-                                    <option value="primary-1">Primary 1</option>
-                                    <option value="primary-2">Primary 2</option>
-                                    <option value="primary-3">Primary 3</option>
-                                    <option value="primary-4">Primary 4</option>
-                                    <option value="primary-5">Primary 5</option>
-                                    <option value="primary-6">Primary 6</option>
-                                    <option value="jss-1">JSS 1</option>
-                                    <option value="jss-2">JSS 2</option>
-                                    <option value="jss-3">JSS 3</option>
-                                    <option value="sss-1">SSS 1</option>
-                                    <option value="sss-2">SSS 2</option>
-                                    <option value="sss-3">SSS 3</option>
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="KG1">KG1</option>
+                                    <option value="KG2">KG2</option>
+                                    <option value="Creche">Creche</option>
+                                    <option value="Nursery 1">Nursery 1</option>
+                                    <option value="Nursery 2">Nursery 2</option>
+                                    <option value="Nursery 3">Nursery 3</option>
+                                    <option value="Primary 1">Primary 1</option>
+                                    <option value="Primary 2">Primary 2</option>
+                                    <option value="Primary 3">Primary 3</option>
+                                    <option value="Primary 4">Primary 4</option>
+                                    <option value="Primary 5">Primary 5</option>
+                                    <option value="Primary 6">Primary 6</option>
+                                    <option value="JSS1">JSS1</option>
+                                    <option value="JSS2">JSS2</option>
+                                    <option value="JSS3">JSS3</option>
+                                    <option value="SS1">SS1</option>
+                                    <option value="SS2">SS2</option>
+                                    <option value="SS3">SS3</option>
                                 </select>
                             </div>
                         </div>
@@ -493,7 +502,7 @@
     <!-- Custom JavaScript -->
     <script>
         // API Configuration
-        const API_BASE_URL = '/api'; // Update this to your backend API endpoint
+        const API_BASE_URL = 'https://goldlincschools.onrender.com/api'; // Update this to your backend API endpoint
 
         // Form submission handler
         document.getElementById('resultsForm').addEventListener('submit', async function(e) {
@@ -563,9 +572,9 @@
         function displayResults(data) {
             // Populate student info
             document.getElementById('resultAdmission').textContent = data.admissionNumber;
-            document.getElementById('resultSession').textContent = data.session.replace('-', '/');
-            document.getElementById('resultTerm').textContent = data.term.replace('-', ' ');
-            document.getElementById('resultClass').textContent = data.class;
+            document.getElementById('resultSession').textContent = data.session;
+            document.getElementById('resultTerm').textContent = data.term;
+            document.getElementById('resultClass').textContent = data.studentClass;
             
             // Calculate stats
             const scores = data.results.map(s => s.score);
