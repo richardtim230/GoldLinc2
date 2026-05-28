@@ -502,7 +502,7 @@
     <!-- Custom JavaScript -->
     <script>
         // API Configuration
-        const API_BASE_URL = 'https://goldlincschools.onrender.com/api'; // Update this to your backend API endpoint
+        const API_BASE_URL = 'https://goldlincschools.onrender.com'; // Your backend URL
 
         // Form submission handler
         document.getElementById('resultsForm').addEventListener('submit', async function(e) {
@@ -532,79 +532,84 @@
             submitBtn.disabled = true;
 
             try {
-                // Call backend API to fetch results
-                const response = await fetch(`${API_BASE_URL}/results/check`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        admissionNumber: admission,
-                        scratchCard: scratchCard,
-                        session: session,
-                        term: term,
-                        studentClass: studentClass
-                    })
+                // Build query parameters for GET request
+                const params = new URLSearchParams({
+                    regNo: admission,
+                    scratchCard: scratchCard,
+                    class: studentClass,
+                    session: session,
+                    term: term
                 });
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Failed to fetch results');
-                }
+                // Call backend API with GET request
+                const response = await fetch(`${API_BASE_URL}/api/results/check?${params}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
 
                 const data = await response.json();
 
-                if (data.success) {
-                    displayResults(data.result);
+                if (response.ok) {
+                    displayResults(data, admission, session, term, studentClass);
                     showSuccess('Results loaded successfully!');
                 } else {
-                    showError(data.message || 'No results found for the provided credentials.');
+                    showError(data.error || 'No results found for the provided credentials. Please check and try again.');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showError(error.message || 'An error occurred while fetching your results. Please try again.');
+                showError('An error occurred while fetching your results. Please try again. Error: ' + error.message);
             } finally {
                 hideLoading();
                 submitBtn.disabled = false;
             }
         }
 
-        function displayResults(data) {
+        function displayResults(data, admission, session, term, studentClass) {
             // Populate student info
-            document.getElementById('resultAdmission').textContent = data.admissionNumber;
-            document.getElementById('resultSession').textContent = data.session;
-            document.getElementById('resultTerm').textContent = data.term;
-            document.getElementById('resultClass').textContent = data.studentClass;
+            document.getElementById('resultAdmission').textContent = admission;
+            document.getElementById('resultSession').textContent = session;
+            document.getElementById('resultTerm').textContent = term;
+            document.getElementById('resultClass').textContent = studentClass;
             
+            // Extract results from response
+            const results = data.results || [];
+            
+            if (!results || results.length === 0) {
+                showError('No subject results found.');
+                return;
+            }
+
             // Calculate stats
-            const scores = data.results.map(s => s.score);
-            const average = Math.round(scores.reduce((a, b) => a + b) / scores.length);
-            const passed = data.results.filter(s => s.score >= 50).length;
-            const best = data.results.reduce((a, b) => a.score > b.score ? a : b);
+            const scores = results.map(s => s.total);
+            const average = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+            const passed = results.filter(s => s.total >= 50).length;
+            const best = results.reduce((a, b) => a.total > b.total ? a : b);
             
             document.getElementById('averageScore').textContent = average + '%';
-            document.getElementById('subjectsPassed').textContent = passed + '/' + data.results.length;
-            document.getElementById('bestSubject').textContent = best.subject + ' (' + best.score + '%)';
+            document.getElementById('subjectsPassed').textContent = passed + '/' + results.length;
+            document.getElementById('bestSubject').textContent = best.subject + ' (' + best.total + '%)';
             
             // Calculate overall grade
-            const overallGrade = average >= 90 ? 'A' : average >= 80 ? 'B' : average >= 70 ? 'C' : average >= 60 ? 'D' : 'E';
+            const overallGrade = average >= 70 ? 'A' : average >= 60 ? 'B' : average >= 50 ? 'C' : average >= 45 ? 'D' : average >= 40 ? 'E' : 'F';
             document.getElementById('resultGrade').textContent = overallGrade;
             
             // Populate results table
             const tbody = document.getElementById('resultsTableBody');
             tbody.innerHTML = '';
             
-            data.results.forEach(subject => {
+            results.forEach(subject => {
                 const row = document.createElement('tr');
                 const gradeColor = getGradeColor(subject.grade);
                 row.innerHTML = `
                     <td class="px-6 py-4 font-medium text-gray-900">${subject.subject}</td>
-                    <td class="px-6 py-4 text-center font-bold text-lg text-brand-600">${subject.score}</td>
+                    <td class="px-6 py-4 text-center font-bold text-lg text-brand-600">${subject.total}</td>
                     <td class="px-6 py-4 text-center">
                         <span class="inline-block px-3 py-1 rounded-full text-sm font-bold ${gradeColor}">${subject.grade}</span>
                     </td>
-                    <td class="px-6 py-4 text-center"><span class="text-green-600 font-medium">${subject.status}</span></td>
-                    <td class="px-6 py-4 text-center text-sm text-gray-600">${subject.remark}</td>
+                    <td class="px-6 py-4 text-center"><span class="text-green-600 font-medium">Pass</span></td>
+                    <td class="px-6 py-4 text-center text-sm text-gray-600">${subject.remarks || '-'}</td>
                 `;
                 tbody.appendChild(row);
             });
