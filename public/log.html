@@ -48,7 +48,7 @@
             <div class="p-8 border-b border-brand-700">
                 <div class="flex items-center space-x-4">
                     <div class="bg-white bg-opacity-10 p-3 rounded-lg backdrop-blur-sm">
-                        <svg class="w-8 h-8 text-gold-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10.5 1.5H5.75A2.25 2.25 0 003.5 3.75v12.5A2.25 2.25 0 005.75 18.5h8.5a2.25 2.25 0 002.25-2.25V6.5m-10-5v3.75a.75.75 0 001.5 0V1.5m4 0v3.75a.75.75 0 001.5 0V1.5"></path></svg>
+                        <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779961202/editor-uploads/frngf21mg4fcrnmccobm.png" class="h-8 w-auto object-contain" alt="Gold and Linc Schools Logo">
                     </div>
                     <div>
                         <h1 class="text-2xl font-bold font-serif">Gold & Linc</h1>
@@ -133,23 +133,74 @@
             <div class="lg:hidden bg-white border-b border-gray-200 sticky top-0 z-40">
                 <div class="flex items-center justify-between p-4">
                     <div class="flex items-center space-x-3">
-                        <div class="bg-brand-50 p-2 rounded-lg">
-                            <svg class="w-6 h-6 text-brand-900" fill="currentColor" viewBox="0 0 20 20"><path d="M10.5 1.5H5.75A2.25 2.25 0 003.5 3.75v12.5A2.25 2.25 0 005.75 18.5h8.5a2.25 2.25 0 002.25-2.25V6.5m-10-5v3.75a.75.75 0 001.5 0V1.5m4 0v3.75a.75.75 0 001.5 0V1.5"></path></svg>
-                        </div>
+                        <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779961202/editor-uploads/frngf21mg4fcrnmccobm.png" class="h-10 w-auto object-contain" alt="Gold and Linc Schools Logo">
                         <div>
                             <p class="text-sm font-bold text-brand-900">Gold & Linc</p>
                             <p class="text-xs text-gray-500">Portal</p>
                         </div>
                     </div>
-                    <button class="text-gray-500 hover:text-gray-700" data-collapse-toggle="mobile-sidebar">
+                    <button id="mobileMenuBtn" class="text-gray-500 hover:text-gray-700 p-2 rounded hover:bg-gray-100 transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
+                </div>
+
+                <!-- Mobile Menu Dropdown -->
+                <div id="mobileSidebar" class="hidden border-t border-gray-200 bg-white max-h-96 overflow-y-auto">
+                    <div class="p-4 space-y-3">
+                        <p class="text-xs uppercase tracking-widest text-gray-600 font-semibold mb-3">Select Portal</p>
+                        
+                        <button class="mobile-portal-selector w-full text-left px-4 py-2 rounded-lg bg-gold-600 text-white font-medium transition-all text-sm" data-portal="parent">
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                                Parents Portal
+                            </span>
+                        </button>
+
+                        <button class="mobile-portal-selector w-full text-left px-4 py-2 rounded-lg bg-brand-700 hover:bg-brand-600 text-white font-medium transition-all text-sm" data-portal="student">
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C6.5 6.253 2 10.998 2 17.001c0 5.591 3.824 10.29 9 11.622m0-13c5.5 0 10 4.745 10 10.999c0 5.591-3.824 10.29-9 11.622"></path></svg>
+                                Students Portal
+                            </span>
+                        </button>
+
+                        <button class="mobile-portal-selector w-full text-left px-4 py-2 rounded-lg bg-brand-700 hover:bg-brand-600 text-white font-medium transition-all text-sm" data-portal="staff">
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                                Staff Portal
+                            </span>
+                        </button>
+                    </div>
+
+                    <div class="border-t border-gray-200 p-4">
+                        <p class="text-xs uppercase tracking-widest text-gray-600 font-semibold mb-3">Features</p>
+                        <ul class="space-y-2 text-xs text-gray-700">
+                            <li class="flex items-center">
+                                <svg class="w-3 h-3 mr-2 text-gold-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+                                Academic Records
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="w-3 h-3 mr-2 text-gold-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+                                Grade Reports
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="w-3 h-3 mr-2 text-gold-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+                                Fee Management
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
             <!-- LOGIN SECTION -->
             <div class="flex items-center justify-center min-h-screen lg:min-h-full p-4">
                 <div class="w-full max-w-md">
+                    <!-- Logo and Welcome for Mobile -->
+                    <div class="lg:hidden text-center mb-6">
+                        <div class="flex justify-center mb-4">
+                            <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779961202/editor-uploads/frngf21mg4fcrnmccobm.png" class="h-16 w-auto object-contain" alt="Gold and Linc Schools Logo">
+                        </div>
+                    </div>
+
                     <!-- Welcome Card -->
                     <div class="text-center mb-8">
                         <h1 class="text-3xl lg:text-4xl font-bold text-brand-900 font-serif mb-2">Welcome Back</h1>
@@ -267,7 +318,34 @@
     <script>
         let currentPortal = 'parent';
 
-        // Portal Selection
+        // Mobile Menu Toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileSidebar = document.getElementById('mobileSidebar');
+
+            if (mobileMenuBtn && mobileSidebar) {
+                mobileMenuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    mobileSidebar.classList.toggle('hidden');
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!mobileSidebar.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                        mobileSidebar.classList.add('hidden');
+                    }
+                });
+
+                // Close menu when a portal is selected
+                document.querySelectorAll('.mobile-portal-selector').forEach(button => {
+                    button.addEventListener('click', function() {
+                        mobileSidebar.classList.add('hidden');
+                    });
+                });
+            }
+        });
+
+        // Desktop Portal Selection
         document.querySelectorAll('.portal-selector').forEach(button => {
             button.addEventListener('click', function() {
                 currentPortal = this.dataset.portal;
@@ -281,14 +359,36 @@
                 this.classList.remove('bg-brand-700', 'hover:bg-brand-600');
                 
                 // Update display
-                const portalNames = {
-                    'parent': 'Parents Portal',
-                    'student': 'Students Portal',
-                    'staff': 'Staff Portal'
-                };
-                document.getElementById('portalDisplay').textContent = portalNames[currentPortal];
+                updatePortalDisplay(this.dataset.portal);
             });
         });
+
+        // Mobile Portal Selection
+        document.querySelectorAll('.mobile-portal-selector').forEach(button => {
+            button.addEventListener('click', function() {
+                currentPortal = this.dataset.portal;
+                
+                // Update active state
+                document.querySelectorAll('.mobile-portal-selector').forEach(btn => {
+                    btn.classList.remove('bg-gold-600');
+                    btn.classList.add('bg-brand-700', 'hover:bg-brand-600');
+                });
+                this.classList.add('bg-gold-600');
+                this.classList.remove('bg-brand-700', 'hover:bg-brand-600');
+                
+                // Update display
+                updatePortalDisplay(this.dataset.portal);
+            });
+        });
+
+        function updatePortalDisplay(portal) {
+            const portalNames = {
+                'parent': 'Parents Portal',
+                'student': 'Students Portal',
+                'staff': 'Staff Portal'
+            };
+            document.getElementById('portalDisplay').textContent = portalNames[portal];
+        }
 
         // Password Toggle
         function togglePassword() {
@@ -322,17 +422,6 @@
                 window.location.href = redirects[currentPortal];
             }, 2000);
         });
-
-        // Mobile Sidebar Toggle
-        const mobileToggle = document.querySelector('[data-collapse-toggle="mobile-sidebar"]');
-        if (mobileToggle) {
-            mobileToggle.addEventListener('click', function() {
-                const sidebar = document.getElementById('mobile-sidebar');
-                if (sidebar) {
-                    sidebar.classList.toggle('hidden');
-                }
-            });
-        }
     </script>
 </body>
 </html>
