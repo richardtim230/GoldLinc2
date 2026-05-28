@@ -149,21 +149,21 @@
                     <div class="p-4 space-y-3">
                         <p class="text-xs uppercase tracking-widest text-brand-900 font-semibold mb-3">Select Portal</p>
                         
-                        <button class="mobile-portal-selector w-full text-left px-4 py-2 rounded-lg bg-gold-600 text-black font-medium transition-all text-sm" data-portal="parent">
+                        <button class="mobile-portal-selector w-full text-left px-4 py-2 rounded-lg bg-gold-600 text-white font-medium transition-all text-sm" data-portal="parent">
                             <span class="flex items-center">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
                                 Parents Portal
                             </span>
                         </button>
 
-                        <button class="mobile-portal-selector w-full text-left px-4 py-2 rounded-lg bg-brand-700 hover:bg-brand-600 text-black font-medium transition-all text-sm" data-portal="student">
+                        <button class="mobile-portal-selector w-full text-left px-4 py-2 rounded-lg bg-brand-700 hover:bg-brand-600 text-white font-medium transition-all text-sm" data-portal="student">
                             <span class="flex items-center">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C6.5 6.253 2 10.998 2 17.001c0 5.591 3.824 10.29 9 11.622m0-13c5.5 0 10 4.745 10 10.999c0 5.591-3.824 10.29-9 11.622"></path></svg>
                                 Students Portal
                             </span>
                         </button>
 
-                        <button class="mobile-portal-selector w-full text-left px-4 py-2 rounded-lg bg-brand-700 hover:bg-brand-600 text-black font-medium transition-all text-sm" data-portal="staff">
+                        <button class="mobile-portal-selector w-full text-left px-4 py-2 rounded-lg bg-brand-700 hover:bg-brand-600 text-white font-medium transition-all text-sm" data-portal="staff">
                             <span class="flex items-center">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
                                 Staff Portal
@@ -224,14 +224,14 @@
                         </div>
 
                         <form id="loginForm" class="space-y-6">
-                            <!-- Email Field -->
+                            <!-- Email/Registration Field -->
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address or Registration Number</label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                                     </div>
-                                    <input type="email" required class="w-full bg-gray-50 border border-gray-300 rounded-lg pl-10 pr-4 py-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white focus:border-transparent outline-none transition-all" placeholder="your@email.com">
+                                    <input type="text" id="emailOrReg" required class="w-full bg-gray-50 border border-gray-300 rounded-lg pl-10 pr-4 py-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white focus:border-transparent outline-none transition-all" placeholder="Enter your email or registration number">
                                 </div>
                             </div>
 
@@ -242,7 +242,7 @@
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                                     </div>
-                                    <input type="password" id="passwordInput" required class="w-full bg-gray-50 border border-gray-300 rounded-lg pl-10 pr-12 py-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white focus:border-transparent outline-none transition-all" placeholder="••••••••">
+                                    <input type="password" id="passwordInput" required class="w-full bg-gray-50 border border-gray-300 rounded-lg pl-10 pr-12 py-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white focus:border-transparent outline-none transition-all" placeholder="Enter your password">
                                     <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600" onclick="togglePassword()">
                                         <svg id="eyeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                     </button>
@@ -252,8 +252,8 @@
                             <!-- Remember Me & Forgot Password -->
                             <div class="flex items-center justify-between">
                                 <label class="flex items-center">
-                                    <input type="checkbox" class="w-4 h-4 text-brand-600 rounded border-gray-300 focus:ring-brand-500">
-                                    <span class="ml-2 text-sm text-gray-600">Remember me</span>
+                                    <input type="checkbox" id="keepLoggedIn" class="w-4 h-4 text-brand-600 rounded border-gray-300 focus:ring-brand-500">
+                                    <span class="ml-2 text-sm text-gray-600">Keep me logged on</span>
                                 </label>
                                 <a href="#" class="text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors">Forgot password?</a>
                             </div>
@@ -261,15 +261,15 @@
                             <!-- Login Button -->
                             <button type="submit" class="w-full bg-brand-500 hover:bg-brand-800 text-white font-semibold py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center group">
                                 <svg class="w-5 h-5 mr-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h12.75"></path></svg>
-                                Sign In
+                                SIGN IN
                             </button>
 
-                            <!-- Demo Credentials Info -->
-                            <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                                <p class="text-xs font-semibold text-blue-900 mb-2">Demo Credentials:</p>
-                                <p class="text-xs text-blue-700"><span class="font-medium">Parent:</span> parent@goldlinc.edu / password123</p>
-                                <p class="text-xs text-blue-700"><span class="font-medium">Student:</span> student@goldlinc.edu / password123</p>
-                                <p class="text-xs text-blue-700"><span class="font-medium">Staff:</span> staff@goldlinc.edu / password123</p>
+                            <!-- Spinner (Hidden by default) -->
+                            <div id="spinner" class="hidden text-center mt-4">
+                                <svg class="animate-spin h-5 w-5 text-brand-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
                             </div>
                         </form>
 
@@ -319,10 +319,16 @@
         <span>Login successful! Redirecting...</span>
     </div>
 
+    <!-- Error Toast (Hidden) -->
+    <div id="errorToast" class="hidden fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 z-50">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" fill-rule="evenodd"></path></svg>
+        <span id="errorMsg">An error occurred</span>
+    </div>
+
     <!-- Flowbite Script -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 
-    <!-- Custom JavaScript -->
+    <!-- Custom JavaScript with Backend Integration -->
     <script>
         let currentPortal = 'parent';
 
@@ -337,14 +343,12 @@
                     mobileSidebar.classList.toggle('hidden');
                 });
 
-                // Close menu when clicking outside
                 document.addEventListener('click', function(e) {
                     if (!mobileSidebar.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
                         mobileSidebar.classList.add('hidden');
                     }
                 });
 
-                // Close menu when a portal is selected
                 document.querySelectorAll('.mobile-portal-selector').forEach(button => {
                     button.addEventListener('click', function() {
                         mobileSidebar.classList.add('hidden');
@@ -358,7 +362,6 @@
             button.addEventListener('click', function() {
                 currentPortal = this.dataset.portal;
                 
-                // Update active state
                 document.querySelectorAll('.portal-selector').forEach(btn => {
                     btn.classList.remove('bg-gold-600');
                     btn.classList.add('bg-brand-700', 'hover:bg-brand-600');
@@ -366,7 +369,6 @@
                 this.classList.add('bg-gold-600');
                 this.classList.remove('bg-brand-700', 'hover:bg-brand-600');
                 
-                // Update display
                 updatePortalDisplay(this.dataset.portal);
             });
         });
@@ -376,7 +378,6 @@
             button.addEventListener('click', function() {
                 currentPortal = this.dataset.portal;
                 
-                // Update active state
                 document.querySelectorAll('.mobile-portal-selector').forEach(btn => {
                     btn.classList.remove('bg-gold-600');
                     btn.classList.add('bg-brand-700', 'hover:bg-brand-600');
@@ -384,7 +385,6 @@
                 this.classList.add('bg-gold-600');
                 this.classList.remove('bg-brand-700', 'hover:bg-brand-600');
                 
-                // Update display
                 updatePortalDisplay(this.dataset.portal);
             });
         });
@@ -412,23 +412,144 @@
             }
         }
 
-        // Form Submission
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        // Show Error Toast
+        function showErrorToast(message) {
+            const toast = document.getElementById('errorToast');
+            document.getElementById('errorMsg').textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 4000);
+        }
+
+        // Form Submission with Backend Integration
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Show success toast
-            const toast = document.getElementById('successToast');
-            toast.classList.remove('hidden');
+            const emailOrReg = document.getElementById('emailOrReg').value.trim();
+            const password = document.getElementById('passwordInput').value.trim();
+            const keepLoggedIn = document.getElementById('keepLoggedIn').checked;
+            const spinner = document.getElementById('spinner');
+            const submitBtn = this.querySelector('button[type="submit"]');
+
+            if (!emailOrReg || !password) {
+                showErrorToast('Please fill in all fields.');
+                return;
+            }
+
+            const isEmail = emailOrReg.includes('@');
             
-            // Redirect after 2 seconds based on portal
-            setTimeout(() => {
-                const redirects = {
-                    'parent': 'parent-dashboard.html',
-                    'student': 'student-dashboard.html',
-                    'staff': 'staff-dashboard.html'
-                };
-                window.location.href = redirects[currentPortal];
-            }, 2000);
+            // Show spinner
+            spinner.classList.remove('hidden');
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.6';
+
+            try {
+                // Try parent login first if it looks like an email
+                if (isEmail && currentPortal === 'parent') {
+                    try {
+                        const parentRes = await fetch('https://goldlincschools.onrender.com/api/parents/login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: emailOrReg, password }),
+                        });
+
+                        if (parentRes.ok) {
+                            const parentData = await parentRes.json();
+                            if (parentData?.token) {
+                                localStorage.setItem('token', parentData.token);
+                                localStorage.setItem('parentToken', parentData.token);
+                                localStorage.setItem('parentId', parentData.parent._id);
+                                localStorage.setItem('parentName', parentData.parent.name);
+                                localStorage.setItem('userRole', 'parent');
+                                localStorage.setItem('user', JSON.stringify(parentData.parent));
+                                
+                                if (keepLoggedIn) {
+                                    localStorage.setItem('keepLoggedIn', 'true');
+                                }
+
+                                document.getElementById('successToast').classList.remove('hidden');
+                                setTimeout(() => {
+                                    window.location.href = 'p-dashboard.html';
+                                }, 1500);
+                                return;
+                            }
+                        }
+                    } catch (parentErr) {
+                        console.log('Parent login attempt failed, trying regular auth...');
+                    }
+                }
+
+                // Try regular auth (student/admin/teacher/staff)
+                const body = isEmail
+                    ? { email: emailOrReg, password }
+                    : { regNo: emailOrReg, password };
+
+                const res = await fetch('https://goldlincschools.onrender.com/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body),
+                });
+
+                let data = {};
+                try {
+                    data = await res.json();
+                } catch (err) {
+                    showErrorToast('Server error: Invalid response');
+                    return;
+                }
+
+                if (res.ok && data?.token) {
+                    // Store JWT token in multiple keys for compatibility
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('adminToken', data.token);
+                    localStorage.setItem('superadmin_token', data.token);
+                    localStorage.setItem('student_token', data.token);
+                    
+                    if (data.user) {
+                        localStorage.setItem('user', JSON.stringify(data.user));
+                        localStorage.setItem('userRole', data.user.role);
+                    }
+
+                    if (keepLoggedIn) {
+                        localStorage.setItem('keepLoggedIn', 'true');
+                    }
+
+                    console.log('✓ Login successful for role:', data.user?.role);
+
+                    document.getElementById('successToast').classList.remove('hidden');
+
+                    // Role-based redirect
+                    const role = data.user?.role?.toLowerCase();
+                    setTimeout(() => {
+                        if (role === 'superadmin') {
+                            window.location.href = 'admin.html';
+                        } else if (role === 'admin') {
+                            window.location.href = 'gen-sec.html';
+                        } else if (role === 'teacher') {
+                            window.location.href = 'teacher-dashboard.html';
+                        } else if (role === 'staff') {
+                            window.location.href = 'gen-sec.html';
+                        } else if (role === 'parent') {
+                            window.location.href = 'p-dashboard.html';
+                        } else if (role === 'student') {
+                            window.location.href = 'student-dashboard.html';
+                        } else {
+                            window.location.href = '/';
+                        }
+                    }, 1500);
+                } else {
+                    showErrorToast(data?.error || 'Invalid login credentials');
+                }
+            } catch (err) {
+                console.error('[Login Error]', err);
+                showErrorToast('Network or server error: ' + err.message);
+            } finally {
+                spinner.classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+            }
         });
     </script>
 </body>
