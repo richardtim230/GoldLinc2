@@ -150,7 +150,7 @@
                         </div>
                         <div>
                             <h3 class="text-lg font-bold text-brand-900 mb-1">Enter Your Details</h3>
-                            <p class="text-gray-600 text-sm">Provide your admission number and PIN to access your results securely.</p>
+                            <p class="text-gray-600 text-sm">Provide your admission/registration number and PIN/scratch card to access your results securely.</p>
                         </div>
                     </div>
 
@@ -159,8 +159,8 @@
                             <div class="flex items-center justify-center h-10 w-10 rounded-full bg-brand-500 text-white font-bold">2</div>
                         </div>
                         <div>
-                            <h3 class="text-lg font-bold text-brand-900 mb-1">Select Examination</h3>
-                            <p class="text-gray-600 text-sm">Choose the examination session (e.g., Mid-Year, End of Year, Mock Exams) you want to review.</p>
+                            <h3 class="text-lg font-bold text-brand-900 mb-1">Select Period</h3>
+                            <p class="text-gray-600 text-sm">Choose the session, term, and class/grade you want to review your results for.</p>
                         </div>
                     </div>
 
@@ -180,7 +180,7 @@
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         Need Help?
                     </h4>
-                    <p class="text-sm text-blue-800 mb-2">If you forgot your PIN or admission number, contact our admissions office.</p>
+                    <p class="text-sm text-blue-800 mb-2">If you forgot your PIN/scratch card or registration number, contact our admissions office.</p>
                     <p class="text-xs text-blue-700 font-medium">Email: goldlincschools@gmail.com | Phone: 08034430941</p>
                 </div>
             </div>
@@ -198,33 +198,43 @@
                             
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                                 <div>
-                                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-2">Admission Number *</label>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-2">Admission/Registration Number *</label>
                                     <input type="text" id="admissionNumber" required placeholder="e.g., GLS2025001" class="w-full bg-gray-50 border border-gray-200 rounded p-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none transition-all uppercase">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-2">PIN *</label>
-                                    <input type="password" id="studentPin" required placeholder="Enter your 4-digit PIN" class="w-full bg-gray-50 border border-gray-200 rounded p-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none transition-all" maxlength="4" inputmode="numeric">
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-2">PIN/Scratch Card *</label>
+                                    <input type="password" id="scratchCard" required placeholder="Enter PIN or scratch card code" class="w-full bg-gray-50 border border-gray-200 rounded p-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none transition-all">
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Examination Selection -->
+                        <!-- Academic Period Section -->
                         <div class="pb-6 border-b border-gray-200">
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">Select Examination</h3>
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">Academic Period</h3>
                             
-                            <div>
-                                <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-2">Examination Session *</label>
-                                <select id="examSession" required class="w-full bg-gray-50 border border-gray-200 rounded p-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none transition-all text-gray-600">
-                                    <option value="">Select Examination Session...</option>
-                                    <option value="mid-year-2026">Mid-Year Examination 2026</option>
-                                    <option value="end-year-2025">End of Year Examination 2025</option>
-                                    <option value="mock-2025">Mock Exams 2025</option>
-                                    <option value="mid-year-2025">Mid-Year Examination 2025</option>
-                                    <option value="end-year-2024">End of Year Examination 2024</option>
-                                </select>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-2">Session *</label>
+                                    <select id="session" required class="w-full bg-gray-50 border border-gray-200 rounded p-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none transition-all text-gray-600">
+                                        <option value="">Select Session...</option>
+                                        <option value="2025-2026">2025/2026</option>
+                                        <option value="2024-2025">2024/2025</option>
+                                        <option value="2023-2024">2023/2024</option>
+                                        <option value="2022-2023">2022/2023</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-2">Term *</label>
+                                    <select id="term" required class="w-full bg-gray-50 border border-gray-200 rounded p-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none transition-all text-gray-600">
+                                        <option value="">Select Term...</option>
+                                        <option value="1st-term">1st Term</option>
+                                        <option value="2nd-term">2nd Term</option>
+                                        <option value="3rd-term">3rd Term</option>
+                                    </select>
+                                </div>
                             </div>
 
-                            <div class="mt-4">
+                            <div>
                                 <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-2">Class/Grade *</label>
                                 <select id="studentClass" required class="w-full bg-gray-50 border border-gray-200 rounded p-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none transition-all text-gray-600">
                                     <option value="">Select Your Class...</option>
@@ -278,18 +288,22 @@
 
             <!-- Student Info Card -->
             <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6 mb-6">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
                     <div>
-                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Admission Number</p>
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Registration Number</p>
                         <p id="resultAdmission" class="text-lg font-bold text-brand-900"></p>
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Session</p>
+                        <p id="resultSession" class="text-lg font-bold text-brand-900"></p>
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Term</p>
+                        <p id="resultTerm" class="text-lg font-bold text-brand-900"></p>
                     </div>
                     <div>
                         <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Class</p>
                         <p id="resultClass" class="text-lg font-bold text-brand-900"></p>
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Examination</p>
-                        <p id="resultExam" class="text-lg font-bold text-brand-900"></p>
                     </div>
                     <div>
                         <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Overall Grade</p>
@@ -354,18 +368,18 @@
                         <svg class="w-5 h-5 text-gray-500 transition-transform" id="faqIcon1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
                     </button>
                     <div class="hidden px-6 pb-4 text-gray-600 text-sm border-t border-gray-100" id="faqContent1">
-                        Results are typically released within two weeks after examinations end. An email notification will be sent to parents and the student's PIN will be activated for online access.
+                        Results are typically released within two weeks after examinations end. An email notification will be sent to parents and the student's PIN/scratch card will be activated for online access.
                     </div>
                 </div>
 
                 <!-- FAQ Item 2 -->
                 <div class="bg-white border border-gray-200 rounded-lg overflow-hidden" id="faqItem2">
                     <button class="w-full px-6 py-4 flex justify-between items-center hover:bg-brand-50 transition-colors" onclick="toggleFAQ(2)">
-                        <span class="font-semibold text-brand-900">What if I forgot my PIN?</span>
+                        <span class="font-semibold text-brand-900">What if I forgot my PIN or scratch card?</span>
                         <svg class="w-5 h-5 text-gray-500 transition-transform" id="faqIcon2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
                     </button>
                     <div class="hidden px-6 pb-4 text-gray-600 text-sm border-t border-gray-100" id="faqContent2">
-                        Contact the admissions office with your admission number and a valid form of identification. They will verify your identity and reset your PIN. Email: goldlincschools@gmail.com or call 08034430941.
+                        Contact the admissions office with your registration number and a valid form of identification. They will verify your identity and provide you with a new PIN or scratch card. Email: goldlincschools@gmail.com or call 08034430941.
                     </div>
                 </div>
 
@@ -470,19 +484,19 @@
         // Sample results data (in production, this would come from backend API)
         const sampleResults = {
             'GLS2025001': {
-                'mid-year-2026': {
-                    'primary-4': {
-                        name: 'Chidinma Okafor',
-                        class: 'Primary 4',
-                        exam: 'Mid-Year Examination 2026',
-                        subjects: [
-                            { name: 'English Language', score: 85, grade: 'B', status: 'Pass', remark: 'Excellent performance' },
-                            { name: 'Mathematics', score: 92, grade: 'A', status: 'Pass', remark: 'Outstanding' },
-                            { name: 'Science', score: 88, grade: 'B', status: 'Pass', remark: 'Very good progress' },
-                            { name: 'Social Studies', score: 80, grade: 'B', status: 'Pass', remark: 'Good understanding' },
-                            { name: 'Creative Arts', score: 95, grade: 'A', status: 'Pass', remark: 'Exceptional talent' },
-                            { name: 'Physical Education', score: 87, grade: 'B', status: 'Pass', remark: 'Active participation' }
-                        ]
+                '2025-2026': {
+                    '1st-term': {
+                        'primary-4': {
+                            class: 'Primary 4',
+                            subjects: [
+                                { name: 'English Language', score: 85, grade: 'B', status: 'Pass', remark: 'Excellent performance' },
+                                { name: 'Mathematics', score: 92, grade: 'A', status: 'Pass', remark: 'Outstanding' },
+                                { name: 'Science', score: 88, grade: 'B', status: 'Pass', remark: 'Very good progress' },
+                                { name: 'Social Studies', score: 80, grade: 'B', status: 'Pass', remark: 'Good understanding' },
+                                { name: 'Creative Arts', score: 95, grade: 'A', status: 'Pass', remark: 'Exceptional talent' },
+                                { name: 'Physical Education', score: 87, grade: 'B', status: 'Pass', remark: 'Active participation' }
+                            ]
+                        }
                     }
                 }
             }
@@ -493,27 +507,29 @@
             e.preventDefault();
             
             const admission = document.getElementById('admissionNumber').value.toUpperCase();
-            const pin = document.getElementById('studentPin').value;
-            const examSession = document.getElementById('examSession').value;
+            const scratchCard = document.getElementById('scratchCard').value;
+            const session = document.getElementById('session').value;
+            const term = document.getElementById('term').value;
             const studentClass = document.getElementById('studentClass').value;
             
             // Simulate authentication
-            if (pin === '1234') { // Demo PIN
-                displayResults(admission, examSession, studentClass);
+            if (scratchCard === '1234') { // Demo PIN/Scratch Card
+                displayResults(admission, session, term, studentClass);
             } else {
-                alert('Invalid PIN. Please try again.');
+                alert('Invalid PIN/Scratch Card. Please try again. Demo: Use 1234');
             }
         });
 
-        function displayResults(admission, examSession, studentClass) {
+        function displayResults(admission, session, term, studentClass) {
             // Check if data exists (demo purposes)
-            if (sampleResults[admission] && sampleResults[admission][examSession] && sampleResults[admission][examSession][studentClass]) {
-                const data = sampleResults[admission][examSession][studentClass];
+            if (sampleResults[admission] && sampleResults[admission][session] && sampleResults[admission][session][term] && sampleResults[admission][session][term][studentClass]) {
+                const data = sampleResults[admission][session][term][studentClass];
                 
                 // Populate student info
                 document.getElementById('resultAdmission').textContent = admission;
+                document.getElementById('resultSession').textContent = session.replace('-', '/');
+                document.getElementById('resultTerm').textContent = term.replace('-', ' ');
                 document.getElementById('resultClass').textContent = data.class;
-                document.getElementById('resultExam').textContent = data.exam;
                 
                 // Calculate stats
                 const scores = data.subjects.map(s => s.score);
@@ -552,7 +568,7 @@
                 document.getElementById('resultsDisplay').classList.remove('hidden');
                 window.scrollTo(0, 0);
             } else {
-                alert('No results found for the provided credentials. Please check and try again.');
+                alert('No results found for the provided credentials. Please check and try again. Demo admission: GLS2025001');
             }
         }
 
@@ -585,13 +601,6 @@
             icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
             icon.style.transition = 'transform 0.3s ease';
         }
-
-        // PIN input - only allow numbers
-        document.getElementById('studentPin').addEventListener('keypress', function(e) {
-            if (!/[0-9]/.test(e.key)) {
-                e.preventDefault();
-            }
-        });
     </script>
 
     <style>
