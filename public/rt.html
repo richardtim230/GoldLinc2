@@ -295,10 +295,27 @@
 
         <div id="panel-grading" class="space-y-6 hidden">
             <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h3 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Result Upload Analytics</h3>
+                        <p class="text-base font-black text-brand-900 mt-0.5">Roster Capture Progress</p>
+                    </div>
+                    <div class="text-right text-xs">
+                        <span class="font-bold text-slate-500">Completed Data Cells: </span>
+                        <span id="progressStatsCount" class="font-mono font-black text-brand-900 bg-slate-100 px-2 py-0.5 rounded-md">0 / 0</span>
+                        <span id="progressStatsLeft" class="ml-2 font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">0 Cells Left</span>
+                    </div>
+                </div>
+                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden shadow-inner">
+                    <div id="progressBarFill" class="bg-gradient-to-r from-brand-500 to-emerald-500 h-full w-0 transition-all duration-300"></div>
+                </div>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
                 <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-slate-100 pb-4">
                     <div>
                         <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Secondary Gradebook Mark Sheet Matrix</h2>
-                        <p class="text-xs text-slate-500">Pushes score modifications straight to parent profile views.</p>
+                        <p class="text-xs text-slate-500">Pushes score modifications straight to parent profile views. Weights: CA1 (20%), CA2 (20%), Exam (60%).</p>
                     </div>
                     <div class="flex space-x-2 shrink-0">
                         <select id="gradebookClassFilter" onchange="renderGradebook()" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
@@ -306,7 +323,7 @@
                             <option value="SS3 Beta">SS3 Beta - Advanced Biology</option>
                         </select>
                         <button onclick="saveGradebookChanges()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider shadow transition">
-                            Save Changes
+                            Bulk Save Class
                         </button>
                     </div>
                 </div>
@@ -316,9 +333,11 @@
                             <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
                                 <th class="p-3 pl-4">Admission Code</th>
                                 <th class="p-3">Student Name</th>
-                                <th class="p-3 text-center w-24">CA Marks (40)</th>
-                                <th class="p-3 text-center w-24">Exam (60)</th>
-                                <th class="p-3 text-center w-28">Total Outcome</th>
+                                <th class="p-3 text-center w-20">CA1 (20)</th>
+                                <th class="p-3 text-center w-20">CA2 (20)</th>
+                                <th class="p-3 text-center w-20">Exam (60)</th>
+                                <th class="p-3 text-center w-24">Total Outcome</th>
+                                <th class="p-3 text-center w-36">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="gradebookTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
@@ -480,10 +499,11 @@
             }
         ];
 
+        // Refactored Student Registry to separate CA1 and CA2 parameters natively
         let studentRegistry = [
-            { code: "GLS/2024/048", name: "Samuel Adeniyi", classGroup: "SS2 Alpha", caMark: 34, examMark: 48, standing: "Active" },
-            { code: "GLS/2024/091", name: "Chidi Okafor", classGroup: "SS2 Alpha", caMark: 28, examMark: 42, standing: "Active" },
-            { code: "GLS/2023/012", name: "Fatima Bello", classGroup: "SS3 Beta", caMark: 31, examMark: 51, standing: "Active" }
+            { code: "GLS/2024/048", name: "Samuel Adeniyi", classGroup: "SS2 Alpha", ca1Mark: 17, ca2Mark: 17, examMark: 48, standing: "Active" },
+            { code: "GLS/2024/091", name: "Chidi Okafor", classGroup: "SS2 Alpha", ca1Mark: 14, ca2Mark: 14, examMark: 42, standing: "Active" },
+            { code: "GLS/2023/012", name: "Fatima Bello", classGroup: "SS3 Beta", ca1Mark: 15, ca2Mark: 16, examMark: 51, standing: "Active" }
         ];
 
         let assignmentsDatabase = [
@@ -501,7 +521,6 @@
 
         // EXPLICIT RUNTIME TAB CONTROL ENGINE
         function switchPanel(panelId) {
-            // Panel Registry Key Arrays
             const panels = ['overview', 'assessments', 'assignments', 'students', 'grading', 'profile'];
             
             panels.forEach(p => {
@@ -523,7 +542,6 @@
                 }
             });
             
-            // Auto close mobile navbar if it triggered the switch
             closeBottomNav(null);
         }
 
@@ -689,7 +707,6 @@
                     placeholder: 'Enter rich-text biology assessment item stem...',
                     modules: { toolbar: [['bold', 'italic', 'underline'], ['image'], ['clean']] }
                 });
-                // Attach intercepted hook for image button mapping
                 stemQuillInstance.getModule('toolbar').addHandler('image', function() {
                     triggerCustomMediaPicker(stemQuillInstance);
                 });
@@ -920,7 +937,7 @@
         }
 
         /* -----------------------------------------------------------
-           GRADEBOOK LOGIC MATRIX OPERATIONS
+           GRADEBOOK PARAMETERS & REAL-TIME TRACKING MATRIX
            ----------------------------------------------------------- */
         function renderGradebook() {
             const filter = document.getElementById('gradebookClassFilter').value;
@@ -935,33 +952,126 @@
                         <td class="p-3 pl-4 font-mono font-bold text-brand-900">${s.code}</td>
                         <td class="p-3 font-bold text-slate-800">${s.name}</td>
                         <td class="p-3 text-center">
-                            <input type="number" value="${s.caMark}" class="ca-input w-16 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono font-bold p-1 text-xs focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
+                            <input type="number" min="0" max="20" value="${s.ca1Mark}" oninput="calculateRowTotal(this)" class="ca1-input w-14 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono font-bold p-1 text-xs focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
                         </td>
                         <td class="p-3 text-center">
-                            <input type="number" value="${s.examMark}" class="exam-input w-16 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono font-bold p-1 text-xs focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
+                            <input type="number" min="0" max="20" value="${s.ca2Mark}" oninput="calculateRowTotal(this)" class="ca2-input w-14 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono font-bold p-1 text-xs focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
                         </td>
-                        <td class="p-3 text-center font-mono font-black text-slate-900 select-all tracking-wide">
-                            <span class="total-span">${s.caMark + s.examMark}</span>/100
+                        <td class="p-3 text-center">
+                            <input type="number" min="0" max="60" value="${s.examMark}" oninput="calculateRowTotal(this)" class="exam-input w-14 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono font-bold p-1 text-xs focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
+                        </td>
+                        <td class="p-3 text-center font-mono font-black text-slate-900 tracking-wide">
+                            <span class="total-span">${s.ca1Mark + s.ca2Mark + s.examMark}</span>/100
+                        </td>
+                        <td class="p-3 text-center space-x-1 whitespace-nowrap">
+                            <button onclick="saveSingleRow(this)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[10px] px-2.5 py-1 rounded-md uppercase tracking-wider transition">Save Row</button>
+                            <button onclick="clearSingleRow(this)" class="bg-white border border-slate-200 text-slate-500 hover:bg-slate-100 font-extrabold text-[10px] px-2.5 py-1 rounded-md uppercase tracking-wider transition">Clear</button>
                         </td>
                     </tr>`;
             });
+
+            updateProgressMetrics();
         }
 
+        // Calculates single row totals on keyboard inputs dynamically
+        function calculateRowTotal(inputElement) {
+            const row = inputElement.closest('tr');
+            const ca1 = parseInt(row.querySelector('.ca1-input').value) || 0;
+            const ca2 = parseInt(row.querySelector('.ca2-input').value) || 0;
+            const exam = parseInt(row.querySelector('.exam-input').value) || 0;
+            
+            row.querySelector('.total-span').innerText = ca1 + ca2 + exam;
+            updateProgressMetrics();
+        }
+
+        // Computes how many inputs are completed vs. how many left across all score cells
+        function updateProgressMetrics() {
+            const rows = document.getElementById('gradebookTableBody').children;
+            const totalStudents = rows.length;
+            const totalExpectedCells = totalStudents * 3; // 3 inputs per student (CA1, CA2, Exam)
+            let completedCells = 0;
+
+            for(let row of rows) {
+                const ca1Val = row.querySelector('.ca1-input').value;
+                const ca2Val = row.querySelector('.ca2-input').value;
+                const examVal = row.querySelector('.exam-input').value;
+
+                if (ca1Val !== "" && !isNaN(ca1Val)) completedCells++;
+                if (ca2Val !== "" && !isNaN(ca2Val)) completedCells++;
+                if (examVal !== "" && !isNaN(examVal)) completedCells++;
+            }
+
+            const cellsLeft = totalExpectedCells - completedCells;
+            document.getElementById('progressStatsCount').innerText = `${completedCells} / ${totalExpectedCells}`;
+            document.getElementById('progressStatsLeft').innerText = `${cellsLeft} Input Cells Left`;
+
+            const percentage = totalExpectedCells > 0 ? (completedCells / totalExpectedCells) * 100 : 0;
+            document.getElementById('progressBarFill').style.width = `${percentage}%`;
+        }
+
+        // Action button code: saves row state parameters locally to target database record
+        function saveSingleRow(buttonElement) {
+            const row = buttonElement.closest('tr');
+            const code = row.getAttribute('data-student-code');
+            const ca1Val = parseInt(row.querySelector('.ca1-input').value) || 0;
+            const ca2Val = parseInt(row.querySelector('.ca2-input').value) || 0;
+            const examVal = parseInt(row.querySelector('.exam-input').value) || 0;
+
+            if (ca1Val > 20 || ca2Val > 20 || examVal > 60) {
+                alert("Validation error: Marks exceed limits! Max caps are CA1: 20, CA2: 20, Exam: 60.");
+                return;
+            }
+
+            const student = studentRegistry.find(s => s.code === code);
+            if(student) {
+                student.ca1Mark = ca1Val;
+                student.ca2Mark = ca2Val;
+                student.examMark = examVal;
+                alert(`Scores for student ${student.name} saved successfully.`);
+            }
+            updateProgressMetrics();
+        }
+
+        // Action button code: resets row inputs completely
+        function clearSingleRow(buttonElement) {
+            const row = buttonElement.closest('tr');
+            row.querySelector('.ca1-input').value = '';
+            row.querySelector('.ca2-input').value = '';
+            row.querySelector('.exam-input').value = '';
+            row.querySelector('.total-span').innerText = '0';
+            updateProgressMetrics();
+        }
+
+        // Bulk action code: processes all inputs across the grid
         function saveGradebookChanges() {
             const rows = document.getElementById('gradebookTableBody').children;
+            let boundsError = false;
+
             for(let row of rows) {
                 const code = row.getAttribute('data-student-code');
-                const caVal = parseInt(row.querySelector('.ca-input').value) || 0;
+                const ca1Val = parseInt(row.querySelector('.ca1-input').value) || 0;
+                const ca2Val = parseInt(row.querySelector('.ca2-input').value) || 0;
                 const examVal = parseInt(row.querySelector('.exam-input').value) || 0;
+
+                if (ca1Val > 20 || ca2Val > 20 || examVal > 60) {
+                    boundsError = true;
+                    continue;
+                }
 
                 const student = studentRegistry.find(s => s.code === code);
                 if(student) {
-                    student.caMark = caVal;
+                    student.ca1Mark = ca1Val;
+                    student.ca2Mark = ca2Val;
                     student.examMark = examVal;
-                    row.querySelector('.total-span').innerText = caVal + examVal;
                 }
             }
-            alert("Gradebook updates synced completely across all active database files.");
+
+            if (boundsError) {
+                alert("Some grades exceeded limits (CA1: 20, CA2: 20, Exam: 60) and could not be bulk saved.");
+            } else {
+                alert("Gradebook updates synced completely across all active database files.");
+            }
+            renderGradebook();
         }
 
         /* -----------------------------------------------------------
