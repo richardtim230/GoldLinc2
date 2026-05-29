@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gold and Linc Schools | Official Academic Transcript</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7', // Primary Sky Blue
+                            800: '#075985', // Accent Deep Blue
+                            900: '#0c4a6e', // Dark Crest
+                        },
+                        gold: {
+                            500: '#d97706',
+                            600: '#b45309',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* CSS Print Utilities for Professional PDF Export */
+        @media print {
+            body { background-color: #ffffff; color: #000000; font-size: 12px; }
+            .no-print { display: none !important; }
+            .print-border { border: 2px solid #0c4a6e !important; }
+            .shadow-sm, .shadow-md, .shadow-xl { shadow: none !important; border: 1px solid #cbd5e1 !important; }
+            @page { margin: 1.5cm; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+
+    <!-- TOP PRINT INTERFACE CONTROLS (Hidden during printing/PDF save) -->
+    <div class="max-w-4xl mx-auto mb-6 no-print flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <div class="text-xs text-slate-500">
+            <p><strong>Registry Node:</strong> Verified System Transcript Document.</p>
+        </div>
+        <button onclick="window.print()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs uppercase tracking-wider px-4 py-2.5 rounded-lg shadow dynamic-pop transition active:scale-95 flex items-center">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2-2v4h10z"/></svg>
+            Print / Save Report Card PDF
+        </button>
+    </div>
+
+    <!-- MAIN ACADEMIC REPORT CARD CONTAINER -->
+    <article class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden print-border p-6 sm:p-10 space-y-8">
+        
+        <!-- HEADER LAYOUT Section: Crest & Institutional Data -->
+        <header class="flex flex-col sm:flex-row items-center justify-between border-b-4 border-brand-900 pb-6 gap-4">
+            <div class="flex items-center space-x-4 text-center sm:text-left flex-col sm:flex-row">
+                <div class="bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm shrink-0 mb-3 sm:mb-0">
+                    <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779961202/editor-uploads/frngf21mg4fcrnmccobm.png" class="h-20 w-auto object-contain" alt="Gold & Linc Corporate Crest">
+                </div>
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-black font-serif uppercase tracking-tight text-brand-900">Gold & Linc Schools</h1>
+                    <p class="text-xs font-bold text-gold-600 uppercase tracking-widest font-sans mt-0.5">Knowledge · Integrity · Excellence</p>
+                    <p class="text-[11px] text-slate-500 mt-2 max-w-sm leading-tight font-medium">
+                        Behind Irenitemi Hotel, Testing Ground Area, Off Osogbo Road, Ilesa, Osun State.
+                    </p>
+                </div>
+            </div>
+            <div class="text-center sm:text-right bg-brand-50 border border-brand-100 p-4 rounded-xl min-w-[200px]">
+                <h2 class="text-sm font-black uppercase text-brand-900 tracking-wider font-sans">Official Terminal Report</h2>
+                <div class="text-xs text-slate-600 mt-1.5 space-y-0.5 font-medium">
+                    <p><strong>Session:</strong> 2025/2026 Academic Session</p>
+                    <p><strong>Term Evaluated:</strong> Second Term Track</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- STUDENT METRIC BIO MATRIX INFRASTRUCTURE -->
+        <section class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-150 text-xs font-medium text-slate-700">
+            <div>
+                <span class="block text-[10px] uppercase text-slate-400 font-extrabold tracking-wider">Student Name</span>
+                <span class="text-sm font-bold text-slate-900">Samuel Adeniyi</span>
+            </div>
+            <div>
+                <span class="block text-[10px] uppercase text-slate-400 font-extrabold tracking-wider">Admission ID</span>
+                <span class="text-sm font-mono font-bold text-slate-900">GLS/2024/048</span>
+            </div>
+            <div>
+                <span class="block text-[10px] uppercase text-slate-400 font-extrabold tracking-wider">Class Stream</span>
+                <span class="text-sm font-bold text-slate-900">Secondary Track (SS2)</span>
+            </div>
+            <div>
+                <span class="block text-[10px] uppercase text-slate-400 font-extrabold tracking-wider">Class Population</span>
+                <span class="text-sm font-bold text-slate-900">28 Pupils Total</span>
+            </div>
+            <div class="pt-2 border-t border-slate-200/60">
+                <span class="block text-[10px] uppercase text-slate-400 font-extrabold tracking-wider">Attendance Rate</span>
+                <span class="text-slate-900 font-bold">96.4% (54 / 56 Days)</span>
+            </div>
+            <div class="pt-2 border-t border-slate-200/60">
+                <span class="block text-[10px] uppercase text-slate-400 font-extrabold tracking-wider">Position in Class</span>
+                <span class="text-brand-900 font-black">4th Position</span>
+            </div>
+            <div class="pt-2 border-t border-slate-200/60">
+                <span class="block text-[10px] uppercase text-slate-400 font-extrabold tracking-wider">Term Cumulative Avg</span>
+                <span class="text-slate-900 font-bold">78.2%</span>
+            </div>
+            <div class="pt-2 border-t border-slate-200/60">
+                <span class="block text-[10px] uppercase text-slate-400 font-extrabold tracking-wider">Promotional Status</span>
+                <span class="text-emerald-700 font-bold uppercase">Satisfactory Record</span>
+            </div>
+        </section>
+
+        <!-- PRIMARY ACADEMIC GRADEBOOK LEDGER CORES -->
+        <section class="space-y-2">
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-brand-900 flex items-center">
+                <span class="w-1.5 h-3 bg-brand-900 rounded-sm mr-2 block"></span>
+                Part A: Cognitive Performance Summary Ledger
+            </h3>
+            <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-brand-900 text-white font-bold uppercase tracking-wider text-[11px]">
+                            <th class="p-3 pl-4">Subject Course Block</th>
+                            <th class="p-3 text-center">Continuous Ass. (40)</th>
+                            <th class="p-3 text-center">Terminal Exam (60)</th>
+                            <th class="p-3 text-center">Total Score (100)</th>
+                            <th class="p-3 text-center">Class Highest</th>
+                            <th class="p-3 text-center">Class Lowest</th>
+                            <th class="p-3 pr-4 text-center">Alpha Grade Code</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 font-medium text-slate-700">
+                        <tr class="hover:bg-slate-50/40">
+                            <td class="p-3 pl-4 font-bold text-slate-900">Mathematics Core Track</td>
+                            <td class="p-3 text-center font-mono">34</td>
+                            <td class="p-3 text-center font-mono">48</td>
+                            <td class="p-3 text-center font-bold text-slate-900 font-mono">82</td>
+                            <td class="p-3 text-center font-mono text-slate-400">94</td>
+                            <td class="p-3 text-center font-mono text-slate-400">41</td>
+                            <td class="p-3 pr-4 text-center"><span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-extrabold">A - Distinction</span></td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/40">
+                            <td class="p-3 pl-4 font-bold text-slate-900">English Language & Rhetoric</td>
+                            <td class="p-3 text-center font-mono">29</td>
+                            <td class="p-3 text-center font-mono">45</td>
+                            <td class="p-3 text-center font-bold text-slate-900 font-mono">74</td>
+                            <td class="p-3 text-center font-mono text-slate-400">88</td>
+                            <td class="p-3 text-center font-mono text-slate-400">46</td>
+                            <td class="p-3 pr-4 text-center"><span class="bg-sky-50 text-sky-700 border border-sky-200 px-2 py-0.5 rounded font-extrabold">B - Very Good</span></td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/40">
+                            <td class="p-3 pl-4 font-bold text-slate-900">Chemistry Field Principles</td>
+                            <td class="p-3 text-center font-mono">31</td>
+                            <td class="p-3 text-center font-mono">52</td>
+                            <td class="p-3 text-center font-bold text-slate-900 font-mono">83</td>
+                            <td class="p-3 text-center font-mono text-slate-400">91</td>
+                            <td class="p-3 text-center font-mono text-slate-400">38</td>
+                            <td class="p-3 pr-4 text-center"><span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-extrabold">A - Distinction</span></td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/40">
+                            <td class="p-3 pl-4 font-bold text-slate-900">Biology Foundations</td>
+                            <td class="p-3 text-center font-mono">26</td>
+                            <td class="p-3 text-center font-mono">41</td>
+                            <td class="p-3 text-center font-bold text-slate-900 font-mono">67</td>
+                            <td class="p-3 text-center font-mono text-slate-400">84</td>
+                            <td class="p-3 text-center font-mono text-slate-400">40</td>
+                            <td class="p-3 pr-4 text-center"><span class="bg-amber-50 text-gold-700 border border-amber-200 px-2 py-0.5 rounded font-extrabold">C - Credit</span></td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/40">
+                            <td class="p-3 pl-4 font-bold text-slate-900">Physics Experimental Fields</td>
+                            <td class="p-3 text-center font-mono">28</td>
+                            <td class="p-3 text-center font-mono">37</td>
+                            <td class="p-3 text-center font-bold text-slate-900 font-mono">65</td>
+                            <td class="p-3 text-center font-mono text-slate-400">89</td>
+                            <td class="p-3 text-center font-mono text-slate-400">35</td>
+                            <td class="p-3 pr-4 text-center"><span class="bg-amber-50 text-gold-700 border border-amber-200 px-2 py-0.5 rounded font-extrabold">C - Credit</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- DUAL DOCK GRID MODULE: Behavioral & Skill Performance Domains -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- AFFECTIVE DOMAIN BEHAVIORAL TRAITS SCORING MATRIX -->
+            <section class="space-y-2">
+                <h3 class="text-xs font-extrabold uppercase tracking-wider text-brand-900 flex items-center">
+                    <span class="w-1.5 h-3 bg-brand-900 rounded-sm mr-2 block"></span>
+                    Part B: Affective Evaluation Traits
+                </h3>
+                <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm text-xs">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200">
+                                <th class="p-2.5 pl-4">Behavior Evaluation Node</th>
+                                <th class="p-2.5 pr-4 text-right">Metric Key (1-5)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+                            <tr><td class="p-2.5 pl-4">Punctuality and Promptness</td><td class="p-2.5 pr-4 text-right font-bold text-brand-900 font-mono">5 / 5</td></tr>
+                            <tr><td class="p-2.5 pl-4">Classroom Discipline & Attentiveness</td><td class="p-2.5 pr-4 text-right font-bold text-brand-900 font-mono">4 / 5</td></tr>
+                            <tr><td class="p-2.5 pl-4">Reliability and Peer Leadership</td><td class="p-2.5 pr-4 text-right font-bold text-brand-900 font-mono">5 / 5</td></tr>
+                            <tr><td class="p-2.5 pl-4">Neatness & Attire Presentation</td><td class="p-2.5 pr-4 text-right font-bold text-brand-900 font-mono">5 / 5</td></tr>
+                            <tr><td class="p-2.5 pl-4">Honesty and Relational Integrity</td><td class="p-2.5 pr-4 text-right font-bold text-brand-900 font-mono">5 / 5</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- PSYCHOMOTOR CORE COMPETENCY MARKS -->
+            <section class="space-y-2">
+                <h3 class="text-xs font-extrabold uppercase tracking-wider text-brand-900 flex items-center">
+                    <span class="w-1.5 h-3 bg-brand-900 rounded-sm mr-2 block"></span>
+                    Part C: Psychomotor Competency
+                </h3>
+                <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm text-xs">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200">
+                                <th class="p-2.5 pl-4">Skills & Handiwork Modules</th>
+                                <th class="p-2.5 pr-4 text-right">Metric Key (1-5)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+                            <tr><td class="p-2.5 pl-4">Verbal and Written Articulation</td><td class="p-2.5 pr-4 text-right font-bold text-brand-900 font-mono">4 / 5</td></tr>
+                            <tr><td class="p-2.5 pl-4">Sports and Athletic Field Adaptations</td><td class="p-2.5 pr-4 text-right font-bold text-brand-900 font-mono">3 / 5</td></tr>
+                            <tr><td class="p-2.5 pl-4">Laboratory Handling & Experimentation</td><td class="p-2.5 pr-4 text-right font-bold text-brand-900 font-mono">5 / 5</td></tr>
+                            <tr><td class="p-2.5 pl-4">Musical & Creative Arts Engagements</td><td class="p-2.5 pr-4 text-right font-bold text-brand-900 font-mono">4 / 5</td></tr>
+                            <tr><td class="p-2.5 pl-4">Digital Skills & Computer Logic Usage</td><td class="p-2.5 pr-4 text-right font-bold text-brand-900 font-mono">4 / 5</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- EVALUATION GRADING KEY EXPLANATION SYSTEM METRICS -->
+        <footer class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-[10px] text-slate-500 font-medium flex flex-wrap gap-4 items-center justify-between">
+            <div>
+                <strong class="text-slate-700 uppercase tracking-wider block mb-0.5">Cognitive Grading Key:</strong>
+                <span>75-100: A (Distinction) · 65-74: B (Very Good) · 50-64: C (Credit) · 40-49: P (Pass) · 0-39: F (Fail)</span>
+            </div>
+            <div>
+                <strong class="text-slate-700 uppercase tracking-wider block mb-0.5">Rating Evaluation Scale:</strong>
+                <span>5: Excellent · 4: Commendable · 3: Acceptable · 2: Developing · 1: Needs Support</span>
+            </div>
+        </footer>
+
+        <!-- REMARKS & SIGN-OFF BLOCKS (With space for signatures) -->
+        <section class="border-t border-slate-200 pt-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-xs font-medium text-slate-700">
+            <div class="space-y-4">
+                <div class="p-4 bg-slate-50 border border-slate-150 rounded-xl">
+                    <p class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider">Form Class Tutor Remarks</p>
+                    <p class="text-slate-900 italic font-serif mt-1 leading-relaxed">
+                        "Samuel continues to show exemplary performance in core science modules. His dedication to structural logic tracks is outstanding. Recommended to maintain this focus."
+                    </p>
+                </div>
+                <div class="flex items-end justify-between px-2 pt-2">
+                    <div>
+                        <div class="h-10 border-b border-dashed border-slate-400 w-44"></div>
+                        <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wide mt-1">Class Tutor Signature</p>
+                    </div>
+                    <p class="text-slate-500 font-mono font-bold">Date: 2026/04/12</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="p-4 bg-slate-50 border border-slate-150 rounded-xl">
+                    <p class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider">Principal Director's Official Assessment</p>
+                    <p class="text-slate-900 italic font-serif mt-1 leading-relaxed">
+                        "An excellent terminal result. He displays proper behavioral traits that match our core institutional standards perfectly."
+                    </p>
+                </div>
+                <div class="flex items-end justify-between px-2 pt-2">
+                    <div>
+                        <div class="h-10 border-b border-dashed border-slate-400 w-44"></div>
+                        <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wide mt-1">Principal Seal Signature</p>
+                    </div>
+                    <p class="text-slate-500 font-mono font-bold">Date: 2026/04/15</p>
+                </div>
+            </div>
+        </section>
+
+    </article>
+
+    <!-- VERIFICATION CODE FOOTNOTE CONTEXT -->
+    <div class="max-w-4xl mx-auto mt-4 text-center text-[10px] text-slate-400 font-medium">
+        <p>This academic transcript transcript is pulled live from the Gold and Linc Registry Nodes. System Check Token Hash: <span class="font-mono bg-white px-1 py-0.5 rounded border border-slate-200">GLS-2026-X883B</span></p>
+    </div>
+
+</body>
+</html>
