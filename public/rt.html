@@ -4,13 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gold and Linc Schools | Faculty LMS & Multi-Editor Console</title>
-    <!-- Tailwind CSS & Flowbite via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
-    <!-- Quill.js Rich Text Editor CDN -->
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&family=Playfair+Display:ital,wght=0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -64,6 +61,9 @@
         .option-editor-container .ql-container {
             height: 60px;
         }
+        .explanation-editor-container .ql-container {
+            height: 80px;
+        }
         .ql-toolbar {
             border-top-left-radius: 0.5rem;
             border-top-right-radius: 0.5rem;
@@ -74,7 +74,6 @@
 </head>
 <body class="bg-[#f8fafc] text-slate-800 font-sans antialiased min-h-screen flex flex-col md:flex-row overflow-x-hidden" onload="initSystemNode();">
 
-    <!-- 1. DESKTOP SIDEBAR -->
     <aside class="hidden md:flex flex-col w-72 bg-brand-900 text-white shrink-0 shadow-2xl relative z-30 border-r border-brand-800">
         <div class="p-6 border-b border-brand-800/60 bg-brand-950/20 flex items-center space-x-3">
             <div class="bg-white p-1 rounded-xl shadow-inner flex items-center justify-center shrink-0">
@@ -131,7 +130,6 @@
         </div>
     </aside>
 
-    <!-- 2. MOBILE TOP STICKY HEADER -->
     <header class="md:hidden w-full bg-brand-900 text-white h-16 px-4 flex items-center justify-between shadow-md sticky top-0 z-40">
         <div class="flex items-center space-x-2.5">
             <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779961202/editor-uploads/frngf21mg4fcrnmccobm.png" class="h-7 w-auto bg-white p-0.5 rounded-lg" alt="Logo">
@@ -143,7 +141,6 @@
         </button>
     </header>
 
-    <!-- 3. MOBILE BOTTOM SHEET DRAWER OVERLAY MODULE -->
     <div id="bottomDrawerOverlay" onclick="closeBottomNav(event)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden transition-opacity duration-300 opacity-0">
         <div id="bottomDrawerCard" class="absolute bottom-0 inset-x-0 bg-brand-900 text-white parabolic-top transform translate-y-full transition-transform duration-300 border-t-2 border-gold-400 p-6 pt-12 space-y-4 max-h-[85vh] overflow-y-auto">
             <div class="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-brand-800 rounded-full"></div>
@@ -158,10 +155,8 @@
         </div>
     </div>
 
-    <!-- 4. MAIN CENTRAL CONTENT INTERFACE -->
     <main class="flex-grow p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto w-full overflow-hidden" id="lmsPanels">
         
-        <!-- TWO-COLUMN RUNTIME PROFILE PROFILE DATA HEADER -->
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
                 <div class="p-2.5 bg-brand-50 rounded-lg text-brand-800 shrink-0">
@@ -185,7 +180,6 @@
             </div>
         </section>
 
-        <!-- PANEL 1: COURSE PERFORMANCE DESK -->
         <div id="panel-overview" class="space-y-6">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
@@ -237,7 +231,6 @@
             </div>
         </div>
 
-        <!-- PANEL 2: QUESTION BANK ENGINE -->
         <div id="panel-assessments" class="space-y-6 hidden">
             <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
                 
@@ -258,7 +251,6 @@
             </div>
         </div>
 
-        <!-- PANEL 3: ASSIGNMENTS HUB -->
         <div id="panel-assignments" class="space-y-6 hidden">
             <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -272,7 +264,6 @@
             </div>
         </div>
 
-        <!-- PANEL 4: STUDENT ROSTERS -->
         <div id="panel-students" class="space-y-6 hidden">
             <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
                 <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-100 pb-3">
@@ -302,7 +293,6 @@
             </div>
         </div>
 
-        <!-- PANEL 5: GRADEBOOK ENTRY MATRIX -->
         <div id="panel-grading" class="space-y-6 hidden">
             <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
                 <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-slate-100 pb-4">
@@ -337,7 +327,6 @@
             </div>
         </div>
 
-        <!-- PANEL 6: FACULTY PROFILE VIEW -->
         <div id="panel-profile" class="space-y-6 hidden">
             <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
                 <div class="border-b border-slate-100 pb-3">
@@ -368,7 +357,6 @@
         </div>
     </main>
 
-    <!-- 5. ADVANCED SYSTEM MODAL DIALOG ENGINE (SUPPORTS MULTI-EDITOR QUILL ARRAYS) -->
     <div id="questionModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-white rounded-2xl border border-slate-200 w-full max-w-3xl shadow-2xl flex flex-col overflow-hidden max-h-[92vh]">
             
@@ -405,7 +393,9 @@
 
                 <div class="space-y-1.5">
                     <label class="block font-extrabold text-slate-400 uppercase tracking-wider">Optional Grading Explanation & Marking Rationale</label>
-                    <textarea id="modalExplanation" rows="2" placeholder="Provide step-by-step resolution rationale for student correction paths..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:bg-white outline-none font-medium focus:ring-1 focus:ring-brand-500"></textarea>
+                    <div class="explanation-editor-container">
+                        <div id="quillExplanation" class="bg-white rounded-xl"></div>
+                    </div>
                 </div>
             </div>
 
@@ -416,7 +406,38 @@
         </div>
     </div>
 
-    <!-- CORE RUNTIME BUSINESS ENGINE -->
+    <div id="mediaPickerDialog" class="fixed inset-0 z-[100] overflow-y-auto bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white rounded-xl border border-slate-200 w-full max-w-md shadow-2xl p-5 space-y-4 text-xs">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                <h4 class="font-extrabold text-brand-900 uppercase tracking-wider">Insert Rich Text Image</h4>
+                <button onclick="closeMediaPicker()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">&times;</button>
+            </div>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block font-bold text-slate-500 uppercase tracking-wider text-[10px] mb-1">Option A: Upload Local Asset File</label>
+                    <input type="file" id="mediaLocalFileInput" accept="image/*" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs outline-none focus:ring-1 focus:ring-brand-500">
+                </div>
+                
+                <div class="relative flex py-2 items-center">
+                    <div class="flex-grow border-t border-slate-200"></div>
+                    <span class="flex-shrink mx-3 text-slate-400 font-bold text-[10px] uppercase">Or</span>
+                    <div class="flex-grow border-t border-slate-200"></div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-500 uppercase tracking-wider text-[10px] mb-1">Option B: Link Asset URL Address</label>
+                    <input type="url" id="mediaUrlInput" placeholder="https://example.com/image.png" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs outline-none focus:ring-1 focus:ring-brand-500">
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-end space-x-2 border-t border-slate-100">
+                <button onclick="closeMediaPicker()" class="bg-white border border-slate-200 text-slate-600 font-bold px-3 py-1.5 rounded-lg uppercase text-[10px]">Close</button>
+                <button onclick="commitMediaAssetInsertion()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold px-4 py-1.5 rounded-lg uppercase text-[10px]">Insert Image</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const overlay = document.getElementById('bottomDrawerOverlay');
         const card = document.getElementById('bottomDrawerCard');
@@ -426,7 +447,11 @@
         let contextualTargetQuestionId = null;
 
         let stemQuillInstance = null;
+        let explanationQuillInstance = null;
         let optionQuillRegistry = {}; 
+
+        // Active context tracking variables for media asset injection redirection
+        let activeMediaTargetQuillInstance = null;
 
         // STATE DATABASES
         let assessmentDatabase = [
@@ -444,7 +469,7 @@
                             { text: "<p>Lysosomal waste paths</p>", isCorrect: false },
                             { text: "<p>Nucleolus core bounds</p>", isCorrect: false }
                         ],
-                        explanation: "The mitochondrion orchestrates adenosine triphosphate generation through systematic citric acid cycle configurations."
+                        explanation: "<p>The mitochondrion orchestrates adenosine triphosphate generation through systematic citric acid cycle configurations.</p>"
                     }
                 ]
             },
@@ -511,6 +536,46 @@
             if (!event || event.target === overlay) {
                 overlay.classList.add('opacity-0'); card.classList.add('translate-y-full');
                 setTimeout(() => { overlay.classList.add('hidden'); }, 300);
+            }
+        }
+
+        /* -----------------------------------------------------------
+           MEDIA PICKER LOGIC AND OVERRIDE HANDLER
+           ----------------------------------------------------------- */
+        function triggerCustomMediaPicker(quillInstance) {
+            activeMediaTargetQuillInstance = quillInstance;
+            document.getElementById('mediaLocalFileInput').value = '';
+            document.getElementById('mediaUrlInput').value = '';
+            document.getElementById('mediaPickerDialog').style.display = 'flex';
+        }
+
+        function closeMediaPicker() {
+            document.getElementById('mediaPickerDialog').style.display = 'none';
+            activeMediaTargetQuillInstance = null;
+        }
+
+        function commitMediaAssetInsertion() {
+            if (!activeMediaTargetQuillInstance) return;
+            
+            const localFile = document.getElementById('mediaLocalFileInput').files[0];
+            const urlAddress = document.getElementById('mediaUrlInput').value.trim();
+            
+            const range = activeMediaTargetQuillInstance.getSelection(true);
+
+            if (localFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    activeMediaTargetQuillInstance.insertEmbed(range.index, 'image', e.target.result);
+                    activeMediaTargetQuillInstance.setSelection(range.index + 1);
+                    closeMediaPicker();
+                };
+                reader.readAsDataURL(localFile);
+            } else if (urlAddress) {
+                activeMediaTargetQuillInstance.insertEmbed(range.index, 'image', urlAddress);
+                activeMediaTargetQuillInstance.setSelection(range.index + 1);
+                closeMediaPicker();
+            } else {
+                alert("Please complete an upload path or append a verified URL address link path.");
             }
         }
 
@@ -622,7 +687,21 @@
                 stemQuillInstance = new Quill('#quillQuestionStem', {
                     theme: 'snow',
                     placeholder: 'Enter rich-text biology assessment item stem...',
-                    modules: { toolbar: [['bold', 'italic', 'underline'], ['clean']] }
+                    modules: { toolbar: [['bold', 'italic', 'underline'], ['image'], ['clean']] }
+                });
+                // Attach intercepted hook for image button mapping
+                stemQuillInstance.getModule('toolbar').addHandler('image', function() {
+                    triggerCustomMediaPicker(stemQuillInstance);
+                });
+            }
+            if(!explanationQuillInstance) {
+                explanationQuillInstance = new Quill('#quillExplanation', {
+                    theme: 'snow',
+                    placeholder: 'Provide step-by-step resolution rationale for student correction paths...',
+                    modules: { toolbar: [['bold', 'italic', 'underline'], ['image'], ['clean']] }
+                });
+                explanationQuillInstance.getModule('toolbar').addHandler('image', function() {
+                    triggerCustomMediaPicker(explanationQuillInstance);
                 });
             }
         }
@@ -652,7 +731,11 @@
             const optQuill = new Quill(`#editor_${fieldIndex}`, {
                 theme: 'snow',
                 placeholder: 'Write response option choices...',
-                modules: { toolbar: [['bold', 'italic', 'underline'], ['clean']] }
+                modules: { toolbar: [['bold', 'italic', 'underline'], ['image'], ['clean']] }
+            });
+            
+            optQuill.getModule('toolbar').addHandler('image', function() {
+                triggerCustomMediaPicker(optQuill);
             });
             
             if(initialHtml) optQuill.root.innerHTML = initialHtml;
@@ -678,9 +761,9 @@
             
             initModalStemsIfRequired();
             stemQuillInstance.setText('');
+            explanationQuillInstance.setText('');
             document.getElementById('modalImageUrl').value = '';
             document.getElementById('modalImagePreview').classList.add('hidden');
-            document.getElementById('modalExplanation').value = '';
             document.getElementById('modalOptionsWrapper').innerHTML = '';
             optionQuillRegistry = {};
 
@@ -706,7 +789,7 @@
                 stemQuillInstance.root.innerHTML = q.text;
                 document.getElementById('modalImageUrl').value = q.imageUrl || '';
                 previewModalImage();
-                document.getElementById('modalExplanation').value = q.explanation || '';
+                explanationQuillInstance.root.innerHTML = q.explanation || '';
                 document.getElementById('modalOptionsWrapper').innerHTML = '';
                 optionQuillRegistry = {};
 
@@ -724,7 +807,7 @@
             const stemHtml = stemQuillInstance.root.innerHTML.trim();
             const plainStem = stemQuillInstance.getText().trim();
             const imgUrl = document.getElementById('modalImageUrl').value.trim();
-            const expText = document.getElementById('modalExplanation').value.trim();
+            const expHtml = explanationQuillInstance.root.innerHTML.trim();
 
             if(!plainStem) { alert("Question stem body value is required."); return; }
 
@@ -754,11 +837,11 @@
 
             if (activeTargetModalMode === 'CREATE') {
                 col.questions.push({
-                    id: `q_${Date.now()}`, text: stemHtml, imageUrl: imgUrl, options: compileOptions, explanation: expText
+                    id: `q_${Date.now()}`, text: stemHtml, imageUrl: imgUrl, options: compileOptions, explanation: expHtml
                 });
             } else {
                 const q = col.questions.find(item => item.id === contextualTargetQuestionId);
-                if(q) { q.text = stemHtml; q.imageUrl = imgUrl; q.options = compileOptions; q.explanation = expText; }
+                if(q) { q.text = stemHtml; q.imageUrl = imgUrl; q.options = compileOptions; q.explanation = expHtml; }
             }
 
             closeQuestionModal();
