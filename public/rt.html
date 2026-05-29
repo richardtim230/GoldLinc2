@@ -7,6 +7,9 @@
     <!-- Tailwind CSS & Flowbite via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <!-- Quill.js Rich Text Editor CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,12 +41,10 @@
         }
     </script>
     <style>
-        /* Smooth Custom Parabolic Curve Top for Mobile Bottom Sheet Nav */
         .parabolic-top {
             border-top-left-radius: 50% 40px;
             border-top-right-radius: 50% 40px;
         }
-        /* State active rules for tabs toggle panels */
         #lmsMenu button[aria-selected="true"] {
             background: linear-gradient(to right, #075985, #0284c7) !important;
             color: #ffffff !important;
@@ -53,13 +54,24 @@
             background-color: rgba(15, 23, 42, 0.2);
             color: #ffffff;
         }
+        /* Custom Quill standard heights for modal layout integrity */
+        .ql-container {
+            height: 120px;
+            font-size: 13px;
+            border-bottom-left-radius: 0.75rem;
+            border-bottom-right-radius: 0.75rem;
+        }
+        .ql-toolbar {
+            border-top-left-radius: 0.75rem;
+            border-top-right-radius: 0.75rem;
+            background-color: #f8fafc;
+        }
     </style>
 </head>
-<body class="bg-[#f8fafc] text-slate-800 font-sans antialiased min-h-screen flex flex-col md:flex-row overflow-x-hidden" onload="renderCollections()">
+<body class="bg-[#f8fafc] text-slate-800 font-sans antialiased min-h-screen flex flex-col md:flex-row overflow-x-hidden" onload="renderCollections(); initQuill();">
 
     <!-- 1. DESKTOP SIDEBAR -->
     <aside class="hidden md:flex flex-col w-72 bg-brand-900 text-white shrink-0 shadow-2xl relative z-30 border-r border-brand-800">
-        <!-- Sidebar Branding Header -->
         <div class="p-6 border-b border-brand-800/60 bg-brand-950/20 flex items-center space-x-3">
             <div class="bg-white p-1 rounded-xl shadow-inner flex items-center justify-center shrink-0">
                 <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779961202/editor-uploads/frngf21mg4fcrnmccobm.png" class="h-9 w-auto object-contain" alt="Gold and Linc Logo">
@@ -70,14 +82,12 @@
             </div>
         </div>
 
-        <!-- Instructor Identity Meta Panel (Secondary Track) -->
         <div class="p-4 mx-4 my-5 bg-brand-800/50 rounded-2xl border border-brand-500/30 backdrop-blur-sm text-xs">
             <p class="text-[10px] font-bold text-brand-500 uppercase tracking-wider mb-1 px-1">Department</p>
             <p id="sidebarDept" class="text-sm font-bold text-white px-1">Senior Biological Sciences</p>
             <p id="sidebarLevels" class="text-[10px] text-brand-100/70 px-1 mt-0.5">Assigned: SS1, SS2, SS3 Track</p>
         </div>
 
-        <!-- Navigation Controller Sub-Menu Tabs -->
         <nav class="flex-grow px-4 space-y-1" id="lmsMenu" data-tabs-toggle="#lmsPanels" role="tablist">
             <p class="text-[10px] font-bold text-brand-500 uppercase tracking-widest px-3 mb-2">LMS Components</p>
             
@@ -123,12 +133,10 @@
     <div id="bottomDrawerOverlay" onclick="closeBottomNav(event)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden transition-opacity duration-300 opacity-0">
         <div id="bottomDrawerCard" class="absolute bottom-0 inset-x-0 bg-brand-900 text-white parabolic-top transform translate-y-full transition-transform duration-300 border-t-2 border-gold-400 p-6 pt-12 space-y-6 max-h-[85vh] overflow-y-auto">
             <div class="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-brand-800 rounded-full"></div>
-            
             <div class="text-center">
                 <p class="font-serif text-lg font-bold">LMS Core Applications</p>
                 <p class="text-[11px] text-brand-500 font-medium">Secondary School Systems Branch</p>
             </div>
-
             <div class="grid grid-cols-1 gap-2 text-sm font-bold">
                 <button onclick="triggerTabClick('overview-tab')" class="w-full bg-brand-800 p-4 rounded-xl flex items-center justify-between border border-brand-500/20 text-left">
                     <span>Course Performance Desk</span>
@@ -196,7 +204,6 @@
                 </div>
             </div>
 
-            <!-- Term Class Sheet Routing List -->
             <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
                 <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/60">
                     <div>
@@ -254,7 +261,6 @@
                         </button>
                     </div>
                 </div>
-
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs border-collapse">
                         <thead>
@@ -280,17 +286,16 @@
             </div>
         </div>
 
-        <!-- PANEL 3: DYNAMIC ASSESSMENTS QUESTION BANK (CRUD ARCHITECTURE) -->
+        <!-- PANEL 3: DYNAMIC ASSESSMENTS QUESTION BANK (FOCUS DRILL ACCORDION WRAPPER) -->
         <div id="assessments-panel" role="tabpanel" aria-labelledby="assessments-tab" class="space-y-6 hidden">
-            
-            <!-- Category Collection Creation Controller Block -->
             <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between sm:items-start gap-4 border-b border-slate-100 pb-4">
+                
+                <!-- Main Header controls block -->
+                <div id="collectionControlHeader" class="flex flex-col sm:flex-row justify-between sm:items-start gap-4 border-b border-slate-100 pb-4">
                     <div>
                         <h2 class="text-base font-bold text-brand-900 uppercase tracking-wider">Question Bank Categorization Deck</h2>
-                        <p class="text-xs text-slate-500">Create target test frameworks (e.g., <code class="bg-slate-100 px-1 rounded text-rose-600 font-bold font-mono">SS2 BIOLOGY TEST 1</code>) and deploy specific objective evaluation items.</p>
+                        <p class="text-xs text-slate-500">Isolate focus tracks to run standard objective items evaluation updates safely.</p>
                     </div>
-                    <!-- Form entry for defining high-yield assessment collections -->
                     <div class="flex flex-wrap gap-2 items-center w-full sm:w-auto">
                         <input type="text" id="newCollectionName" placeholder="e.g., SS2 BIOLOGY TEST 1" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold p-2.5 placeholder-slate-400 focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none flex-grow sm:flex-initial">
                         <button onclick="createCollection()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl uppercase tracking-wider transition whitespace-nowrap">
@@ -299,10 +304,8 @@
                     </div>
                 </div>
 
-                <!-- Dynamic Wrapper Mount Destination Target for Assessment Collections -->
-                <div id="collectionsContainer" class="space-y-8 mt-4">
-                    <!-- Javascript DOM injection node point references elements directly -->
-                </div>
+                <!-- Mount Node Target -->
+                <div id="collectionsContainer" class="space-y-4 mt-4"></div>
             </div>
         </div>
 
@@ -314,12 +317,9 @@
                         <h2 class="text-base font-bold text-brand-900 uppercase tracking-wider">Faculty Personal Profile Desk</h2>
                         <p class="text-xs text-slate-500">Review your system identity tokens and modify display elements seen by administrators and student paths.</p>
                     </div>
-                    <span class="inline-flex bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full border border-emerald-100">
-                        System Token: Status verified
-                    </span>
+                    <span class="inline-flex bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full border border-emerald-100">System Token: Status verified</span>
                 </div>
 
-                <!-- Profile Update Interaction Form Grid -->
                 <form id="profileForm" onsubmit="updateTeacherProfile(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs">
                     <div>
                         <label class="block font-extrabold text-slate-400 uppercase tracking-wider mb-2">Full Instructor Name</label>
@@ -338,53 +338,102 @@
                         <input type="text" id="profileLevels" value="Assigned: SS1, SS2, SS3 Track" class="w-full bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 p-3 focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
                     </div>
                     <div class="sm:col-span-2 border-t border-slate-100 pt-4 flex justify-end">
-                        <button type="submit" class="bg-gradient-to-r from-brand-800 to-brand-500 hover:shadow-lg text-white font-bold text-xs px-6 py-3 rounded-xl uppercase tracking-wider transition-all">
-                            Update Profile Node
-                        </button>
+                        <button type="submit" class="bg-gradient-to-r from-brand-800 to-brand-500 hover:shadow-lg text-white font-bold text-xs px-6 py-3 rounded-xl uppercase tracking-wider transition-all">Update Profile Node</button>
                     </div>
                 </form>
             </div>
         </div>
-
     </main>
 
-    <!-- Footer Information -->
-    <footer class="md:hidden w-full bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400 mt-auto">
-        &copy; 2026 Gold & Linc Schools Console.
-    </footer>
+    <!-- 5. QUILL MODAL DIALOG COMPONENT FOR CRUD CREATION/EDITING -->
+    <div id="questionModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl border border-slate-200 w-full max-w-2xl shadow-2xl flex flex-col overflow-hidden animate-[fadeIn_0.2s_ease-out]">
+            <!-- Header -->
+            <div class="p-5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+                <div>
+                    <h3 id="modalTitle" class="text-sm font-extrabold text-brand-900 uppercase tracking-wider">Upload / Adjust Objective Item</h3>
+                    <p class="text-[11px] text-slate-500">Format using rich-text attributes securely before writing mutations.</p>
+                </div>
+                <button onclick="closeQuestionModal()" class="text-slate-400 hover:text-slate-600 bg-white border border-slate-200 p-1.5 rounded-lg transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6xl12 12"/></svg>
+                </button>
+            </div>
+            <!-- Body -->
+            <div class="p-6 space-y-4 overflow-y-auto max-h-[70vh] text-xs">
+                <!-- Quill Destination Attachment -->
+                <div>
+                    <label class="block font-extrabold text-slate-400 uppercase tracking-wider mb-2">Question Text Core</label>
+                    <div id="quillEditorContainer" class="bg-white rounded-xl"></div>
+                </div>
+                <!-- Options Grid Inputs (Strict Text Validation Sync) -->
+                <div class="space-y-3 pt-2">
+                    <label class="block font-extrabold text-slate-400 uppercase tracking-wider">Multiple-Choice Response Options</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-xl p-2 focus-within:bg-white focus-within:ring-1 focus-within:ring-brand-500">
+                            <span class="font-extrabold text-slate-400 pl-1">A.</span>
+                            <input type="text" id="modalOptA" class="w-full bg-transparent border-0 p-1 font-medium focus:ring-0 outline-none">
+                        </div>
+                        <div class="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-xl p-2 focus-within:bg-white focus-within:ring-1 focus-within:ring-brand-500">
+                            <span class="font-extrabold text-slate-400 pl-1">B.</span>
+                            <input type="text" id="modalOptB" class="w-full bg-transparent border-0 p-1 font-medium focus:ring-0 outline-none">
+                        </div>
+                        <div class="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-xl p-2 focus-within:bg-white focus-within:ring-1 focus-within:ring-brand-500">
+                            <span class="font-extrabold text-slate-400 pl-1">C.</span>
+                            <input type="text" id="modalOptC" class="w-full bg-transparent border-0 p-1 font-medium focus:ring-0 outline-none">
+                        </div>
+                        <div class="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-xl p-2 focus-within:bg-white focus-within:ring-1 focus-within:ring-brand-500">
+                            <span class="font-extrabold text-slate-400 pl-1">D.</span>
+                            <input type="text" id="modalOptD" class="w-full bg-transparent border-0 p-1 font-medium focus:ring-0 outline-none">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Footer controls -->
+            <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-end space-x-2">
+                <button onclick="closeQuestionModal()" class="bg-white border border-slate-200 text-slate-600 font-bold px-4 py-2 rounded-xl uppercase tracking-wider transition text-[11px]">Cancel</button>
+                <button onclick="saveModalQuestionData()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold px-5 py-2 rounded-xl uppercase tracking-wider transition text-[11px]">Commit Structural Save</button>
+            </div>
+        </div>
+    </div>
 
-    <!-- Flowbite Script Execution Bundle -->
+    <footer class="md:hidden w-full bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400 mt-auto">&copy; 2026 Gold & Linc Schools Console.</footer>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
     
-    <!-- SYSTEM BUSINESS ENGINE CORE DATA LOGIC -->
+    <!-- CORE RUNTIME BUSINESS ENGINE -->
     <script>
-        /* Mobile responsive drawer handling triggers */
         const overlay = document.getElementById('bottomDrawerOverlay');
         const card = document.getElementById('bottomDrawerCard');
+        let globalQuillInstance = null;
+
+        // Current operational layout pointers
+        let activeIsolatedCollectionId = null; 
+        let activeTargetModalMode = 'CREATE'; // 'CREATE' or 'EDIT'
+        let contextualTargetQuestionId = null;
 
         function openBottomNav() {
             overlay.classList.remove('hidden');
-            setTimeout(() => {
-                overlay.classList.remove('opacity-0');
-                card.classList.remove('translate-y-full');
-            }, 20);
+            setTimeout(() => { overlay.classList.remove('opacity-0'); card.classList.remove('translate-y-full'); }, 20);
         }
-
         function closeBottomNav(event) {
             if (!event || event.target === overlay) {
-                overlay.classList.add('opacity-0');
-                card.classList.add('translate-y-full');
+                overlay.classList.add('opacity-0'); card.classList.add('translate-y-full');
                 setTimeout(() => { overlay.classList.add('hidden'); }, 300);
             }
         }
+        function triggerTabClick(tabId) { document.getElementById(tabId).click(); closeBottomNav(null); }
 
-        function triggerTabClick(tabId) {
-            document.getElementById(tabId).click();
-            closeBottomNav(null);
+        function initQuill() {
+            globalQuillInstance = new Quill('#quillEditorContainer', {
+                theme: 'snow',
+                placeholder: 'Compose high-yield biology test question stem body elements safely...',
+                modules: {
+                    toolbar: [['bold', 'italic', 'underline'], [{ 'list': 'ordered'}, { 'list': 'bullet' }], ['clean']]
+                }
+            });
         }
 
         /* -----------------------------------------------------------
-           LMS DATA COMPONENT LAYER: CATEGORIZED CRUD QUESTIONS STORAGE
+           LMS DATA STATE ARCHITECTURE: ISOLATED ACCORDION FILTERS
            ----------------------------------------------------------- */
         let assessmentDatabase = [
             {
@@ -414,150 +463,208 @@
         function renderCollections() {
             const container = document.getElementById('collectionsContainer');
             container.innerHTML = '';
-
-            // Update statistical counters
             document.getElementById('overviewCollectionCount').innerText = `${assessmentDatabase.length} Saved Collections`;
 
             if(assessmentDatabase.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center p-8 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-xs font-bold">
-                        No active evaluation collections registered. Create one using the input form interface above.
-                    </div>`;
+                container.innerHTML = `<div class="text-center p-8 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-xs font-bold">No active evaluation collections registered.</div>`;
                 return;
             }
 
             assessmentDatabase.forEach((collection) => {
+                // Determine layout rules based on view states
+                const isSomeCollectionActive = activeIsolatedCollectionId !== null;
+                const isThisCollectionActive = activeIsolatedCollectionId === collection.id;
+
+                // Hide completely if another collection has taken focus
+                if (isSomeCollectionActive && !isThisCollectionActive) return;
+
                 let questionsHtml = '';
-                
-                if(collection.questions.length === 0) {
-                    questionsHtml = `
-                        <div class="text-center p-4 bg-white border border-slate-150 rounded-xl text-slate-400 text-[11px] font-bold">
-                            No active objective questions inside this category box array ledger.
-                        </div>`;
-                } else {
-                    collection.questions.forEach((q, index) => {
-                        questionsHtml += `
-                            <div class="p-4 bg-white border border-slate-200 rounded-xl space-y-3 relative group">
-                                <div class="flex justify-between items-center text-[11px]">
-                                    <span class="font-bold text-brand-500 font-mono">Question ${index + 1}</span>
-                                    <button onclick="deleteQuestion('${collection.id}', '${q.id}')" class="text-rose-500 hover:text-rose-700 font-bold uppercase tracking-wider text-[10px] bg-rose-50 px-2 py-0.5 rounded transition">
-                                        Delete Question
-                                    </button>
-                                </div>
-                                <p class="text-xs font-bold text-slate-900 leading-relaxed">${q.text}</p>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-medium text-slate-600">
-                                    <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 truncate"><span class="font-extrabold text-slate-400 mr-1">A.</span> ${q.options[0]}</div>
-                                    <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 truncate"><span class="font-extrabold text-slate-400 mr-1">B.</span> ${q.options[1]}</div>
-                                    <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 truncate"><span class="font-extrabold text-slate-400 mr-1">C.</span> ${q.options[2]}</div>
-                                    <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 truncate"><span class="font-extrabold text-slate-400 mr-1">D.</span> ${q.options[3]}</div>
-                                </div>
-                            </div>`;
-                    });
+                if (isThisCollectionActive) {
+                    if(collection.questions.length === 0) {
+                        questionsHtml = `<div class="text-center p-6 bg-white border border-slate-150 rounded-xl text-slate-400 text-[11px] font-bold">No active objective questions inside this category box array ledger.</div>`;
+                    } else {
+                        collection.questions.forEach((q, index) => {
+                            questionsHtml += `
+                                <div class="p-5 bg-white border border-slate-200 rounded-xl space-y-3 relative shadow-inner">
+                                    <div class="flex justify-between items-center text-[11px]">
+                                        <span class="font-extrabold text-brand-500 font-mono">OBJECTIVE QUESTION ${index + 1}</span>
+                                        <div class="flex space-x-1.5">
+                                            <button onclick="openEditQuestionModal('${collection.id}', '${q.id}')" class="text-brand-800 hover:text-white hover:bg-brand-800 font-bold uppercase tracking-wider text-[10px] bg-brand-50 px-2.5 py-1 rounded-lg transition border border-brand-200">
+                                                Edit Elements
+                                            </button>
+                                            <button onclick="deleteQuestion('${collection.id}', '${q.id}')" class="text-rose-600 hover:text-white hover:bg-rose-600 font-bold uppercase tracking-wider text-[10px] bg-rose-50 px-2.5 py-1 rounded-lg transition border border-rose-100">
+                                                Delete Item
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="text-xs font-bold text-slate-900 leading-relaxed">${q.text}</div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-medium text-slate-600">
+                                        <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 truncate"><span class="font-extrabold text-slate-400 mr-1">A.</span> ${q.options[0]}</div>
+                                        <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 truncate"><span class="font-extrabold text-slate-400 mr-1">B.</span> ${q.options[1]}</div>
+                                        <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 truncate"><span class="font-extrabold text-slate-400 mr-1">C.</span> ${q.options[2]}</div>
+                                        <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 truncate"><span class="font-extrabold text-slate-400 mr-1">D.</span> ${q.options[3]}</div>
+                                    </div>
+                                </div>`;
+                        });
+                    }
                 }
 
+                const actionButtonHtml = isThisCollectionActive 
+                    ? `<button onclick="toggleCollectionFocus(null)" class="bg-slate-700 hover:bg-slate-800 text-white font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">
+                           &larr; Collapse View
+                       </button>`
+                    : `<button onclick="toggleCollectionFocus('${collection.id}')" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">
+                           View Collection Items (${collection.questions.length}) &rarr;
+                       </button>`;
+
                 const cardBlock = `
-                    <div class="p-5 border border-slate-200 rounded-2xl bg-slate-50/60 space-y-4 shadow-sm relative">
+                    <div class="p-5 border border-slate-200 rounded-2xl bg-slate-50/60 space-y-4 shadow-sm relative transition-all duration-300">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-3">
                             <div>
-                                <span class="inline-block text-[9px] font-black tracking-widest bg-brand-900 text-white px-2 py-0.5 rounded uppercase font-mono">Category ID: ${collection.id}</span>
+                                <span class="inline-block text-[9px] font-black tracking-widest bg-brand-900 text-white px-2 py-0.5 rounded uppercase font-mono">Category Track</span>
                                 <h3 class="text-sm font-black text-slate-900 mt-1 uppercase tracking-wide font-serif">${collection.name}</h3>
                             </div>
                             <div class="flex items-center space-x-1.5 self-end sm:self-auto">
-                                <button onclick="addQuestionPrompt('${collection.id}')" class="bg-brand-50 border border-brand-200 hover:bg-brand-100 text-brand-900 font-bold text-[11px] px-3 py-1.5 rounded-xl transition uppercase tracking-wide">
-                                    + Insert Objective Question
-                                </button>
-                                <button onclick="deleteCollection('${collection.id}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold text-[11px] px-3 py-1.5 rounded-xl transition uppercase tracking-wide">
+                                ${isThisCollectionActive ? `
+                                <button onclick="openCreateQuestionModal('${collection.id}')" class="bg-brand-50 border border-brand-200 hover:bg-brand-100 text-brand-900 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">
+                                    + Insert Question (Quill)
+                                </button>` : ''}
+                                ${actionButtonHtml}
+                                <button onclick="deleteCollection('${collection.id}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">
                                     Drop Category
                                 </button>
                             </div>
                         </div>
-                        <div class="space-y-3">
-                            ${questionsHtml}
-                        </div>
+                        ${isThisCollectionActive ? `<div class="space-y-3 pt-2 animate-[fadeIn_0.25s_ease-out]">${questionsHtml}</div>` : ''}
                     </div>`;
                 
                 container.innerHTML += cardBlock;
             });
         }
 
-        // CREATE: Assessment Category Grouping
+        function toggleCollectionFocus(collectionId) {
+            activeIsolatedCollectionId = collectionId;
+            // Hide dashboard form controls header if inside isolated view to keep screen exceptionally clean
+            const headerBlock = document.getElementById('collectionControlHeader');
+            if(collectionId !== null) {
+                headerBlock.classList.add('hidden');
+            } else {
+                headerBlock.classList.remove('hidden');
+            }
+            renderCollections();
+        }
+
         function createCollection() {
             const input = document.getElementById('newCollectionName');
             const nameValue = input.value.trim().toUpperCase();
-
-            if(!nameValue) {
-                alert("Please declare a legal collection title string identity before saving.");
-                return;
-            }
-
-            const newId = `collection_${Date.now()}`;
-            assessmentDatabase.push({
-                id: newId,
-                name: nameValue,
-                questions: []
-            });
-
+            if(!nameValue) { alert("Please declare a legal collection title string identity before saving."); return; }
+            assessmentDatabase.push({ id: `collection_${Date.now()}`, name: nameValue, questions: [] });
             input.value = '';
             renderCollections();
         }
 
-        // DELETE: Assessment Category Grouping
         function deleteCollection(collectionId) {
             if(confirm("Are you certain you want to purge this full testing category along with all matching questions?")) {
                 assessmentDatabase = assessmentDatabase.filter(c => c.id !== collectionId);
-                renderCollections();
-            }
-        }
-
-        // CREATE: Objective Question Item Inside Category Group Array
-        function addQuestionPrompt(collectionId) {
-            const questionText = prompt("Enter the exact objective question statement body:");
-            if(!questionText) return;
-
-            // Maintain balanced response lengths to preserve rigorous exam difficulty
-            const optA = prompt("Option A label entry:"); if(!optA) return;
-            const optB = prompt("Option B label entry:"); if(!optB) return;
-            const optC = prompt("Option C label entry:"); if(!optC) return;
-            const optD = prompt("Option D label entry:"); if(!optD) return;
-
-            const targetCollection = assessmentDatabase.find(c => c.id === collectionId);
-            if(targetCollection) {
-                targetCollection.questions.push({
-                    id: `q_${Date.now()}`,
-                    text: questionText,
-                    options: [optA, optB, optC, optD]
-                });
-                renderCollections();
-            }
-        }
-
-        // DELETE: Objective Question Item From Specific Category Group
-        function deleteQuestion(collectionId, questionId) {
-            const targetCollection = assessmentDatabase.find(c => c.id === collectionId);
-            if(targetCollection) {
-                targetCollection.questions = targetCollection.questions.filter(q => q.id !== questionId);
+                if(activeIsolatedCollectionId === collectionId) toggleCollectionFocus(null);
                 renderCollections();
             }
         }
 
         /* -----------------------------------------------------------
-           FACULTY PROFILE WORKSPACE SYNCHRONIZATION RUNTIME LAYER
+           MODAL CRITICAL LAYER & RICH-TEXT EDITOR MUTATIONS
            ----------------------------------------------------------- */
+        function openCreateQuestionModal(collectionId) {
+            activeTargetModalMode = 'CREATE';
+            activeIsolatedCollectionId = collectionId;
+            document.getElementById('modalTitle').innerText = "Deploy New Objective Item Structure";
+            
+            // Clear inputs cleanly
+            globalQuillInstance.setText('');
+            document.getElementById('modalOptA').value = '';
+            document.getElementById('modalOptB').value = '';
+            document.getElementById('modalOptC').value = '';
+            document.getElementById('modalOptD').value = '';
+
+            document.getElementById('questionModal').style.display = 'flex';
+        }
+
+        function openEditQuestionModal(collectionId, questionId) {
+            activeTargetModalMode = 'EDIT';
+            activeIsolatedCollectionId = collectionId;
+            contextualTargetQuestionId = questionId;
+            document.getElementById('modalTitle').innerText = "Refine Saved Objective Item Parameters";
+
+            const targetCollection = assessmentDatabase.find(c => c.id === collectionId);
+            const targetQuestion = targetCollection.questions.find(q => q.id === questionId);
+
+            if(targetQuestion) {
+                // Populate modal frames safely with structural layout text properties
+                globalQuillInstance.root.innerHTML = targetQuestion.text;
+                document.getElementById('modalOptA').value = targetQuestion.options[0];
+                document.getElementById('modalOptB').value = targetQuestion.options[1];
+                document.getElementById('modalOptC').value = targetQuestion.options[2];
+                document.getElementById('modalOptD').value = targetQuestion.options[3];
+                
+                document.getElementById('questionModal').style.display = 'flex';
+            }
+        }
+
+        function closeQuestionModal() {
+            document.getElementById('questionModal').style.display = 'none';
+        }
+
+        function saveModalQuestionData() {
+            // Pull input attributes cleanly
+            const questionTextHtml = globalQuillInstance.root.innerHTML.trim();
+            const questionPlainText = globalQuillInstance.getText().trim();
+            
+            const optA = document.getElementById('modalOptA').value.trim();
+            const optB = document.getElementById('modalOptB').value.trim();
+            const optC = document.getElementById('modalOptC').value.trim();
+            const optD = document.getElementById('modalOptD').value.trim();
+
+            if(!questionPlainText || !optA || !optB || !optC || !optD) {
+                alert("All structural components (Question Body + Balanced Options A-D) must be declared.");
+                return;
+            }
+
+            const targetCollection = assessmentDatabase.find(c => c.id === activeIsolatedCollectionId);
+            if(!targetCollection) return;
+
+            if (activeTargetModalMode === 'CREATE') {
+                targetCollection.questions.push({
+                    id: `q_${Date.now()}`,
+                    text: questionTextHtml,
+                    options: [optA, optB, optC, optD]
+                });
+            } else if (activeTargetModalMode === 'EDIT') {
+                const targetQuestion = targetCollection.questions.find(q => q.id === contextualTargetQuestionId);
+                if(targetQuestion) {
+                    targetQuestion.text = questionTextHtml;
+                    targetQuestion.options = [optA, optB, optC, optD];
+                }
+            }
+
+            closeQuestionModal();
+            renderCollections();
+        }
+
+        function deleteQuestion(collectionId, questionId) {
+            const targetCollection = assessmentDatabase.find(c => c.id === collectionId);
+            if(targetCollection && confirm("Drop this isolated test question?")) {
+                targetCollection.questions = targetCollection.questions.filter(q => q.id !== questionId);
+                renderCollections();
+            }
+        }
+
         function updateTeacherProfile(event) {
             event.preventDefault();
-
-            const nameValue = document.getElementById('profileName').value;
-            const titleValue = document.getElementById('profileTitle').value;
-            const deptValue = document.getElementById('profileDept').value;
-            const levelsValue = document.getElementById('profileLevels').value;
-
-            // Sync structural values across runtime application nodes dynamically
-            document.getElementById('headerTeacherName').innerText = nameValue;
-            document.getElementById('headerTeacherTitle').innerText = titleValue;
-            document.getElementById('sidebarDept').innerText = deptValue;
-            document.getElementById('sidebarLevels').innerText = levelsValue;
-
-            alert("Faculty identity profile parameters modified and pushed across system templates successfully.");
+            document.getElementById('headerTeacherName').innerText = document.getElementById('profileName').value;
+            document.getElementById('headerTeacherTitle').innerText = document.getElementById('profileTitle').value;
+            document.getElementById('sidebarDept').innerText = document.getElementById('profileDept').value;
+            document.getElementById('sidebarLevels').innerText = document.getElementById('profileLevels').value;
+            alert("Faculty identity profile parameters modified successfully.");
         }
     </script>
 </body>
