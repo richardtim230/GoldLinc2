@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gold and Linc Schools | Faculty LMS Management Console</title>
+    <title>Gold and Linc Schools | Faculty LMS & Question Bank Console</title>
     <!-- Tailwind CSS & Flowbite via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
@@ -55,7 +55,7 @@
         }
     </style>
 </head>
-<body class="bg-[#f8fafc] text-slate-800 font-sans antialiased min-h-screen flex flex-col md:flex-row overflow-x-hidden">
+<body class="bg-[#f8fafc] text-slate-800 font-sans antialiased min-h-screen flex flex-col md:flex-row overflow-x-hidden" onload="renderCollections()">
 
     <!-- 1. DESKTOP SIDEBAR -->
     <aside class="hidden md:flex flex-col w-72 bg-brand-900 text-white shrink-0 shadow-2xl relative z-30 border-r border-brand-800">
@@ -70,14 +70,14 @@
             </div>
         </div>
 
-        <!-- Instructor Core Detail Info Panel -->
+        <!-- Instructor Identity Meta Panel (Secondary Track) -->
         <div class="p-4 mx-4 my-5 bg-brand-800/50 rounded-2xl border border-brand-500/30 backdrop-blur-sm text-xs">
-            <p class="text-[10px] font-bold text-brand-500 uppercase tracking-wider mb-1 px-1">Assigned Department</p>
-            <p class="text-sm font-bold text-white px-1">Organic Chemistry & Sciences</p>
-            <p class="text-[10px] text-brand-100/70 px-1 mt-0.5">Course Codes: CHM 202 & CHM 308</p>
+            <p class="text-[10px] font-bold text-brand-500 uppercase tracking-wider mb-1 px-1">Department</p>
+            <p id="sidebarDept" class="text-sm font-bold text-white px-1">Senior Biological Sciences</p>
+            <p id="sidebarLevels" class="text-[10px] text-brand-100/70 px-1 mt-0.5">Assigned: SS1, SS2, SS3 Track</p>
         </div>
 
-        <!-- Navigation Controller Sub-Menu -->
+        <!-- Navigation Controller Sub-Menu Tabs -->
         <nav class="flex-grow px-4 space-y-1" id="lmsMenu" data-tabs-toggle="#lmsPanels" role="tablist">
             <p class="text-[10px] font-bold text-brand-500 uppercase tracking-widest px-3 mb-2">LMS Components</p>
             
@@ -90,15 +90,15 @@
                 <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                 Gradebook & Mark Sheet
             </button>
-            
-            <button id="curriculum-tab" data-tabs-target="#curriculum-panel" type="button" role="tab" class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl text-left transition-all text-brand-100" aria-selected="false">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.232.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                Lesson Planner Engine
-            </button>
 
             <button id="assessments-tab" data-tabs-target="#assessments-panel" type="button" role="tab" class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl text-left transition-all text-brand-100" aria-selected="false">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
-                Assessment Question Bank
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                Question Bank Categories
+            </button>
+            
+            <button id="profile-tab" data-tabs-target="#profile-panel" type="button" role="tab" class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl text-left transition-all text-brand-100" aria-selected="false">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                Faculty Profile Desk
             </button>
         </nav>
 
@@ -119,17 +119,16 @@
         </button>
     </header>
 
-    <!-- 3. MOBILE INTERACTIVE BOTTOM SHEET DRAWER OVERLAY MODULE -->
+    <!-- 3. MOBILE BOTTOM SHEET DRAWER OVERLAY MODULE -->
     <div id="bottomDrawerOverlay" onclick="closeBottomNav(event)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden transition-opacity duration-300 opacity-0">
         <div id="bottomDrawerCard" class="absolute bottom-0 inset-x-0 bg-brand-900 text-white parabolic-top transform translate-y-full transition-transform duration-300 border-t-2 border-gold-400 p-6 pt-12 space-y-6 max-h-[85vh] overflow-y-auto">
             <div class="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-brand-800 rounded-full"></div>
             
             <div class="text-center">
                 <p class="font-serif text-lg font-bold">LMS Core Applications</p>
-                <p class="text-[11px] text-brand-500 font-medium">Department of Organic Chemistry & Sciences</p>
+                <p class="text-[11px] text-brand-500 font-medium">Secondary School Systems Branch</p>
             </div>
 
-            <!-- Mobile Drawer Buttons linking target components via click actions -->
             <div class="grid grid-cols-1 gap-2 text-sm font-bold">
                 <button onclick="triggerTabClick('overview-tab')" class="w-full bg-brand-800 p-4 rounded-xl flex items-center justify-between border border-brand-500/20 text-left">
                     <span>Course Performance Desk</span>
@@ -139,100 +138,97 @@
                     <span>Gradebook & Mark Sheet</span>
                     <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </button>
-                <button onclick="triggerTabClick('curriculum-tab')" class="w-full bg-brand-800 p-4 rounded-xl flex items-center justify-between border border-brand-500/20 text-left">
-                    <span>Lesson Planner Engine</span>
+                <button onclick="triggerTabClick('assessments-tab')" class="w-full bg-brand-800 p-4 rounded-xl flex items-center justify-between border border-brand-500/20 text-left">
+                    <span>Question Bank Categories</span>
                     <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </button>
-                <button onclick="triggerTabClick('assessments-tab')" class="w-full bg-brand-800 p-4 rounded-xl flex items-center justify-between border border-brand-500/20 text-left">
-                    <span>Assessment Question Bank</span>
+                <button onclick="triggerTabClick('profile-tab')" class="w-full bg-brand-800 p-4 rounded-xl flex items-center justify-between border border-brand-500/20 text-left">
+                    <span>Faculty Profile Desk</span>
                     <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- 4. MAIN CENTRAL CONTENT DESK INTERFACE -->
+    <!-- 4. MAIN CENTRAL CONTENT INTERFACE -->
     <main class="flex-grow p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto w-full overflow-hidden" id="lmsPanels">
         
-        <!-- TWO-COLUMN IDENTITY GRID CARDS -->
+        <!-- TWO-COLUMN RUNTIME PROFILE PROFILE DATA HEADER -->
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Faculty Officer Credentials Card -->
             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
                 <div class="p-3 bg-brand-50 rounded-xl text-brand-800 shrink-0">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
                 <div class="text-xs">
-                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Assigned Faculty Staff</p>
-                    <p class="text-base font-black text-slate-900 mt-0.5">Dr. Marcus Vance</p>
-                    <p class="text-slate-500 mt-0.5">Senior Instructor, Science Core Tracks</p>
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Active Faculty Staff</p>
+                    <p id="headerTeacherName" class="text-base font-black text-slate-900 mt-0.5">Mrs. Omolara Adeniran</p>
+                    <p id="headerTeacherTitle" class="text-slate-500 mt-0.5">Lead Educator, Science Division</p>
                 </div>
             </div>
-            <!-- Dynamic Semester / Session Tracker Card -->
             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
                 <div class="p-3 bg-amber-50 rounded-xl text-gold-600 shrink-0">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 </div>
                 <div class="text-xs">
-                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Active Calendar Node</p>
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Academic Term Node</p>
                     <p class="text-base font-black text-slate-900 mt-0.5">2025/2026 Academic Session</p>
-                    <span class="inline-flex bg-brand-50 border border-brand-100 text-brand-800 font-bold px-2 py-0.5 rounded-md mt-1">Second Evaluation Term</span>
+                    <span class="inline-flex bg-brand-50 border border-brand-100 text-brand-800 font-bold px-2 py-0.5 rounded-md mt-1">First Term Continuous Assessment Cycle</span>
                 </div>
             </div>
         </section>
 
-        <!-- PANEL 1: OVERVIEW DASHBOARD MATRIX -->
+        <!-- PANEL 1: COURSE PERFORMANCE DESK -->
         <div id="overview-panel" role="tabpanel" aria-labelledby="overview-tab" class="space-y-6">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Total Enrolled Students</p>
-                    <p class="text-2xl font-black text-brand-900 mt-1">142</p>
-                    <p class="text-[10px] text-slate-400 font-medium mt-1">Across CHM 202 & 308 tracks</p>
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Assigned Total Class Roll</p>
+                    <p class="text-2xl font-black text-brand-900 mt-1">118 Students</p>
+                    <p class="text-[10px] text-slate-400 font-medium mt-1">Across SS2 & SS3 Biology classes</p>
                 </div>
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Class Grade Average</p>
-                    <p class="text-2xl font-black text-emerald-600 mt-1">74.8%</p>
-                    <span class="inline-flex bg-emerald-50 text-emerald-700 text-[9px] font-bold px-2 py-0.5 rounded-full mt-1">Grade Level: B+</span>
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Overall Test Average</p>
+                    <p class="text-2xl font-black text-emerald-600 mt-1">71.5%</p>
+                    <span class="inline-flex bg-emerald-50 text-emerald-700 text-[9px] font-bold px-2 py-0.5 rounded-full mt-1">Class Standing: Good</span>
                 </div>
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Pending Test Reviews</p>
-                    <p class="text-2xl font-black text-amber-600 mt-1">38</p>
-                    <p class="text-[10px] text-amber-700 font-bold mt-1">Symmetrical Synthesis Scripts</p>
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Active Category Assessment Batches</p>
+                    <p id="overviewCollectionCount" class="text-2xl font-black text-amber-600 mt-1">2 Saved Collections</p>
                 </div>
             </div>
 
-            <!-- Grade Metrics Matrix Chart/Table Area -->
+            <!-- Term Class Sheet Routing List -->
             <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
                 <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/60">
                     <div>
-                        <h3 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Course Syllabus Performance Distribution</h3>
-                        <p class="text-xs text-slate-500">Real-time summaries calculated from continuous testing logs.</p>
+                        <h3 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Assigned Form Class Cohort Summaries</h3>
+                        <p class="text-xs text-slate-500">Live averages calculated from term gradebooks.</p>
                     </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs border-collapse">
                         <thead>
                             <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase tracking-wider border-b border-slate-100">
-                                <th class="p-4 pl-6">Course Module</th>
-                                <th class="p-4">Assigned Tier</th>
-                                <th class="p-4 text-center">Completed Assesm.</th>
-                                <th class="p-4 text-center">Class Average Score</th>
-                                <th class="p-4 pr-6 text-center">Status Index</th>
+                                <th class="p-4 pl-6">Target Form Level Class</th>
+                                <th class="p-4">Subject Focus</th>
+                                <th class="p-4 text-center">Active Tests Tracked</th>
+                                <th class="p-4 text-center">Current Class Mean</th>
+                                <th class="p-4 pr-6 text-center">Status</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
                             <tr class="hover:bg-slate-50/40 transition">
-                                <td class="p-4 pl-6 font-bold text-brand-900">CHM 202: Basic Organic Chemistry Structures</td>
-                                <td class="p-4">Secondary Stream Track</td>
-                                <td class="p-4 text-center">4 Tests</td>
-                                <td class="p-4 text-center font-bold text-slate-900 font-mono">79.4%</td>
-                                <td class="p-4 pr-6 text-center"><span class="bg-emerald-50 text-emerald-700 border border-emerald-100 font-bold px-2.5 py-0.5 rounded-full text-[11px]">On Track</span></td>
+                                <td class="p-4 pl-6 font-bold text-brand-900">Senior Secondary Class 2 (SS2 Alpha)</td>
+                                <td class="p-4">Biology Core Tracks</td>
+                                <td class="p-4 text-center">2 Active Batches</td>
+                                <td class="p-4 text-center font-bold text-slate-900 font-mono">73.8%</td>
+                                <td class="p-4 pr-6 text-center"><span class="bg-emerald-50 text-emerald-700 border border-emerald-100 font-bold px-2.5 py-0.5 rounded-full text-[11px]">Syllabus Normalized</span></td>
                             </tr>
                             <tr class="hover:bg-slate-50/40 transition">
-                                <td class="p-4 pl-6 font-bold text-brand-900">CHM 308: Advanced Carbonyl Group Reactions</td>
-                                <td class="p-4">Secondary Advanced Tier</td>
-                                <td class="p-4 text-center">3 Tests</td>
-                                <td class="p-4 text-center font-bold text-slate-900 font-mono">68.2%</td>
-                                <td class="p-4 pr-6 text-center"><span class="bg-amber-50 text-amber-700 border border-amber-100 font-bold px-2.5 py-0.5 rounded-full text-[11px]">Review Required</span></td>
+                                <td class="p-4 pl-6 font-bold text-brand-900">Senior Secondary Class 3 (SS3 Beta)</td>
+                                <td class="p-4">Advanced Biological Applications</td>
+                                <td class="p-4 text-center">1 Active Batch</td>
+                                <td class="p-4 text-center font-bold text-slate-900 font-mono">65.1%</td>
+                                <td class="p-4 pr-6 text-center"><span class="bg-amber-50 text-amber-700 border border-amber-100 font-bold px-2.5 py-0.5 rounded-full text-[11px]">Review Impending</span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -245,31 +241,29 @@
             <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
                 <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-slate-100 pb-4">
                     <div>
-                        <h2 class="text-base font-bold text-brand-900 uppercase tracking-wider">Continuous Assessment Grading Matrix</h2>
-                        <p class="text-xs text-slate-500">Pushes score overrides directly to student and parent checking terminals.</p>
+                        <h2 class="text-base font-bold text-brand-900 uppercase tracking-wider">Secondary Gradebook Mark Sheet Matrix</h2>
+                        <p class="text-xs text-slate-500">Pushes score modifications straight to parents profile views.</p>
                     </div>
                     <div class="flex space-x-2 shrink-0">
-                        <select class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2.5 outline-none focus:ring-1 focus:ring-brand-500">
-                            <option>CHM 202 (Organic Chemistry)</option>
-                            <option>CHM 308 (Carbonyl Synthetics)</option>
+                        <select class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2.5 focus:ring-1 focus:ring-brand-500 outline-none">
+                            <option>SS2 - Biology Core</option>
+                            <option>SS3 - Advanced Biology</option>
                         </select>
-                        <button onclick="alert('Scores updated and synced to student report terminals successfully.')" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider shadow transition">
-                            Sync Marks Ledger
+                        <button onclick="alert('Gradebook logs synced successfully.')" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider shadow transition">
+                            Save Changes
                         </button>
                     </div>
                 </div>
 
-                <!-- Marks Override Ledger Sheet Table -->
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs border-collapse">
                         <thead>
                             <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase tracking-wider border-b border-slate-100">
-                                <th class="p-3 pl-4">Reg Code</th>
+                                <th class="p-3 pl-4">Admission Code</th>
                                 <th class="p-3">Student Name</th>
-                                <th class="p-3 text-center w-24">CA Score (40)</th>
+                                <th class="p-3 text-center w-24">CA Marks (40)</th>
                                 <th class="p-3 text-center w-24">Exam (60)</th>
-                                <th class="p-3 text-center w-24">Total Mark</th>
-                                <th class="p-3 text-center w-28">Calculated Grade</th>
+                                <th class="p-3 text-center w-28">Calculated Status</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
@@ -278,16 +272,7 @@
                                 <td class="p-3">Samuel Adeniyi</td>
                                 <td class="p-3 text-center"><input type="number" value="34" class="w-16 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono font-bold p-1 text-xs focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none"></td>
                                 <td class="p-3 text-center"><input type="number" value="48" class="w-16 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono font-bold p-1 text-xs focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none"></td>
-                                <td class="p-3 text-center font-bold text-slate-900 font-mono pt-4 block">82</td>
-                                <td class="p-3 text-center"><span class="bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 rounded font-bold text-[11px]">A - Excellent</span></td>
-                            </tr>
-                            <tr class="hover:bg-slate-50/50 transition">
-                                <td class="p-3 pl-4 font-mono font-bold text-brand-900">GLS/2024/112</td>
-                                <td class="p-3">Deborah Adeniyi</td>
-                                <td class="p-3 text-center"><input type="number" value="29" class="w-16 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono font-bold p-1 text-xs focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none"></td>
-                                <td class="p-3 text-center"><input type="number" value="45" class="w-16 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono font-bold p-1 text-xs focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none"></td>
-                                <td class="p-3 text-center font-bold text-slate-900 font-mono pt-4 block">74</td>
-                                <td class="p-3 text-center"><span class="bg-sky-50 text-sky-700 border border-sky-100 px-2 py-0.5 rounded font-bold text-[11px]">B - Very Good</span></td>
+                                <td class="p-3 text-center"><span class="bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 rounded font-bold text-[11px]">A - Distinctions</span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -295,86 +280,75 @@
             </div>
         </div>
 
-        <!-- PANEL 3: LESSON PLANNER SYLLABUS CORE -->
-        <div id="curriculum-panel" role="tabpanel" aria-labelledby="curriculum-tab" class="space-y-6 hidden">
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
-                <div class="border-b border-slate-100 pb-4">
-                    <h2 class="text-base font-bold text-brand-900 uppercase tracking-wider">Lesson Course Planner Engine</h2>
-                    <p class="text-xs text-slate-500">Design structural lecture pacing modules and sync supporting reading reference pathways.</p>
+        <!-- PANEL 3: DYNAMIC ASSESSMENTS QUESTION BANK (CRUD ARCHITECTURE) -->
+        <div id="assessments-panel" role="tabpanel" aria-labelledby="assessments-tab" class="space-y-6 hidden">
+            
+            <!-- Category Collection Creation Controller Block -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-start gap-4 border-b border-slate-100 pb-4">
+                    <div>
+                        <h2 class="text-base font-bold text-brand-900 uppercase tracking-wider">Question Bank Categorization Deck</h2>
+                        <p class="text-xs text-slate-500">Create target test frameworks (e.g., <code class="bg-slate-100 px-1 rounded text-rose-600 font-bold font-mono">SS2 BIOLOGY TEST 1</code>) and deploy specific objective evaluation items.</p>
+                    </div>
+                    <!-- Form entry for defining high-yield assessment collections -->
+                    <div class="flex flex-wrap gap-2 items-center w-full sm:w-auto">
+                        <input type="text" id="newCollectionName" placeholder="e.g., SS2 BIOLOGY TEST 1" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold p-2.5 placeholder-slate-400 focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none flex-grow sm:flex-initial">
+                        <button onclick="createCollection()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl uppercase tracking-wider transition whitespace-nowrap">
+                            Create Collection
+                        </button>
+                    </div>
                 </div>
 
-                <div class="space-y-4">
-                    <div class="p-5 border border-slate-200 rounded-2xl bg-slate-50/40 relative">
-                        <span class="absolute top-4 right-4 text-[10px] font-black uppercase tracking-wider text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-md">Completed Track</span>
-                        <p class="text-xs font-bold text-brand-500 font-mono">Module Week 1 - 3</p>
-                        <h4 class="text-sm font-bold text-slate-900 mt-1">Alkanes and Functional Group Formations</h4>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed max-w-2xl">Covers physical properties variations, carbon chains saturation limits, and systematic nomenclature criteria according to IUPAC design frameworks.</p>
-                    </div>
-
-                    <div class="p-5 border-2 border-dashed border-brand-500/30 bg-brand-50/20 rounded-2xl relative">
-                        <span class="absolute top-4 right-4 text-[10px] font-black uppercase tracking-wider text-brand-700 bg-brand-100 px-2 py-0.5 rounded-md animate-pulse">Active Lecture Cycle</span>
-                        <p class="text-xs font-bold text-brand-800 font-mono">Module Week 4 - 6</p>
-                        <h4 class="text-sm font-bold text-slate-900 mt-1">Nucleophilic Substitution & Carbonyl Conversions</h4>
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed max-w-2xl">Analyzing bimolecular pathways ($SN_2$) and electrical stability trends under localized polarized charge groups.</p>
-                        <div class="mt-4 flex space-x-2">
-                            <button onclick="alert('Uploading support course brief document node...')" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-[11px] px-3 py-1.5 rounded-lg transition uppercase tracking-wide">
-                                Upload Lesson Notes
-                            </button>
-                        </div>
-                    </div>
+                <!-- Dynamic Wrapper Mount Destination Target for Assessment Collections -->
+                <div id="collectionsContainer" class="space-y-8 mt-4">
+                    <!-- Javascript DOM injection node point references elements directly -->
                 </div>
             </div>
         </div>
 
-        <!-- PANEL 4: EXAM & QUIZ QUESTION BANKS (JSON SCHEMA PATTERN) -->
-        <div id="assessments-panel" role="tabpanel" aria-labelledby="assessments-tab" class="space-y-6 hidden">
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-slate-100 pb-4">
+        <!-- PANEL 4: FACULTY PROFILE VIEW & UPDATE WORKSPACE -->
+        <div id="profile-panel" role="tabpanel" aria-labelledby="profile-tab" class="space-y-6 hidden">
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+                <div class="border-b border-slate-100 pb-4 flex flex-col sm:flex-row justify-between sm:items-center gap-2">
                     <div>
-                        <h2 class="text-base font-bold text-brand-900 uppercase tracking-wider">Assessment Question Bank (JSON Engine)</h2>
-                        <p class="text-xs text-slate-500">Compiles high-yield questions with balanced option lengths to maintain proper exam-level difficulty.</p>
+                        <h2 class="text-base font-bold text-brand-900 uppercase tracking-wider">Faculty Personal Profile Desk</h2>
+                        <p class="text-xs text-slate-500">Review your system identity tokens and modify display elements seen by administrators and student paths.</p>
                     </div>
-                    <button onclick="alert('Adding empty question matrix block to array ledger...')" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider transition shrink-0">
-                        Add New Objective Question
-                    </button>
+                    <span class="inline-flex bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full border border-emerald-100">
+                        System Token: Status verified
+                    </span>
                 </div>
 
-                <!-- Question Bank Interactive Simulation Cards -->
-                <div class="space-y-4">
-                    <div class="p-5 border border-slate-200 rounded-2xl space-y-3 bg-slate-50/50">
-                        <div class="flex justify-between items-center text-xs">
-                            <span class="font-bold font-mono text-brand-500">Question Item #01 (CHM 202)</span>
-                            <span class="bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded uppercase text-[10px]">JSON Output Ready</span>
-                        </div>
-                        <h4 class="text-sm font-bold text-slate-900 leading-relaxed">Which of the following organic compounds will display the highest stability index when subjected to a nucleophilic substitution pathway?</h4>
-                        
-                        <!-- Choices options matching balanced length rules for exam rigor -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
-                            <div class="p-3 bg-white border border-slate-200 rounded-xl text-xs flex items-center font-medium">
-                                <span class="w-5 h-5 rounded-full bg-slate-100 text-slate-600 font-bold flex items-center justify-center mr-2 shrink-0">A</span>
-                                Primary alkyl halides structure
-                            </div>
-                            <div class="p-3 bg-white border border-slate-200 rounded-xl text-xs flex items-center font-medium">
-                                <span class="w-5 h-5 rounded-full bg-slate-100 text-slate-600 font-bold flex items-center justify-center mr-2 shrink-0">B</span>
-                                Tertiary carbocation complexes
-                            </div>
-                            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs flex items-center font-bold text-emerald-800">
-                                <span class="w-5 h-5 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center mr-2 shrink-0">C</span>
-                                Resonance stabilized structures
-                            </div>
-                            <div class="p-3 bg-white border border-slate-200 rounded-xl text-xs flex items-center font-medium">
-                                <span class="w-5 h-5 rounded-full bg-slate-100 text-slate-600 font-bold flex items-center justify-center mr-2 shrink-0">D</span>
-                                Saturated chain configuration
-                            </div>
-                        </div>
+                <!-- Profile Update Interaction Form Grid -->
+                <form id="profileForm" onsubmit="updateTeacherProfile(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs">
+                    <div>
+                        <label class="block font-extrabold text-slate-400 uppercase tracking-wider mb-2">Full Instructor Name</label>
+                        <input type="text" id="profileName" value="Mrs. Omolara Adeniran" class="w-full bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 p-3 focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
                     </div>
-                </div>
+                    <div>
+                        <label class="block font-extrabold text-slate-400 uppercase tracking-wider mb-2">Faculty Rank Title</label>
+                        <input type="text" id="profileTitle" value="Lead Educator, Science Division" class="w-full bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 p-3 focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-extrabold text-slate-400 uppercase tracking-wider mb-2">Assigned Subject Department</label>
+                        <input type="text" id="profileDept" value="Senior Biological Sciences" class="w-full bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 p-3 focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-extrabold text-slate-400 uppercase tracking-wider mb-2">Assigned Form Class Tracks</label>
+                        <input type="text" id="profileLevels" value="Assigned: SS1, SS2, SS3 Track" class="w-full bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 p-3 focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
+                    </div>
+                    <div class="sm:col-span-2 border-t border-slate-100 pt-4 flex justify-end">
+                        <button type="submit" class="bg-gradient-to-r from-brand-800 to-brand-500 hover:shadow-lg text-white font-bold text-xs px-6 py-3 rounded-xl uppercase tracking-wider transition-all">
+                            Update Profile Node
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
 
     </main>
 
-    <!-- Footer Security Information -->
+    <!-- Footer Information -->
     <footer class="md:hidden w-full bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400 mt-auto">
         &copy; 2026 Gold & Linc Schools Console.
     </footer>
@@ -382,8 +356,9 @@
     <!-- Flowbite Script Execution Bundle -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
     
-    <!-- UI Layout Control Interaction Scripts -->
+    <!-- SYSTEM BUSINESS ENGINE CORE DATA LOGIC -->
     <script>
+        /* Mobile responsive drawer handling triggers */
         const overlay = document.getElementById('bottomDrawerOverlay');
         const card = document.getElementById('bottomDrawerCard');
 
@@ -404,9 +379,185 @@
         }
 
         function triggerTabClick(tabId) {
-            // Programmatically sync mobile actions to desktop click triggers
             document.getElementById(tabId).click();
             closeBottomNav(null);
+        }
+
+        /* -----------------------------------------------------------
+           LMS DATA COMPONENT LAYER: CATEGORIZED CRUD QUESTIONS STORAGE
+           ----------------------------------------------------------- */
+        let assessmentDatabase = [
+            {
+                id: "collection_1",
+                name: "SS2 BIOLOGY TEST 1",
+                questions: [
+                    {
+                        id: "q_1_1",
+                        text: "Which of the following organic structures directly represents the primary site for cellular respiration pathways within complex animal tissue units?",
+                        options: ["Mitochondrion organelle", "Ribosomal structures", "Lysosomal structures", "Nucleolus boundaries"]
+                    }
+                ]
+            },
+            {
+                id: "collection_2",
+                name: "SS3 MOCK EXAM PRACTICALS",
+                questions: [
+                    {
+                        id: "q_2_1",
+                        text: "During an observation of an adaptation pathway, what localized structural element preserves osmotic pressure balances inside plant cell walls?",
+                        options: ["Contractile vacuole system", "Semipermeable membrane", "Cytoplasmic matrix fluid", "Cellulose exterior line"]
+                    }
+                ]
+            }
+        ];
+
+        function renderCollections() {
+            const container = document.getElementById('collectionsContainer');
+            container.innerHTML = '';
+
+            // Update statistical counters
+            document.getElementById('overviewCollectionCount').innerText = `${assessmentDatabase.length} Saved Collections`;
+
+            if(assessmentDatabase.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center p-8 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-xs font-bold">
+                        No active evaluation collections registered. Create one using the input form interface above.
+                    </div>`;
+                return;
+            }
+
+            assessmentDatabase.forEach((collection) => {
+                let questionsHtml = '';
+                
+                if(collection.questions.length === 0) {
+                    questionsHtml = `
+                        <div class="text-center p-4 bg-white border border-slate-150 rounded-xl text-slate-400 text-[11px] font-bold">
+                            No active objective questions inside this category box array ledger.
+                        </div>`;
+                } else {
+                    collection.questions.forEach((q, index) => {
+                        questionsHtml += `
+                            <div class="p-4 bg-white border border-slate-200 rounded-xl space-y-3 relative group">
+                                <div class="flex justify-between items-center text-[11px]">
+                                    <span class="font-bold text-brand-500 font-mono">Question ${index + 1}</span>
+                                    <button onclick="deleteQuestion('${collection.id}', '${q.id}')" class="text-rose-500 hover:text-rose-700 font-bold uppercase tracking-wider text-[10px] bg-rose-50 px-2 py-0.5 rounded transition">
+                                        Delete Question
+                                    </button>
+                                </div>
+                                <p class="text-xs font-bold text-slate-900 leading-relaxed">${q.text}</p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-medium text-slate-600">
+                                    <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 truncate"><span class="font-extrabold text-slate-400 mr-1">A.</span> ${q.options[0]}</div>
+                                    <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 truncate"><span class="font-extrabold text-slate-400 mr-1">B.</span> ${q.options[1]}</div>
+                                    <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 truncate"><span class="font-extrabold text-slate-400 mr-1">C.</span> ${q.options[2]}</div>
+                                    <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 truncate"><span class="font-extrabold text-slate-400 mr-1">D.</span> ${q.options[3]}</div>
+                                </div>
+                            </div>`;
+                    });
+                }
+
+                const cardBlock = `
+                    <div class="p-5 border border-slate-200 rounded-2xl bg-slate-50/60 space-y-4 shadow-sm relative">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-3">
+                            <div>
+                                <span class="inline-block text-[9px] font-black tracking-widest bg-brand-900 text-white px-2 py-0.5 rounded uppercase font-mono">Category ID: ${collection.id}</span>
+                                <h3 class="text-sm font-black text-slate-900 mt-1 uppercase tracking-wide font-serif">${collection.name}</h3>
+                            </div>
+                            <div class="flex items-center space-x-1.5 self-end sm:self-auto">
+                                <button onclick="addQuestionPrompt('${collection.id}')" class="bg-brand-50 border border-brand-200 hover:bg-brand-100 text-brand-900 font-bold text-[11px] px-3 py-1.5 rounded-xl transition uppercase tracking-wide">
+                                    + Insert Objective Question
+                                </button>
+                                <button onclick="deleteCollection('${collection.id}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold text-[11px] px-3 py-1.5 rounded-xl transition uppercase tracking-wide">
+                                    Drop Category
+                                </button>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            ${questionsHtml}
+                        </div>
+                    </div>`;
+                
+                container.innerHTML += cardBlock;
+            });
+        }
+
+        // CREATE: Assessment Category Grouping
+        function createCollection() {
+            const input = document.getElementById('newCollectionName');
+            const nameValue = input.value.trim().toUpperCase();
+
+            if(!nameValue) {
+                alert("Please declare a legal collection title string identity before saving.");
+                return;
+            }
+
+            const newId = `collection_${Date.now()}`;
+            assessmentDatabase.push({
+                id: newId,
+                name: nameValue,
+                questions: []
+            });
+
+            input.value = '';
+            renderCollections();
+        }
+
+        // DELETE: Assessment Category Grouping
+        function deleteCollection(collectionId) {
+            if(confirm("Are you certain you want to purge this full testing category along with all matching questions?")) {
+                assessmentDatabase = assessmentDatabase.filter(c => c.id !== collectionId);
+                renderCollections();
+            }
+        }
+
+        // CREATE: Objective Question Item Inside Category Group Array
+        function addQuestionPrompt(collectionId) {
+            const questionText = prompt("Enter the exact objective question statement body:");
+            if(!questionText) return;
+
+            // Maintain balanced response lengths to preserve rigorous exam difficulty
+            const optA = prompt("Option A label entry:"); if(!optA) return;
+            const optB = prompt("Option B label entry:"); if(!optB) return;
+            const optC = prompt("Option C label entry:"); if(!optC) return;
+            const optD = prompt("Option D label entry:"); if(!optD) return;
+
+            const targetCollection = assessmentDatabase.find(c => c.id === collectionId);
+            if(targetCollection) {
+                targetCollection.questions.push({
+                    id: `q_${Date.now()}`,
+                    text: questionText,
+                    options: [optA, optB, optC, optD]
+                });
+                renderCollections();
+            }
+        }
+
+        // DELETE: Objective Question Item From Specific Category Group
+        function deleteQuestion(collectionId, questionId) {
+            const targetCollection = assessmentDatabase.find(c => c.id === collectionId);
+            if(targetCollection) {
+                targetCollection.questions = targetCollection.questions.filter(q => q.id !== questionId);
+                renderCollections();
+            }
+        }
+
+        /* -----------------------------------------------------------
+           FACULTY PROFILE WORKSPACE SYNCHRONIZATION RUNTIME LAYER
+           ----------------------------------------------------------- */
+        function updateTeacherProfile(event) {
+            event.preventDefault();
+
+            const nameValue = document.getElementById('profileName').value;
+            const titleValue = document.getElementById('profileTitle').value;
+            const deptValue = document.getElementById('profileDept').value;
+            const levelsValue = document.getElementById('profileLevels').value;
+
+            // Sync structural values across runtime application nodes dynamically
+            document.getElementById('headerTeacherName').innerText = nameValue;
+            document.getElementById('headerTeacherTitle').innerText = titleValue;
+            document.getElementById('sidebarDept').innerText = deptValue;
+            document.getElementById('sidebarLevels').innerText = levelsValue;
+
+            alert("Faculty identity profile parameters modified and pushed across system templates successfully.");
         }
     </script>
 </body>
