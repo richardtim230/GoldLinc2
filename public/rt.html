@@ -64,6 +64,9 @@
         .explanation-editor-container .ql-container {
             height: 80px;
         }
+        .assignment-editor-container .ql-container {
+            height: 120px;
+        }
         .ql-toolbar {
             border-top-left-radius: 0.5rem;
             border-top-right-radius: 0.5rem;
@@ -258,7 +261,9 @@
                         <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Term Project & Assignments Deployment</h2>
                         <p class="text-xs text-slate-500">Track current terminal task pushes and target submission close points.</p>
                     </div>
-                    <button onclick="deployAssignmentPrompt()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase">Deploy Task</button>
+                    <button onclick="openAssignmentModal()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider shadow-sm transition">
+                        + Open Deployment Modal
+                    </button>
                 </div>
                 <div id="assignmentsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
@@ -425,6 +430,73 @@
         </div>
     </div>
 
+    <div id="assignmentModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl border border-slate-200 w-full max-w-3xl shadow-2xl flex flex-col overflow-hidden max-h-[92vh]">
+            
+            <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+                <div>
+                    <h3 class="text-xs font-extrabold text-brand-900 uppercase tracking-wider">Deploy New Assignment Portfolio</h3>
+                    <p class="text-[11px] text-slate-500">Configure parameters, distribute tasks, or select MCQ rows from core categories.</p>
+                </div>
+                <button onclick="closeAssignmentModal()" class="text-slate-400 hover:text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md font-bold">&times;</button>
+            </div>
+
+            <div class="p-5 space-y-4 overflow-y-auto text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Assignment Title</label>
+                        <input type="text" id="asmModalTitle" placeholder="e.g., Photosynthesis Pathways" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Target Class Cohort</label>
+                        <select id="asmModalClass" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                            <option value="SS2 Alpha">SS2 Alpha - Biology Core</option>
+                            <option value="SS3 Beta">SS3 Beta - Advanced Biology</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Submission Deadline</label>
+                        <input type="date" id="asmModalDue" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-400 mb-1">Task Deployment Routing Type</label>
+                    <select id="asmModalType" onchange="toggleAssignmentTypeSection()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500 text-brand-900">
+                        <option value="STANDARD">Standard Task Portfolio (Rich Text & Instructions)</option>
+                        <option value="QUESTION_BANK">Question Bank Evaluation (Allocate Dynamic MCQs)</option>
+                    </select>
+                </div>
+
+                <div id="asmTypeStandardWrapper" class="space-y-1.5">
+                    <label class="block font-extrabold text-slate-400 uppercase tracking-wider">Task Guidelines & Instructions (Rich Text)</label>
+                    <div class="assignment-editor-container">
+                        <div id="quillAssignmentBody" class="bg-white rounded-xl"></div>
+                    </div>
+                </div>
+
+                <div id="asmTypeQuestionBankWrapper" class="space-y-3 hidden p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-200 pb-2">
+                        <div>
+                            <h4 class="font-extrabold text-brand-900 text-xs uppercase tracking-wide">Question Bank Matrix Mapper</h4>
+                            <p class="text-[11px] text-slate-500">Select which objective questions to link with this task assignment.</p>
+                        </div>
+                        <select id="asmBankCategorySelector" onchange="loadQuestionsForAllocation()" class="bg-white border border-slate-200 rounded-xl text-[11px] font-bold text-slate-700 p-1.5 outline-none focus:ring-1 focus:ring-brand-500">
+                            </select>
+                    </div>
+
+                    <div id="asmAllocationQuestionsContainer" class="space-y-3 max-h-60 overflow-y-auto pt-1">
+                        </div>
+                </div>
+            </div>
+
+            <div class="p-3.5 border-t border-slate-100 bg-slate-50 flex justify-end space-x-2">
+                <button onclick="closeAssignmentModal()" class="bg-white border border-slate-200 text-slate-600 font-bold px-4 py-1.5 rounded-xl text-[11px] uppercase">Cancel</button>
+                <button onclick="commitAssignmentDeployment()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold px-5 py-1.5 rounded-xl text-[11px] uppercase tracking-wider transition">Deploy Task Portfolio</button>
+            </div>
+        </div>
+    </div>
+
     <div id="mediaPickerDialog" class="fixed inset-0 z-[100] overflow-y-auto bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-white rounded-xl border border-slate-200 w-full max-w-md shadow-2xl p-5 space-y-4 text-xs">
             <div class="flex justify-between items-center border-b border-slate-100 pb-2">
@@ -467,6 +539,7 @@
 
         let stemQuillInstance = null;
         let explanationQuillInstance = null;
+        let assignmentQuillInstance = null;
         let optionQuillRegistry = {}; 
 
         // Active context tracking variables for media asset injection redirection
@@ -489,17 +562,37 @@
                             { text: "<p>Nucleolus core bounds</p>", isCorrect: false }
                         ],
                         explanation: "<p>The mitochondrion orchestrates adenosine triphosphate generation through systematic citric acid cycle configurations.</p>"
+                    },
+                    {
+                        id: "q_1_2",
+                        text: "<p>Identify the primary function of rough endoplasmic reticulum sheets during cellular adaptation sequences.</p>",
+                        imageUrl: "",
+                        options: [
+                            { text: "<p>Polypeptide structure synthesis</p>", isCorrect: true },
+                            { text: "<p>Lipid synthesis matrix chains</p>", isCorrect: false }
+                        ],
+                        explanation: "<p>Rough endoplasmic reticulum holds ribosomes explicitly for surface translation pathways.</p>"
                     }
                 ]
             },
             {
                 id: "collection_2",
                 name: "SS3 MOCK EXAM PRACTICALS",
-                questions: []
+                questions: [
+                    {
+                        id: "q_2_1",
+                        text: "<p>During mammalian respiration modeling setups, what specific color variation shows up inside lime water when exposed to unpurified carbon dioxide bubbles?</p>",
+                        imageUrl: "",
+                        options: [
+                            { text: "<p>Milky precipitation formation</p>", isCorrect: true },
+                            { text: "<p>Translucent azure blue shift</p>", isCorrect: false }
+                        ],
+                        explanation: "<p>Insoluble calcium carbonate precipitates form cleanly inside the water solution.</p>"
+                    }
+                ]
             }
         ];
 
-        // Refactored Student Registry to separate CA1 and CA2 parameters natively
         let studentRegistry = [
             { code: "GLS/2024/048", name: "Samuel Adeniyi", classGroup: "SS2 Alpha", ca1Mark: 17, ca2Mark: 17, examMark: 48, standing: "Active" },
             { code: "GLS/2024/091", name: "Chidi Okafor", classGroup: "SS2 Alpha", ca1Mark: 14, ca2Mark: 14, examMark: 42, standing: "Active" },
@@ -507,8 +600,8 @@
         ];
 
         let assignmentsDatabase = [
-            { id: "asm_1", title: "Mendelian Genetics Punnett Square Deck", classGroup: "SS2 Alpha", due: "2026-06-04", status: "Open" },
-            { id: "asm_2", title: "Mammalian Circulatory Pathway Tracking Portfolio", classGroup: "SS3 Beta", due: "2026-06-09", status: "Open" }
+            { id: "asm_1", title: "Mendelian Genetics Punnett Square Deck", classGroup: "SS2 Alpha", due: "2026-06-04", status: "Open", type: "STANDARD", questionsAllocated: [] },
+            { id: "asm_2", title: "Mammalian Circulatory Pathway Tracking Portfolio", classGroup: "SS3 Beta", due: "2026-06-09", status: "Open", type: "STANDARD", questionsAllocated: [] }
         ];
 
         // ONLOAD RUNTIME SETUP
@@ -874,7 +967,7 @@
         }
 
         /* -----------------------------------------------------------
-           ASSIGNMENTS MODULE HANDLERS
+           ASSIGNMENTS DESIGN PORTFOLIO WITH MCQ ALLOCATION LOGIC
            ----------------------------------------------------------- */
         function renderAssignments() {
             const container = document.getElementById('assignmentsContainer');
@@ -886,28 +979,158 @@
             }
 
             assignmentsDatabase.forEach(a => {
+                const typeLabel = a.type === 'QUESTION_BANK' 
+                    ? `<span class="bg-indigo-100 text-indigo-800 border border-indigo-200 text-[10px] px-2 py-0.5 rounded font-bold uppercase">MCQ Question Bank Assessment</span>`
+                    : `<span class="bg-slate-100 text-slate-700 border border-slate-200 text-[10px] px-2 py-0.5 rounded font-bold uppercase">Standard Task Instructions</span>`;
+
+                let innerMetaHtml = '';
+                if(a.type === 'QUESTION_BANK') {
+                    innerMetaHtml = `<p class="text-[11px] text-brand-800 font-bold bg-brand-50 p-2 rounded-lg border border-brand-100">&bull; Allocated Evaluation Total: ${a.questionsAllocated ? a.questionsAllocated.length : 0} Objective Items Linked</p>`;
+                } else if(a.instructions) {
+                    innerMetaHtml = `<div class="text-[11px] text-slate-500 line-clamp-2 bg-slate-50 p-2 rounded border border-slate-150">${a.instructions.replace(/<[^>]*>/g, '')}</div>`;
+                }
+
                 container.innerHTML += `
-                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                    <div class="p-5 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-sm relative">
                         <div class="flex justify-between items-start">
-                            <span class="text-[9px] font-bold bg-amber-600 text-white px-1.5 py-0.5 rounded tracking-wider uppercase font-mono">${a.classGroup}</span>
-                            <span class="text-[10px] text-slate-400 font-bold">Due: ${a.due}</span>
+                            <span class="text-[9px] font-black bg-brand-900 text-white px-2 py-0.5 rounded tracking-widest uppercase font-mono">${a.classGroup}</span>
+                            <span class="text-[10px] text-slate-400 font-bold">Due Parameter: ${a.due}</span>
                         </div>
-                        <h4 class="text-xs font-black text-slate-900 uppercase font-serif tracking-wide leading-tight">${a.title}</h4>
-                        <div class="flex justify-between items-center pt-2 text-[11px] border-t border-slate-200/50">
-                            <span class="text-emerald-600 font-bold">&bull; Status: ${a.status}</span>
-                            <button onclick="alert('Opening student response portfolio analytics pipelines...')" class="text-brand-800 font-bold hover:underline">Submissions</button>
+                        <h4 class="text-xs font-black text-slate-900 uppercase font-serif tracking-wide leading-snug">${a.title}</h4>
+                        <div class="py-0.5">${typeLabel}</div>
+                        ${innerMetaHtml}
+                        <div class="flex justify-between items-center pt-2.5 text-[11px] border-t border-slate-100">
+                            <span class="text-emerald-600 font-extrabold">&bull; Tracking Link: ${a.status}</span>
+                            <button onclick="alert('Launching student performance response portfolio tracking dashboards...')" class="text-brand-800 font-bold hover:underline tracking-wider uppercase text-[10px]">Analytics Desk &rarr;</button>
                         </div>
                     </div>`;
             });
         }
 
-        function deployAssignmentPrompt() {
-            const title = prompt("Enter assignment project title:"); if(!title) return;
-            const cls = prompt("Target Class Tier (e.g., SS2 Alpha):"); if(!cls) return;
-            const due = prompt("Set deadline date parameter value (YYYY-MM-DD):"); if(!due) return;
+        function openAssignmentModal() {
+            if(!assignmentQuillInstance) {
+                assignmentQuillInstance = new Quill('#quillAssignmentBody', {
+                    theme: 'snow',
+                    placeholder: 'Define tasks, instructions, objectives or research specifications...',
+                    modules: { toolbar: [['bold', 'italic', 'underline'], ['image'], ['clean']] }
+                });
+                assignmentQuillInstance.getModule('toolbar').addHandler('image', function() {
+                    triggerCustomMediaPicker(assignmentQuillInstance);
+                });
+            }
 
-            assignmentsDatabase.push({ id: `asm_${Date.now()}`, title: title, classGroup: cls, due: due, status: "Open" });
+            // Reset Fields
+            document.getElementById('asmModalTitle').value = '';
+            document.getElementById('asmModalDue').value = '';
+            document.getElementById('asmModalType').value = 'STANDARD';
+            assignmentQuillInstance.setText('');
+            
+            toggleAssignmentTypeSection();
+            populateAssignmentBankCategories();
+
+            document.getElementById('assignmentModal').style.display = 'flex';
+        }
+
+        function closeAssignmentModal() {
+            document.getElementById('assignmentModal').style.display = 'none';
+        }
+
+        function toggleAssignmentTypeSection() {
+            const type = document.getElementById('asmModalType').value;
+            const standardWrapper = document.getElementById('asmTypeStandardWrapper');
+            const bankWrapper = document.getElementById('asmTypeQuestionBankWrapper');
+
+            if(type === 'STANDARD') {
+                standardWrapper.classList.remove('hidden');
+                bankWrapper.classList.add('hidden');
+            } else {
+                standardWrapper.classList.add('hidden');
+                bankWrapper.classList.remove('hidden');
+                loadQuestionsForAllocation();
+            }
+        }
+
+        function populateAssignmentBankCategories() {
+            const selector = document.getElementById('asmBankCategorySelector');
+            selector.innerHTML = '';
+            assessmentDatabase.forEach(c => {
+                selector.innerHTML += `<option value="${c.id}">${c.name} (${c.questions.length} Items)</option>`;
+            });
+        }
+
+        function loadQuestionsForAllocation() {
+            const catId = document.getElementById('asmBankCategorySelector').value;
+            const container = document.getElementById('asmAllocationQuestionsContainer');
+            container.innerHTML = '';
+
+            if(!catId) {
+                container.innerHTML = `<p class="text-slate-400 font-bold text-[11px] py-2">Create a Question Bank Category first.</p>`;
+                return;
+            }
+
+            const col = assessmentDatabase.find(c => c.id === catId);
+            if(!col || col.questions.length === 0) {
+                container.innerHTML = `<p class="text-slate-400 font-bold text-[11px] py-2">No question tracks found in this category portfolio loop.</p>`;
+                return;
+            }
+
+            col.questions.forEach((q, index) => {
+                // Stripping HTML tags for pristine clean label preview
+                const cleanTextPreview = q.text.replace(/<[^>]*>/g, '');
+                container.innerHTML += `
+                    <label class="flex items-start space-x-3 p-2.5 bg-white border border-slate-200 rounded-xl hover:border-brand-300 transition cursor-pointer select-none">
+                        <input type="checkbox" value="${q.id}" class="asm-allocated-checkbox mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                        <div class="text-[11px] font-medium text-slate-800">
+                            <span class="font-extrabold text-brand-600 block mb-0.5">ITEM ROW #${index+1}</span>
+                            <span class="line-clamp-2 text-slate-600 font-semibold">${cleanTextPreview}</span>
+                        </div>
+                    </label>`;
+            });
+        }
+
+        function commitAssignmentDeployment() {
+            const titleValue = document.getElementById('asmModalTitle').value.trim();
+            const classValue = document.getElementById('asmModalClass').value;
+            const dueValue = document.getElementById('asmModalDue').value;
+            const typeValue = document.getElementById('asmModalType').value;
+
+            if(!titleValue || !dueValue) {
+                alert("Please write a valid assignment title and select a clear deadline date point.");
+                return;
+            }
+
+            let allocatedArray = [];
+            let instructionsHtml = '';
+
+            if(typeValue === 'STANDARD') {
+                instructionsHtml = assignmentQuillInstance.root.innerHTML.trim();
+            } else {
+                const checkedBoxes = document.querySelectorAll('.asm-allocated-checkbox:checked');
+                checkedBoxes.forEach(cb => {
+                    allocatedArray.push(cb.value);
+                });
+
+                if(allocatedArray.length === 0) {
+                    alert("Please select at least one checkable MCQ box block to allocate to this assessment portfolio.");
+                    return;
+                }
+            }
+
+            // Inject object instance cleanly into tracking state database
+            assignmentsDatabase.push({
+                id: `asm_${Date.now()}`,
+                title: titleValue.toUpperCase(),
+                classGroup: classValue,
+                due: dueValue,
+                status: "Open",
+                type: typeValue,
+                instructions: instructionsHtml,
+                questionsAllocated: allocatedArray
+            });
+
+            closeAssignmentModal();
             renderAssignments();
+            alert(`Task data structure deployed cleanly for target group ${classValue}.`);
         }
 
         /* -----------------------------------------------------------
@@ -937,7 +1160,7 @@
         }
 
         /* -----------------------------------------------------------
-           GRADEBOOK PARAMETERS & REAL-TIME TRACKING MATRIX
+           GRADEBOOK ENTRY MATRIX ENGINE
            ----------------------------------------------------------- */
         function renderGradebook() {
             const filter = document.getElementById('gradebookClassFilter').value;
@@ -973,7 +1196,6 @@
             updateProgressMetrics();
         }
 
-        // Calculates single row totals on keyboard inputs dynamically
         function calculateRowTotal(inputElement) {
             const row = inputElement.closest('tr');
             const ca1 = parseInt(row.querySelector('.ca1-input').value) || 0;
@@ -984,11 +1206,10 @@
             updateProgressMetrics();
         }
 
-        // Computes how many inputs are completed vs. how many left across all score cells
         function updateProgressMetrics() {
             const rows = document.getElementById('gradebookTableBody').children;
             const totalStudents = rows.length;
-            const totalExpectedCells = totalStudents * 3; // 3 inputs per student (CA1, CA2, Exam)
+            const totalExpectedCells = totalStudents * 3; 
             let completedCells = 0;
 
             for(let row of rows) {
@@ -1009,7 +1230,6 @@
             document.getElementById('progressBarFill').style.width = `${percentage}%`;
         }
 
-        // Action button code: saves row state parameters locally to target database record
         function saveSingleRow(buttonElement) {
             const row = buttonElement.closest('tr');
             const code = row.getAttribute('data-student-code');
@@ -1032,7 +1252,6 @@
             updateProgressMetrics();
         }
 
-        // Action button code: resets row inputs completely
         function clearSingleRow(buttonElement) {
             const row = buttonElement.closest('tr');
             row.querySelector('.ca1-input').value = '';
@@ -1042,7 +1261,6 @@
             updateProgressMetrics();
         }
 
-        // Bulk action code: processes all inputs across the grid
         function saveGradebookChanges() {
             const rows = document.getElementById('gradebookTableBody').children;
             let boundsError = false;
