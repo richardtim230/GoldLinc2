@@ -200,7 +200,8 @@ router.get('/cbt/:cbtId', teacherAuth, async (req, res) => {
   }
 });
 
-// ============ COLLECTIONS ROUTES (BEFORE /:id ROUTES) ============
+// ============ COLLECTIONS ROUTES (BEFORE OTHER /:id ROUTES) ============
+// ⚠️ CRITICAL: These routes must come BEFORE other /:id routes to avoid pattern matching conflicts
 
 // GET /api/teachers/:id/collections
 router.get('/:id/collections', teacherAuth, async (req, res) => {
