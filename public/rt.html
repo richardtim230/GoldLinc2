@@ -3,16 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gold and Linc Schools | Faculty LMS Production Console</title>
+  <title>Teacher Dashboard - GoldLinc Schools</title>
   
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Flowbite & Tailwind CSS Core -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
   
+  <!-- Google Fonts styling -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&family=Playfair+Display:ital,wght=0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght=0,200..800;1,200..800&family=Playfair+Display:ital,wght=0,400..900;1,400..900&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
@@ -28,239 +30,236 @@
             }
           },
           fontFamily: {
-            sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
             serif: ['Playfair Display', 'serif']
           }
         }
       }
-    };
+    }
   </script>
 
   <style>
     body {
-      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-      background: linear-gradient(180deg, #f6f8ff, #eef2ff);
-      -webkit-font-smoothing: antialiased;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f8fafc;
     }
-    
     .page-loader {
       position: fixed;
-      inset: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255, 255, 255, 0.9);
+      z-index: 9999;
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 9999;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(4px);
-      flex-direction: column;
     }
     .page-loader.active {
       display: flex;
     }
-    .page-loader .spinner {
-      width: 44px;
-      height: 44px;
+    .spinner {
+      border: 4px solid rgba(0,0,0,0.1);
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
-      border: 6px solid rgba(0, 0, 0, 0.06);
-      border-top-color: #3b82f6;
+      border-left-color: #0b2a44;
       animation: spin 1s linear infinite;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     .quill-editor {
-      background: #fff;
-      border: 1px solid #e6e9ef;
-      border-radius: 8px;
-      min-height: 120px;
-    }
-    
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed !important;
-      transform: none !important;
-      box-shadow: none !important;
+      height: 150px;
+      background: white;
     }
   </style>
 </head>
+<body class="bg-gray-50 text-gray-900">
 
-<body class="text-brand-navy min-h-screen antialiased">
-
-  <div id="pageLoader" class="page-loader" role="status" aria-live="polite" aria-hidden="true">
-    <div class="spinner" aria-hidden="true"></div>
-    <div class="mt-4 font-extrabold text-brand-navy text-lg" id="loaderMsg">Initializing Environment...</div>
-    <div class="text-brand-muted text-sm" id="loaderSub">Synchronizing multi-editor parameters with deployment node.</div>
+  <!-- PAGE LOADER Overlay -->
+  <div id="pageLoader" class="page-loader" role="status">
+    <div class="text-center">
+      <div class="spinner mx-auto mb-2"></div>
+      <p id="loaderMsg" class="text-sm font-semibold text-brand-navy">Loading data...</p>
+    </div>
   </div>
 
   <div class="flex min-h-screen">
-    <aside id="sidebar" class="w-72 fixed inset-y-0 left-0 bg-slate-900 text-white p-4 flex flex-col gap-4 shadow-xl z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
-      <div class="flex items-center gap-3 pb-4 border-b border-slate-800">
-        <img src="../logo.png" alt="School Seal" class="w-10 h-10 rounded-lg bg-white p-0.5 object-contain">
-        <div>
-          <div class="font-extrabold text-sm text-brand-gold">Faculty Multi-Editor</div>
-          <div class="text-xs text-slate-400 font-medium">Gold and Linc Schools</div>
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-brand-navy text-white p-4 flex flex-col justify-between transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+      <div>
+        <div class="flex items-center gap-3 mb-8 px-2">
+          <img src="../logo.png" alt="Logo" class="w-10 h-10 rounded">
+          <div>
+            <h2 class="font-bold text-sm tracking-wide">GOLDLINC SCHOOLS</h2>
+            <p class="text-xs text-gray-400">Teacher Portal</p>
+          </div>
         </div>
+
+        <nav class="space-y-1">
+          <a href="#overview" data-tab="overview" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-slate-800 hover:text-white transition active">
+            <i class="fa fa-th-large w-5 text-center"></i> Overview
+          </a>
+          <a href="#classes" data-tab="classes" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa fa-users w-5 text-center"></i> My Classes
+          </a>
+          <a href="#attendance" data-tab="attendance" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa fa-calendar-check w-5 text-center"></i> Attendance
+          </a>
+          <a href="#assignments" data-tab="assignments" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa fa-tasks w-5 text-center"></i> Assignments
+          </a>
+          <a href="#gradebook" data-tab="gradebook" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa fa-book w-5 text-center"></i> Gradebook
+          </a>
+          <a href="#cbtQuestions" data-tab="cbtQuestions" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa fa-laptop w-5 text-center"></i> Create CBT Questions
+          </a>
+          <a href="#myCBTQuestions" data-tab="myCBTQuestions" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa fa-folder-open w-5 text-center"></i> My CBT Questions
+          </a>
+          <a href="#notifications" data-tab="notifications" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa fa-bell w-5 text-center"></i> Notifications
+          </a>
+          <a href="#settings" data-tab="settings" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa fa-cog w-5 text-center"></i> Settings
+          </a>
+        </nav>
       </div>
 
-      <nav class="flex flex-col gap-1.5 overflow-y-auto flex-1 text-sm font-semibold" aria-label="Faculty Console Modules">
-        <a href="#overview" data-tab="overview" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-brand-gold transition-all active">
-          <i class="fa fa-chart-pie w-5 text-center"></i> Dashboard Overview
-        </a>
-        <a href="#classes" data-tab="classes" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-brand-gold transition-all">
-          <i class="fa fa-chalkboard-teacher w-5 text-center"></i> Managed Classes
-        </a>
-        <a href="#attendance" data-tab="attendance" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-brand-gold transition-all">
-          <i class="fa fa-calendar-check w-5 text-center"></i> Smart Attendance
-        </a>
-        <a href="#assignments" data-tab="assignments" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-brand-gold transition-all">
-          <i class="fa fa-scroll w-5 text-center"></i> Assignment Matrix
-        </a>
-        <a href="#gradebook" data-tab="gradebook" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-brand-gold transition-all">
-          <i class="fa fa-book-open w-5 text-center"></i> Production Gradebook
-        </a>
-        <a href="#cbtQuestions" data-tab="cbtQuestions" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-brand-gold transition-all">
-          <i class="fa fa-laptop-code w-5 text-center"></i> CBT Authoring Tool
-        </a>
-        <a href="#myCBTQuestions" data-tab="myCBTQuestions" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-brand-gold transition-all">
-          <i class="fa fa-folder-tree w-5 text-center"></i> CBT Deployment Vault
-        </a>
-        <a href="#notifications" data-tab="notifications" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-brand-gold transition-all">
-          <i class="fa fa-bell w-5 text-center"></i> Broadcast Alerts
-        </a>
-        <a href="#settings" data-tab="settings" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-brand-gold transition-all">
-          <i class="fa fa-sliders w-5 text-center"></i> Faculty Configuration
-        </a>
-      </nav>
-
-      <div class="pt-4 border-t border-slate-800 flex items-center gap-3">
-        <img src="../avatar.jpg" alt="Profile avatar" id="teacherAvatar" class="w-10 h-10 rounded-lg object-cover border-2 border-brand-gold">
-        <div class="min-w-0 flex-1">
-          <div id="teacherName" class="font-bold text-sm text-slate-100 truncate">Loading Account...</div>
-          <div id="teacherDept" class="text-xs text-slate-400 font-medium truncate">Validating context...</div>
+      <div class="flex items-center gap-3 pt-4 border-t border-slate-800">
+        <img src="../avatar.jpg" alt="Avatar" id="teacherAvatar" class="w-10 h-10 rounded-full object-cover">
+        <div class="truncate">
+          <p id="teacherName" class="font-semibold text-sm truncate">Loading...</p>
+          <p id="teacherDept" class="text-xs text-gray-400 truncate">Please wait...</p>
         </div>
       </div>
     </aside>
 
-    <div class="flex-1 md:ml-72 flex flex-col min-w-0">
-      
-      <header class="h-20 bg-white/90 backdrop-blur-md border-b border-slate-200 fixed top-0 right-0 left-0 md:left-72 px-6 flex items-center justify-between z-40">
+    <!-- MAIN CONTENT CONTAINER -->
+    <div class="flex-1 md:ml-64 min-w-0">
+      <!-- HEADER -->
+      <header class="bg-white border-b border-gray-200 h-16 fixed top-0 right-0 left-0 md:left-64 px-6 flex items-center justify-between z-40">
         <div class="flex items-center gap-4">
-          <button id="sidebarToggle" class="md:hidden text-white bg-brand-blue p-2 rounded-lg hover:bg-brand-purple transition-colors" aria-label="Toggle navigation viewport">
+          <button id="sidebarToggle" class="md:hidden text-gray-600 p-1 hover:bg-gray-100 rounded">
             <i class="fa fa-bars text-xl"></i>
           </button>
-          <div>
-            <h1 class="text-lg font-black text-slate-900 tracking-tight" id="headerTitle">Academic Hub</h1>
-            <p class="text-xs font-semibold text-brand-muted" id="headerSubtitle">Active Processing Core Matrix</p>
-          </div>
+          <h1 id="pageTitle" class="text-xl font-bold text-gray-800">Overview</h1>
         </div>
         <div class="flex items-center gap-4">
-          <div id="termInfo" class="text-xs font-bold bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200 text-slate-700">Dynamic Session Engine</div>
-          <img src="../avatar.jpg" alt="Profile header context" id="topbarAvatar" class="w-10 h-10 rounded-lg border-2 border-white shadow-sm object-cover">
+          <span id="termInfo" class="text-xs bg-gray-100 text-gray-700 font-medium px-2.5 py-1 rounded">Term Loading...</span>
+          <img src="../avatar.jpg" alt="Profile" id="topbarAvatar" class="w-8 h-8 rounded-full border object-cover">
         </div>
       </header>
 
-      <main class="flex-1 p-6 pt-28 max-w-full">
+      <!-- CONTENT SECTIONS -->
+      <main class="p-6 mt-16 max-w-7xl mx-auto space-y-6">
         
+        <!-- OVERVIEW PANEL -->
         <section id="overview" class="view-panel space-y-6">
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
-              <span class="text-xs font-bold uppercase tracking-wider text-brand-muted">Assigned Operations</span>
-              <span class="text-3xl font-black text-slate-900 my-2" id="statClasses">0</span>
-              <span class="text-xs text-emerald-600 font-semibold"><i class="fa fa-circle-check"></i> Active Course Tracks</span>
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-500">Classes Assigned</p>
+                <h3 id="statClasses" class="text-2xl font-bold text-gray-900 mt-1">0</h3>
+              </div>
+              <div class="w-12 h-12 bg-blue-50 text-brand-blue rounded-xl flex items-center justify-center text-xl"><i class="fa fa-graduation-cap"></i></div>
             </div>
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
-              <span class="text-xs font-bold uppercase tracking-wider text-brand-muted">Monitored Enrolments</span>
-              <span class="text-3xl font-black text-slate-900 my-2" id="statStudents">0</span>
-              <span class="text-xs text-brand-blue font-semibold"><i class="fa fa-users"></i> Registered Records</span>
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-500">Total Students</p>
+                <h3 id="statStudents" class="text-2xl font-bold text-gray-900 mt-1">0</h3>
+              </div>
+              <div class="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center text-xl"><i class="fa fa-users"></i></div>
             </div>
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
-              <span class="text-xs font-bold uppercase tracking-wider text-brand-muted">Pending Evaluations</span>
-              <span class="text-3xl font-black text-slate-900 my-2" id="statPending">0</span>
-              <span class="text-xs text-amber-500 font-semibold"><i class="fa fa-hourglass-half"></i> Submissions Awaiting Audit</span>
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-500">Pending Assignments</p>
+                <h3 id="statPending" class="text-2xl font-bold text-gray-900 mt-1">0</h3>
+              </div>
+              <div class="w-12 h-12 bg-yellow-50 text-yellow-600 rounded-xl flex items-center justify-center text-xl"><i class="fa fa-clock"></i></div>
             </div>
           </div>
           
-          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-            <h3 class="text-base font-black text-slate-900 mb-4 flex items-center gap-2"><i class="fa fa-folder-open text-brand-blue"></i> Live Class Roster Frameworks</h3>
-            <div id="class-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+          <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+            <h3 class="font-bold text-lg text-gray-800 mb-4">My Classes Overview</h3>
+            <div id="class-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
           </div>
         </section>
 
-        <section id="classes" class="view-panel space-y-6 hidden">
-          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
+        <!-- MY CLASSES PANEL -->
+        <section id="classes" class="view-panel space-y-4 hidden">
+          <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
               <div>
-                <h2 class="text-base font-black text-slate-900">Roster Registry Terminal</h2>
-                <p class="text-xs font-semibold text-brand-muted">Execute student directory queries against current terms</p>
+                <h3 class="font-bold text-lg text-gray-800">Class Roster</h3>
+                <p class="text-xs text-gray-500">View students registered in your assigned classes</p>
               </div>
-              <div class="flex gap-2 min-w-[260px]">
-                <select id="classSelect" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 p-2.5 focus:ring-2 focus:ring-brand-blue w-full"></select>
-              </div>
+              <select id="classSelect" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 min-w-[200px]"></select>
             </div>
             
             <div class="overflow-x-auto">
-              <table id="rosterTable" class="w-full text-left text-sm">
-                <thead>
-                  <tr class="border-b border-slate-100 text-brand-muted font-bold text-xs uppercase tracking-wider bg-slate-50/70">
-                    <th class="p-3">Index</th>
-                    <th class="p-3">Full Student Legal Identity</th>
-                    <th class="p-3">Admission Code</th>
-                    <th class="p-3">Network Access Route</th>
+              <table id="rosterTable" class="w-full text-sm text-left text-gray-500">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                  <tr>
+                    <th scope="col" class="px-6 py-3">S/N</th>
+                    <th scope="col" class="px-6 py-3">Student Name</th>
+                    <th scope="col" class="px-6 py-3">Admission Number</th>
+                    <th scope="col" class="px-6 py-3">Email</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100 font-medium text-slate-700"></tbody>
+                <tbody class="divide-y divide-gray-200 text-gray-900 font-medium"></tbody>
               </table>
             </div>
           </div>
         </section>
 
-        <section id="attendance" class="view-panel space-y-6 hidden">
-          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
+        <!-- ATTENDANCE PANEL -->
+        <section id="attendance" class="view-panel space-y-4 hidden">
+          <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end mb-6">
               <div>
-                <label class="text-xs font-bold text-slate-700 block mb-1.5">Target Management Boundary</label>
-                <select id="attendance-class" class="bg-white border border-slate-200 rounded-xl text-xs font-semibold p-2.5 focus:ring-2 focus:ring-brand-blue"></select>
+                <label class="block mb-2 text-sm font-semibold text-gray-700">Select Class</label>
+                <select id="attendance-class" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 w-full"></select>
               </div>
               <div>
-                <label class="text-xs font-bold text-slate-700 block mb-1.5">Date Variable Pointer</label>
-                <input type="date" id="attDate" class="bg-white border border-slate-200 rounded-xl text-xs font-semibold p-2.5 focus:ring-2 focus:ring-brand-blue">
+                <label class="block mb-2 text-sm font-semibold text-gray-700">Select Date</label>
+                <input type="date" id="attDate" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 w-full">
               </div>
-              <button id="loadAttendanceBtn" class="bg-brand-blue text-white rounded-xl text-xs font-bold p-3 hover:bg-brand-purple transition-all flex items-center justify-center gap-2">
-                <i class="fa fa-arrow-rotate-right"></i> Synchronize Roster Parameters
+              <button id="loadAttendanceBtn" class="bg-brand-blue text-white font-semibold text-sm rounded-lg p-2.5 hover:bg-blue-600 transition flex items-center justify-center gap-2">
+                <i class="fa fa-refresh"></i> Load Attendance Sheet
               </button>
             </div>
 
-            <form id="attendance-form" class="hidden">
-              <div class="overflow-x-auto rounded-xl border border-slate-100 mb-4">
-                <table class="w-full text-left text-sm">
-                  <thead>
-                    <tr class="bg-slate-50 text-xs font-bold text-brand-muted border-b border-slate-100">
-                      <th class="p-3">Student Name</th>
-                      <th class="p-3 text-center">Present</th>
-                      <th class="p-3 text-center">Absent</th>
-                      <th class="p-3 text-center">Excused</th>
+            <form id="attendance-form" class="hidden space-y-4">
+              <div class="overflow-x-auto border border-gray-200 rounded-lg">
+                <table class="w-full text-sm text-left text-gray-500">
+                  <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                    <tr>
+                      <th scope="col" class="px-6 py-3">Student Name</th>
+                      <th scope="col" class="px-6 py-3 text-center">Present</th>
+                      <th scope="col" class="px-6 py-3 text-center">Absent</th>
+                      <th scope="col" class="px-6 py-3 text-center">Excused</th>
                     </tr>
                   </thead>
-                  <tbody id="attendance-students" class="divide-y divide-slate-100 font-semibold text-slate-700"></tbody>
+                  <tbody id="attendance-students" class="divide-y divide-gray-200 text-gray-900 font-semibold"></tbody>
                 </table>
               </div>
-              <button type="submit" id="saveAttendanceSubmitBtn" class="bg-slate-900 text-white font-bold text-xs px-5 py-3 rounded-xl hover:bg-brand-blue transition-all">
-                <i class="fa fa-floppy-disk mr-1.5"></i> Commit Log Matrix to Ledger
+              <button type="submit" id="saveAttendanceSubmitBtn" class="bg-brand-navy text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-slate-800 transition">
+                <i class="fa fa-save mr-1.5"></i> Save Attendance
               </button>
             </form>
           </div>
         </section>
 
-        <section id="assignments" class="view-panel space-y-6 hidden">
-          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4 mb-4">
+        <!-- ASSIGNMENTS PANEL -->
+        <section id="assignments" class="view-panel space-y-4 hidden">
+          <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
               <div>
-                <h2 class="text-base font-black text-slate-900">Task Matrix Hub</h2>
-                <p class="text-xs font-semibold text-brand-muted">Instantiate and manage curriculum assignments</p>
+                <h3 class="font-bold text-lg text-gray-800">Assignments</h3>
+                <p class="text-xs text-gray-500">Create and track student assignments</p>
               </div>
               <div class="flex flex-wrap gap-2 w-full sm:w-auto">
-                <select id="assignment-filter-class" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 p-2.5 focus:ring-2 focus:ring-brand-blue min-w-[160px]"></select>
-                <button id="newAssignBtn" class="bg-brand-blue text-white rounded-xl text-xs font-bold px-4 py-2.5 hover:bg-brand-purple transition-all flex items-center gap-2">
-                  <i class="fa fa-plus"></i> Compose Directive Template
+                <select id="assignment-filter-class" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 min-w-[150px]"></select>
+                <button id="newAssignBtn" class="bg-brand-blue text-white font-semibold text-sm px-4 py-2.5 rounded-lg hover:bg-blue-600 transition flex items-center gap-2" onclick="openAssignmentModal()">
+                  <i class="fa fa-plus"></i> Create New Assignment
                 </button>
               </div>
             </div>
@@ -268,116 +267,119 @@
           </div>
         </section>
 
-        <section id="gradebook" class="view-panel space-y-6 hidden">
-          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4 mb-4">
+        <!-- GRADEBOOK PANEL -->
+        <section id="gradebook" class="view-panel space-y-4 hidden">
+          <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
               <div>
-                <h2 class="text-base font-black text-slate-900">Gradebook Matrix Terminal</h2>
-                <p class="text-xs font-semibold text-brand-muted">Commit operational academic continuous assessments and exams</p>
+                <h3 class="font-bold text-lg text-gray-800">Gradebook Management</h3>
+                <p class="text-xs text-gray-500">Enter marks for Continuous Assessments and Exams</p>
               </div>
               <div class="flex gap-2 w-full sm:w-auto">
-                <select id="gradebook-class" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 p-2.5 focus:ring-2 focus:ring-brand-blue min-w-[180px]"></select>
-                <button id="saveGradesBtn" class="bg-brand-blue text-white rounded-xl text-xs font-bold px-4 py-2.5 hover:bg-brand-purple transition-all flex items-center gap-2">
-                  <i class="fa fa-cloud-arrow-up"></i> Pipeline Record Manifest
+                <select id="gradebook-class" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 min-w-[180px]"></select>
+                <button id="saveGradesBtn" class="bg-brand-blue text-white font-semibold text-sm px-4 py-2.5 rounded-lg hover:bg-blue-600 transition flex items-center gap-2" onclick="openGradebookUploadModal()">
+                  <i class="fa fa-upload"></i> Upload Results Terminal
                 </button>
               </div>
             </div>
-            <div id="gradebook-table" class="overflow-x-auto rounded-xl border border-slate-100"></div>
+            <div id="gradebook-table" class="overflow-x-auto border border-gray-200 rounded-lg"></div>
           </div>
         </section>
 
-        <section id="cbtQuestions" class="view-panel space-y-6 hidden">
-          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-            <div class="border-b border-slate-100 pb-3 mb-5">
-              <h2 class="text-base font-black text-slate-900">CBT Evaluation Parameters</h2>
-              <p class="text-xs font-semibold text-brand-muted">Compose evaluation banks with transactional localStorage validation state redundancy</p>
-            </div>
+        <!-- CREATE CBT QUESTIONS PANEL -->
+        <section id="cbtQuestions" class="view-panel space-y-4 hidden">
+          <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+            <h3 class="font-bold text-lg text-gray-800 mb-2">Create CBT Assessment</h3>
+            <p class="text-xs text-gray-500 mb-6">Draft and save assessment banks with automated local resilience</p>
             
-            <form id="cbt-question-form" autocomplete="off" class="space-y-6">
+            <form id="cbt-question-form" class="space-y-6">
               <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div>
-                  <label class="text-xs font-bold text-slate-700 block mb-1">Target Class Bound</label>
-                  <select id="cbt-class-select" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5"></select>
+                  <label class="block mb-2 text-sm font-semibold text-gray-700">Select Class</label>
+                  <select id="cbt-class-select" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 w-full"></select>
                 </div>
                 <div>
-                  <label class="text-xs font-bold text-slate-700 block mb-1">Subject Scope Taxonomy</label>
-                  <select id="cbt-subject-select" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5"></select>
+                  <label class="block mb-2 text-sm font-semibold text-gray-700">Select Subject</label>
+                  <select id="cbt-subject-select" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 w-full"></select>
                 </div>
                 <div>
-                  <label class="text-xs font-bold text-slate-700 block mb-1">Assessment Run Identity</label>
-                  <input type="text" id="cbt-title" placeholder="e.g., Session Midterm" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5">
+                  <label class="block mb-2 text-sm font-semibold text-gray-700">CBT Assessment Title</label>
+                  <input type="text" id="cbt-title" placeholder="e.g. 1st Term Midterm Test" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 w-full">
                 </div>
                 <div>
-                  <label class="text-xs font-bold text-slate-700 block mb-1">Execution Limit (Min)</label>
-                  <input type="number" id="cbt-duration" min="1" placeholder="e.g., 45" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5">
+                  <label class="block mb-2 text-sm font-semibold text-gray-700">Duration (Minutes)</label>
+                  <input type="number" id="cbt-duration" placeholder="e.g. 45" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 w-full">
                 </div>
               </div>
 
-              <div>
-                <h3 class="text-sm font-extrabold text-slate-900 mb-3 flex items-center justify-between">
-                  <span>Questions Registry Matrix</span>
-                  <button type="button" id="cbt-add-question-btn" class="bg-slate-100 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-slate-200 transition-all flex items-center gap-1.5">
-                    <i class="fa fa-plus text-brand-blue"></i> Append Node Structure
+              <div class="space-y-4 border-t border-gray-100 pt-4">
+                <div class="flex items-center justify-between">
+                  <h4 class="font-bold text-gray-800">Questions Ledger Matrix</h4>
+                  <button type="button" id="cbt-add-question-btn" class="text-brand-blue font-semibold text-sm hover:underline flex items-center gap-1">
+                    <i class="fa fa-plus"></i> Add New Question Block
                   </button>
-                </h3>
+                </div>
                 <div id="cbt-questions-list" class="space-y-4"></div>
               </div>
 
-              <button type="submit" id="cbt-upload-btn" class="w-full bg-slate-900 text-white font-bold text-xs p-3.5 rounded-xl hover:bg-brand-blue transition-all shadow-sm">
-                <i class="fa fa-server mr-2"></i> Deploy Full Structural Assessment Matrix To Render Server
+              <button type="submit" id="cbt-upload-btn" class="w-full bg-brand-navy text-white font-bold text-sm p-3 rounded-lg hover:bg-slate-800 transition">
+                <i class="fa fa-server mr-2"></i> Deploy CBT Assessment To Live Database
               </button>
-              <div id="cbt-upload-msg" class="text-xs text-center font-bold"></div>
+              <div id="cbt-upload-msg" class="text-sm text-center font-bold"></div>
             </form>
           </div>
         </section>
 
-        <section id="myCBTQuestions" class="view-panel space-y-6 hidden">
-          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4 mb-4">
+        <!-- MY CBT QUESTIONS PANEL -->
+        <section id="myCBTQuestions" class="view-panel space-y-4 hidden">
+          <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
               <div>
-                <h2 class="text-base font-black text-slate-900">CBT Evaluation Inventories</h2>
-                <p class="text-xs font-semibold text-brand-muted">Active evaluations configured across remote nodes</p>
+                <h3 class="font-bold text-lg text-gray-800">My CBT Question Pool</h3>
+                <p class="text-xs text-gray-500">View and aggregate drafted assessments</p>
               </div>
-              <button id="pushToUniversalBtn" disabled class="bg-slate-900 text-white rounded-xl text-xs font-bold px-4 py-2.5 hover:bg-brand-blue transition-all disabled:opacity-40 flex items-center gap-2">
-                <i class="fa fa-share-nodes"></i> Batch Push Assets to Global Question Bank
+              <button id="pushToUniversalBtn" disabled class="bg-brand-navy text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-slate-800 transition disabled:opacity-50 flex items-center gap-2">
+                <i class="fa fa-share-alt"></i> Push Selected to Global Question Bank
               </button>
             </div>
-            <div id="myCBTQuestionsList" class="overflow-x-auto rounded-xl border border-slate-100"></div>
+            <div id="myCBTQuestionsList" class="overflow-x-auto border border-gray-200 rounded-lg"></div>
           </div>
         </section>
 
-        <section id="notifications" class="view-panel space-y-6 hidden">
-          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-            <h2 class="text-base font-black text-slate-900 mb-1">Administrative Message Logs</h2>
-            <p class="text-xs font-semibold text-brand-muted mb-4">Inbound notifications from central operations core platform</p>
-            <div id="notification-list" class="divide-y divide-slate-100"></div>
+        <!-- NOTIFICATIONS PANEL -->
+        <section id="notifications" class="view-panel space-y-4 hidden">
+          <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+            <h3 class="font-bold text-lg text-gray-800 mb-1">Administrative Broadcast Logs</h3>
+            <p class="text-xs text-gray-500 mb-4">Official messages from administration team</p>
+            <div id="notification-list" class="divide-y divide-gray-100"></div>
           </div>
         </section>
 
-        <section id="settings" class="view-panel space-y-6 hidden">
-          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 max-w-xl">
-            <h2 class="text-base font-black text-slate-900 mb-1">Identity Vector Parameters</h2>
-            <p class="text-xs font-semibold text-brand-muted mb-5">Modify operational faculty directory authentication profiles</p>
+        <!-- SETTINGS PANEL -->
+        <section id="settings" class="view-panel space-y-4 hidden">
+          <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 max-w-xl">
+            <h3 class="font-bold text-lg text-gray-800 mb-1">Account Profiles</h3>
+            <p class="text-xs text-gray-500 mb-6">Manage profile info and authentication parameters</p>
             
             <form id="profile-form" class="space-y-4">
               <div>
-                <label class="text-xs font-bold text-slate-700 block mb-1">Legal Public Name Descriptor</label>
-                <input type="text" id="profile-name" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5">
+                <label class="block mb-1.5 text-xs font-bold text-gray-700">Legal Full Name</label>
+                <input type="text" id="profile-name" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 w-full">
               </div>
               <div>
-                <label class="text-xs font-bold text-slate-700 block mb-1">Official Institutional Designation</label>
-                <input type="text" id="profile-designation" required placeholder="e.g., Lead Organic Chemist" class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5">
+                <label class="block mb-1.5 text-xs font-bold text-gray-700">Official Designation</label>
+                <input type="text" id="profile-designation" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 w-full">
               </div>
               <div>
-                <label class="text-xs font-bold text-slate-700 block mb-1">Network Route Email Entity</label>
-                <input type="email" id="profile-email" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5">
+                <label class="block mb-1.5 text-xs font-bold text-gray-700">Email Address Identifier</label>
+                <input type="email" id="profile-email" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 w-full">
               </div>
               <div>
-                <label class="text-xs font-bold text-slate-700 block mb-1">Secret Key Credentials (Optional)</label>
-                <input type="password" id="profile-password" placeholder="Pass null or remain un-entered to bypass update routine" class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5">
+                <label class="block mb-1.5 text-xs font-bold text-gray-700">New Password (Leave empty to skip)</label>
+                <input type="password" id="profile-password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 w-full">
               </div>
-              <button type="submit" id="profileSaveSubmitBtn" class="bg-brand-blue text-white rounded-xl text-xs font-bold px-5 py-3 hover:bg-brand-purple transition-all flex items-center gap-2">
-                <i class="fa fa-user-gear"></i> Update Faculty Context Directory
+              <button type="submit" id="profileSaveSubmitBtn" class="bg-brand-blue text-white font-semibold text-sm px-5 py-2.5 rounded-lg hover:bg-blue-600 transition flex items-center gap-2">
+                <i class="fa fa-user-cog"></i> Save Settings Profiler
               </button>
             </form>
           </div>
@@ -387,92 +389,95 @@
     </div>
   </div>
 
-  <div id="assignmentModalBg" class="form-modal-bg fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl border border-slate-100 shadow-2xl w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
-      <button class="absolute top-4 right-4 text-slate-400 hover:text-slate-900 text-2xl font-bold transition-all" onclick="closeAssignmentModal()">&times;</button>
-      <h3 class="text-base font-black text-slate-900 mb-4 flex items-center gap-2"><i class="fa fa-pen-ruler text-brand-blue"></i> Compose Task Parameters</h3>
+  <!-- CREATE ASSIGNMENT MODAL -->
+  <div id="assignmentModalBg" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
+      <button class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold transition" onclick="closeAssignmentModal()">&times;</button>
+      <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2"><i class="fa fa-edit text-brand-blue"></i> Dispatch Assignment Matrix</h3>
       
       <form id="assignmentForm" class="space-y-4">
         <input type="hidden" id="assignment-id-edit" value="">
         <div>
-          <label class="text-xs font-bold text-slate-700 block mb-1">Target Class Assignment Group *</label>
-          <select id="assignment-class" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5"></select>
+          <label class="block mb-1 text-xs font-bold text-gray-700">Select Class Target Group *</label>
+          <select id="assignment-class" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 w-full"></select>
         </div>
         <div>
-          <label class="text-xs font-bold text-slate-700 block mb-1">Task Nomenclature Descriptor *</label>
-          <input type="text" id="assignment-title" placeholder="e.g., Alkanol Synthesis Reaction Map" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5">
+          <label class="block mb-1 text-xs font-bold text-gray-700">Assignment Title Descriptor *</label>
+          <input type="text" id="assignment-title" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 w-full">
         </div>
         <div>
-          <label class="text-xs font-bold text-slate-700 block mb-1">Subject Framework Core Scope</label>
-          <select id="assignment-subject" class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5">
-            <option value="">Select Target Taxonomy Subject Context</option>
+          <label class="block mb-1 text-xs font-bold text-gray-700">Subject Framework Taxonomy</label>
+          <select id="assignment-subject" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 w-full">
+            <option value="">Select Subject Frame</option>
           </select>
         </div>
         <div>
-          <label class="text-xs font-bold text-slate-700 block mb-1">Structural Instruction Matrix *</label>
-          <textarea id="assignment-desc" placeholder="Provide complete instruction metrics..." required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5 h-24 resize-none"></textarea>
+          <label class="block mb-1 text-xs font-bold text-gray-700">Instruction/Description Parameters *</label>
+          <textarea id="assignment-desc" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 w-full h-24 resize-none"></textarea>
         </div>
         <div>
-          <label class="text-xs font-bold text-slate-700 block mb-1">Closing Submission Due Date *</label>
-          <input type="date" id="assignment-due" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5">
+          <label class="block mb-1 text-xs font-bold text-gray-700">Due Date Timeline Boundary *</label>
+          <input type="date" id="assignment-due" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 w-full">
         </div>
         <div class="flex justify-end gap-2 pt-2">
-          <button type="button" class="bg-slate-100 text-slate-700 text-xs font-bold px-4 py-2 rounded-xl" onclick="closeAssignmentModal()">Dismiss</button>
-          <button type="submit" id="assignmentSubmitButton" class="bg-brand-blue text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-brand-purple transition-all">Commit Task Object</button>
+          <button type="button" class="bg-gray-100 text-gray-700 text-sm font-semibold px-4 py-2 rounded-lg" onclick="closeAssignmentModal()">Dismiss</button>
+          <button type="submit" id="assignmentSubmitButton" class="bg-brand-blue text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-blue-600 transition">Save Assignment Block</button>
         </div>
       </form>
     </div>
   </div>
 
-  <div id="gradebookUploadModalBg" class="form-modal-bg fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl border border-slate-100 shadow-2xl w-full max-w-md p-6 relative">
-      <button class="absolute top-4 right-4 text-slate-400 hover:text-slate-900 text-2xl font-bold transition-all" onclick="window.closeGradebookUploadModal()">&times;</button>
-      <h3 class="text-base font-black text-slate-900 mb-4 flex items-center gap-2"><i class="fa fa-cloud-arrow-up text-brand-blue"></i> Structural Manifest Upload Pipeline</h3>
+  <!-- GRADEBOOK UPLOAD TERMINAL MODAL -->
+  <div id="gradebookUploadModalBg" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 relative">
+      <button class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold transition" onclick="window.closeGradebookUploadModal()">&times;</button>
+      <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2"><i class="fa fa-cloud-upload text-brand-blue"></i> Upload Results Terminal Matrix</h3>
       
       <form id="gradebookUploadForm" class="space-y-4" onsubmit="event.preventDefault(); window.submitGradebookResults();">
         <div>
-          <label class="text-xs font-bold text-slate-700 block mb-1">Academic Session Cycle Node</label>
-          <select id="gb-session-select" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5 w-full">
-            <option value="">Select Active Session</option>
-            <option value="2027-2028">2027–2028 Academic Run</option>
-            <option value="2026-2027">2026–2027 Academic Run</option>
-            <option value="2025-2026">2025–2026 Academic Run</option>
+          <label class="block mb-1 text-xs font-bold text-gray-700">Academic Session Cycle</label>
+          <select id="gb-session-select" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 w-full">
+            <option value="">Select Academic Session</option>
+            <option value="2027-2028">2027–2028 Session</option>
+            <option value="2026-2027">2026–2027 Session</option>
+            <option value="2025-2026">2025–2026 Session</option>
           </select>
         </div>
         <div>
-          <label class="text-xs font-bold text-slate-700 block mb-1">Operational Term Pointer</label>
-          <select id="gb-term-select" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5 w-full">
-            <option value="">Select Run Term Pointer</option>
-            <option value="FIRST TERM">FIRST TERM LOGISTIC</option>
-            <option value="SECOND TERM">SECOND TERM LOGISTIC</option>
-            <option value="THIRD TERM">THIRD TERM LOGISTIC</option>
+          <label class="block mb-1 text-xs font-bold text-gray-700">Operational Term Axis Pointer</label>
+          <select id="gb-term-select" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 w-full">
+            <option value="">Select Target Term Pointer</option>
+            <option value="FIRST TERM">FIRST TERM</option>
+            <option value="SECOND TERM">SECOND TERM</option>
+            <option value="THIRD TERM">THIRD TERM</option>
           </select>
         </div>
         <div>
-          <label class="text-xs font-bold text-slate-700 block mb-1">Continuous Evaluation Type Metric</label>
-          <select id="gb-result-type-select" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5 w-full">
-            <option value="">Select Structural Evaluation Type</option>
-            <option value="exam">Examination Assessment Module</option>
-            <option value="ca1">Continuous Assessment Registry Block 1</option>
-            <option value="ca2">Continuous Assessment Registry Block 2</option>
+          <label class="block mb-1 text-xs font-bold text-gray-700">Continuous Assessment Module Block Type</label>
+          <select id="gb-result-type-select" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 w-full">
+            <option value="">Select Result Block Array Type</option>
+            <option value="exam">Examination Assessment</option>
+            <option value="ca1">Continuous Assessment Block 1 (CA1)</option>
+            <option value="ca2">Continuous Assessment Block 2 (CA2)</option>
           </select>
         </div>
         <div class="flex justify-end gap-2 pt-2">
-          <button type="button" class="bg-slate-100 text-slate-700 text-xs font-bold px-4 py-2 rounded-xl" onclick="window.closeGradebookUploadModal()">Cancel</button>
-          <button type="submit" id="gradebookUploadSubmitBtn" class="bg-brand-blue text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-brand-purple transition-all">Pipeline Data Packages</button>
+          <button type="button" class="bg-gray-100 text-gray-700 text-sm font-semibold px-4 py-2 rounded-lg" onclick="window.closeGradebookUploadModal()">Cancel</button>
+          <button type="submit" id="gradebookUploadSubmitBtn" class="bg-brand-blue text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-blue-600 transition">Commit Manifest Dataset</button>
         </div>
       </form>
     </div>
   </div>
 
+  <!-- RUNTIME CONTROLLER AND ASYNCHRONOUS EXECUTOR -->
   <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
   <script>
     (function () {
-      // ============ PRODUCTION LIVE CONFIGURATION CONFIGS ============
+      // LIVE BACKEND BASE API HOOK CONFIGURATIONS
       const API_BASE_URL = "https://goldlincschools.onrender.com";
       const token = localStorage.getItem('teacherToken') || localStorage.getItem('token') || "";
 
-      // ============ CACHE STORAGE HOOK REGISTRIES ============
+      // STATE CACHE MATRICES STORAGE REGISTRIES
       let teacher = null;
       let studentsByClass = {};
       let subjectsByClass = {};
@@ -483,26 +488,21 @@
       let cbtQuestions = [];
       let selectedCBTIds = [];
       let cbtDraftKey = 'cbtDraft_current';
-      let selectedClassId = null;
 
-      // ============ LAZY LOADER HOOK OPERATIONS ============
+      // SCREEN OVERLAY SPINNER LIFECYCLE MANAGEMENT HOOKS
       const pageLoader = document.getElementById('pageLoader');
       const loaderMsg = document.getElementById('loaderMsg');
-      const loaderSub = document.getElementById('loaderSub');
 
-      function showLoader(msg, sub) {
+      function showLoader(msg) {
         if (msg) loaderMsg.textContent = msg;
-        if (sub) loaderSub.textContent = sub;
         pageLoader.classList.add('active');
-        pageLoader.setAttribute('aria-hidden', 'false');
       }
 
       function hideLoader() {
         pageLoader.classList.remove('active');
-        pageLoader.setAttribute('aria-hidden', 'true');
       }
 
-      // ============ BUTTON BUTTON INTERACTION CONTEXT SPINNER CONTROL ============
+      // SUBMIT/ACTION BUTTON SPIN-LOCK HOOK FOR SEAMLESS USER CONTEXT
       function toggleButtonLoading(btnEl, isLoading) {
         if (!btnEl) return;
         if (isLoading) {
@@ -525,8 +525,8 @@
         try {
           await asyncCallback();
         } catch (err) {
-          console.error(`Production pipeline context fault tracked on element: ${buttonId}`, err);
-          alert("A downstream system operation returned an processing network error code.");
+          console.error(`Downstream communication transaction failed on node segment: ${buttonId}`, err);
+          alert("A structural transmission operation returned an unexpected execution fault code.");
         } finally {
           toggleButtonLoading(btn, false);
         }
@@ -536,7 +536,7 @@
         return token ? { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token } : { 'Content-Type': 'application/json' };
       }
 
-      // ============ PRODUCTION CORE REST ENDPOINT LAYERS ============
+      // DATA FETCH PIPELINES FOR API CONTEXT
       async function fetchTeacherProfile() {
         try {
           const res = await fetch(`${API_BASE_URL}/api/teachers/me`, { headers: authHeaders() });
@@ -598,62 +598,58 @@
         } catch { return []; }
       }
 
-      // ============ UI RE-RENDER AND SYNCHRONIZATION BINDINGS ============
+      // SYNCHRONIZATION AND LAYOUT RE-RENDERS
       function syncDashboardUI(data) {
-        // Hydrate Core Identity Vectors
         document.getElementById('teacherName').textContent = data.teacher.name || "Faculty Member";
-        document.getElementById('teacherDept').textContent = data.teacher.designation || "Department Academic Core";
+        document.getElementById('teacherDept').textContent = data.teacher.designation || "Academic Department";
         
-        // Stats Matrices Data Remapping
+        // Populate system global overview statistics matrices
         document.getElementById('statClasses').textContent = data.classes.length;
-        let runningCount = 0;
-        for (const cid in data.studentsByClass) { runningCount += data.studentsByClass[cid].length; }
-        document.getElementById('statStudents').textContent = runningCount;
-        document.getElementById('statPending').textContent = data.assignments.reduce((acc, curr) => acc + (curr.pendingCount || 0), 0);
+        let totalScholars = 0;
+        for (const cid in data.studentsByClass) { totalScholars += data.studentsByClass[cid].length; }
+        document.getElementById('statStudents').textContent = totalScholars;
+        document.getElementById('statPending').textContent = data.assignments.reduce((acc, c) => acc + (c.pendingCount || 0), 0);
 
-        // Core UI Lists Builders
         const listContainer = document.getElementById('class-list');
         listContainer.innerHTML = '';
         
-        const classSelects = ['classSelect', 'attendance-class', 'assignment-filter-class', 'gradebook-class', 'cbt-class-select', 'assignment-class'];
-        classSelects.forEach(id => {
-          const selectEl = document.getElementById(id);
-          if (selectEl) {
-            selectEl.innerHTML = id === 'assignment-filter-class' ? '<option value="">All Viewport Classes</option>' : '';
+        const targetSelectors = ['classSelect', 'attendance-class', 'assignment-filter-class', 'gradebook-class', 'cbt-class-select', 'assignment-class'];
+        targetSelectors.forEach(id => {
+          const select = document.getElementById(id);
+          if (select) {
+            select.innerHTML = id === 'assignment-filter-class' ? '<option value="">All Viewport Classes</option>' : '';
           }
         });
 
         if (data.classes.length === 0) {
-          listContainer.innerHTML = `<div class="col-span-full border-2 border-dashed border-slate-200 p-8 rounded-xl text-center text-xs font-bold text-brand-muted">No operational class boundaries assigned to this faculty context.</div>`;
+          listContainer.innerHTML = `<div class="col-span-full border border-dashed p-6 rounded-xl text-center text-sm font-semibold text-gray-400">No operational class structures bound to profile context.</div>`;
           return;
         }
 
         data.classes.forEach(cls => {
-          // Cards Population
-          const card = document.createElement('div');
-          card.className = "p-4 border border-slate-200/60 bg-slate-50/50 hover:bg-slate-50 rounded-xl transition-all flex justify-between items-center";
-          card.innerHTML = `
+          const item = document.createElement('div');
+          item.className = "bg-white p-4 border border-gray-200 rounded-xl shadow-sm flex items-center justify-between";
+          item.innerHTML = `
             <div>
-              <div class="font-extrabold text-sm text-slate-900">${cls.name}</div>
-              <div class="text-xs text-brand-muted font-bold mt-0.5">${data.studentsByClass[cls.id]?.length || 0} Registered Scholars</div>
+              <p class="font-bold text-gray-800 text-sm">${cls.name}</p>
+              <p class="text-xs text-gray-500 mt-0.5">${data.studentsByClass[cls.id]?.length || 0} Registered Students</p>
             </div>
-            <i class="fa fa-angle-right text-slate-400"></i>
+            <i class="fa fa-chevron-right text-gray-300 text-sm"></i>
           `;
-          listContainer.appendChild(card);
+          listContainer.appendChild(item);
 
-          // Select Filters Population
-          classSelects.forEach(id => {
-            const selectEl = document.getElementById(id);
-            if (selectEl) {
+          targetSelectors.forEach(id => {
+            const select = document.getElementById(id);
+            if (select) {
               const opt = document.createElement('option');
               opt.value = cls.id;
               opt.textContent = cls.name;
-              selectEl.appendChild(opt);
+              select.appendChild(opt);
             }
           });
         });
 
-        // Trigger dynamic sub-list updates for the default chosen options
+        // Trigger cascade re-renders for core defaults
         renderRosterTable(document.getElementById('classSelect').value);
         renderAssignmentList(document.getElementById('assignment-filter-class').value);
         renderGradebookMatrix(document.getElementById('gradebook-class').value);
@@ -667,32 +663,32 @@
         tbody.innerHTML = '';
         const roster = studentsByClass[classId] || [];
         if (roster.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-xs font-bold text-brand-muted">No student accounts found matching this operational boundary matrix.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-sm font-semibold text-gray-400">No student directory records map to this environment parameter boundary.</td></tr>`;
           return;
         }
         roster.forEach((student, idx) => {
           const row = document.createElement('tr');
-          row.className = "border-b border-slate-100 hover:bg-slate-50/40 text-xs font-bold text-slate-700";
+          row.className = "bg-white border-b hover:bg-gray-50 text-xs";
           row.innerHTML = `
-            <td class="p-3 text-brand-muted">${idx + 1}</td>
-            <td class="p-3 text-slate-900">${student.firstname || ''} ${student.surname || ''}</td>
-            <td class="p-3"><span class="bg-slate-100 px-2 py-1 rounded text-slate-600 font-mono">${student.code || student.regNo || '—'}</span></td>
-            <td class="p-3 text-brand-blue font-medium">${student.email || '—'}</td>
+            <td class="px-6 py-4 font-semibold text-gray-500">${idx + 1}</td>
+            <td class="px-6 py-4 font-bold text-gray-900">${student.firstname || ''} ${student.surname || ''}</td>
+            <td class="px-6 py-4"><span class="bg-gray-100 text-gray-700 font-mono px-2 py-0.5 rounded">${student.code || student.regNo || '—'}</span></td>
+            <td class="px-6 py-4 text-brand-blue font-medium">${student.email || '—'}</td>
           `;
           tbody.appendChild(row);
         });
       }
 
       async function renderAttendanceRoster(classId, dateStr) {
-        const container = document.getElementById('attendance-form');
+        const form = document.getElementById('attendance-form');
         const tbody = document.getElementById('attendance-students');
         tbody.innerHTML = '';
         attendanceRecords = [];
         const roster = studentsByClass[classId] || [];
 
         if (roster.length === 0) {
-          container.classList.add('hidden');
-          alert("Cannot populate verification rosters—current operational layer contains 0 accounts.");
+          form.classList.add('hidden');
+          alert("Roster building operation cancelled: Target directory data pool is empty.");
           return;
         }
 
@@ -701,32 +697,31 @@
           attendanceRecords.push({ studentId: recId, date: dateStr, status: "Present" });
 
           const row = document.createElement('tr');
-          row.className = "border-b border-slate-100 hover:bg-slate-50/40 text-xs text-slate-800";
+          row.className = "bg-white border-b text-xs";
           row.innerHTML = `
-            <td class="p-3 font-bold">${student.firstname || ''} ${student.surname || ''}</td>
-            <td class="p-3 text-center">
-              <input type="radio" name="att-${recId}" value="Present" checked class="w-4 h-4 text-brand-blue focus:ring-brand-blue border-slate-300">
+            <td class="px-6 py-4 font-bold text-gray-900">${student.firstname || ''} ${student.surname || ''}</td>
+            <td class="px-6 py-4 text-center">
+              <input type="radio" name="att-${recId}" value="Present" checked class="w-4 h-4 text-brand-blue focus:ring-brand-blue border-gray-300">
             </td>
-            <td class="p-3 text-center">
-              <input type="radio" name="att-${recId}" value="Absent" class="w-4 h-4 text-red-600 focus:ring-red-500 border-slate-300">
+            <td class="px-6 py-4 text-center">
+              <input type="radio" name="att-${recId}" value="Absent" class="w-4 h-4 text-red-600 focus:ring-red-500 border-gray-300">
             </td>
-            <td class="p-3 text-center">
-              <input type="radio" name="att-${recId}" value="Excused" class="w-4 h-4 text-amber-500 focus:ring-amber-500 border-slate-300">
+            <td class="px-6 py-4 text-center">
+              <input type="radio" name="att-${recId}" value="Excused" class="w-4 h-4 text-yellow-500 focus:ring-yellow-400 border-gray-300">
             </td>
           `;
           
-          // Wire live variable mutations to option array updates
           row.querySelectorAll(`input[name="att-${recId}"]`).forEach(radio => {
             radio.addEventListener('change', (e) => {
-              const matched = attendanceRecords.find(r => r.studentId === recId);
-              if (matched) matched.status = e.target.value;
+              const match = attendanceRecords.find(r => r.studentId === recId);
+              if (match) match.status = e.target.value;
             });
           });
 
           tbody.appendChild(row);
         });
 
-        container.classList.remove('hidden');
+        form.classList.remove('hidden');
       }
 
       function renderAssignmentList(filterClassId) {
@@ -735,27 +730,27 @@
         const filtered = filterClassId ? assignments.filter(a => a.classId === filterClassId) : assignments;
 
         if (filtered.length === 0) {
-          container.innerHTML = `<div class="col-span-full border-2 border-dashed border-slate-200 p-8 rounded-2xl text-center text-xs font-bold text-brand-muted">No assignments dispatched to target classes.</div>`;
+          container.innerHTML = `<div class="col-span-full border border-dashed border-gray-200 p-6 rounded-xl text-center text-sm font-semibold text-gray-400">No dispatch assignment configurations available in the scope index.</div>`;
           return;
         }
 
         filtered.forEach(assign => {
-          const card = document.createElement('div');
-          card.className = "bg-slate-50 border border-slate-200/80 p-5 rounded-2xl flex flex-col justify-between hover:border-slate-300 transition-all";
-          card.innerHTML = `
+          const element = document.createElement('div');
+          element.className = "bg-white border border-gray-200 p-5 rounded-xl shadow-sm flex flex-col justify-between";
+          element.innerHTML = `
             <div>
               <div class="flex justify-between items-start gap-2">
-                <h4 class="font-black text-sm text-slate-900">${assign.title}</h4>
-                <span class="bg-brand-blue/10 text-brand-blue font-extrabold text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full">${assign.className || 'Core Boundary'}</span>
+                <h4 class="font-bold text-gray-900 text-sm">${assign.title}</h4>
+                <span class="bg-blue-50 text-brand-blue font-bold text-[10px] px-2 py-0.5 rounded-full uppercase">${assign.className || 'Class Group'}</span>
               </div>
-              <p class="text-xs text-slate-600 font-medium mt-2 line-clamp-3">${assign.description || ''}</p>
+              <p class="text-xs text-gray-600 font-medium mt-2 line-clamp-3">${assign.description || ''}</p>
             </div>
-            <div class="border-t border-slate-200/60 pt-3 mt-4 flex justify-between items-center text-xs font-bold text-brand-muted">
-              <span><i class="fa fa-calendar-clock mr-1"></i> Due: ${assign.dueDate ? new Date(assign.dueDate).toLocaleDateString() : '—'}</span>
-              <span class="text-brand-purple"><i class="fa fa-inbox-in mr-1"></i> ${assign.pendingCount || 0} Awaiting Audit</span>
+            <div class="border-t border-gray-100 pt-3 mt-4 flex justify-between items-center text-xs font-semibold text-gray-400">
+              <span><i class="fa fa-calendar mr-1"></i> Due: ${assign.dueDate ? new Date(assign.dueDate).toLocaleDateString() : '—'}</span>
+              <span class="text-brand-purple"><i class="fa fa-inbox mr-1"></i> ${assign.pendingCount || 0} Submissions Pending Audit</span>
             </div>
           `;
-          container.appendChild(card);
+          container.appendChild(element);
         });
       }
 
@@ -765,66 +760,65 @@
         const roster = studentsByClass[classId] || [];
 
         if (roster.length === 0) {
-          container.innerHTML = `<div class="border-2 border-dashed border-slate-200 p-8 rounded-2xl text-center text-xs font-bold text-brand-muted">Select an operational class track containing valid account datasets to build matrix matrices.</div>`;
+          container.innerHTML = `<div class="border border-dashed border-gray-200 p-6 rounded-xl text-center text-sm font-semibold text-gray-400">Please choose a valid active class boundaries path from filter criteria selectors.</div>`;
           return;
         }
 
-        let html = `
-          <table class="w-full text-left text-sm">
-            <thead>
-              <tr class="bg-slate-50 text-xs font-bold text-brand-muted uppercase border-b border-slate-200">
-                <th class="p-3">Student Identity</th>
-                <th class="p-3 text-center">CA 1 Max (20)</th>
-                <th class="p-3 text-center">CA 2 Max (20)</th>
-                <th class="p-3 text-center">Exam Bound Max (60)</th>
-                <th class="p-3 text-center">Calculated Composite</th>
+        let matrixHtml = `
+          <table class="w-full text-sm text-left text-gray-500">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th scope="col" class="px-6 py-3">Student Name</th>
+                <th scope="col" class="px-6 py-3 text-center">CA 1 Max (20)</th>
+                <th scope="col" class="px-6 py-3 text-center">CA 2 Max (20)</th>
+                <th scope="col" class="px-6 py-3 text-center">Exam Boundary Max (60)</th>
+                <th scope="col" class="px-6 py-3 text-center">Composite Sum Total</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 font-bold text-slate-700">
+            <tbody class="divide-y divide-gray-200 font-semibold text-gray-900">
         `;
 
         roster.forEach(student => {
-          html += `
-            <tr data-student-id="${student.id || student._id}" class="hover:bg-slate-50/40 text-xs">
-              <td class="p-3 text-slate-900 font-extrabold">${student.firstname || ''} ${student.surname || ''}</td>
-              <td class="p-2"><input type="number" min="0" max="20" placeholder="0" class="ca1-input w-20 text-center bg-white border border-slate-200 rounded-lg p-1.5 focus:ring-1 focus:ring-brand-blue mx-auto block"></td>
-              <td class="p-2"><input type="number" min="0" max="20" placeholder="0" class="ca2-input w-20 text-center bg-white border border-slate-200 rounded-lg p-1.5 focus:ring-1 focus:ring-brand-blue mx-auto block"></td>
-              <td class="p-2"><input type="number" min="0" max="60" placeholder="0" class="exam-input w-25 text-center bg-white border border-slate-200 rounded-lg p-1.5 focus:ring-1 focus:ring-brand-blue mx-auto block"></td>
-              <td class="p-3 text-center text-sm font-black text-brand-blue"><span class="total-span">0</span></td>
+          matrixHtml += `
+            <tr data-student-id="${student.id || student._id}" class="bg-white hover:bg-gray-50/50 text-xs">
+              <td class="px-6 py-4 font-bold text-gray-900">${student.firstname || ''} ${student.surname || ''}</td>
+              <td class="px-4 py-2"><input type="number" min="0" max="20" placeholder="0" class="ca1-input w-20 text-center bg-gray-50 border border-gray-200 rounded p-1 mx-auto block focus:ring-1 focus:ring-brand-blue"></td>
+              <td class="px-4 py-2"><input type="number" min="0" max="20" placeholder="0" class="ca2-input w-20 text-center bg-gray-50 border border-gray-200 rounded p-1 mx-auto block focus:ring-1 focus:ring-brand-blue"></td>
+              <td class="px-4 py-2"><input type="number" min="0" max="60" placeholder="0" class="exam-input w-24 text-center bg-gray-50 border border-gray-200 rounded p-1 mx-auto block focus:ring-1 focus:ring-brand-blue"></td>
+              <td class="px-6 py-4 text-center text-sm font-bold text-brand-blue"><span class="total-span">0</span></td>
             </tr>
           `;
         });
 
-        html += `</tbody></table>`;
-        container.innerHTML = html;
+        matrixHtml += `</tbody></table>`;
+        container.innerHTML = matrixHtml;
 
-        // Auto-calculating operational listener vectors
         container.querySelectorAll('tbody tr').forEach(row => {
-          const inputs = row.querySelectorAll('input');
-          const totalSpan = row.querySelector('.total-span');
-          inputs.forEach(input => {
-            input.addEventListener('input', () => {
-              const ca1 = parseInt(row.querySelector('.ca1-input').value) || 0;
-              const ca2 = parseInt(row.querySelector('.ca2-input').value) || 0;
-              const exam = parseInt(row.querySelector('.exam-input').value) || 0;
-              totalSpan.textContent = ca1 + ca2 + exam;
+          const fields = row.querySelectorAll('input');
+          const outputSpan = row.querySelector('.total-span');
+          fields.forEach(f => {
+            f.addEventListener('input', () => {
+              const val1 = parseInt(row.querySelector('.ca1-input').value) || 0;
+              const val2 = parseInt(row.querySelector('.ca2-input').value) || 0;
+              const val3 = parseInt(row.querySelector('.exam-input').value) || 0;
+              outputSpan.textContent = val1 + val2 + val3;
             });
           });
         });
       }
 
       function populateSubjectDropdowns(classId) {
-        const subjects = subjectsByClass[classId] || [];
-        const targets = ['cbt-subject-select', 'assignment-subject'];
-        targets.forEach(id => {
+        const contextSubjects = subjectsByClass[classId] || [];
+        const targetedDropdowns = ['cbt-subject-select', 'assignment-subject'];
+        targetedDropdowns.forEach(id => {
           const select = document.getElementById(id);
           if (select) {
-            select.innerHTML = id === 'assignment-subject' ? '<option value="">Select Subject Context Frame</option>' : '';
-            subjects.forEach(sub => {
-              const opt = document.createElement('option');
-              opt.value = sub.id || sub._id;
-              opt.textContent = sub.name;
-              select.appendChild(opt);
+            select.innerHTML = id === 'assignment-subject' ? '<option value="">Select Subject Frame</option>' : '';
+            contextSubjects.forEach(s => {
+              const option = document.createElement('option');
+              option.value = s.id || s._id;
+              option.textContent = s.name;
+              select.appendChild(option);
             });
           }
         });
@@ -835,43 +829,43 @@
         container.innerHTML = '';
 
         if (myUploadedCBTs.length === 0) {
-          container.innerHTML = `<div class="border-2 border-dashed border-slate-200 p-8 rounded-2xl text-center text-xs font-bold text-brand-muted">No computer-based assessments committed to repository architecture.</div>`;
+          container.innerHTML = `<div class="border border-dashed border-gray-200 p-6 rounded-xl text-center text-sm font-semibold text-gray-400">Computer based evaluations ledger matrix returns blank context values.</div>`;
           document.getElementById('pushToUniversalBtn').disabled = true;
           return;
         }
 
-        let html = `
-          <table class="w-full text-left text-sm">
-            <thead>
-              <tr class="bg-slate-50 text-xs font-bold text-brand-muted border-b border-slate-200">
-                <th class="p-3 text-center w-12">Select</th>
-                <th class="p-3">Assessment Title</th>
-                <th class="p-3">Track Context</th>
-                <th class="p-3">Runtime Quantizer</th>
-                <th class="p-3 text-center">Structure Size</th>
+        let innerCode = `
+          <table class="w-full text-sm text-left text-gray-500">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-center w-12">Select</th>
+                <th scope="col" class="px-6 py-3">Assessment Title</th>
+                <th scope="col" class="px-6 py-3">Track Framework</th>
+                <th scope="col" class="px-6 py-3">Running Duration</th>
+                <th scope="col" class="px-6 py-3 text-center">Structure Size</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 font-bold text-slate-700 text-xs">
+            <tbody class="divide-y divide-gray-200 text-gray-900 font-semibold text-xs">
         `;
 
-        myUploadedCBTs.forEach(cbt => {
-          html += `
-            <tr class="hover:bg-slate-50/40">
-              <td class="p-3 text-center"><input type="checkbox" value="${cbt.id || cbt._id}" class="cbt-select-box w-4 h-4 rounded text-brand-blue focus:ring-brand-blue border-slate-300"></td>
-              <td class="p-3 text-slate-900 font-extrabold">${cbt.title}</td>
-              <td class="p-3"><span class="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md font-semibold">${cbt.className || 'Dispatched Track'}</span></td>
-              <td class="p-3 text-brand-muted"><i class="fa fa-clock mr-1"></i> ${cbt.duration || 0} Minutes</td>
-              <td class="p-3 text-center text-brand-purple font-black">${cbt.questions?.length || 0} Qs</td>
+        myUploadedCBTs.forEach(item => {
+          innerCode += `
+            <tr class="bg-white hover:bg-gray-50/50">
+              <td class="px-6 py-4 text-center"><input type="checkbox" value="${item.id || item._id}" class="cbt-select-box w-4 h-4 rounded text-brand-blue focus:ring-brand-blue border-gray-300"></td>
+              <td class="px-6 py-4 font-bold text-gray-900">${item.title}</td>
+              <td class="px-6 py-4"><span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-[11px]">${item.className || 'Academic Course Tracker'}</span></td>
+              <td class="px-6 py-4 text-gray-500"><i class="fa fa-clock mr-1"></i> ${item.duration || 0} Mins</td>
+              <td class="px-6 py-4 text-center text-brand-purple font-bold">${item.questions?.length || 0} Questions Matrix</td>
             </tr>
           `;
         });
 
-        html += `</tbody></table>`;
-        container.innerHTML = html;
+        innerCode += `</tbody></table>`;
+        container.innerHTML = innerCode;
 
         container.querySelectorAll('.cbt-select-box').forEach(box => {
           box.addEventListener('change', () => {
-            selectedCBTIds = Array.from(container.querySelectorAll('.cbt-select-box:checked')).map(b => b.value);
+            selectedCBTIds = Array.from(container.querySelectorAll('.cbt-select-box:checked')).map(cb => cb.value);
             document.getElementById('pushToUniversalBtn').disabled = selectedCBTIds.length === 0;
           });
         });
@@ -882,157 +876,157 @@
         container.innerHTML = '';
 
         if (notifications.length === 0) {
-          container.innerHTML = `<div class="border-2 border-dashed border-slate-200 p-8 rounded-2xl text-center text-xs font-bold text-brand-muted">Broadcast array returns empty context profiles.</div>`;
+          container.innerHTML = `<div class="border border-dashed border-gray-200 p-6 rounded-xl text-center text-sm font-semibold text-gray-400">Broadcast notification indexes return clean states.</div>`;
           return;
         }
 
         notifications.forEach(notif => {
-          const item = document.createElement('div');
-          item.className = "py-4 flex gap-4 items-start font-medium text-slate-700 text-xs";
-          item.innerHTML = `
-            <div class="bg-slate-100 p-2 rounded-xl text-brand-blue mt-0.5"><i class="fa fa-circle-exclamation text-sm"></i></div>
+          const row = document.createElement('div');
+          row.className = "py-4 flex gap-3 items-start text-xs font-semibold text-gray-700";
+          row.innerHTML = `
+            <div class="bg-blue-50 text-brand-blue p-2 rounded-lg mt-0.5"><i class="fa fa-exclamation-circle text-sm"></i></div>
             <div>
-              <div class="text-slate-900 font-extrabold text-sm">${notif.title || 'System Broadcast Alert'}</div>
-              <p class="text-slate-600 mt-1 font-semibold leading-relaxed">${notif.message || ''}</p>
-              <div class="text-[10px] text-brand-muted font-bold mt-2"><i class="fa fa-clock mr-1"></i> ${notif.createdAt ? new Date(notif.createdAt).toLocaleString() : 'Processing Timeframe'}</div>
+              <h5 class="text-gray-900 font-bold text-sm">${notif.title || 'Official Management Update'}</h5>
+              <p class="text-gray-600 mt-1 font-medium leading-relaxed">${notif.message || ''}</p>
+              <div class="text-[10px] text-gray-400 font-bold mt-2"><i class="fa fa-clock-o mr-1"></i> ${notif.createdAt ? new Date(notif.createdAt).toLocaleString() : 'System Timestamp'}</div>
             </div>
           `;
-          container.appendChild(item);
+          container.appendChild(row);
         });
       }
 
-      // ============ CBT INLINE STRUCTURAL ARRAY MUTATION CONTROLLERS ============
+      // INLINE CBT QUESTIONS NODE STRUCTURAL MANAGER ARRAYS
       function appendNewCBTQuestionBlock() {
         const container = document.getElementById('cbt-questions-list');
-        const qIndex = container.children.length;
+        const count = container.children.length;
         
-        const block = document.createElement('div');
-        block.className = "bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-3 relative q-block-node";
-        block.innerHTML = `
-          <button type="button" class="absolute top-3 right-3 text-red-500 font-bold hover:text-red-700 remove-q-btn text-base">&times;</button>
-          <div class="text-xs font-black text-brand-purple uppercase tracking-wider">Question Node Element Layer #${qIndex + 1}</div>
+        const node = document.createElement('div');
+        node.className = "bg-gray-50 border border-gray-200 p-4 rounded-lg space-y-3 relative q-block-node";
+        node.innerHTML = `
+          <button type="button" class="absolute top-2 right-2 text-red-500 font-bold hover:text-red-700 remove-q-btn text-xl">&times;</button>
+          <div class="text-xs font-bold text-brand-purple uppercase tracking-wider">Question Node Structural Element #${count + 1}</div>
           
           <div>
-            <label class="text-xs font-bold text-slate-700 block mb-1">Query Body Content Text</label>
-            <input type="text" placeholder="Enter objective evaluation prompt string" required class="q-prompt border-slate-200 text-xs font-semibold rounded-xl">
+            <label class="block mb-1 text-xs font-bold text-gray-700">Question Text String Mapping</label>
+            <input type="text" placeholder="Objective inquiry string parameters" required class="q-prompt bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 w-full">
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label class="text-xs font-bold text-slate-600 block mb-0.5">Option Alternative A</label>
-              <input type="text" required class="q-opt-A border-slate-200 text-xs font-medium rounded-lg p-2 bg-white">
+              <label class="block text-xs font-semibold text-gray-600 mb-1">Option Variable Alternative A</label>
+              <input type="text" required class="q-opt-A bg-white border border-gray-300 text-gray-900 text-xs rounded p-2 w-full">
             </div>
             <div>
-              <label class="text-xs font-bold text-slate-600 block mb-0.5">Option Alternative B</label>
-              <input type="text" required class="q-opt-B border-slate-200 text-xs font-medium rounded-lg p-2 bg-white">
+              <label class="block text-xs font-semibold text-gray-600 mb-1">Option Variable Alternative B</label>
+              <input type="text" required class="q-opt-B bg-white border border-gray-300 text-gray-900 text-xs rounded p-2 w-full">
             </div>
             <div>
-              <label class="text-xs font-bold text-slate-600 block mb-0.5">Option Alternative C</label>
-              <input type="text" required class="q-opt-C border-slate-200 text-xs font-medium rounded-lg p-2 bg-white">
+              <label class="block text-xs font-semibold text-gray-600 mb-1">Option Variable Alternative C</label>
+              <input type="text" required class="q-opt-C bg-white border border-gray-300 text-gray-900 text-xs rounded p-2 w-full">
             </div>
             <div>
-              <label class="text-xs font-bold text-slate-600 block mb-0.5">Option Alternative D</label>
-              <input type="text" required class="q-opt-D border-slate-200 text-xs font-medium rounded-lg p-2 bg-white">
+              <label class="block text-xs font-semibold text-gray-600 mb-1">Option Variable Alternative D</label>
+              <input type="text" required class="q-opt-D bg-white border border-gray-300 text-gray-900 text-xs rounded p-2 w-full">
             </div>
           </div>
 
-          <div class="w-1/2">
-            <label class="text-xs font-bold text-slate-700 block mb-1">Authoritative Key Mapping Anchor</label>
-            <select class="q-correct border-slate-200 text-xs font-bold rounded-xl bg-white p-2">
-              <option value="A">Alternative Option A Key</option>
-              <option value="B">Alternative Option B Key</option>
-              <option value="C">Alternative Option C Key</option>
-              <option value="D">Alternative Option D Key</option>
+          <div class="w-full sm:w-1/3">
+            <label class="block mb-1 text-xs font-bold text-gray-700">Correct Alternative Anchor Key</label>
+            <select class="q-correct bg-white border border-gray-300 text-gray-900 text-xs font-bold rounded p-2 w-full">
+              <option value="A">Option Variable Alternative A</option>
+              <option value="B">Option Variable Alternative B</option>
+              <option value="C">Option Variable Alternative C</option>
+              <option value="D">Option Variable Alternative D</option>
             </select>
           </div>
         `;
 
-        block.querySelector('.remove-q-btn').addEventListener('click', () => {
-          block.remove();
+        node.querySelector('.remove-q-btn').addEventListener('click', () => {
+          node.remove();
           reindexCBTQuestionBlocks();
           saveCBTDraftToLocalStorage();
         });
 
-        block.querySelectorAll('input, select').forEach(el => el.addEventListener('input', saveCBTDraftToLocalStorage));
+        node.querySelectorAll('input, select').forEach(item => item.addEventListener('input', saveCBTDraftToLocalStorage));
 
-        container.appendChild(block);
+        container.appendChild(node);
         saveCBTDraftToLocalStorage();
       }
 
       function reindexCBTQuestionBlocks() {
-        const blocks = document.querySelectorAll('.q-block-node');
-        blocks.forEach((b, idx) => {
-          b.querySelector('.text-brand-purple').textContent = `Question Node Element Layer #${idx + 1}`;
+        const components = document.querySelectorAll('.q-block-node');
+        components.forEach((element, i) => {
+          element.querySelector('.text-brand-purple').textContent = `Question Node Structural Element #${i + 1}`;
         });
       }
 
       function parseCBTQuestionsPayload() {
-        const blocks = document.querySelectorAll('.q-block-node');
-        const list = [];
-        blocks.forEach(b => {
-          list.push({
-            question: b.querySelector('.q-prompt').value,
+        const structuralNodes = document.querySelectorAll('.q-block-node');
+        const outList = [];
+        structuralNodes.forEach(node => {
+          outList.push({
+            question: node.querySelector('.q-prompt').value,
             options: [
-              b.querySelector('.q-opt-A').value,
-              b.querySelector('.q-opt-B').value,
-              b.querySelector('.q-opt-C').value,
-              b.querySelector('.q-opt-D').value
+              node.querySelector('.q-opt-A').value,
+              node.querySelector('.q-opt-B').value,
+              node.querySelector('.q-opt-C').value,
+              node.querySelector('.q-opt-D').value
             ],
-            answer: b.querySelector('.q-correct').value
+            answer: node.querySelector('.q-correct').value
           });
         });
-        cbtQuestions = list;
+        cbtQuestions = outList;
       }
 
       function saveCBTDraftToLocalStorage() {
         parseCBTQuestionsPayload();
-        const draft = {
+        const stateDump = {
           classId: document.getElementById('cbt-class-select')?.value || '',
           subjectId: document.getElementById('cbt-subject-select')?.value || '',
           title: document.getElementById('cbt-title')?.value || '',
           duration: document.getElementById('cbt-duration')?.value || '',
           questions: cbtQuestions
         };
-        localStorage.setItem(cbtDraftKey, JSON.stringify(draft));
+        localStorage.setItem(cbtDraftKey, JSON.stringify(stateDump));
       }
 
       function loadAndHydrateCBTDraft() {
-        const raw = localStorage.getItem(cbtDraftKey);
-        if (!raw) return;
+        const serialized = localStorage.getItem(cbtDraftKey);
+        if (!serialized) return;
         try {
-          const draft = JSON.parse(raw);
-          if (!draft) return;
+          const configObject = JSON.parse(serialized);
+          if (!configObject) return;
           
-          if (draft.classId) document.getElementById('cbt-class-select').value = draft.classId;
-          if (draft.subjectId) document.getElementById('cbt-subject-select').value = draft.subjectId;
-          if (draft.title) document.getElementById('cbt-title').value = draft.title;
-          if (draft.duration) document.getElementById('cbt-duration').value = draft.duration;
+          if (configObject.classId) document.getElementById('cbt-class-select').value = configObject.classId;
+          if (configObject.subjectId) document.getElementById('cbt-subject-select').value = configObject.subjectId;
+          if (configObject.title) document.getElementById('cbt-title').value = configObject.title;
+          if (configObject.duration) document.getElementById('cbt-duration').value = configObject.duration;
 
           const container = document.getElementById('cbt-questions-list');
           container.innerHTML = '';
           
-          if (Array.isArray(draft.questions)) {
-            draft.questions.forEach((q) => {
+          if (Array.isArray(configObject.questions)) {
+            configObject.questions.forEach((q) => {
               appendNewCBTQuestionBlock();
-              const blocks = container.querySelectorAll('.q-block-node');
-              const targetBlock = blocks[blocks.length - 1];
+              const nodes = container.querySelectorAll('.q-block-node');
+              const activeNode = nodes[nodes.length - 1];
               
-              targetBlock.querySelector('.q-prompt').value = q.question || '';
+              activeNode.querySelector('.q-prompt').value = q.question || '';
               if (q.options && q.options.length >= 4) {
-                targetBlock.querySelector('.q-opt-A').value = q.options[0] || '';
-                targetBlock.querySelector('.q-opt-B').value = q.options[1] || '';
-                targetBlock.querySelector('.q-opt-C').value = q.options[2] || '';
-                targetBlock.querySelector('.q-opt-D').value = q.options[3] || '';
+                activeNode.querySelector('.q-opt-A').value = q.options[0] || '';
+                activeNode.querySelector('.q-opt-B').value = q.options[1] || '';
+                activeNode.querySelector('.q-opt-C').value = q.options[2] || '';
+                activeNode.querySelector('.q-opt-D').value = q.options[3] || '';
               }
-              targetBlock.querySelector('.q-correct').value = q.answer || 'A';
+              activeNode.querySelector('.q-correct').value = q.answer || 'A';
             });
           }
-        } catch (e) {
-          console.error("Failed executing draft state rehydration routine", e);
+        } catch (err) {
+          console.error("Local variable configuration cache lookup drop encountered.", err);
         }
       }
 
-      // ============ GLOBAL INTERACTIVE WORKFLOW HANDLERS ============
+      // ACCESSIBLE GLOBAL LAYER TRIGGERS FOR ROUTINES
       window.openAssignmentModal = function () {
         document.getElementById('assignmentForm').reset();
         document.getElementById('assignment-id-edit').value = '';
@@ -1054,12 +1048,12 @@
 
       window.submitGradebookResults = function () {
         fetchWithSpinLock('gradebookUploadSubmitBtn', async () => {
-          const targetClassId = document.getElementById('gradebook-class').value;
-          const rows = document.querySelectorAll('#gradebook-table tbody tr');
-          const resultsPayload = [];
+          const currentClassId = document.getElementById('gradebook-class').value;
+          const matrixRows = document.querySelectorAll('#gradebook-table tbody tr');
+          const structuredManifestRecords = [];
 
-          rows.forEach(row => {
-            resultsPayload.push({
+          matrixRows.forEach(row => {
+            structuredManifestRecords.push({
               studentId: row.getAttribute('data-student-id'),
               ca1: parseInt(row.querySelector('.ca1-input').value) || 0,
               ca2: parseInt(row.querySelector('.ca2-input').value) || 0,
@@ -1067,89 +1061,87 @@
             });
           });
 
-          const postBody = {
-            classId: targetClassId,
+          const bodyManifest = {
+            classId: currentClassId,
             session: document.getElementById('gb-session-select').value,
             term: document.getElementById('gb-term-select').value,
             type: document.getElementById('gb-result-type-select').value,
-            records: resultsPayload
+            records: structuredManifestRecords
           };
 
           const res = await fetch(`${API_BASE_URL}/api/teachers/gradebook/upload`, {
             method: 'POST',
             headers: authHeaders(),
-            body: JSON.stringify(postBody)
+            body: JSON.stringify(bodyManifest)
           });
 
           if (res.ok) {
-            alert("Gradebook records successfully written to processing core storage array.");
+            alert("Operational grade record sets written successfully to live database array.");
             window.closeGradebookUploadModal();
           } else {
-            alert("Transactional transmission rejection encountered on data endpoint channel.");
+            alert("Downstream service pipeline dropped core grade array communication manifest.");
           }
         });
       };
 
-      // ============ APPLICATION INITIALIZATION ENGINE ROUTINE ============
-      async function bootstrapApplicationEngine() {
-        showLoader("Synchronizing Faculty Profile Security Matrix...", "Validating active encryption keys");
+      // PLATFORM RE-BOOTSTRAPPING INITIALIZER APPLICATION ENGINE
+      async function initializeApplicationPortal() {
+        showLoader("Verifying teacher security contexts...");
         
         if (!token) {
-          alert("Operational credentials drop caught inside interface pipeline. Redirecting to access terminal.");
+          alert("Authorization profile token value is completely drop-state null. Returning to authentication page.");
           window.location.href = "/login.html";
           return;
         }
 
         teacher = await fetchTeacherProfile();
         if (!teacher) {
-          alert("Severe Exception: Profile identity dropped by authorization nodes.");
+          alert("Severe system context failure: authorization drop caught on verification nodes.");
           hideLoader();
           return;
         }
 
-        const baselineClasses = await fetchTeacherClasses();
+        const structuralClasses = await fetchTeacherClasses();
         notifications = await fetchTeacherNotifications();
         assignments = await fetchAssignments();
         myUploadedCBTs = await fetchMyCBTQuestions();
 
-        // Enforce safe mapping loops over class bounds to fetch active student registries
-        for (const targetClass of baselineClasses) {
-          studentsByClass[targetClass.id] = await fetchStudentsByClass(targetClass.id);
-          subjectsByClass[targetClass.id] = await fetchSubjectsByClass(targetClass.id);
+        for (const elementClass of structuralClasses) {
+          studentsByClass[elementClass.id] = await fetchStudentsByClass(elementClass.id);
+          subjectsByClass[elementClass.id] = await fetchSubjectsByClass(elementClass.id);
         }
 
-        // Pass direct state object data references to internal ecosystem managers
-        syncDashboardUI({ teacher, classes: baselineClasses, notifications, assignments, myUploadedCBTs, studentsByClass, subjectsByClass });
+        syncDashboardUI({ teacher, classes: structuralClasses, notifications, assignments, myUploadedCBTs, studentsByClass, subjectsByClass });
         loadAndHydrateCBTDraft();
 
         hideLoader();
       }
 
-      // ============ EVENT BINDINGS INTERCEPTORS FOR CONTROLLERS ============
+      // ENGINE CONTROLLER BINDINGS AND EVENT BROKERS
       document.addEventListener('DOMContentLoaded', () => {
-        bootstrapApplicationEngine();
+        initializeApplicationPortal();
 
-        // View Tab Route Layout Mutation Engine Handler
-        const triggers = document.querySelectorAll('.tab-trigger');
-        triggers.forEach(t => {
-          t.addEventListener('click', (e) => {
+        // Responsive Sidebar tab panel display toggle router matrix loops
+        const interfaceTriggers = document.querySelectorAll('.tab-trigger');
+        interfaceTriggers.forEach(triggerElement => {
+          triggerElement.addEventListener('click', (e) => {
             e.preventDefault();
-            const destinationId = t.getAttribute('data-tab');
+            const interfaceTargetId = triggerElement.getAttribute('data-tab');
             
-            document.querySelectorAll('.view-panel').forEach(panel => panel.classList.add('hidden'));
-            triggers.forEach(trigger => trigger.classList.remove('bg-slate-800', 'text-brand-gold'));
+            document.querySelectorAll('.view-panel').forEach(vPanel => vPanel.classList.add('hidden'));
+            interfaceTriggers.forEach(trigger => trigger.classList.remove('bg-slate-800', 'text-white'));
             
-            const targetPanel = document.getElementById(destinationId);
-            if (targetPanel) {
-              targetPanel.classList.remove('hidden');
-              t.classList.add('bg-slate-800', 'text-brand-gold');
-              document.getElementById('headerTitle').textContent = t.textContent.trim();
-              window.location.hash = destinationId;
+            const activeVPanel = document.getElementById(interfaceTargetId);
+            if (activeVPanel) {
+              activeVPanel.classList.remove('hidden');
+              triggerElement.classList.add('bg-slate-800', 'text-white');
+              document.getElementById('pageTitle').textContent = triggerElement.textContent.trim();
+              window.location.hash = interfaceTargetId;
             }
           });
         });
 
-        // Filter Controls Sync Core Triggers
+        // Interface filter selectors trigger mutations mappings links
         document.getElementById('classSelect')?.addEventListener('change', (e) => renderRosterTable(e.target.value));
         document.getElementById('assignment-filter-class')?.addEventListener('change', (e) => renderAssignmentList(e.target.value));
         document.getElementById('gradebook-class')?.addEventListener('change', (e) => renderGradebookMatrix(e.target.value));
@@ -1158,21 +1150,21 @@
           saveCBTDraftToLocalStorage();
         });
 
-        // Smart Attendance Engine Dispatch Call
+        // Attendance ledger sheet rehydration hook
         document.getElementById('loadAttendanceBtn')?.addEventListener('click', (e) => {
           e.preventDefault();
           fetchWithSpinLock('loadAttendanceBtn', async () => {
-            const chosenClass = document.getElementById('attendance-class').value;
-            const chosenDate = document.getElementById('attDate').value;
-            if (!chosenClass || !chosenDate) {
-              alert("Operation cancelled: Parameters required to map evaluation vectors are null.");
+            const classTargetId = document.getElementById('attendance-class').value;
+            const targetCalendarDate = document.getElementById('attDate').value;
+            if (!classTargetId || !targetCalendarDate) {
+              alert("Configuration constraints missed: active class reference vectors and target parameters cannot be null.");
               return;
             }
-            await renderAttendanceRoster(chosenClass, chosenDate);
+            await renderAttendanceRoster(classTargetId, targetCalendarDate);
           });
         });
 
-        // Smart Attendance Serialization Transaction Commitment 
+        // Attendance storage commitment post execution callback 
         document.getElementById('attendance-form')?.addEventListener('submit', (e) => {
           e.preventDefault();
           fetchWithSpinLock('saveAttendanceSubmitBtn', async () => {
@@ -1181,15 +1173,15 @@
               headers: authHeaders(),
               body: JSON.stringify({ records: attendanceRecords })
             });
-            if (res.ok) alert("Roster attendance logs verified and stamped successfully.");
+            if (res.ok) alert("Operational attendance data arrays successfully stamped on database channels.");
           });
         });
 
-        // Task Form Schema Serialization Dispatch Commit Routine
+        // Assignment data form structure compilation router
         document.getElementById('assignmentForm')?.addEventListener('submit', (e) => {
           e.preventDefault();
           fetchWithSpinLock('assignmentSubmitButton', async () => {
-            const payload = {
+            const compiledPayload = {
               classId: document.getElementById('assignment-class').value,
               title: document.getElementById('assignment-title').value,
               subjectId: document.getElementById('assignment-subject').value,
@@ -1200,11 +1192,11 @@
             const res = await fetch(`${API_BASE_URL}/api/teachers/assignments/create`, {
               method: 'POST',
               headers: authHeaders(),
-              body: JSON.stringify(payload)
+              body: JSON.stringify(compiledPayload)
             });
 
             if (res.ok) {
-              alert("Task directive payload built and deployed downchannel.");
+              alert("Assignment task definition matrix fully dispatched downstream.");
               assignments = await fetchAssignments();
               renderAssignmentList(document.getElementById('assignment-filter-class').value);
               window.closeAssignmentModal();
@@ -1212,20 +1204,20 @@
           });
         });
 
-        // Append Question Vector Node Trigger Link
+        // Interactive callback append button links for CBT node elements
         document.getElementById('cbt-add-question-btn')?.addEventListener('click', appendNewCBTQuestionBlock);
 
-        // CBT Package Post Deployment Matrix Core Hook
+        // CBT assessment payload storage channel deployment dispatcher
         document.getElementById('cbt-question-form')?.addEventListener('submit', (e) => {
           e.preventDefault();
           fetchWithSpinLock('cbt-upload-btn', async () => {
             parseCBTQuestionsPayload();
             if (cbtQuestions.length === 0) {
-              alert("Validation failure: CBT assessment payload structure requires > 0 query blocks.");
+              alert("Validation dropped: Structural evaluations pool components matrix must contain > 0 question elements.");
               return;
             }
 
-            const payload = {
+            const outPayloadConfig = {
               classId: document.getElementById('cbt-class-select').value,
               subjectId: document.getElementById('cbt-subject-select').value,
               title: document.getElementById('cbt-title').value,
@@ -1236,21 +1228,21 @@
             const res = await fetch(`${API_BASE_URL}/api/teachers/cbt/upload`, {
               method: 'POST',
               headers: authHeaders(),
-              body: JSON.stringify(payload)
+              body: JSON.stringify(outPayloadConfig)
             });
 
             if (res.ok) {
               localStorage.removeItem(cbtDraftKey);
               document.getElementById('cbt-questions-list').innerHTML = '';
               document.getElementById('cbt-question-form').reset();
-              alert("Structural assessment components written completely to server repositories.");
+              alert("Structural CBT assessment bank successfully logged to backend server repository.");
               myUploadedCBTs = await fetchMyCBTQuestions();
               renderCBTInventoryVault();
             }
           });
         });
 
-        // Batch Shared Question Bank Dispatch Trigger Pipeline
+        // Batch upload aggregating pool deployment switch links
         document.getElementById('pushToUniversalBtn')?.addEventListener('click', () => {
           fetchWithSpinLock('pushToUniversalBtn', async () => {
             const res = await fetch(`${API_BASE_URL}/api/teachers/cbt/push-universal`, {
@@ -1258,36 +1250,36 @@
               headers: authHeaders(),
               body: JSON.stringify({ cbtIds: selectedCBTIds })
             });
-            if (res.ok) alert("Selected evaluations aggregated into universal shared questions pool.");
+            if (res.ok) alert("Target question components matrices pushed completely to universal database core.");
           });
         });
 
-        // Faculty Identity Update Account Pipeline Commit Hook
+        // Profile details synchronization update request hook
         document.getElementById('profile-form')?.addEventListener('submit', (e) => {
           e.preventDefault();
           fetchWithSpinLock('profileSaveSubmitBtn', async () => {
-            const payload = {
+            const outModel = {
               name: document.getElementById('profile-name').value,
               designation: document.getElementById('profile-designation').value,
               email: document.getElementById('profile-email').value
             };
-            const pwd = document.getElementById('profile-password').value;
-            if (pwd) payload.password = pwd;
+            const customPass = document.getElementById('profile-password').value;
+            if (customPass) outModel.password = customPass;
 
             const res = await fetch(`${API_BASE_URL}/api/teachers/profile/update`, {
               method: 'PUT',
               headers: authHeaders(),
-              body: JSON.stringify(payload)
+              body: JSON.stringify(outModel)
             });
 
-            if (res.ok) alert("Faculty account identity structural updates applied.");
+            if (res.ok) alert("Teacher account profiler changes successfully committed.");
           });
         });
 
-        // Side Responsive Drawer View Toggle Hook
+        // Mobile responsive drawer toggle event mapping tracker
         document.getElementById('sidebarToggle')?.addEventListener('click', () => {
-          const sidebar = document.getElementById('sidebar');
-          sidebar.classList.toggle('-translate-x-full');
+          const menuBox = document.getElementById('sidebar');
+          menuBox.classList.toggle('-translate-x-full');
         });
       });
     })();
