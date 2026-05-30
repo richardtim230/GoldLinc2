@@ -2,555 +2,1336 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=0.850">
-    <title>Portal Login | Gold and Linc Schools</title>
-    <!-- Tailwind CSS & Flowbite via CDN -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gold and Linc Schools | Faculty LMS & Multi-Editor Console</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
-    <!-- Google Fonts for professional typography -->
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,400;0,700;1,300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&family=Playfair+Display:ital,wght=0,600;0,700;1,400&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         brand: {
-                            50: '#f0f7ff',
-                            100: '#e0effe',
-                            500: '#0284c7',
-                            800: '#075985',
-                            900: '#0c4a6e',
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7', 
+                            800: '#075985', 
+                            900: '#0c4a6e', 
                         },
                         gold: {
+                            400: '#fbbf24',
                             500: '#d97706',
                             600: '#b45309',
                         }
                     },
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['Merriweather', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
                     }
                 }
             }
         }
     </script>
+    <style>
+        .parabolic-top {
+            border-top-left-radius: 50% 40px;
+            border-top-right-radius: 50% 40px;
+        }
+        .sidebar-btn-active {
+            background: linear-gradient(to right, #075985, #0284c7) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+        .sidebar-btn-inactive:hover {
+            background-color: rgba(15, 23, 42, 0.2);
+            color: #ffffff;
+        }
+        /* Custom Quill standard heights for modal layout integrity */
+        .ql-container {
+            height: 100px;
+            font-size: 13px;
+            border-bottom-left-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+        }
+        .option-editor-container .ql-container {
+            height: 60px;
+        }
+        .explanation-editor-container .ql-container {
+            height: 80px;
+        }
+        .assignment-editor-container .ql-container {
+            height: 120px;
+        }
+        .ql-toolbar {
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+            background-color: #f8fafc;
+            padding: 4px 8px !important;
+        }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+<body class="bg-[#f8fafc] text-slate-800 font-sans antialiased min-h-screen flex flex-col md:flex-row overflow-x-hidden" onload="initSystemNode();">
 
-    <!-- MAIN CONTAINER -->
-    <div class="flex h-screen overflow-hidden">
+    <aside class="hidden md:flex flex-col w-72 bg-brand-900 text-white shrink-0 shadow-2xl relative z-30 border-r border-brand-800">
+        <div class="p-6 border-b border-brand-800/60 bg-brand-950/20 flex items-center space-x-3">
+            <div class="bg-white p-1 rounded-xl shadow-inner flex items-center justify-center shrink-0">
+                <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779961202/editor-uploads/frngf21mg4fcrnmccobm.png" class="h-9 w-auto object-contain" alt="Gold and Linc Logo">
+            </div>
+            <div>
+                <span class="block text-base font-extrabold tracking-tight uppercase font-serif">Gold & Linc</span>
+                <span class="block text-[10px] text-brand-500 uppercase tracking-widest font-extrabold -mt-0.5">Faculty Terminal</span>
+            </div>
+        </div>
 
-        <!-- SIDEBAR FOR DESKTOP -->
-        <aside class="hidden lg:flex lg:flex-col w-80 bg-gradient-to-b from-brand-900 via-brand-800 to-brand-900 text-white shadow-2xl border-r border-brand-800">
-            <!-- Logo Section -->
-            <div class="p-8 border-b border-brand-700">
-                <div class="flex items-center space-x-4">
-                    <div class="bg-white bg-opacity-10 p-3 rounded-lg backdrop-blur-sm">
-                        <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779961202/editor-uploads/frngf21mg4fcrnmccobm.png" class="h-8 w-auto object-contain" alt="Gold and Linc Schools Logo">
+        <div class="p-4 mx-4 my-4 bg-brand-800/50 rounded-2xl border border-brand-500/30 backdrop-blur-sm text-xs">
+            <p class="text-[10px] font-bold text-brand-500 uppercase tracking-wider mb-1 px-1">Department</p>
+            <p id="sidebarDept" class="text-sm font-bold text-white px-1">Senior Biological Sciences</p>
+            <p id="sidebarLevels" class="text-[10px] text-brand-100/70 px-1 mt-0.5">Assigned: SS1, SS2, SS3 Track</p>
+        </div>
+
+        <nav class="flex-grow px-4 space-y-1 overflow-y-auto pb-4" id="lmsMenu">
+            <p class="text-[10px] font-bold text-brand-500 uppercase tracking-widest px-3 mb-2">LMS Components</p>
+            
+            <button id="btn-overview" onclick="switchPanel('overview')" type="button" class="sidebar-btn-active w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition-all text-brand-100">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"/></svg>
+                Course Performance Desk
+            </button>
+
+            <button id="btn-assessments" onclick="switchPanel('assessments')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition-all text-brand-100">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                Question Bank Categories
+            </button>
+
+            <button id="btn-assignments" onclick="switchPanel('assignments')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition-all text-brand-100">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Assignments Hub
+            </button>
+
+            <button id="btn-students" onclick="switchPanel('students')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition-all text-brand-100">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                Student Rosters
+            </button>
+            
+            <button id="btn-grading" onclick="switchPanel('grading')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition-all text-brand-100">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                Gradebook & Mark Sheet
+            </button>
+            
+            <button id="btn-profile" onclick="switchPanel('profile')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition-all text-brand-100">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                Faculty Profile Desk
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-brand-800/60 bg-brand-950/20 text-[11px] text-center text-brand-100/60">
+            System Node: <strong class="text-white font-semibold">Faculty_LMS_2026</strong>
+        </div>
+    </aside>
+
+    <header class="md:hidden w-full bg-brand-900 text-white h-16 px-4 flex items-center justify-between shadow-md sticky top-0 z-40">
+        <div class="flex items-center space-x-2.5">
+            <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779961202/editor-uploads/frngf21mg4fcrnmccobm.png" class="h-7 w-auto bg-white p-0.5 rounded-lg" alt="Logo">
+            <span class="font-serif font-bold text-sm tracking-wide">Gold & Linc LMS</span>
+        </div>
+        <button type="button" onclick="openBottomNav()" class="bg-brand-800 border border-brand-500/40 px-3 py-1.5 rounded-xl text-xs font-bold text-white transition active:scale-95 flex items-center space-x-1">
+            <span>LMS Menu</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+    </header>
+
+    <div id="bottomDrawerOverlay" onclick="closeBottomNav(event)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden transition-opacity duration-300 opacity-0">
+        <div id="bottomDrawerCard" class="absolute bottom-0 inset-x-0 bg-brand-900 text-white parabolic-top transform translate-y-full transition-transform duration-300 border-t-2 border-gold-400 p-6 pt-12 space-y-4 max-h-[85vh] overflow-y-auto">
+            <div class="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-brand-800 rounded-full"></div>
+            <div class="grid grid-cols-1 gap-2 text-sm font-bold">
+                <button onclick="switchPanel('overview')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Course Performance Desk</span> &rarr;</button>
+                <button onclick="switchPanel('assessments')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Question Bank Categories</span> &rarr;</button>
+                <button onclick="switchPanel('assignments')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Assignments Hub</span> &rarr;</button>
+                <button onclick="switchPanel('students')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Student Rosters</span> &rarr;</button>
+                <button onclick="switchPanel('grading')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Gradebook & Mark Sheet</span> &rarr;</button>
+                <button onclick="switchPanel('profile')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Faculty Profile Desk</span> &rarr;</button>
+            </div>
+        </div>
+    </div>
+
+    <main class="flex-grow p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto w-full overflow-hidden" id="lmsPanels">
+        
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                <div class="p-2.5 bg-brand-50 rounded-lg text-brand-800 shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div class="text-xs">
+                    <p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Active Faculty Staff</p>
+                    <p id="headerTeacherName" class="text-sm font-black text-slate-900">Mrs. Omolara Adeniran</p>
+                    <p id="headerTeacherTitle" class="text-slate-500 text-[11px]">Lead Educator, Science Division</p>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                <div class="p-2.5 bg-amber-50 rounded-lg text-gold-600 shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <div class="text-xs">
+                    <p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Academic Term Node</p>
+                    <p class="text-sm font-black text-slate-900">2025/2026 Session &bull; First Term</p>
+                    <span class="inline-flex bg-brand-50 text-brand-800 font-bold px-1.5 py-0.5 rounded text-[10px] mt-0.5">Continuous Assessment Cycle</span>
+                </div>
+            </div>
+        </section>
+
+        <div id="panel-overview" class="space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Assigned Total Class Roll</p>
+                    <p class="text-xl font-black text-brand-900 mt-1">118 Students</p>
+                    <p class="text-[10px] text-slate-400 font-medium mt-1">Across SS2 & SS3 Biology classes</p>
+                </div>
+                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Overall Test Average</p>
+                    <p class="text-xl font-black text-emerald-600 mt-1">71.5%</p>
+                    <span class="inline-flex bg-emerald-50 text-emerald-700 text-[9px] font-bold px-1.5 py-0.5 rounded-full mt-1">Class Standing: Good</span>
+                </div>
+                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Active Categories</p>
+                    <p id="overviewCollectionCount" class="text-xl font-black text-amber-600 mt-1">2 Saved Collections</p>
+                </div>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                <div class="p-4 border-b border-slate-100 bg-slate-50/60">
+                    <h3 class="text-xs font-bold text-brand-900 uppercase tracking-wider">Assigned Form Class Cohort Summaries</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
+                                <th class="p-3 pl-4">Target Form Level Class</th>
+                                <th class="p-3">Subject Focus</th>
+                                <th class="p-3 text-center">Active Tests Tracked</th>
+                                <th class="p-3 text-center">Current Class Mean</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
+                            <tr class="hover:bg-slate-50/40 transition">
+                                <td class="p-3 pl-4 font-bold text-brand-900">Senior Secondary Class 2 (SS2 Alpha)</td>
+                                <td class="p-3">Biology Core Tracks</td>
+                                <td class="p-3 text-center">2 Active Batches</td>
+                                <td class="p-3 text-center font-bold text-slate-900 font-mono">73.8%</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50/40 transition">
+                                <td class="p-3 pl-4 font-bold text-brand-900">Senior Secondary Class 3 (SS3 Beta)</td>
+                                <td class="p-3">Advanced Biological Applications</td>
+                                <td class="p-3 text-center">1 Active Batch</td>
+                                <td class="p-3 text-center font-bold text-slate-900 font-mono">65.1%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="panel-assessments" class="space-y-6 hidden">
+            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                
+                <div id="collectionControlHeader" class="flex flex-col sm:flex-row justify-between sm:items-start gap-4 border-b border-slate-100 pb-4">
+                    <div>
+                        <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Question Bank Categorization Deck</h2>
+                        <p class="text-xs text-slate-500">Isolate focus tracks to run standard objective items evaluation updates safely.</p>
+                    </div>
+                    <div class="flex gap-2 items-center w-full sm:w-auto">
+                        <input type="text" id="newCollectionName" placeholder="e.g., SS2 BIOLOGY TEST 1" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold p-2 focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none flex-grow">
+                        <button onclick="createCollection()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider transition whitespace-nowrap">
+                            Create Collection
+                        </button>
+                    </div>
+                </div>
+
+                <div id="collectionsContainer" class="space-y-4"></div>
+            </div>
+        </div>
+
+        <div id="panel-assignments" class="space-y-6 hidden">
+            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                    <div>
+                        <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Term Project & Assignments Deployment</h2>
+                        <p class="text-xs text-slate-500">Track current terminal task pushes and target submission close points.</p>
+                    </div>
+                    <button onclick="openAssignmentModal()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider shadow-sm transition">
+                        + Open Deployment Modal
+                    </button>
+                </div>
+                <div id="assignmentsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+        </div>
+
+        <div id="panel-students" class="space-y-6 hidden">
+            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-100 pb-3">
+                    <div>
+                        <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Secondary Form Cohort Registry</h2>
+                        <p class="text-xs text-slate-500">Review assigned class lines and student system codes cleanly.</p>
+                    </div>
+                    <select id="studentClassFilter" onchange="renderStudents()" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
+                        <option value="ALL">Display All Assigned Classes</option>
+                        <option value="SS2 Alpha">Senior Secondary 2 (SS2 Alpha)</option>
+                        <option value="SS3 Beta">Senior Secondary 3 (SS3 Beta)</option>
+                    </select>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-slate-100">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
+                                <th class="p-3 pl-4">Admission Code</th>
+                                <th class="p-3">Student Fullname</th>
+                                <th class="p-3">Assigned Class Tier</th>
+                                <th class="p-3 text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="panel-grading" class="space-y-6 hidden">
+            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h3 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Result Upload Analytics</h3>
+                        <p class="text-base font-black text-brand-900 mt-0.5">Roster Capture Progress</p>
+                    </div>
+                    <div class="text-right text-xs">
+                        <span class="font-bold text-slate-500">Completed Data Cells: </span>
+                        <span id="progressStatsCount" class="font-mono font-black text-brand-900 bg-slate-100 px-2 py-0.5 rounded-md">0 / 0</span>
+                        <span id="progressStatsLeft" class="ml-2 font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">0 Cells Left</span>
+                    </div>
+                </div>
+                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden shadow-inner">
+                    <div id="progressBarFill" class="bg-gradient-to-r from-brand-500 to-emerald-500 h-full w-0 transition-all duration-300"></div>
+                </div>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-slate-100 pb-4">
+                    <div>
+                        <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Secondary Gradebook Mark Sheet Matrix</h2>
+                        <p class="text-xs text-slate-500">Pushes score modifications straight to parent profile views. Weights: CA1 (20%), CA2 (20%), Exam (60%).</p>
+                    </div>
+                    <div class="flex space-x-2 shrink-0">
+                        <select id="gradebookClassFilter" onchange="renderGradebook()" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
+                            <option value="SS2 Alpha">SS2 Alpha - Biology Core</option>
+                            <option value="SS3 Beta">SS3 Beta - Advanced Biology</option>
+                        </select>
+                        <button onclick="saveGradebookChanges()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider shadow transition">
+                            Bulk Save Class
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-slate-100">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
+                                <th class="p-3 pl-4">Admission Code</th>
+                                <th class="p-3">Student Name</th>
+                                <th class="p-3 text-center w-20">CA1 (20)</th>
+                                <th class="p-3 text-center w-20">CA2 (20)</th>
+                                <th class="p-3 text-center w-20">Exam (60)</th>
+                                <th class="p-3 text-center w-24">Total Outcome</th>
+                                <th class="p-3 text-center w-28">Standing Term</th>
+                                <th class="p-3 text-center w-36">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gradebookTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="panel-profile" class="space-y-6 hidden">
+            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                <div class="border-b border-slate-100 pb-3">
+                    <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Faculty Profile Management Desk</h2>
+                </div>
+                <form id="profileForm" onsubmit="updateTeacherProfile(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Full Instructor Name</label>
+                        <input type="text" id="profileName" value="Mrs. Omolara Adeniran" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
                     </div>
                     <div>
-                        <h1 class="text-2xl font-bold font-serif">Gold & Linc</h1>
-                        <p class="text-xs text-brand-200 uppercase tracking-widest font-medium">Schools Portal</p>
+                        <label class="block font-bold text-slate-400 mb-1">Faculty Rank Title</label>
+                        <input type="text" id="profileTitle" value="Lead Educator, Science Division" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Assigned Subject Department</label>
+                        <input type="text" id="profileDept" value="Senior Biological Sciences" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Assigned Form Class Tracks</label>
+                        <input type="text" id="profileLevels" value="Assigned: SS1, SS2, SS3 Track" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                    </div>
+                    <div class="sm:col-span-2 flex justify-end">
+                        <button type="submit" class="bg-brand-900 text-white font-bold px-5 py-2 rounded-xl uppercase transition hover:bg-brand-800">Update Profile</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <div id="questionModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl border border-slate-200 w-full max-w-3xl shadow-2xl flex flex-col overflow-hidden max-h-[92vh]">
+            
+            <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+                <div>
+                    <h3 id="modalTitle" class="text-xs font-extrabold text-brand-900 uppercase tracking-wider">Configure Assessment Item</h3>
+                    <p class="text-[11px] text-slate-500">Edit stems, diagrams, multi-editor response spaces, and answer keys.</p>
+                </div>
+                <button onclick="closeQuestionModal()" class="text-slate-400 hover:text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md font-bold">&times;</button>
+            </div>
+            
+            <div class="p-5 space-y-4 overflow-y-auto text-xs">
+                <div>
+                    <label class="block font-extrabold text-slate-400 uppercase tracking-wider mb-1.5">Question Stem Body (Rich Text)</label>
+                    <div id="quillQuestionStem" class="bg-white rounded-xl"></div>
+                </div>
+                
+                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                    <label class="block font-extrabold text-slate-500 uppercase tracking-wider text-[11px]">Attach Diagram Vector / Diagram Image Asset</label>
+                    <div class="flex gap-2">
+                        <input type="url" id="modalImageUrl" placeholder="Paste structural image URL path here (e.g., https://...)" class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none focus:ring-1 focus:ring-brand-500">
+                        <button onclick="previewModalImage()" class="bg-slate-200 hover:bg-slate-300 font-bold px-3 py-2 rounded-lg transition text-[11px] uppercase">Preview</button>
+                    </div>
+                    <img id="modalImagePreview" src="" class="hidden max-h-32 w-auto object-contain rounded border border-slate-200 bg-white p-1">
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <label class="block font-extrabold text-slate-400 uppercase tracking-wider">Dynamic Response Option Fields</label>
+                        <button onclick="appendBlankOptionField()" class="text-brand-800 hover:text-brand-900 font-bold text-[11px] bg-brand-50 px-2.5 py-1 rounded-lg border border-brand-200 transition">+ Append Option Row</button>
+                    </div>
+                    <div id="modalOptionsWrapper" class="space-y-4"></div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="block font-extrabold text-slate-400 uppercase tracking-wider">Optional Grading Explanation & Marking Rationale</label>
+                    <div class="explanation-editor-container">
+                        <div id="quillExplanation" class="bg-white rounded-xl"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Portal Selection -->
-            <div class="p-6 space-y-3 border-b border-brand-700">
-                <p class="text-xs uppercase tracking-widest text-brand-300 font-semibold mb-4">Select Portal</p>
-                
-                <div class="space-y-2">
-                    <button class="portal-selector w-full text-left px-4 py-3 rounded-lg bg-gold-600 text-white font-medium transition-all flex items-center justify-between group" data-portal="parent">
-                        <span class="flex items-center">
-                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                            Parents Portal
-                        </span>
-                        <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </button>
+            <div class="p-3.5 border-t border-slate-100 bg-slate-50 flex justify-end space-x-2">
+                <button onclick="closeQuestionModal()" class="bg-white border border-slate-200 text-slate-600 font-bold px-4 py-1.5 rounded-xl text-[11px] uppercase">Cancel</button>
+                <button onclick="saveModalQuestionData()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold px-5 py-1.5 rounded-xl text-[11px] uppercase">Commit Changes</button>
+            </div>
+        </div>
+    </div>
 
-                    <button class="portal-selector w-full text-left px-4 py-3 rounded-lg bg-brand-700 hover:bg-brand-600 text-white font-medium transition-all flex items-center justify-between group" data-portal="student">
-                        <span class="flex items-center">
-                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C6.5 6.253 2 10.998 2 17.001c0 5.591 3.824 10.29 9 11.622m0-13c5.5 0 10 4.745 10 10.999c0 5.591-3.824 10.29-9 11.622"></path></svg>
-                            Students Portal
-                        </span>
-                        <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </button>
-
-                    <button class="portal-selector w-full text-left px-4 py-3 rounded-lg bg-brand-700 hover:bg-brand-600 text-white font-medium transition-all flex items-center justify-between group" data-portal="staff">
-                        <span class="flex items-center">
-                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
-                            Staff Portal
-                        </span>
-                        <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </button>
+    <div id="assignmentModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl border border-slate-200 w-full max-w-3xl shadow-2xl flex flex-col overflow-hidden max-h-[92vh]">
+            
+            <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+                <div>
+                    <h3 class="text-xs font-extrabold text-brand-900 uppercase tracking-wider">Deploy New Assignment Portfolio</h3>
+                    <p class="text-[11px] text-slate-500">Configure parameters, distribute tasks, or select MCQ rows from core categories.</p>
                 </div>
+                <button onclick="closeAssignmentModal()" class="text-slate-400 hover:text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md font-bold">&times;</button>
             </div>
 
-            <!-- Features List -->
-            <div class="p-6 flex-1">
-                <p class="text-xs uppercase tracking-widest text-brand-300 font-semibold mb-4">Portal Features</p>
-                <ul class="space-y-3">
-                    <li class="flex items-start group cursor-pointer">
-                        <svg class="w-4 h-4 mr-3 mt-1 text-gold-500 flex-shrink-0 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
-                        <span class="text-sm text-brand-100 group-hover:text-white transition-colors">Academic Records</span>
-                    </li>
-                    <li class="flex items-start group cursor-pointer">
-                        <svg class="w-4 h-4 mr-3 mt-1 text-gold-500 flex-shrink-0 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
-                        <span class="text-sm text-brand-100 group-hover:text-white transition-colors">Grade Reports</span>
-                    </li>
-                    <li class="flex items-start group cursor-pointer">
-                        <svg class="w-4 h-4 mr-3 mt-1 text-gold-500 flex-shrink-0 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
-                        <span class="text-sm text-brand-100 group-hover:text-white transition-colors">Fee Management</span>
-                    </li>
-                    <li class="flex items-start group cursor-pointer">
-                        <svg class="w-4 h-4 mr-3 mt-1 text-gold-500 flex-shrink-0 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
-                        <span class="text-sm text-brand-100 group-hover:text-white transition-colors">Attendance Tracking</span>
-                    </li>
-                    <li class="flex items-start group cursor-pointer">
-                        <svg class="w-4 h-4 mr-3 mt-1 text-gold-500 flex-shrink-0 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
-                        <span class="text-sm text-brand-100 group-hover:text-white transition-colors">Messaging System</span>
-                    </li>
-                    <li class="flex items-start group cursor-pointer">
-                        <svg class="w-4 h-4 mr-3 mt-1 text-gold-500 flex-shrink-0 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
-                        <span class="text-sm text-brand-100 group-hover:text-white transition-colors">Event Calendar</span>
-                    </li>
-                </ul>
-            </div>
+            <div class="p-5 space-y-4 overflow-y-auto text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Assignment Title</label>
+                        <input type="text" id="asmModalTitle" placeholder="e.g., Photosynthesis Pathways" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Target Class Cohort</label>
+                        <select id="asmModalClass" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                            <option value="SS2 Alpha">SS2 Alpha - Biology Core</option>
+                            <option value="SS3 Beta">SS3 Beta - Advanced Biology</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Submission Deadline</label>
+                        <input type="date" id="asmModalDue" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                    </div>
+                </div>
 
-            <!-- Footer Info -->
-            <div class="p-6 border-t border-brand-700 bg-brand-900 bg-opacity-50">
-                <p class="text-xs text-brand-300 mb-3">Need help? Contact support at:</p>
-                <p class="text-xs font-semibold text-white mb-1">support@goldlincschools.edu</p>
-                <p class="text-xs text-brand-300">Available: Mon-Fri, 8 AM - 5 PM</p>
-            </div>
-        </aside>
+                <div>
+                    <label class="block font-bold text-slate-400 mb-1">Task Deployment Routing Type</label>
+                    <select id="asmModalType" onchange="toggleAssignmentTypeSection()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500 text-brand-900">
+                        <option value="STANDARD">Standard Task Portfolio (Rich Text & Instructions)</option>
+                        <option value="QUESTION_BANK">Question Bank Evaluation (Allocate Dynamic MCQs)</option>
+                    </select>
+                </div>
 
-        <!-- MAIN CONTENT -->
-        <main class="flex-1 overflow-auto">
-            <!-- TOP BAR FOR MOBILE -->
-            <div class="lg:hidden bg-white border-b border-gray-200 sticky top-0 z-40">
-                <div class="flex items-center justify-between p-4">
-                    <div class="flex items-center space-x-3">
-                        <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779961202/editor-uploads/frngf21mg4fcrnmccobm.png" class="h-10 w-auto object-contain" alt="Gold and Linc Schools Logo">
+                <div id="asmTypeStandardWrapper" class="space-y-1.5">
+                    <label class="block font-extrabold text-slate-400 uppercase tracking-wider">Task Guidelines & Instructions (Rich Text)</label>
+                    <div class="assignment-editor-container">
+                        <div id="quillAssignmentBody" class="bg-white rounded-xl"></div>
+                    </div>
+                </div>
+
+                <div id="asmTypeQuestionBankWrapper" class="space-y-3 hidden p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-200 pb-2">
                         <div>
-                            <p class="text-sm font-bold text-brand-900">Gold & Linc</p>
-                            <p class="text-xs text-gray-500">Portal</p>
+                            <h4 class="font-extrabold text-brand-900 text-xs uppercase tracking-wide">Question Bank Matrix Mapper</h4>
+                            <p class="text-[11px] text-slate-500">Select which objective questions to link with this task assignment.</p>
                         </div>
-                    </div>
-                    <button id="mobileMenuBtn" class="text-gray-500 hover:text-gray-700 p-2 rounded hover:bg-gray-100 transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                    </button>
-                </div>
-
-                <!-- Mobile Menu Dropdown -->
-                <div id="mobileSidebar" class="hidden border-t border-gray-200 bg-white max-h-96 overflow-y-auto">
-                    <div class="p-4 space-y-3">
-                        <p class="text-xs uppercase tracking-widest text-brand-900 font-semibold mb-3">Select Portal</p>
-                        
-                        <button class="mobile-portal-selector w-full text-left px-4 py-2 rounded-lg bg-gold-600 text-black font-medium transition-all text-sm" data-portal="parent">
-                            <span class="flex items-center">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                                Parents Portal
-                            </span>
-                        </button>
-
-                        <button class="mobile-portal-selector w-full text-left px-4 py-2 rounded-lg bg-brand-700 hover:bg-brand-600 text-black font-medium transition-all text-sm" data-portal="student">
-                            <span class="flex items-center">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C6.5 6.253 2 10.998 2 17.001c0 5.591 3.824 10.29 9 11.622m0-13c5.5 0 10 4.745 10 10.999c0 5.591-3.824 10.29-9 11.622"></path></svg>
-                                Students Portal
-                            </span>
-                        </button>
-
-                        <button class="mobile-portal-selector w-full text-left px-4 py-2 rounded-lg bg-brand-700 hover:bg-brand-600 text-black font-medium transition-all text-sm" data-portal="staff">
-                            <span class="flex items-center">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
-                                Staff Portal
-                            </span>
-                        </button>
+                        <select id="asmBankCategorySelector" onchange="loadQuestionsForAllocation()" class="bg-white border border-slate-200 rounded-xl text-[11px] font-bold text-slate-700 p-1.5 outline-none focus:ring-1 focus:ring-brand-500">
+                            </select>
                     </div>
 
-                    <div class="border-t border-gray-200 p-4">
-                        <p class="text-xs uppercase tracking-widest text-brand-900 font-semibold mb-3">Features</p>
-                        <ul class="space-y-2 text-xs text-gray-800">
-                            <li class="flex items-center">
-                                <svg class="w-3 h-3 mr-2 text-gold-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
-                                Academic Records
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-3 h-3 mr-2 text-gold-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
-                                Grade Reports
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-3 h-3 mr-2 text-gold-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
-                                Fee Management
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-3 h-3 mr-2 text-gold-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
-                                Attendance Tracking
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-3 h-3 mr-2 text-gold-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
-                                Messaging System
-                            </li>
-                        </ul>
-                    </div>
+                    <div id="asmAllocationQuestionsContainer" class="space-y-3 max-h-60 overflow-y-auto pt-1">
+                        </div>
                 </div>
             </div>
 
-            <!-- LOGIN SECTION -->
-            <div class="flex items-center justify-center min-h-screen lg:min-h-full p-4">
-                <div class="w-full max-w-md">
-                    <!-- Logo and Welcome for Mobile -->
-                    <div class="lg:hidden text-center mb-6">
-                        <div class="flex justify-center mb-4">
-                            <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779961202/editor-uploads/frngf21mg4fcrnmccobm.png" class="h-16 w-auto object-contain" alt="Gold and Linc Schools Logo">
-                        </div>
-                    </div>
+            <div class="p-3.5 border-t border-slate-100 bg-slate-50 flex justify-end space-x-2">
+                <button onclick="closeAssignmentModal()" class="bg-white border border-slate-200 text-slate-600 font-bold px-4 py-1.5 rounded-xl text-[11px] uppercase">Cancel</button>
+                <button onclick="commitAssignmentDeployment()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold px-5 py-1.5 rounded-xl text-[11px] uppercase tracking-wider transition">Deploy Task Portfolio</button>
+            </div>
+        </div>
+    </div>
 
-                    <!-- Welcome Card -->
-                    <div class="text-center mb-8">
-                        <h1 class="text-3xl lg:text-4xl font-bold text-brand-900 font-serif mb-2">Welcome Back</h1>
-                        <p class="text-gray-600">Sign in to your Gold and Linc Schools account</p>
-                    </div>
+    <div id="mediaPickerDialog" class="fixed inset-0 z-[100] overflow-y-auto bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white rounded-xl border border-slate-200 w-full max-w-md shadow-2xl p-5 space-y-4 text-xs">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                <h4 class="font-extrabold text-brand-900 uppercase tracking-wider">Insert Rich Text Image</h4>
+                <button onclick="closeMediaPicker()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">&times;</button>
+            </div>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block font-bold text-slate-500 uppercase tracking-wider text-[10px] mb-1">Option A: Upload Local Asset File</label>
+                    <input type="file" id="mediaLocalFileInput" accept="image/*" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs outline-none focus:ring-1 focus:ring-brand-500">
+                </div>
+                
+                <div class="relative flex py-2 items-center">
+                    <div class="flex-grow border-t border-slate-200"></div>
+                    <span class="flex-shrink mx-3 text-slate-400 font-bold text-[10px] uppercase">Or</span>
+                    <div class="flex-grow border-t border-slate-200"></div>
+                </div>
 
-                    <!-- Login Form -->
-                    <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-8 lg:p-10">
-                        <!-- Portal Name Display -->
-                        <div class="mb-8 p-4 rounded-lg bg-brand-50 border border-brand-200">
-                            <p class="text-xs text-brand-600 uppercase tracking-widest font-semibold mb-1">Current Portal</p>
-                            <p class="text-lg font-bold text-brand-900" id="portalDisplay">Parents Portal</p>
-                        </div>
-
-                        <form id="loginForm" class="space-y-6">
-                            <!-- Email/Registration Field -->
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address or Registration Number</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                                    </div>
-                                    <input type="text" id="emailOrReg" required class="w-full bg-gray-50 border border-gray-300 rounded-lg pl-10 pr-4 py-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white focus:border-transparent outline-none transition-all" placeholder="Enter your email or registration number">
-                                </div>
-                            </div>
-
-                            <!-- Password Field -->
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                                    </div>
-                                    <input type="password" id="passwordInput" required class="w-full bg-gray-50 border border-gray-300 rounded-lg pl-10 pr-12 py-3 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white focus:border-transparent outline-none transition-all" placeholder="Enter your password">
-                                    <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600" onclick="togglePassword()">
-                                        <svg id="eyeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Remember Me & Forgot Password -->
-                            <div class="flex items-center justify-between">
-                                <label class="flex items-center">
-                                    <input type="checkbox" id="keepLoggedIn" class="w-4 h-4 text-brand-600 rounded border-gray-300 focus:ring-brand-500">
-                                    <span class="ml-2 text-sm text-gray-600">Keep me logged on</span>
-                                </label>
-                                <a href="#" class="text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors">Forgot password?</a>
-                            </div>
-
-                            <!-- Login Button -->
-                            <button type="submit" class="w-full bg-brand-500 hover:bg-brand-800 text-white font-semibold py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center group">
-                                <svg class="w-5 h-5 mr-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h12.75"></path></svg>
-                                SIGN IN
-                            </button>
-
-                            <!-- Spinner (Hidden by default) -->
-                            <div id="spinner" class="hidden text-center mt-4">
-                                <svg class="animate-spin h-5 w-5 text-brand-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                            </div>
-                        </form>
-
-                        <!-- Divider -->
-                        <div class="my-8 relative">
-                            <div class="absolute inset-0 flex items-center">
-                                <div class="w-full border-t border-gray-300"></div>
-                            </div>
-                            <div class="relative flex justify-center text-sm">
-                                <span class="px-2 bg-white text-gray-500">or continue with</span>
-                            </div>
-                        </div>
-
-                        <!-- SSO Options -->
-                        <div class="space-y-3">
-                            <button type="button" class="w-full border border-gray-300 rounded-lg py-2.5 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center">
-                                <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24"><path fill="#1F2937" d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm0 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm3.5 9c.828 0 1.5.672 1.5 1.5s-.672 1.5-1.5 1.5-1.5-.672-1.5-1.5.672-1.5 1.5-1.5zm-7 0c.828 0 1.5.672 1.5 1.5s-.672 1.5-1.5 1.5-1.5-.672-1.5-1.5.672-1.5 1.5-1.5z"/></svg>
-                                Sign in with Google
-                            </button>
-                            <button type="button" class="w-full border border-gray-300 rounded-lg py-2.5 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center">
-                                <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24"><path fill="#1F2937" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                                Sign in with LinkedIn
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Footer Links -->
-                    <div class="mt-8 text-center space-y-3">
-                        <p class="text-sm text-gray-600">
-                            Don't have an account? 
-                            <a href="admissions.html" class="font-medium text-brand-600 hover:text-brand-700 transition-colors">Apply Now</a>
-                        </p>
-                        <div class="flex justify-center space-x-6 text-xs text-gray-500">
-                            <a href="#" class="hover:text-gray-700 transition-colors">Privacy Policy</a>
-                            <a href="#" class="hover:text-gray-700 transition-colors">Terms of Service</a>
-                            <a href="index.html" class="hover:text-gray-700 transition-colors">Back to Home</a>
-                        </div>
-                    </div>
+                <div>
+                    <label class="block font-bold text-slate-500 uppercase tracking-wider text-[10px] mb-1">Option B: Link Asset URL Address</label>
+                    <input type="url" id="mediaUrlInput" placeholder="https://example.com/image.png" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs outline-none focus:ring-1 focus:ring-brand-500">
                 </div>
             </div>
-        </main>
+
+            <div class="pt-2 flex justify-end space-x-2 border-t border-slate-100">
+                <button onclick="closeMediaPicker()" class="bg-white border border-slate-200 text-slate-600 font-bold px-3 py-1.5 rounded-lg uppercase text-[10px]">Close</button>
+                <button onclick="commitMediaAssetInsertion()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold px-4 py-1.5 rounded-lg uppercase text-[10px]">Insert Image</button>
+            </div>
+        </div>
     </div>
 
-    <!-- Success Toast (Hidden) -->
-    <div id="successToast" class="hidden fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 z-50 animate-pulse">
-        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
-        <span>Login successful! Redirecting...</span>
-    </div>
-
-    <!-- Error Toast (Hidden) -->
-    <div id="errorToast" class="hidden fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 z-50">
-        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" fill-rule="evenodd"></path></svg>
-        <span id="errorMsg">An error occurred</span>
-    </div>
-
-    <!-- Flowbite Script -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
-
-    <!-- Custom JavaScript with Backend Integration -->
     <script>
-        let currentPortal = 'parent';
+        const overlay = document.getElementById('bottomDrawerOverlay');
+        const card = document.getElementById('bottomDrawerCard');
+        
+        let activeIsolatedCollectionId = null;
+        let activeTargetModalMode = 'CREATE';
+        let contextualTargetQuestionId = null;
 
-        // Mobile Menu Toggle
-        document.addEventListener('DOMContentLoaded', function() {
-            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-            const mobileSidebar = document.getElementById('mobileSidebar');
+        let stemQuillInstance = null;
+        let explanationQuillInstance = null;
+        let assignmentQuillInstance = null;
+        let optionQuillRegistry = {}; 
 
-            if (mobileMenuBtn && mobileSidebar) {
-                mobileMenuBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    mobileSidebar.classList.toggle('hidden');
-                });
+        // Active context tracking variables for media asset injection redirection
+        let activeMediaTargetQuillInstance = null;
 
-                document.addEventListener('click', function(e) {
-                    if (!mobileSidebar.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
-                        mobileSidebar.classList.add('hidden');
+        // STATE DATABASES
+        let assessmentDatabase = [
+            {
+                id: "collection_1",
+                name: "SS2 BIOLOGY TEST 1",
+                questions: [
+                    {
+                        id: "q_1_1",
+                        text: "<p>Study the provided biological matrix. Which of the following organelles forms the primary site for cellular respiration pathways within animal tissue layers?</p>",
+                        imageUrl: "https://images.unsplash.com/photo-1532187863486-abf9d39d6618?auto=format&fit=crop&w=300&q=80",
+                        options: [
+                            { text: "<p>Mitochondrion structures</p>", isCorrect: true },
+                            { text: "<p>Ribosomal body complexes</p>", isCorrect: false },
+                            { text: "<p>Lysosomal waste paths</p>", isCorrect: false },
+                            { text: "<p>Nucleolus core bounds</p>", isCorrect: false }
+                        ],
+                        explanation: "<p>The mitochondrion orchestrates adenosine triphosphate generation through systematic citric acid cycle configurations.</p>"
+                    },
+                    {
+                        id: "q_1_2",
+                        text: "<p>Identify the primary function of rough endoplasmic reticulum sheets during cellular adaptation sequences.</p>",
+                        imageUrl: "",
+                        options: [
+                            { text: "<p>Polypeptide structure synthesis</p>", isCorrect: true },
+                            { text: "<p>Lipid synthesis matrix chains</p>", isCorrect: false }
+                        ],
+                        explanation: "<p>Rough endoplasmic reticulum holds ribosomes explicitly for surface translation pathways.</p>"
                     }
-                });
-
-                document.querySelectorAll('.mobile-portal-selector').forEach(button => {
-                    button.addEventListener('click', function() {
-                        mobileSidebar.classList.add('hidden');
-                    });
-                });
+                ]
+            },
+            {
+                id: "collection_2",
+                name: "SS3 MOCK EXAM PRACTICALS",
+                questions: [
+                    {
+                        id: "q_2_1",
+                        text: "<p>During mammalian respiration modeling setups, what specific color variation shows up inside lime water when exposed to unpurified carbon dioxide bubbles?</p>",
+                        imageUrl: "",
+                        options: [
+                            { text: "<p>Milky precipitation formation</p>", isCorrect: true },
+                            { text: "<p>Translucent azure blue shift</p>", isCorrect: false }
+                        ],
+                        explanation: "<p>Insoluble calcium carbonate precipitates form cleanly inside the water solution.</p>"
+                    }
+                ]
             }
-        });
+        ];
 
-        // Desktop Portal Selection
-        document.querySelectorAll('.portal-selector').forEach(button => {
-            button.addEventListener('click', function() {
-                currentPortal = this.dataset.portal;
-                
-                document.querySelectorAll('.portal-selector').forEach(btn => {
-                    btn.classList.remove('bg-gold-600');
-                    btn.classList.add('bg-brand-700', 'hover:bg-brand-600');
-                });
-                this.classList.add('bg-gold-600');
-                this.classList.remove('bg-brand-700', 'hover:bg-brand-600');
-                
-                updatePortalDisplay(this.dataset.portal);
-            });
-        });
+        let studentRegistry = [
+            { code: "GLS/2024/048", name: "Samuel Adeniyi", classGroup: "SS2 Alpha", ca1Mark: 17, ca2Mark: 17, examMark: 48, standing: "Active" },
+            { code: "GLS/2024/091", name: "Chidi Okafor", classGroup: "SS2 Alpha", ca1Mark: 14, ca2Mark: 14, examMark: 42, standing: "Active" },
+            { code: "GLS/2023/012", name: "Fatima Bello", classGroup: "SS3 Beta", ca1Mark: 15, ca2Mark: 16, examMark: 51, standing: "Active" }
+        ];
 
-        // Mobile Portal Selection
-        document.querySelectorAll('.mobile-portal-selector').forEach(button => {
-            button.addEventListener('click', function() {
-                currentPortal = this.dataset.portal;
-                
-                document.querySelectorAll('.mobile-portal-selector').forEach(btn => {
-                    btn.classList.remove('bg-gold-600');
-                    btn.classList.add('bg-brand-700', 'hover:bg-brand-600');
-                });
-                this.classList.add('bg-gold-600');
-                this.classList.remove('bg-brand-700', 'hover:bg-brand-600');
-                
-                updatePortalDisplay(this.dataset.portal);
-            });
-        });
+        let assignmentsDatabase = [
+            { id: "asm_1", title: "Mendelian Genetics Punnett Square Deck", classGroup: "SS2 Alpha", due: "2026-06-04", status: "Open", type: "STANDARD", questionsAllocated: [] },
+            { id: "asm_2", title: "Mammalian Circulatory Pathway Tracking Portfolio", classGroup: "SS3 Beta", due: "2026-06-09", status: "Open", type: "STANDARD", questionsAllocated: [] }
+        ];
 
-        function updatePortalDisplay(portal) {
-            const portalNames = {
-                'parent': 'Parents Portal',
-                'student': 'Students Portal',
-                'staff': 'Staff Portal'
-            };
-            document.getElementById('portalDisplay').textContent = portalNames[portal];
+        // ONLOAD RUNTIME SETUP
+        function initSystemNode() {
+            renderCollections(); 
+            renderStudents(); 
+            renderAssignments(); 
+            renderGradebook();
         }
 
-        // Password Toggle
-        function togglePassword() {
-            const input = document.getElementById('passwordInput');
-            const icon = document.getElementById('eyeIcon');
+        // EXPLICIT RUNTIME TAB CONTROL ENGINE
+        function switchPanel(panelId) {
+            const panels = ['overview', 'assessments', 'assignments', 'students', 'grading', 'profile'];
             
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-4.803m5.596-3.856a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h12"></path>';
+            panels.forEach(p => {
+                const targetPanel = document.getElementById(`panel-${p}`);
+                const targetButton = document.getElementById(`btn-${p}`);
+                
+                if (p === panelId) {
+                    if (targetPanel) targetPanel.classList.remove('hidden');
+                    if (targetButton) {
+                        targetButton.classList.remove('sidebar-btn-inactive');
+                        targetButton.classList.add('sidebar-btn-active');
+                    }
+                } else {
+                    if (targetPanel) targetPanel.classList.add('hidden');
+                    if (targetButton) {
+                        targetButton.classList.remove('sidebar-btn-active');
+                        targetButton.classList.add('sidebar-btn-inactive');
+                    }
+                }
+            });
+            
+            closeBottomNav(null);
+        }
+
+        // MOBILE DRAWER LOGIC
+        function openBottomNav() {
+            overlay.classList.remove('hidden');
+            setTimeout(() => { overlay.classList.remove('opacity-0'); card.classList.remove('translate-y-full'); }, 20);
+        }
+        function closeBottomNav(event) {
+            if (!event || event.target === overlay) {
+                overlay.classList.add('opacity-0'); card.classList.add('translate-y-full');
+                setTimeout(() => { overlay.classList.add('hidden'); }, 300);
+            }
+        }
+
+        /* -----------------------------------------------------------
+           MEDIA PICKER LOGIC AND OVERRIDE HANDLER
+           ----------------------------------------------------------- */
+        function triggerCustomMediaPicker(quillInstance) {
+            activeMediaTargetQuillInstance = quillInstance;
+            document.getElementById('mediaLocalFileInput').value = '';
+            document.getElementById('mediaUrlInput').value = '';
+            document.getElementById('mediaPickerDialog').style.display = 'flex';
+        }
+
+        function closeMediaPicker() {
+            document.getElementById('mediaPickerDialog').style.display = 'none';
+            activeMediaTargetQuillInstance = null;
+        }
+
+        function commitMediaAssetInsertion() {
+            if (!activeMediaTargetQuillInstance) return;
+            
+            const localFile = document.getElementById('mediaLocalFileInput').files[0];
+            const urlAddress = document.getElementById('mediaUrlInput').value.trim();
+            
+            const range = activeMediaTargetQuillInstance.getSelection(true);
+
+            if (localFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    activeMediaTargetQuillInstance.insertEmbed(range.index, 'image', e.target.result);
+                    activeMediaTargetQuillInstance.setSelection(range.index + 1);
+                    closeMediaPicker();
+                };
+                reader.readAsDataURL(localFile);
+            } else if (urlAddress) {
+                activeMediaTargetQuillInstance.insertEmbed(range.index, 'image', urlAddress);
+                activeMediaTargetQuillInstance.setSelection(range.index + 1);
+                closeMediaPicker();
             } else {
-                input.type = 'password';
-                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
+                alert("Please complete an upload path or append a verified URL address link path.");
             }
         }
 
-        // Show Error Toast
-        function showErrorToast(message) {
-            const toast = document.getElementById('errorToast');
-            document.getElementById('errorMsg').textContent = message;
-            toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 4000);
-        }
+        /* -----------------------------------------------------------
+           QUESTION BANK LAYOUT ENGINE
+           ----------------------------------------------------------- */
+        function renderCollections() {
+            const container = document.getElementById('collectionsContainer');
+            container.innerHTML = '';
+            document.getElementById('overviewCollectionCount').innerText = `${assessmentDatabase.length} Saved Collections`;
 
-        // Form Submission with Backend Integration
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const emailOrReg = document.getElementById('emailOrReg').value.trim();
-            const password = document.getElementById('passwordInput').value.trim();
-            const keepLoggedIn = document.getElementById('keepLoggedIn').checked;
-            const spinner = document.getElementById('spinner');
-            const submitBtn = this.querySelector('button[type="submit"]');
-
-            if (!emailOrReg || !password) {
-                showErrorToast('Please fill in all fields.');
+            if(assessmentDatabase.length === 0) {
+                container.innerHTML = `<div class="text-center p-8 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-xs font-bold">No active evaluation collections registered.</div>`;
                 return;
             }
 
-            const isEmail = emailOrReg.includes('@');
-            
-            // Show spinner
-            spinner.classList.remove('hidden');
-            submitBtn.disabled = true;
-            submitBtn.style.opacity = '0.6';
+            assessmentDatabase.forEach((collection) => {
+                const isSomeActive = activeIsolatedCollectionId !== null;
+                const isThisActive = activeIsolatedCollectionId === collection.id;
 
-            try {
-                // Try parent login first if it looks like an email
-                if (isEmail && currentPortal === 'parent') {
-                    try {
-                        const parentRes = await fetch('https://goldlincschools.onrender.com/api/parents/login', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email: emailOrReg, password }),
+                if (isSomeActive && !isThisActive) return;
+
+                let questionsHtml = '';
+                if (isThisActive) {
+                    if(collection.questions.length === 0) {
+                        questionsHtml = `<div class="text-center p-6 bg-white border border-slate-150 rounded-xl text-slate-400 text-[11px] font-bold">No active objective questions inside this category array.</div>`;
+                    } else {
+                        collection.questions.forEach((q, index) => {
+                            let choicesMarkup = '';
+                            q.options.forEach((opt, oIdx) => {
+                                const letter = String.fromCharCode(65 + oIdx);
+                                choicesMarkup += `
+                                    <div class="p-2.5 rounded-lg border ${opt.isCorrect ? 'bg-emerald-50/70 border-emerald-300 text-emerald-900 font-bold' : 'bg-slate-50 border-slate-100'} text-xs">
+                                        <div class="flex items-start"><span class="font-bold mr-1.5">${letter}.</span> <div class="w-full">${opt.text}</div></div>
+                                    </div>`;
+                            });
+
+                            questionsHtml += `
+                                <div class="p-5 bg-white border border-slate-200 rounded-xl space-y-3 relative shadow-inner">
+                                    <div class="flex justify-between items-center text-[11px]">
+                                        <span class="font-extrabold text-brand-500 font-mono">OBJECTIVE QUESTION ${index + 1}</span>
+                                        <div class="flex space-x-1.5">
+                                            <button onclick="openEditQuestionModal('${collection.id}', '${q.id}')" class="text-brand-800 hover:text-white hover:bg-brand-800 font-bold uppercase text-[10px] bg-brand-50 px-2.5 py-1 rounded-lg transition border border-brand-200">Edit</button>
+                                            <button onclick="deleteQuestion('${collection.id}', '${q.id}')" class="text-rose-600 hover:text-white hover:bg-rose-600 font-bold uppercase text-[10px] bg-rose-50 px-2.5 py-1 rounded-lg transition border border-rose-100">Delete</button>
+                                        </div>
+                                    </div>
+                                    <div class="text-xs font-bold text-slate-900 leading-relaxed">${q.text}</div>
+                                    ${q.imageUrl ? `<img src="${q.imageUrl}" class="max-h-36 w-auto object-contain rounded border border-slate-200 bg-slate-50 p-1">` : ''}
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">${choicesMarkup}</div>
+                                    ${q.explanation ? `<div class="p-2.5 bg-amber-50/60 border border-amber-200 text-amber-900 rounded-lg text-[11px] font-medium"><strong class="font-bold">Rationale:</strong> ${q.explanation}</div>` : ''}
+                                </div>`;
                         });
-
-                        if (parentRes.ok) {
-                            const parentData = await parentRes.json();
-                            if (parentData?.token) {
-                                localStorage.setItem('token', parentData.token);
-                                localStorage.setItem('parentToken', parentData.token);
-                                localStorage.setItem('parentId', parentData.parent._id);
-                                localStorage.setItem('parentName', parentData.parent.name);
-                                localStorage.setItem('userRole', 'parent');
-                                localStorage.setItem('user', JSON.stringify(parentData.parent));
-                                
-                                if (keepLoggedIn) {
-                                    localStorage.setItem('keepLoggedIn', 'true');
-                                }
-
-                                document.getElementById('successToast').classList.remove('hidden');
-                                setTimeout(() => {
-                                    window.location.href = 'p-dashboard.html';
-                                }, 1500);
-                                return;
-                            }
-                        }
-                    } catch (parentErr) {
-                        console.log('Parent login attempt failed, trying regular auth...');
                     }
                 }
 
-                // Try regular auth (student/admin/teacher/staff)
-                const body = isEmail
-                    ? { email: emailOrReg, password }
-                    : { regNo: emailOrReg, password };
+                const actionButtonHtml = isThisActive 
+                    ? `<button onclick="toggleCollectionFocus(null)" class="bg-slate-700 hover:bg-slate-800 text-white font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">&larr; Collapse View</button>`
+                    : `<button onclick="toggleCollectionFocus('${collection.id}')" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">View Items (${collection.questions.length}) &rarr;</button>`;
 
-                const res = await fetch('https://goldlincschools.onrender.com/api/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body),
+                container.innerHTML += `
+                    <div class="p-5 border border-slate-200 rounded-2xl bg-slate-50/60 space-y-4 shadow-sm relative">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-3">
+                            <div>
+                                <span class="inline-block text-[9px] font-black tracking-widest bg-brand-900 text-white px-2 py-0.5 rounded uppercase font-mono">Category Track</span>
+                                <h3 class="text-sm font-black text-slate-900 mt-1 uppercase tracking-wide font-serif">${collection.name}</h3>
+                            </div>
+                            <div class="flex items-center space-x-1.5 self-end sm:self-auto">
+                                ${isThisActive ? `
+                                <button onclick="openCreateQuestionModal('${collection.id}')" class="bg-brand-50 border border-brand-200 hover:bg-brand-100 text-brand-900 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">
+                                    + Insert Question
+                                </button>` : ''}
+                                ${actionButtonHtml}
+                                <button onclick="deleteCollection('${collection.id}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">Drop Category</button>
+                            </div>
+                        </div>
+                        ${isThisActive ? `<div class="space-y-3 pt-2 animate-[fadeIn_0.25s_ease-out]">${questionsHtml}</div>` : ''}
+                    </div>`;
+            });
+        }
+
+        function toggleCollectionFocus(collectionId) {
+            activeIsolatedCollectionId = collectionId;
+            document.getElementById('collectionControlHeader').classList.toggle('hidden', collectionId !== null);
+            renderCollections();
+        }
+
+        function createCollection() {
+            const input = document.getElementById('newCollectionName');
+            const nameValue = input.value.trim().toUpperCase();
+            if(!nameValue) { alert("Please declare a legal collection title."); return; }
+            assessmentDatabase.push({ id: `collection_${Date.now()}`, name: nameValue, questions: [] });
+            input.value = '';
+            renderCollections();
+        }
+
+        function deleteCollection(collectionId) {
+            if(confirm("Are you certain you want to purge this full testing category?")) {
+                assessmentDatabase = assessmentDatabase.filter(c => c.id !== collectionId);
+                if(activeIsolatedCollectionId === collectionId) toggleCollectionFocus(null);
+                renderCollections();
+            }
+        }
+
+        /* -----------------------------------------------------------
+           MODAL RICH TEXT STACK MUTATOR METHODS
+           ----------------------------------------------------------- */
+        function initModalStemsIfRequired() {
+            if(!stemQuillInstance) {
+                stemQuillInstance = new Quill('#quillQuestionStem', {
+                    theme: 'snow',
+                    placeholder: 'Enter rich-text biology assessment item stem...',
+                    modules: { toolbar: [['bold', 'italic', 'underline'], ['image'], ['clean']] }
+                });
+                stemQuillInstance.getModule('toolbar').addHandler('image', function() {
+                    triggerCustomMediaPicker(stemQuillInstance);
+                });
+            }
+            if(!explanationQuillInstance) {
+                explanationQuillInstance = new Quill('#quillExplanation', {
+                    theme: 'snow',
+                    placeholder: 'Provide step-by-step resolution rationale for student correction paths...',
+                    modules: { toolbar: [['bold', 'italic', 'underline'], ['image'], ['clean']] }
+                });
+                explanationQuillInstance.getModule('toolbar').addHandler('image', function() {
+                    triggerCustomMediaPicker(explanationQuillInstance);
+                });
+            }
+        }
+
+        function appendBlankOptionField(initialHtml = '', checkedState = false) {
+            const wrapper = document.getElementById('modalOptionsWrapper');
+            const fieldIndex = `opt_row_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+            
+            const rowDiv = document.createElement('div');
+            rowDiv.id = fieldIndex;
+            rowDiv.className = "p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2 relative";
+            
+            rowDiv.innerHTML = `
+                <div class="flex items-center justify-between border-b border-slate-200/60 pb-1.5">
+                    <label class="flex items-center space-x-2 text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
+                        <input type="radio" name="correctAnswerRadio" class="w-3.5 h-3.5 text-brand-500 bg-white border-slate-300 focus:ring-1 focus:ring-brand-500" ${checkedState ? 'checked' : ''}>
+                        <span>Correct Evaluation Key Option</span>
+                    </label>
+                    <button onclick="removeOptionField('${fieldIndex}')" class="text-rose-500 hover:text-rose-700 font-bold uppercase text-[10px] bg-white border border-rose-100 px-2 py-0.5 rounded shadow-sm">Remove Field</button>
+                </div>
+                <div class="option-editor-container">
+                    <div id="editor_${fieldIndex}" class="bg-white rounded-lg"></div>
+                </div>`;
+            
+            wrapper.appendChild(rowDiv);
+
+            const optQuill = new Quill(`#editor_${fieldIndex}`, {
+                theme: 'snow',
+                placeholder: 'Write response option choices...',
+                modules: { toolbar: [['bold', 'italic', 'underline'], ['image'], ['clean']] }
+            });
+            
+            optQuill.getModule('toolbar').addHandler('image', function() {
+                triggerCustomMediaPicker(optQuill);
+            });
+            
+            if(initialHtml) optQuill.root.innerHTML = initialHtml;
+            optionQuillRegistry[fieldIndex] = optQuill;
+        }
+
+        function removeOptionField(id) {
+            const row = document.getElementById(id);
+            if(row) { row.remove(); delete optionQuillRegistry[id]; }
+        }
+
+        function previewModalImage() {
+            const url = document.getElementById('modalImageUrl').value.trim();
+            const preview = document.getElementById('modalImagePreview');
+            if(url) { preview.src = url; preview.classList.remove('hidden'); }
+            else { preview.classList.add('hidden'); }
+        }
+
+        function openCreateQuestionModal(collectionId) {
+            activeTargetModalMode = 'CREATE';
+            activeIsolatedCollectionId = collectionId;
+            document.getElementById('modalTitle').innerText = "Deploy New Objective Item Structure";
+            
+            initModalStemsIfRequired();
+            stemQuillInstance.setText('');
+            explanationQuillInstance.setText('');
+            document.getElementById('modalImageUrl').value = '';
+            document.getElementById('modalImagePreview').classList.add('hidden');
+            document.getElementById('modalOptionsWrapper').innerHTML = '';
+            optionQuillRegistry = {};
+
+            appendBlankOptionField('', false);
+            appendBlankOptionField('', false);
+            appendBlankOptionField('', false);
+            appendBlankOptionField('', false);
+
+            document.getElementById('questionModal').style.display = 'flex';
+        }
+
+        function openEditQuestionModal(collectionId, questionId) {
+            activeTargetModalMode = 'EDIT';
+            activeIsolatedCollectionId = collectionId;
+            contextualTargetQuestionId = questionId;
+            document.getElementById('modalTitle').innerText = "Refine Saved Objective Item Parameters";
+
+            initModalStemsIfRequired();
+            const col = assessmentDatabase.find(c => c.id === collectionId);
+            const q = col.questions.find(item => item.id === questionId);
+
+            if(q) {
+                stemQuillInstance.root.innerHTML = q.text;
+                document.getElementById('modalImageUrl').value = q.imageUrl || '';
+                previewModalImage();
+                explanationQuillInstance.root.innerHTML = q.explanation || '';
+                document.getElementById('modalOptionsWrapper').innerHTML = '';
+                optionQuillRegistry = {};
+
+                q.options.forEach(opt => {
+                    appendBlankOptionField(opt.text, opt.isCorrect);
                 });
 
-                let data = {};
-                try {
-                    data = await res.json();
-                } catch (err) {
-                    showErrorToast('Server error: Invalid response');
+                document.getElementById('questionModal').style.display = 'flex';
+            }
+        }
+
+        function closeQuestionModal() { document.getElementById('questionModal').style.display = 'none'; }
+
+        function saveModalQuestionData() {
+            const stemHtml = stemQuillInstance.root.innerHTML.trim();
+            const plainStem = stemQuillInstance.getText().trim();
+            const imgUrl = document.getElementById('modalImageUrl').value.trim();
+            const expHtml = explanationQuillInstance.root.innerHTML.trim();
+
+            if(!plainStem) { alert("Question stem body value is required."); return; }
+
+            const optionRows = document.getElementById('modalOptionsWrapper').children;
+            if(optionRows.length < 2) { alert("Declare at least two option rows."); return; }
+
+            let compileOptions = [];
+            let chosenCorrectKey = false;
+
+            for(let row of optionRows) {
+                const id = row.id;
+                const inst = optionQuillRegistry[id];
+                const optHtml = inst.root.innerHTML.trim();
+                const optPlain = inst.getText().trim();
+                const radioCheck = row.querySelector('input[name="correctAnswerRadio"]').checked;
+
+                if(!optPlain) { alert("Empty option rows values are rejected."); return; }
+                if(radioCheck) chosenCorrectKey = true;
+
+                compileOptions.push({ text: optHtml, isCorrect: radioCheck });
+            }
+
+            if(!chosenCorrectKey) { alert("Flag one valid target response correct key selection."); return; }
+
+            const col = assessmentDatabase.find(c => c.id === activeIsolatedCollectionId);
+            if(!col) return;
+
+            if (activeTargetModalMode === 'CREATE') {
+                col.questions.push({
+                    id: `q_${Date.now()}`, text: stemHtml, imageUrl: imgUrl, options: compileOptions, explanation: expHtml
+                });
+            } else {
+                const q = col.questions.find(item => item.id === contextualTargetQuestionId);
+                if(q) { q.text = stemHtml; q.imageUrl = imgUrl; q.options = compileOptions; q.explanation = expHtml; }
+            }
+
+            closeQuestionModal();
+            renderCollections();
+        }
+
+        function deleteQuestion(collectionId, questionId) {
+            const targetCollection = assessmentDatabase.find(c => c.id === collectionId);
+            if(targetCollection && confirm("Drop this isolated test question?")) {
+                targetCollection.questions = targetCollection.questions.filter(q => q.id !== questionId);
+                renderCollections();
+            }
+        }
+
+        /* -----------------------------------------------------------
+           ASSIGNMENTS DESIGN PORTFOLIO WITH MCQ ALLOCATION LOGIC
+           ----------------------------------------------------------- */
+        function renderAssignments() {
+            const container = document.getElementById('assignmentsContainer');
+            container.innerHTML = '';
+
+            if(assignmentsDatabase.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center p-6 border rounded-xl text-slate-400 font-bold">No assignments distributed.</div>`;
+                return;
+            }
+
+            assignmentsDatabase.forEach(a => {
+                const typeLabel = a.type === 'QUESTION_BANK' 
+                    ? `<span class="bg-indigo-100 text-indigo-800 border border-indigo-200 text-[10px] px-2 py-0.5 rounded font-bold uppercase">MCQ Question Bank Assessment</span>`
+                    : `<span class="bg-slate-100 text-slate-700 border border-slate-200 text-[10px] px-2 py-0.5 rounded font-bold uppercase">Standard Task Instructions</span>`;
+
+                let innerMetaHtml = '';
+                if(a.type === 'QUESTION_BANK') {
+                    innerMetaHtml = `<p class="text-[11px] text-brand-800 font-bold bg-brand-50 p-2 rounded-lg border border-brand-100">&bull; Allocated Evaluation Total: ${a.questionsAllocated ? a.questionsAllocated.length : 0} Objective Items Linked</p>`;
+                } else if(a.instructions) {
+                    innerMetaHtml = `<div class="text-[11px] text-slate-500 line-clamp-2 bg-slate-50 p-2 rounded border border-slate-150">${a.instructions.replace(/<[^>]*>/g, '')}</div>`;
+                }
+
+                container.innerHTML += `
+                    <div class="p-5 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-sm relative">
+                        <div class="flex justify-between items-start">
+                            <span class="text-[9px] font-black bg-brand-900 text-white px-2 py-0.5 rounded tracking-widest uppercase font-mono">${a.classGroup}</span>
+                            <span class="text-[10px] text-slate-400 font-bold">Due Parameter: ${a.due}</span>
+                        </div>
+                        <h4 class="text-xs font-black text-slate-900 uppercase font-serif tracking-wide leading-snug">${a.title}</h4>
+                        <div class="py-0.5">${typeLabel}</div>
+                        ${innerMetaHtml}
+                        <div class="flex justify-between items-center pt-2.5 text-[11px] border-t border-slate-100">
+                            <span class="text-emerald-600 font-extrabold">&bull; Tracking Link: ${a.status}</span>
+                            <button onclick="alert('Launching student performance response portfolio tracking dashboards...')" class="text-brand-800 font-bold hover:underline tracking-wider uppercase text-[10px]">Analytics Desk &rarr;</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function openAssignmentModal() {
+            if(!assignmentQuillInstance) {
+                assignmentQuillInstance = new Quill('#quillAssignmentBody', {
+                    theme: 'snow',
+                    placeholder: 'Define tasks, instructions, objectives or research specifications...',
+                    modules: { toolbar: [['bold', 'italic', 'underline'], ['image'], ['clean']] }
+                });
+                assignmentQuillInstance.getModule('toolbar').addHandler('image', function() {
+                    triggerCustomMediaPicker(assignmentQuillInstance);
+                });
+            }
+
+            // Reset Fields
+            document.getElementById('asmModalTitle').value = '';
+            document.getElementById('asmModalDue').value = '';
+            document.getElementById('asmModalType').value = 'STANDARD';
+            assignmentQuillInstance.setText('');
+            
+            toggleAssignmentTypeSection();
+            populateAssignmentBankCategories();
+
+            document.getElementById('assignmentModal').style.display = 'flex';
+        }
+
+        function closeAssignmentModal() {
+            document.getElementById('assignmentModal').style.display = 'none';
+        }
+
+        function toggleAssignmentTypeSection() {
+            const type = document.getElementById('asmModalType').value;
+            const standardWrapper = document.getElementById('asmTypeStandardWrapper');
+            const bankWrapper = document.getElementById('asmTypeQuestionBankWrapper');
+
+            if(type === 'STANDARD') {
+                standardWrapper.classList.remove('hidden');
+                bankWrapper.classList.add('hidden');
+            } else {
+                standardWrapper.classList.add('hidden');
+                bankWrapper.classList.remove('hidden');
+                loadQuestionsForAllocation();
+            }
+        }
+
+        function populateAssignmentBankCategories() {
+            const selector = document.getElementById('asmBankCategorySelector');
+            selector.innerHTML = '';
+            assessmentDatabase.forEach(c => {
+                selector.innerHTML += `<option value="${c.id}">${c.name} (${c.questions.length} Items)</option>`;
+            });
+        }
+
+        function loadQuestionsForAllocation() {
+            const catId = document.getElementById('asmBankCategorySelector').value;
+            const container = document.getElementById('asmAllocationQuestionsContainer');
+            container.innerHTML = '';
+
+            if(!catId) {
+                container.innerHTML = `<p class="text-slate-400 font-bold text-[11px] py-2">Create a Question Bank Category first.</p>`;
+                return;
+            }
+
+            const col = assessmentDatabase.find(c => c.id === catId);
+            if(!col || col.questions.length === 0) {
+                container.innerHTML = `<p class="text-slate-400 font-bold text-[11px] py-2">No question tracks found in this category portfolio loop.</p>`;
+                return;
+            }
+
+            col.questions.forEach((q, index) => {
+                const cleanTextPreview = q.text.replace(/<[^>]*>/g, '');
+                container.innerHTML += `
+                    <label class="flex items-start space-x-3 p-2.5 bg-white border border-slate-200 rounded-xl hover:border-brand-300 transition cursor-pointer select-none">
+                        <input type="checkbox" value="${q.id}" class="asm-allocated-checkbox mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                        <div class="text-[11px] font-medium text-slate-800">
+                            <span class="font-extrabold text-brand-600 block mb-0.5">ITEM ROW #${index+1}</span>
+                            <span class="line-clamp-2 text-slate-600 font-semibold">${cleanTextPreview}</span>
+                        </div>
+                    </label>`;
+            });
+        }
+
+        function commitAssignmentDeployment() {
+            const titleValue = document.getElementById('asmModalTitle').value.trim();
+            const classValue = document.getElementById('asmModalClass').value;
+            const dueValue = document.getElementById('asmModalDue').value;
+            const typeValue = document.getElementById('asmModalType').value;
+
+            if(!titleValue || !dueValue) {
+                alert("Please write a valid assignment title and select a clear deadline date point.");
+                return;
+            }
+
+            let allocatedArray = [];
+            let instructionsHtml = '';
+
+            if(typeValue === 'STANDARD') {
+                instructionsHtml = assignmentQuillInstance.root.innerHTML.trim();
+            } else {
+                const checkedBoxes = document.querySelectorAll('.asm-allocated-checkbox:checked');
+                checkedBoxes.forEach(cb => {
+                    allocatedArray.push(cb.value);
+                });
+
+                if(allocatedArray.length === 0) {
+                    alert("Please select at least one checkable MCQ box block to allocate to this assessment portfolio.");
                     return;
                 }
-
-                if (res.ok && data?.token) {
-                    // Store JWT token in multiple keys for compatibility
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('authToken', data.token);
-                    localStorage.setItem('adminToken', data.token);
-                    localStorage.setItem('superadmin_token', data.token);
-                    localStorage.setItem('student_token', data.token);
-                    
-                    if (data.user) {
-                        localStorage.setItem('user', JSON.stringify(data.user));
-                        localStorage.setItem('userRole', data.user.role);
-                    }
-
-                    if (keepLoggedIn) {
-                        localStorage.setItem('keepLoggedIn', 'true');
-                    }
-
-                    console.log('✓ Login successful for role:', data.user?.role);
-
-                    document.getElementById('successToast').classList.remove('hidden');
-
-                    // Role-based redirect
-                    const role = data.user?.role?.toLowerCase();
-                    setTimeout(() => {
-                        if (role === 'superadmin') {
-                            window.location.href = 'admin.html';
-                        } else if (role === 'admin') {
-                            window.location.href = 'gen-sec.html';
-                        } else if (role === 'teacher') {
-                            window.location.href = 'rt.html';
-                        } else if (role === 'staff') {
-                            window.location.href = 'gen-sec.html';
-                        } else if (role === 'parent') {
-                            window.location.href = 'p-dashboard.html';
-                        } else if (role === 'student') {
-                            window.location.href = 'student-dashboard.html';
-                        } else {
-                            window.location.href = '/';
-                        }
-                    }, 1500);
-                } else {
-                    showErrorToast(data?.error || 'Invalid login credentials');
-                }
-            } catch (err) {
-                console.error('[Login Error]', err);
-                showErrorToast('Network or server error: ' + err.message);
-            } finally {
-                spinner.classList.add('hidden');
-                submitBtn.disabled = false;
-                submitBtn.style.opacity = '1';
             }
-        });
+
+            assignmentsDatabase.push({
+                id: `asm_${Date.now()}`,
+                title: titleValue.toUpperCase(),
+                classGroup: classValue,
+                due: dueValue,
+                status: "Open",
+                type: typeValue,
+                instructions: instructionsHtml,
+                questionsAllocated: allocatedArray
+            });
+
+            closeAssignmentModal();
+            renderAssignments();
+            alert(`Task data structure deployed cleanly for target group ${classValue}.`);
+        }
+
+        /* -----------------------------------------------------------
+           STUDENT ROSTERS MANAGEMENT
+           ----------------------------------------------------------- */
+        function renderStudents() {
+            const filter = document.getElementById('studentClassFilter').value;
+            const tbody = document.getElementById('studentTableBody');
+            tbody.innerHTML = '';
+
+            const data = filter === 'ALL' ? studentRegistry : studentRegistry.filter(s => s.classGroup === filter);
+
+            if(data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400 font-bold">No students registered to this track class code loop.</td></tr>`;
+                return;
+            }
+
+            data.forEach(s => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50/50 transition">
+                        <td class="p-3 pl-4 font-mono font-bold text-brand-900">${s.code}</td>
+                        <td class="p-3 text-slate-900 font-bold">${s.name}</td>
+                        <td class="p-3 text-slate-500 font-medium">${s.classGroup}</td>
+                        <td class="p-3 text-center"><span class="bg-emerald-50 text-emerald-700 border border-emerald-100 text-[10px] px-2 py-0.5 rounded-full font-bold">${s.standing}</span></td>
+                    </tr>`;
+            });
+        }
+
+        /* -----------------------------------------------------------
+           GRADEBOOK ENTRY MATRIX ENGINE
+           ----------------------------------------------------------- */
+        function getStandingBadge(score) {
+            if (score >= 75) return { text: "A1 Excellent", class: "bg-emerald-100 text-emerald-800 border-emerald-200" };
+            if (score >= 70) return { text: "B2 Very Good", class: "bg-emerald-50 text-emerald-700 border-emerald-100" };
+            if (score >= 65) return { text: "B3 Good", class: "bg-teal-50 text-teal-700 border-teal-100" };
+            if (score >= 60) return { text: "C4 Credit", class: "bg-blue-50 text-blue-700 border-blue-100" };
+            if (score >= 55) return { text: "C5 Credit", class: "bg-indigo-50 text-indigo-700 border-indigo-100" };
+            if (score >= 50) return { text: "C6 Credit", class: "bg-purple-50 text-purple-700 border-purple-100" };
+            if (score >= 45) return { text: "D7 Pass", class: "bg-amber-50 text-amber-700 border-amber-100" };
+            if (score >= 40) return { text: "E8 Pass", class: "bg-orange-50 text-orange-700 border-orange-100" };
+            return { text: "F9 Fail", class: "bg-rose-100 text-rose-800 border-rose-200" };
+        }
+
+        function renderGradebook() {
+            const filter = document.getElementById('gradebookClassFilter').value;
+            const tbody = document.getElementById('gradebookTableBody');
+            tbody.innerHTML = '';
+
+            const targetStudents = studentRegistry.filter(s => s.classGroup === filter);
+
+            targetStudents.forEach((s) => {
+                const total = s.ca1Mark + s.ca2Mark + s.examMark;
+                const badge = getStandingBadge(total);
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50/50 transition" data-student-code="${s.code}">
+                        <td class="p-3 pl-4 font-mono font-bold text-brand-900">${s.code}</td>
+                        <td class="p-3 font-bold text-slate-800">${s.name}</td>
+                        <td class="p-3 text-center">
+                            <input type="number" min="0" max="20" value="${s.ca1Mark !== null ? s.ca1Mark : ''}" oninput="calculateRowTotal(this)" class="ca1-input w-14 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono font-bold p-1 text-xs focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
+                        </td>
+                        <td class="p-3 text-center">
+                            <input type="number" min="0" max="20" value="${s.ca2Mark !== null ? s.ca2Mark : ''}" oninput="calculateRowTotal(this)" class="ca2-input w-14 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono font-bold p-1 text-xs focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
+                        </td>
+                        <td class="p-3 text-center">
+                            <input type="number" min="0" max="60" value="${s.examMark !== null ? s.examMark : ''}" oninput="calculateRowTotal(this)" class="exam-input w-14 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono font-bold p-1 text-xs focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
+                        </td>
+                        <td class="p-3 text-center font-mono font-black text-slate-900 tracking-wide">
+                            <span class="total-span">${total}</span>/100
+                        </td>
+                        <td class="p-3 text-center">
+                            <span class="standing-badge inline-block text-[10px] font-bold px-2 py-0.5 rounded border text-center whitespace-nowrap min-w-[76px] ${badge.class}">${badge.text}</span>
+                        </td>
+                        <td class="p-3 text-center space-x-1 whitespace-nowrap">
+                            <button onclick="saveSingleRow(this)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[10px] px-2.5 py-1 rounded-md uppercase tracking-wider transition">Save Row</button>
+                            <button onclick="clearSingleRow(this)" class="bg-white border border-slate-200 text-slate-500 hover:bg-slate-100 font-extrabold text-[10px] px-2.5 py-1 rounded-md uppercase tracking-wider transition">Clear</button>
+                        </td>
+                    </tr>`;
+            });
+
+            updateProgressMetrics();
+        }
+
+        function calculateRowTotal(inputElement) {
+            const row = inputElement.closest('tr');
+            const ca1 = parseInt(row.querySelector('.ca1-input').value) || 0;
+            const ca2 = parseInt(row.querySelector('.ca2-input').value) || 0;
+            const exam = parseInt(row.querySelector('.exam-input').value) || 0;
+            const cumulativeTotal = ca1 + ca2 + exam;
+            
+            row.querySelector('.total-span').innerText = cumulativeTotal;
+            
+            const badgeElement = row.querySelector('.standing-badge');
+            const state = getStandingBadge(cumulativeTotal);
+            badgeElement.className = `standing-badge inline-block text-[10px] font-bold px-2 py-0.5 rounded border text-center whitespace-nowrap min-w-[76px] ${state.class}`;
+            badgeElement.innerText = state.text;
+            
+            updateProgressMetrics();
+        }
+
+        function updateProgressMetrics() {
+            const rows = document.getElementById('gradebookTableBody').children;
+            const totalStudents = rows.length;
+            const totalExpectedCells = totalStudents * 3; 
+            let completedCells = 0;
+
+            for(let row of rows) {
+                const ca1Val = row.querySelector('.ca1-input').value;
+                const ca2Val = row.querySelector('.ca2-input').value;
+                const examVal = row.querySelector('.exam-input').value;
+
+                if (ca1Val !== "" && !isNaN(ca1Val)) completedCells++;
+                if (ca2Val !== "" && !isNaN(ca2Val)) completedCells++;
+                if (examVal !== "" && !isNaN(examVal)) completedCells++;
+            }
+
+            const cellsLeft = totalExpectedCells - completedCells;
+            document.getElementById('progressStatsCount').innerText = `${completedCells} / ${totalExpectedCells}`;
+            document.getElementById('progressStatsLeft').innerText = `${cellsLeft} Input Cells Left`;
+
+            const percentage = totalExpectedCells > 0 ? (completedCells / totalExpectedCells) * 100 : 0;
+            document.getElementById('progressBarFill').style.width = `${percentage}%`;
+        }
+
+        function saveSingleRow(buttonElement) {
+            const row = buttonElement.closest('tr');
+            const code = row.getAttribute('data-student-code');
+            const ca1Val = row.querySelector('.ca1-input').value === "" ? 0 : parseInt(row.querySelector('.ca1-input').value);
+            const ca2Val = row.querySelector('.ca2-input').value === "" ? 0 : parseInt(row.querySelector('.ca2-input').value);
+            const examVal = row.querySelector('.exam-input').value === "" ? 0 : parseInt(row.querySelector('.exam-input').value);
+
+            if (ca1Val > 20 || ca2Val > 20 || examVal > 60) {
+                alert("Validation error: Marks exceed limits! Max caps are CA1: 20, CA2: 20, Exam: 60.");
+                return;
+            }
+
+            const student = studentRegistry.find(s => s.code === code);
+            if(student) {
+                student.ca1Mark = ca1Val;
+                student.ca2Mark = ca2Val;
+                student.examMark = examVal;
+                alert(`Scores for student ${student.name} saved successfully.`);
+            }
+            updateProgressMetrics();
+        }
+
+        function clearSingleRow(buttonElement) {
+            const row = buttonElement.closest('tr');
+            row.querySelector('.ca1-input').value = '';
+            row.querySelector('.ca2-input').value = '';
+            row.querySelector('.exam-input').value = '';
+            row.querySelector('.total-span').innerText = '0';
+            
+            const badgeElement = row.querySelector('.standing-badge');
+            const state = getStandingBadge(0);
+            badgeElement.className = `standing-badge inline-block text-[10px] font-bold px-2 py-0.5 rounded border text-center whitespace-nowrap min-w-[76px] ${state.class}`;
+            badgeElement.innerText = state.text;
+            
+            updateProgressMetrics();
+        }
+
+        function saveGradebookChanges() {
+            const rows = document.getElementById('gradebookTableBody').children;
+            let boundsError = false;
+
+            for(let row of rows) {
+                const code = row.getAttribute('data-student-code');
+                const ca1Val = row.querySelector('.ca1-input').value === "" ? 0 : parseInt(row.querySelector('.ca1-input').value);
+                const ca2Val = row.querySelector('.ca2-input').value === "" ? 0 : parseInt(row.querySelector('.ca2-input').value);
+                const examVal = row.querySelector('.exam-input').value === "" ? 0 : parseInt(row.querySelector('.exam-input').value);
+
+                if (ca1Val > 20 || ca2Val > 20 || examVal > 60) {
+                    boundsError = true;
+                    continue;
+                }
+
+                const student = studentRegistry.find(s => s.code === code);
+                if(student) {
+                    student.ca1Mark = ca1Val;
+                    student.ca2Mark = ca2Val;
+                    student.examMark = examVal;
+                }
+            }
+
+            if (boundsError) {
+                alert("Some grades exceeded limits (CA1: 20, CA2: 20, Exam: 60) and could not be bulk saved.");
+            } else {
+                alert("Gradebook updates synced completely across all active database files.");
+            }
+            renderGradebook();
+        }
+
+        /* -----------------------------------------------------------
+           FACULTY PROFILE ACTIONS
+           ----------------------------------------------------------- */
+        function updateTeacherProfile(event) {
+            event.preventDefault();
+            document.getElementById('headerTeacherName').innerText = document.getElementById('profileName').value;
+            document.getElementById('headerTeacherTitle').innerText = document.getElementById('profileTitle').value;
+            document.getElementById('sidebarDept').innerText = document.getElementById('profileDept').value;
+            document.getElementById('sidebarLevels').innerText = document.getElementById('profileLevels').value;
+            alert("Faculty identity profile parameters modified successfully.");
+        }
     </script>
 </body>
 </html>
