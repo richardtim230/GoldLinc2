@@ -139,8 +139,6 @@ router.get('/students', teacherAuth, async (req, res) => {
   })));
 });
 
-// ============ SPECIFIC NON-PARAMETERIZED ROUTES (BEFORE /:id ROUTES) ============
-
 // POST /api/teachers/classes/:classId/subjects
 router.post('/classes/:classId/subjects', teacherAuth, async (req, res) => {
   const { classId } = req.params;
@@ -201,7 +199,6 @@ router.get('/cbt/:cbtId', teacherAuth, async (req, res) => {
 });
 
 // ============ COLLECTIONS ROUTES (BEFORE OTHER /:id ROUTES) ============
-// ⚠️ CRITICAL: These routes must come BEFORE other /:id routes to avoid pattern matching conflicts
 
 // GET /api/teachers/:id/collections
 router.get('/:id/collections', teacherAuth, async (req, res) => {
@@ -305,20 +302,6 @@ router.patch('/:id/collections/:collectionId/questions/:questionId', teacherAuth
   }
 });
 
-// DELETE /api/teachers/:id/collections/:collectionId
-router.delete('/:id/collections/:collectionId', teacherAuth, async (req, res) => {
-  try {
-    if (String(req.params.id) !== String(req.staff._id)) {
-      return res.status(403).json({ error: "Forbidden" });
-    }
-    const collection = await Collection.findByIdAndDelete(req.params.collectionId);
-    if (!collection) return res.status(404).json({ error: "Collection not found" });
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
 // DELETE /api/teachers/:id/collections/:collectionId/questions/:questionId
 router.delete('/:id/collections/:collectionId/questions/:questionId', teacherAuth, async (req, res) => {
   try {
@@ -333,6 +316,20 @@ router.delete('/:id/collections/:collectionId/questions/:questionId', teacherAut
 
     collection.questions = collection.questions.filter(q => q.id !== req.params.questionId);
     await collection.save();
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/teachers/:id/collections/:collectionId
+router.delete('/:id/collections/:collectionId', teacherAuth, async (req, res) => {
+  try {
+    if (String(req.params.id) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    const collection = await Collection.findByIdAndDelete(req.params.collectionId);
+    if (!collection) return res.status(404).json({ error: "Collection not found" });
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
