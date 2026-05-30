@@ -13,6 +13,24 @@ const ResultCBT = require('../models/ResultCBT');
 const CBT = require('../models/CBTExam'); // If your results reference Exam
 const Collection = require('../models/Collection');
 
+// ============ NON-PARAMETERIZED ROUTES FIRST ============
+
+// GET /api/teachers - List all teachers (for assignments or admin)
+router.get('/', async (req, res) => {
+  const teachers = await Staff.find({ access_level: 'Teacher' });
+  res.json(teachers.map(t => ({
+    id: t._id,
+    first_name: t.first_name,
+    last_name: t.last_name,
+    name: `${t.first_name} ${t.last_name}`,
+    email: t.email,
+    phone: t.phone,
+    designation: t.designation,
+    department: t.department,
+    photo_url: t.photo || null,
+  })));
+});
+
 // GET /api/teachers/me - Get own teacher profile + classes + subjects
 router.get('/me', teacherAuth, async (req, res) => {
   const teacher = req.staff;
@@ -58,39 +76,235 @@ router.get('/me', teacherAuth, async (req, res) => {
   });
 });
 
+// PATCH /api/teachers/me - Update own profile
+router.patch('/me', teacherAuth, async (req, res) => {
+  if (req.body.login_password) {
+    req.body.login_password = await bcrypt.hash(req.body.login_password, 10);
+  }
+  const teacher = await Staff.findByIdAndUpdate(req.staff._id, req.body, { new: true });
+  res.json({
+    id: teacher._id,
+    name: `${teacher.first_name} ${teacher.last_name}`,
+    email: teacher.email,
+    phone: teacher.phone,
+    designation: teacher.designation,
+    department: teacher.department,
+    photo_url: teacher.photo || null,
+  });
+});
 
-// GET /api/teachers/:id/cbt-results?classId=...
+// GET /api/teachers/classes - Classes assigned to logged-in teacher
+router.get('/classes', teacherAuth, async (req, res) => {
+  const classes = await Class.find({ teachers: req.staff._id });
+  res.json(classes.map(cls => ({
+    id: cls._id,
+    name: cls.name,
+    arms: cls.arms
+  })));
+});
+
+// GET /api/teachers/subjects - Subjects per class
+router.get('/subjects', teacherAuth, async (req, res) => {
+  const { classId } = req.query;
+  if (!classId) return res.status(400).json({ error: "classId is required" });
+  const cls = await Class.findById(classId)
+    .populate('subjects.subject')
+    .populate('subjects.teacher');
+  if (!cls) return res.json([]);
+  const subjects = (cls.subjects || []).filter(
+    s => s.teacher && String(s.teacher._id) === String(req.staff._id)
+  ).map(s => ({
+    id: s.subject ? s.subject._id : undefined,
+    name: s.subject ? s.subject.name : undefined
+  }));
+  res.json(subjects);
+});
+
+// GET /api/teachers/students - Students by class
+router.get('/students', teacherAuth, async (req, res) => {
+  const { classId } = req.query;
+  if (!classId) return res.status(400).json({ error: "classId is required" });
+
+  // Find the class by ObjectId
+  const cls = await Class.findById(classId);
+  if (!cls) return res.status(404).json({ error: "Class not found" });
+
+  // Find students by class name (string)
+  const students = await Student.find({ class: cls.name });
+  res.json(students.map(stu => ({
+    id: stu._id,
+    name: `${stu.firstname} ${stu.surname}`,
+    regNo: stu.regNo,
+    email: stu.studentEmail
+  })));
+});
+
+// ============ COLLECTIONS ROUTES (BEFORE /:id ROUTES) ============
+
+// GET /api/teachers/:id/collections
+router.get('/:id/collections', teacherAuth, async (req, res) => {
+  try {
+    if (String(req.params.id) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    const collections = await Collection.find({ teacher: req.staff._id }).sort({ createdAt: -1 });
+    res.json({ collections });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/teachers/:id/collections
+router.post('/:id/collections', teacherAuth, async (req, res) => {
+  try {
+    if (String(req.params.id) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    const { name, classId, subjectId, description } = req.body;
+    if (!name) return res.status(400).json({ error: "Collection name is required" });
+
+    const collection = new Collection({
+      teacher: req.staff._id,
+      name,
+      class: classId || null,
+      subject: subjectId || null,
+      description: description || '',
+      questions: []
+    });
+    await collection.save();
+    res.status(201).json({ collection });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/teachers/:id/collections/:collectionId/questions
+router.post('/:id/collections/:collectionId/questions', teacherAuth, async (req, res) => {
+  try {
+    if (String(req.params.id) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    const { text, options, imageUrl, explanation } = req.body;
+    
+    if (!text || !options || options.length === 0) {
+      return res.status(400).json({ error: "Question text and options are required" });
+    }
+
+    const collection = await Collection.findById(req.params.collectionId);
+    if (!collection) return res.status(404).json({ error: "Collection not found" });
+    if (String(collection.teacher) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const question = {
+      id: `question_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      text,
+      options,
+      imageUrl: imageUrl || null,
+      explanation: explanation || null,
+      createdAt: new Date()
+    };
+
+    collection.questions.push(question);
+    await collection.save();
+    
+    res.status(201).json({ question });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PATCH /api/teachers/:id/collections/:collectionId/questions/:questionId
+router.patch('/:id/collections/:collectionId/questions/:questionId', teacherAuth, async (req, res) => {
+  try {
+    if (String(req.params.id) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    const { text, options, imageUrl, explanation } = req.body;
+
+    const collection = await Collection.findById(req.params.collectionId);
+    if (!collection) return res.status(404).json({ error: "Collection not found" });
+    if (String(collection.teacher) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const questionIndex = collection.questions.findIndex(q => q.id === req.params.questionId);
+    if (questionIndex === -1) return res.status(404).json({ error: "Question not found" });
+
+    if (text !== undefined) collection.questions[questionIndex].text = text;
+    if (options !== undefined) collection.questions[questionIndex].options = options;
+    if (imageUrl !== undefined) collection.questions[questionIndex].imageUrl = imageUrl;
+    if (explanation !== undefined) collection.questions[questionIndex].explanation = explanation;
+
+    await collection.save();
+    res.json({ question: collection.questions[questionIndex] });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/teachers/:id/collections/:collectionId
+router.delete('/:id/collections/:collectionId', teacherAuth, async (req, res) => {
+  try {
+    if (String(req.params.id) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    const collection = await Collection.findByIdAndDelete(req.params.collectionId);
+    if (!collection) return res.status(404).json({ error: "Collection not found" });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/teachers/:id/collections/:collectionId/questions/:questionId
+router.delete('/:id/collections/:collectionId/questions/:questionId', teacherAuth, async (req, res) => {
+  try {
+    if (String(req.params.id) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    const collection = await Collection.findById(req.params.collectionId);
+    if (!collection) return res.status(404).json({ error: "Collection not found" });
+    if (String(collection.teacher) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    collection.questions = collection.questions.filter(q => q.id !== req.params.questionId);
+    await collection.save();
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ============ OTHER /:id ROUTES ============
+
+// GET /api/teachers/:id/cbt-results
 router.get('/:id/cbt-results', teacherAuth, async (req, res) => {
   try {
-    // Only allow a teacher to fetch their own results
     if (String(req.params.id) !== String(req.staff._id)) {
       return res.status(403).json({ error: "Forbidden" });
     }
 
-    // Find all classes assigned to this teacher
     const classes = await Class.find({ teachers: req.staff._id });
     const classIds = classes.map(c => String(c._id));
 
     let query = {};
     if (req.query.classId) {
-      // Only allow for classes assigned to this teacher!
       if (!classIds.includes(req.query.classId)) {
         return res.status(403).json({ error: "Not assigned to this class" });
       }
       query.class = req.query.classId;
     } else {
-      // All classes for this teacher
       query.class = { $in: classIds };
     }
 
-    // Fetch all CBT Results for the classes
     const results = await ResultCBT.find(query)
       .populate('student', 'firstname surname')
       .populate('class', 'name')
       .populate('exam', 'title')
       .sort({ createdAt: -1 });
 
-    // Format results for UI
     const formatted = results.map(r => ({
       _id: r._id,
       studentName: r.student ? `${r.student.firstname} ${r.student.surname}` : '',
@@ -136,90 +350,12 @@ router.get('/:id/cbt-results/:resultId', teacherAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-// PATCH /api/teachers/me - Update own profile
-router.patch('/me', teacherAuth, async (req, res) => {
-  if (req.body.login_password) {
-    req.body.login_password = await bcrypt.hash(req.body.login_password, 10);
-  }
-  const teacher = await Staff.findByIdAndUpdate(req.staff._id, req.body, { new: true });
-  res.json({
-    id: teacher._id,
-    name: `${teacher.first_name} ${teacher.last_name}`,
-    email: teacher.email,
-    phone: teacher.phone,
-    designation: teacher.designation,
-    department: teacher.department,
-    photo_url: teacher.photo || null,
-  });
-});
-
-// GET /api/teachers - List all teachers (for assignments or admin)
-router.get('/', async (req, res) => {
-  const teachers = await Staff.find({ access_level: 'Teacher' });
-  res.json(teachers.map(t => ({
-    id: t._id,
-    first_name: t.first_name,
-    last_name: t.last_name,
-    name: `${t.first_name} ${t.last_name}`,
-    email: t.email,
-    phone: t.phone,
-    designation: t.designation,
-    department: t.department,
-    photo_url: t.photo || null,
-  })));
-});
-
-// --- TEACHER CLASSES ---
-// GET /api/teachers/classes - Classes assigned to logged-in teacher
-router.get('/classes', teacherAuth, async (req, res) => {
-  const classes = await Class.find({ teachers: req.staff._id });
-  res.json(classes.map(cls => ({
-    id: cls._id,
-    name: cls.name,
-    arms: cls.arms
-  })));
-});
-
-// --- TEACHER SUBJECTS (per class) ---
-router.get('/subjects', teacherAuth, async (req, res) => {
-  const { classId } = req.query;
-  if (!classId) return res.status(400).json({ error: "classId is required" });
-  const cls = await Class.findById(classId)
-    .populate('subjects.subject')
-    .populate('subjects.teacher');
-  if (!cls) return res.json([]);
-  const subjects = (cls.subjects || []).filter(
-    s => s.teacher && String(s.teacher._id) === String(req.staff._id)
-  ).map(s => ({
-    id: s.subject ? s.subject._id : undefined,
-    name: s.subject ? s.subject.name : undefined
-  }));
-  res.json(subjects);
-});
-
-router.get('/students', teacherAuth, async (req, res) => {
-  const { classId } = req.query;
-  if (!classId) return res.status(400).json({ error: "classId is required" });
-
-  // Find the class by ObjectId
-  const cls = await Class.findById(classId);
-  if (!cls) return res.status(404).json({ error: "Class not found" });
-
-  // Find students by class name (string)
-  const students = await Student.find({ class: cls.name });
-  res.json(students.map(stu => ({
-    id: stu._id,
-    name: `${stu.firstname} ${stu.surname}`,
-    regNo: stu.regNo,
-    email: stu.studentEmail
-  })));
-});
 
 // GET /api/teachers/:id/assignments
 router.get('/:id/assignments', teacherAuth, async (req, res) => {
   try {
     const assignments = await Assignment.find({ teacher: req.params.id })
-      .populate({ path: 'class', select: 'name' }) // ensures .class.name is available
+      .populate({ path: 'class', select: 'name' })
       .sort({ dueDate: 1 });
     res.json({ assignments });
   } catch (err) {
@@ -238,7 +374,7 @@ router.post('/:id/assignments', teacherAuth, async (req, res) => {
       title,
       description,
       dueDate,
-      cbt // <-- attach CBT here!
+      cbt
     });
     await assignment.save();
     await assignment.populate({ path: 'class', select: 'name' });
@@ -247,7 +383,33 @@ router.post('/:id/assignments', teacherAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-// --- NOTIFICATIONS ---
+
+// PATCH /api/teachers/:id/assignments/:assignmentId
+router.patch('/:id/assignments/:assignmentId', teacherAuth, async (req, res) => {
+  try {
+    const assignment = await Assignment.findOneAndUpdate(
+      { _id: req.params.assignmentId, teacher: req.params.id },
+      req.body,
+      { new: true }
+    );
+    if (!assignment) return res.status(404).json({ error: "Assignment not found or not owned by teacher." });
+    res.json({ success: true, assignment });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/teachers/:id/assignments/:assignmentId
+router.delete('/:id/assignments/:assignmentId', teacherAuth, async (req, res) => {
+  try {
+    const assignment = await Assignment.findOneAndDelete({ _id: req.params.assignmentId, teacher: req.params.id });
+    if (!assignment) return res.status(404).json({ error: "Assignment not found or not owned by teacher." });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/teachers/:id/notifications
 router.get('/:id/notifications', teacherAuth, async (req, res) => {
   try {
@@ -258,7 +420,17 @@ router.get('/:id/notifications', teacherAuth, async (req, res) => {
   }
 });
 
-// --- DRAFT RESULTS ---
+// DELETE /api/teachers/:id/notifications/:notificationId
+router.delete('/:id/notifications/:notificationId', teacherAuth, async (req, res) => {
+  try {
+    const notification = await Notification.findOneAndDelete({ _id: req.params.notificationId, teacher: req.params.id });
+    if (!notification) return res.status(404).json({ error: "Notification not found or not owned by teacher." });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/teachers/:id/draft-results
 router.get('/:id/draft-results', teacherAuth, async (req, res) => {
   try {
@@ -291,6 +463,8 @@ router.post('/:id/draft-results', teacherAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// POST /api/teachers/classes/:classId/subjects
 router.post('/classes/:classId/subjects', teacherAuth, async (req, res) => {
   const { classId } = req.params;
   const { subjectName } = req.body;
@@ -336,58 +510,16 @@ router.post('/classes/:classId/subjects', teacherAuth, async (req, res) => {
   });
 });
 
-// PATCH /api/teachers/:id/assignments/:assignmentId - Update assignment
-router.patch('/:id/assignments/:assignmentId', teacherAuth, async (req, res) => {
-  try {
-    const assignment = await Assignment.findOneAndUpdate(
-      { _id: req.params.assignmentId, teacher: req.params.id },
-      req.body,
-      { new: true }
-    );
-    if (!assignment) return res.status(404).json({ error: "Assignment not found or not owned by teacher." });
-    res.json({ success: true, assignment });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// DELETE /api/teachers/:id/assignments/:assignmentId - Delete assignment
-router.delete('/:id/assignments/:assignmentId', teacherAuth, async (req, res) => {
-  try {
-    const assignment = await Assignment.findOneAndDelete({ _id: req.params.assignmentId, teacher: req.params.id });
-    if (!assignment) return res.status(404).json({ error: "Assignment not found or not owned by teacher." });
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// DELETE /api/teachers/:id/notifications/:notificationId - Delete notification
-router.delete('/:id/notifications/:notificationId', teacherAuth, async (req, res) => {
-  try {
-    const notification = await Notification.findOneAndDelete({ _id: req.params.notificationId, teacher: req.params.id });
-    if (!notification) return res.status(404).json({ error: "Notification not found or not owned by teacher." });
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// === UNIFIED QUESTION BANK ENDPOINT - Fetch from BOTH CBT & Collection models ===
-// GET /api/teachers/:id/question-bank - Get ALL questions from both CBT documents and Collection model
+// === UNIFIED QUESTION BANK ENDPOINT ===
 router.get('/:id/question-bank', teacherAuth, async (req, res) => {
   try {
     if (String(req.params.id) !== String(req.staff._id)) {
       return res.status(403).json({ error: "Forbidden" });
     }
 
-    // Fetch from Collections (new model)
     const collections = await Collection.find({ teacher: req.staff._id }).sort({ createdAt: -1 });
-
-    // Fetch from CBT documents (legacy - for migration)
     const cbts = await CBT.find({ teacher: req.staff._id }).sort({ createdAt: -1 });
 
-    // Transform CBT documents into collection format for legacy data
     const legacyCBTCollections = cbts.map(cbt => ({
       _id: cbt._id,
       name: cbt.title || 'Legacy CBT',
@@ -407,11 +539,10 @@ router.get('/:id/question-bank', teacherAuth, async (req, res) => {
       })),
       description: 'Legacy CBT Document - Auto-migrated',
       createdAt: cbt.createdAt,
-      isMigrated: false, // Mark as legacy/not migrated
+      isMigrated: false,
       source: 'CBT'
     }));
 
-    // Combine both sources - new collections first, then legacy CBT
     const allQuestionBanks = [
       ...collections.map(c => ({ 
         ...c.toObject(), 
@@ -427,7 +558,7 @@ router.get('/:id/question-bank', teacherAuth, async (req, res) => {
   }
 });
 
-// POST /api/teachers/:id/cbt - Upload new CBT
+// POST /api/teachers/:id/cbt
 router.post('/:id/cbt', teacherAuth, async (req, res) => {
   try {
     if (String(req.params.id) !== String(req.staff._id)) {
@@ -435,7 +566,7 @@ router.post('/:id/cbt', teacherAuth, async (req, res) => {
     }
     const { class: classId, subject, title, duration, questions } = req.body;
     const cbt = new CBT({
-      teacher: req.staff._id, // <--- use the authenticated teacher's ID only
+      teacher: req.staff._id,
       class: classId,
       subject,
       title,
@@ -453,13 +584,13 @@ router.post('/:id/cbt', teacherAuth, async (req, res) => {
   }
 });
 
-// GET /api/teachers/:id/cbt - List CBTs uploaded by teacher
+// GET /api/teachers/:id/cbt
 router.get('/:id/cbt', teacherAuth, async (req, res) => {
   try {
     if (String(req.params.id) !== String(req.staff._id)) {
       return res.status(403).json({ error: "Forbidden" });
     }
-    const cbts = await CBT.find({ teacher: req.staff._id }) // <--- use the authenticated teacher's ID only
+    const cbts = await CBT.find({ teacher: req.staff._id })
       .populate('class', 'name')
       .populate('subject', 'name');
     res.json({ cbts });
@@ -467,6 +598,8 @@ router.get('/:id/cbt', teacherAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// GET /api/teachers/cbt/:cbtId
 router.get('/cbt/:cbtId', teacherAuth, async (req, res) => {
   try {
     const cbt = await CBT.findById(req.params.cbtId)
@@ -478,7 +611,8 @@ router.get('/cbt/:cbtId', teacherAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-// GET /api/teachers/:id/cbt/:cbtId - Get a specific CBT uploaded by teacher
+
+// GET /api/teachers/:id/cbt/:cbtId
 router.get('/:id/cbt/:cbtId', teacherAuth, async (req, res) => {
   try {
     const cbt = await CBT.findOne({ _id: req.params.cbtId, teacher: req.params.id })
@@ -490,10 +624,10 @@ router.get('/:id/cbt/:cbtId', teacherAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-// DELETE /api/teachers/:id/cbt/:cbtId - Delete a CBT uploaded by teacher
+
+// DELETE /api/teachers/:id/cbt/:cbtId
 router.delete('/:id/cbt/:cbtId', teacherAuth, async (req, res) => {
   try {
-    // Only allow delete if this teacher owns the CBT
     const cbt = await CBT.findOneAndDelete({ _id: req.params.cbtId, teacher: req.params.id });
     if (!cbt) return res.status(404).json({ error: "CBT not found or not owned by teacher." });
     res.json({ success: true });
@@ -501,7 +635,8 @@ router.delete('/:id/cbt/:cbtId', teacherAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-// PATCH /api/teachers/:id/cbt/:cbtId - Update a CBT uploaded by teacher
+
+// PATCH /api/teachers/:id/cbt/:cbtId
 router.patch('/:id/cbt/:cbtId', teacherAuth, async (req, res) => {
   try {
     const cbt = await CBT.findOneAndUpdate(
@@ -519,10 +654,10 @@ router.patch('/:id/cbt/:cbtId', teacherAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 // POST /api/teachers/:id/cbt/push
 router.post('/:id/cbt/push', teacherAuth, async (req, res) => {
   try {
-    // Accepts: { cbtIds: [ ... ] }
     const { cbtIds } = req.body;
     if (!Array.isArray(cbtIds) || !cbtIds.length) {
       return res.status(400).json({ error: "cbtIds array is required" });
@@ -530,12 +665,11 @@ router.post('/:id/cbt/push', teacherAuth, async (req, res) => {
     const cbts = await CBT.find({ _id: { $in: cbtIds }, teacher: req.params.id });
     if (!cbts.length) return res.status(404).json({ error: "No CBTs found" });
 
-    // For each CBT, create a new Exam entry (universal document)
     let pushed = [];
     for (const cbt of cbts) {
       const exam = new CBT({
         title: cbt.title,
-        class: cbt.class, // make sure this matches Exam model's expectations
+        class: cbt.class,
         subject: cbt.subject,
         duration: cbt.duration,
         questions: cbt.questions
@@ -548,143 +682,5 @@ router.post('/:id/cbt/push', teacherAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-// GET /api/teachers/:id/collections - Get only new Collection model data
-router.get('/:id/collections', teacherAuth, async (req, res) => {
-  try {
-    if (String(req.params.id) !== String(req.staff._id)) {
-      return res.status(403).json({ error: "Forbidden" });
-    }
-    const collections = await Collection.find({ teacher: req.staff._id }).sort({ createdAt: -1 });
-    res.json({ collections });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// POST /api/teachers/:id/collections - Create new collection
-router.post('/:id/collections', teacherAuth, async (req, res) => {
-  try {
-    if (String(req.params.id) !== String(req.staff._id)) {
-      return res.status(403).json({ error: "Forbidden" });
-    }
-    const { name, classId, subjectId, description } = req.body;
-    if (!name) return res.status(400).json({ error: "Collection name is required" });
-
-    const collection = new Collection({
-      teacher: req.staff._id,
-      name,
-      class: classId || null,
-      subject: subjectId || null,
-      description: description || '',
-      questions: []
-    });
-    await collection.save();
-    res.status(201).json({ collection });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// POST /api/teachers/:id/collections/:collectionId/questions - Add question to collection
-router.post('/:id/collections/:collectionId/questions', teacherAuth, async (req, res) => {
-  try {
-    if (String(req.params.id) !== String(req.staff._id)) {
-      return res.status(403).json({ error: "Forbidden" });
-    }
-    const { text, options, imageUrl, explanation } = req.body;
-    
-    if (!text || !options || options.length === 0) {
-      return res.status(400).json({ error: "Question text and options are required" });
-    }
-
-    const collection = await Collection.findById(req.params.collectionId);
-    if (!collection) return res.status(404).json({ error: "Collection not found" });
-    if (String(collection.teacher) !== String(req.staff._id)) {
-      return res.status(403).json({ error: "Forbidden" });
-    }
-
-    const question = {
-      id: `question_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      text,
-      options,
-      imageUrl: imageUrl || null,
-      explanation: explanation || null,
-      createdAt: new Date()
-    };
-
-    collection.questions.push(question);
-    await collection.save();
-    
-    res.status(201).json({ question });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// PATCH /api/teachers/:id/collections/:collectionId/questions/:questionId - Update question
-router.patch('/:id/collections/:collectionId/questions/:questionId', teacherAuth, async (req, res) => {
-  try {
-    if (String(req.params.id) !== String(req.staff._id)) {
-      return res.status(403).json({ error: "Forbidden" });
-    }
-    const { text, options, imageUrl, explanation } = req.body;
-
-    const collection = await Collection.findById(req.params.collectionId);
-    if (!collection) return res.status(404).json({ error: "Collection not found" });
-    if (String(collection.teacher) !== String(req.staff._id)) {
-      return res.status(403).json({ error: "Forbidden" });
-    }
-
-    const questionIndex = collection.questions.findIndex(q => q.id === req.params.questionId);
-    if (questionIndex === -1) return res.status(404).json({ error: "Question not found" });
-
-    if (text !== undefined) collection.questions[questionIndex].text = text;
-    if (options !== undefined) collection.questions[questionIndex].options = options;
-    if (imageUrl !== undefined) collection.questions[questionIndex].imageUrl = imageUrl;
-    if (explanation !== undefined) collection.questions[questionIndex].explanation = explanation;
-
-    await collection.save();
-    res.json({ question: collection.questions[questionIndex] });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// DELETE /api/teachers/:id/collections/:collectionId - Delete collection
-router.delete('/:id/collections/:collectionId', teacherAuth, async (req, res) => {
-  try {
-    if (String(req.params.id) !== String(req.staff._id)) {
-      return res.status(403).json({ error: "Forbidden" });
-    }
-    const collection = await Collection.findByIdAndDelete(req.params.collectionId);
-    if (!collection) return res.status(404).json({ error: "Collection not found" });
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// DELETE /api/teachers/:id/collections/:collectionId/questions/:questionId
-router.delete('/:id/collections/:collectionId/questions/:questionId', teacherAuth, async (req, res) => {
-  try {
-    if (String(req.params.id) !== String(req.staff._id)) {
-      return res.status(403).json({ error: "Forbidden" });
-    }
-    const collection = await Collection.findById(req.params.collectionId);
-    if (!collection) return res.status(404).json({ error: "Collection not found" });
-    if (String(collection.teacher) !== String(req.staff._id)) {
-      return res.status(403).json({ error: "Forbidden" });
-    }
-
-    collection.questions = collection.questions.filter(q => q.id !== req.params.questionId);
-    await collection.save();
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-/* Note: For student update/delete, those should be in the students.js route file. */
 
 module.exports = router;
