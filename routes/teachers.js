@@ -139,6 +139,67 @@ router.get('/students', teacherAuth, async (req, res) => {
   })));
 });
 
+// ============ SPECIFIC NON-PARAMETERIZED ROUTES (BEFORE /:id ROUTES) ============
+
+// POST /api/teachers/classes/:classId/subjects
+router.post('/classes/:classId/subjects', teacherAuth, async (req, res) => {
+  const { classId } = req.params;
+  const { subjectName } = req.body;
+  // Find or create subject
+  let subject = await Subject.findOne({ name: subjectName });
+  if (!subject) {
+    subject = new Subject({ name: subjectName });
+    await subject.save();
+  }
+  const cls = await Class.findById(classId);
+  // Prevent duplicate subject assignment
+  let justAdded = null;
+  if (!cls.subjects.some(s => String(s.subject) === String(subject._id) && String(s.teacher) === String(req.staff._id))) {
+    cls.subjects.push({ subject: subject._id, teacher: req.staff._id });
+    await cls.save();
+    justAdded = { subject: subject._id, teacher: req.staff._id };
+  }
+  // Populate the subject for the response
+  await cls.populate([
+    { path: 'subjects.subject', model: 'Subject' },
+    { path: 'subjects.teacher', model: 'Staff', select: 'first_name last_name email' }
+  ]);
+  // Find the just-added subject-teacher pair
+  const added = cls.subjects.find(s =>
+    String(s.subject._id) === String(subject._id) &&
+    String(s.teacher._id) === String(req.staff._id)
+  );
+  res.json({
+    success: true,
+    subject: added
+      ? {
+          id: added.subject._id,
+          name: added.subject.name,
+          teacher: added.teacher
+            ? {
+                id: added.teacher._id,
+                name: `${added.teacher.first_name} ${added.teacher.last_name}`,
+                email: added.teacher.email
+              }
+            : null
+        }
+      : null
+  });
+});
+
+// GET /api/teachers/cbt/:cbtId (NO teacher ID in path)
+router.get('/cbt/:cbtId', teacherAuth, async (req, res) => {
+  try {
+    const cbt = await CBT.findById(req.params.cbtId)
+      .populate('class', 'name')
+      .populate('subject', 'name');
+    if (!cbt) return res.status(404).json({ error: "CBT not found" });
+    res.json({ cbt });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ============ COLLECTIONS ROUTES (BEFORE /:id ROUTES) ============
 
 // GET /api/teachers/:id/collections
@@ -464,52 +525,6 @@ router.post('/:id/draft-results', teacherAuth, async (req, res) => {
   }
 });
 
-// POST /api/teachers/classes/:classId/subjects
-router.post('/classes/:classId/subjects', teacherAuth, async (req, res) => {
-  const { classId } = req.params;
-  const { subjectName } = req.body;
-  // Find or create subject
-  let subject = await Subject.findOne({ name: subjectName });
-  if (!subject) {
-    subject = new Subject({ name: subjectName });
-    await subject.save();
-  }
-  const cls = await Class.findById(classId);
-  // Prevent duplicate subject assignment
-  let justAdded = null;
-  if (!cls.subjects.some(s => String(s.subject) === String(subject._id) && String(s.teacher) === String(req.staff._id))) {
-    cls.subjects.push({ subject: subject._id, teacher: req.staff._id });
-    await cls.save();
-    justAdded = { subject: subject._id, teacher: req.staff._id };
-  }
-  // Populate the subject for the response
-  await cls.populate([
-    { path: 'subjects.subject', model: 'Subject' },
-    { path: 'subjects.teacher', model: 'Staff', select: 'first_name last_name email' }
-  ]);
-  // Find the just-added subject-teacher pair
-  const added = cls.subjects.find(s =>
-    String(s.subject._id) === String(subject._id) &&
-    String(s.teacher._id) === String(req.staff._id)
-  );
-  res.json({
-    success: true,
-    subject: added
-      ? {
-          id: added.subject._id,
-          name: added.subject.name,
-          teacher: added.teacher
-            ? {
-                id: added.teacher._id,
-                name: `${added.teacher.first_name} ${added.teacher.last_name}`,
-                email: added.teacher.email
-              }
-            : null
-        }
-      : null
-  });
-});
-
 // === UNIFIED QUESTION BANK ENDPOINT ===
 router.get('/:id/question-bank', teacherAuth, async (req, res) => {
   try {
@@ -594,19 +609,6 @@ router.get('/:id/cbt', teacherAuth, async (req, res) => {
       .populate('class', 'name')
       .populate('subject', 'name');
     res.json({ cbts });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/teachers/cbt/:cbtId
-router.get('/cbt/:cbtId', teacherAuth, async (req, res) => {
-  try {
-    const cbt = await CBT.findById(req.params.cbtId)
-      .populate('class', 'name')
-      .populate('subject', 'name');
-    if (!cbt) return res.status(404).json({ error: "CBT not found" });
-    res.json({ cbt });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
