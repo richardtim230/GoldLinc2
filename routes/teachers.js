@@ -13,10 +13,20 @@ const ResultCBT = require('../models/ResultCBT');
 const CBT = require('../models/CBTExam'); // If your results reference Exam
 const Collection = require('../models/Collection');
 
+// ============ GLOBAL REQUEST LOGGING MIDDLEWARE ============
+router.use((req, res, next) => {
+  console.log(`\n[TEACHERS ROUTER] ${req.method} ${req.originalUrl}`);
+  console.log(`[TEACHERS ROUTER] Params:`, req.params);
+  console.log(`[TEACHERS ROUTER] Query:`, req.query);
+  console.log(`[TEACHERS ROUTER] Auth User ID:`, req.staff ? req.staff._id : 'NO AUTH');
+  next();
+});
+
 // ============ NON-PARAMETERIZED ROUTES FIRST ============
 
 // GET /api/teachers - List all teachers (for assignments or admin)
 router.get('/', async (req, res) => {
+  console.log('[GET /] Fetching all teachers');
   const teachers = await Staff.find({ access_level: 'Teacher' });
   res.json(teachers.map(t => ({
     id: t._id,
@@ -33,8 +43,12 @@ router.get('/', async (req, res) => {
 
 // GET /api/teachers/me - Get own teacher profile + classes + subjects
 router.get('/me', teacherAuth, async (req, res) => {
+  console.log('[GET /me] Fetching teacher profile for:', req.staff._id);
   const teacher = req.staff;
-  if (!teacher || teacher.access_level !== 'Teacher') return res.status(404).json({ error: "Teacher not found" });
+  if (!teacher || teacher.access_level !== 'Teacher') {
+    console.log('[GET /me] ERROR: Teacher not found or invalid access level');
+    return res.status(404).json({ error: "Teacher not found" });
+  }
 
   // Get classes assigned to this teacher (ObjectId match)
   const classes = await Class.find({ teachers: teacher._id })
@@ -47,6 +61,8 @@ router.get('/me', teacherAuth, async (req, res) => {
       model: 'Staff',
       select: 'first_name last_name email'
     });
+
+  console.log('[GET /me] Found classes:', classes.length);
 
   // Structure classes and subjects in academic format
   const classData = classes.map(cls => ({
@@ -78,10 +94,12 @@ router.get('/me', teacherAuth, async (req, res) => {
 
 // PATCH /api/teachers/me - Update own profile
 router.patch('/me', teacherAuth, async (req, res) => {
+  console.log('[PATCH /me] Updating teacher profile for:', req.staff._id);
   if (req.body.login_password) {
     req.body.login_password = await bcrypt.hash(req.body.login_password, 10);
   }
   const teacher = await Staff.findByIdAndUpdate(req.staff._id, req.body, { new: true });
+  console.log('[PATCH /me] Profile updated successfully');
   res.json({
     id: teacher._id,
     name: `${teacher.first_name} ${teacher.last_name}`,
@@ -95,7 +113,9 @@ router.patch('/me', teacherAuth, async (req, res) => {
 
 // GET /api/teachers/classes - Classes assigned to logged-in teacher
 router.get('/classes', teacherAuth, async (req, res) => {
+  console.log('[GET /classes] Fetching classes for teacher:', req.staff._id);
   const classes = await Class.find({ teachers: req.staff._id });
+  console.log('[GET /classes] Found classes:', classes.length);
   res.json(classes.map(cls => ({
     id: cls._id,
     name: cls.name,
@@ -106,31 +126,47 @@ router.get('/classes', teacherAuth, async (req, res) => {
 // GET /api/teachers/subjects - Subjects per class
 router.get('/subjects', teacherAuth, async (req, res) => {
   const { classId } = req.query;
-  if (!classId) return res.status(400).json({ error: "classId is required" });
+  console.log('[GET /subjects] ClassID:', classId, 'Teacher:', req.staff._id);
+  if (!classId) {
+    console.log('[GET /subjects] ERROR: classId missing from query');
+    return res.status(400).json({ error: "classId is required" });
+  }
   const cls = await Class.findById(classId)
     .populate('subjects.subject')
     .populate('subjects.teacher');
-  if (!cls) return res.json([]);
+  if (!cls) {
+    console.log('[GET /subjects] ERROR: Class not found');
+    return res.json([]);
+  }
   const subjects = (cls.subjects || []).filter(
     s => s.teacher && String(s.teacher._id) === String(req.staff._id)
   ).map(s => ({
     id: s.subject ? s.subject._id : undefined,
     name: s.subject ? s.subject.name : undefined
   }));
+  console.log('[GET /subjects] Found subjects:', subjects.length);
   res.json(subjects);
 });
 
 // GET /api/teachers/students - Students by class
 router.get('/students', teacherAuth, async (req, res) => {
   const { classId } = req.query;
-  if (!classId) return res.status(400).json({ error: "classId is required" });
+  console.log('[GET /students] ClassID:', classId);
+  if (!classId) {
+    console.log('[GET /students] ERROR: classId missing from query');
+    return res.status(400).json({ error: "classId is required" });
+  }
 
   // Find the class by ObjectId
   const cls = await Class.findById(classId);
-  if (!cls) return res.status(404).json({ error: "Class not found" });
+  if (!cls) {
+    console.log('[GET /students] ERROR: Class not found with ID:', classId);
+    return res.status(404).json({ error: "Class not found" });
+  }
 
   // Find students by class name (string)
   const students = await Student.find({ class: cls.name });
+  console.log('[GET /students] Found students:', students.length);
   res.json(students.map(stu => ({
     id: stu._id,
     name: `${stu.firstname} ${stu.surname}`,
@@ -141,6 +177,7 @@ router.get('/students', teacherAuth, async (req, res) => {
 
 // POST /api/teachers/classes/:classId/subjects
 router.post('/classes/:classId/subjects', teacherAuth, async (req, res) => {
+  console.log('[POST /classes/:classId/subjects] ClassID:', req.params.classId);
   const { classId } = req.params;
   const { subjectName } = req.body;
   // Find or create subject
@@ -187,13 +224,19 @@ router.post('/classes/:classId/subjects', teacherAuth, async (req, res) => {
 
 // GET /api/teachers/cbt/:cbtId (NO teacher ID in path)
 router.get('/cbt/:cbtId', teacherAuth, async (req, res) => {
+  console.log('[GET /cbt/:cbtId] CBT ID:', req.params.cbtId);
   try {
     const cbt = await CBT.findById(req.params.cbtId)
       .populate('class', 'name')
       .populate('subject', 'name');
-    if (!cbt) return res.status(404).json({ error: "CBT not found" });
+    if (!cbt) {
+      console.log('[GET /cbt/:cbtId] ERROR: CBT not found');
+      return res.status(404).json({ error: "CBT not found" });
+    }
+    console.log('[GET /cbt/:cbtId] CBT found successfully');
     res.json({ cbt });
   } catch (err) {
+    console.error('[GET /cbt/:cbtId] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
@@ -202,26 +245,44 @@ router.get('/cbt/:cbtId', teacherAuth, async (req, res) => {
 
 // GET /api/teachers/:id/collections
 router.get('/:id/collections', teacherAuth, async (req, res) => {
+  console.log('\n[GET /:id/collections] ROUTE HIT');
+  console.log('[GET /:id/collections] ID param:', req.params.id);
+  console.log('[GET /:id/collections] Auth User ID:', req.staff ? req.staff._id : 'NO AUTH');
   try {
     if (String(req.params.id) !== String(req.staff._id)) {
+      console.log('[GET /:id/collections] ERROR: Forbidden - ID mismatch');
+      console.log('  Param ID:', String(req.params.id));
+      console.log('  Auth ID:', String(req.staff._id));
       return res.status(403).json({ error: "Forbidden" });
     }
+    console.log('[GET /:id/collections] Fetching collections for teacher:', req.staff._id);
     const collections = await Collection.find({ teacher: req.staff._id }).sort({ createdAt: -1 });
+    console.log('[GET /:id/collections] Collections found:', collections.length);
     res.json({ collections });
   } catch (err) {
+    console.error('[GET /:id/collections] ERROR:', err.message);
+    console.error('[GET /:id/collections] Stack:', err.stack);
     res.status(500).json({ error: err.message });
   }
 });
 
 // POST /api/teachers/:id/collections
 router.post('/:id/collections', teacherAuth, async (req, res) => {
+  console.log('\n[POST /:id/collections] ROUTE HIT');
+  console.log('[POST /:id/collections] ID param:', req.params.id);
+  console.log('[POST /:id/collections] Body:', req.body);
   try {
     if (String(req.params.id) !== String(req.staff._id)) {
+      console.log('[POST /:id/collections] ERROR: Forbidden - ID mismatch');
       return res.status(403).json({ error: "Forbidden" });
     }
     const { name, classId, subjectId, description } = req.body;
-    if (!name) return res.status(400).json({ error: "Collection name is required" });
+    if (!name) {
+      console.log('[POST /:id/collections] ERROR: Collection name is required');
+      return res.status(400).json({ error: "Collection name is required" });
+    }
 
+    console.log('[POST /:id/collections] Creating collection with name:', name);
     const collection = new Collection({
       teacher: req.staff._id,
       name,
@@ -231,27 +292,38 @@ router.post('/:id/collections', teacherAuth, async (req, res) => {
       questions: []
     });
     await collection.save();
+    console.log('[POST /:id/collections] Collection created:', collection._id);
     res.status(201).json({ collection });
   } catch (err) {
+    console.error('[POST /:id/collections] ERROR:', err.message);
+    console.error('[POST /:id/collections] Stack:', err.stack);
     res.status(500).json({ error: err.message });
   }
 });
 
 // POST /api/teachers/:id/collections/:collectionId/questions
 router.post('/:id/collections/:collectionId/questions', teacherAuth, async (req, res) => {
+  console.log('\n[POST /:id/collections/:collectionId/questions] ROUTE HIT');
+  console.log('[POST /:id/collections/:collectionId/questions] ID:', req.params.id, 'CollectionID:', req.params.collectionId);
   try {
     if (String(req.params.id) !== String(req.staff._id)) {
+      console.log('[POST /:id/collections/:collectionId/questions] ERROR: Forbidden');
       return res.status(403).json({ error: "Forbidden" });
     }
     const { text, options, imageUrl, explanation } = req.body;
     
     if (!text || !options || options.length === 0) {
+      console.log('[POST /:id/collections/:collectionId/questions] ERROR: Missing required fields');
       return res.status(400).json({ error: "Question text and options are required" });
     }
 
     const collection = await Collection.findById(req.params.collectionId);
-    if (!collection) return res.status(404).json({ error: "Collection not found" });
+    if (!collection) {
+      console.log('[POST /:id/collections/:collectionId/questions] ERROR: Collection not found');
+      return res.status(404).json({ error: "Collection not found" });
+    }
     if (String(collection.teacher) !== String(req.staff._id)) {
+      console.log('[POST /:id/collections/:collectionId/questions] ERROR: Forbidden - not collection owner');
       return res.status(403).json({ error: "Forbidden" });
     }
 
@@ -266,29 +338,45 @@ router.post('/:id/collections/:collectionId/questions', teacherAuth, async (req,
 
     collection.questions.push(question);
     await collection.save();
+    console.log('[POST /:id/collections/:collectionId/questions] Question added:', question.id);
     
     res.status(201).json({ question });
   } catch (err) {
+    console.error('[POST /:id/collections/:collectionId/questions] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 // PATCH /api/teachers/:id/collections/:collectionId/questions/:questionId
 router.patch('/:id/collections/:collectionId/questions/:questionId', teacherAuth, async (req, res) => {
+  console.log('\n[PATCH /:id/collections/:collectionId/questions/:questionId] ROUTE HIT');
+  console.log('[PATCH /:id/collections/:collectionId/questions/:questionId] IDs:', {
+    id: req.params.id,
+    collectionId: req.params.collectionId,
+    questionId: req.params.questionId
+  });
   try {
     if (String(req.params.id) !== String(req.staff._id)) {
+      console.log('[PATCH /:id/collections/:collectionId/questions/:questionId] ERROR: Forbidden');
       return res.status(403).json({ error: "Forbidden" });
     }
     const { text, options, imageUrl, explanation } = req.body;
 
     const collection = await Collection.findById(req.params.collectionId);
-    if (!collection) return res.status(404).json({ error: "Collection not found" });
+    if (!collection) {
+      console.log('[PATCH /:id/collections/:collectionId/questions/:questionId] ERROR: Collection not found');
+      return res.status(404).json({ error: "Collection not found" });
+    }
     if (String(collection.teacher) !== String(req.staff._id)) {
+      console.log('[PATCH /:id/collections/:collectionId/questions/:questionId] ERROR: Forbidden');
       return res.status(403).json({ error: "Forbidden" });
     }
 
     const questionIndex = collection.questions.findIndex(q => q.id === req.params.questionId);
-    if (questionIndex === -1) return res.status(404).json({ error: "Question not found" });
+    if (questionIndex === -1) {
+      console.log('[PATCH /:id/collections/:collectionId/questions/:questionId] ERROR: Question not found');
+      return res.status(404).json({ error: "Question not found" });
+    }
 
     if (text !== undefined) collection.questions[questionIndex].text = text;
     if (options !== undefined) collection.questions[questionIndex].options = options;
@@ -296,42 +384,59 @@ router.patch('/:id/collections/:collectionId/questions/:questionId', teacherAuth
     if (explanation !== undefined) collection.questions[questionIndex].explanation = explanation;
 
     await collection.save();
+    console.log('[PATCH /:id/collections/:collectionId/questions/:questionId] Question updated');
     res.json({ question: collection.questions[questionIndex] });
   } catch (err) {
+    console.error('[PATCH /:id/collections/:collectionId/questions/:questionId] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 // DELETE /api/teachers/:id/collections/:collectionId/questions/:questionId
 router.delete('/:id/collections/:collectionId/questions/:questionId', teacherAuth, async (req, res) => {
+  console.log('\n[DELETE /:id/collections/:collectionId/questions/:questionId] ROUTE HIT');
   try {
     if (String(req.params.id) !== String(req.staff._id)) {
+      console.log('[DELETE /:id/collections/:collectionId/questions/:questionId] ERROR: Forbidden');
       return res.status(403).json({ error: "Forbidden" });
     }
     const collection = await Collection.findById(req.params.collectionId);
-    if (!collection) return res.status(404).json({ error: "Collection not found" });
+    if (!collection) {
+      console.log('[DELETE /:id/collections/:collectionId/questions/:questionId] ERROR: Collection not found');
+      return res.status(404).json({ error: "Collection not found" });
+    }
     if (String(collection.teacher) !== String(req.staff._id)) {
+      console.log('[DELETE /:id/collections/:collectionId/questions/:questionId] ERROR: Forbidden');
       return res.status(403).json({ error: "Forbidden" });
     }
 
     collection.questions = collection.questions.filter(q => q.id !== req.params.questionId);
     await collection.save();
+    console.log('[DELETE /:id/collections/:collectionId/questions/:questionId] Question deleted');
     res.json({ success: true });
   } catch (err) {
+    console.error('[DELETE /:id/collections/:collectionId/questions/:questionId] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 // DELETE /api/teachers/:id/collections/:collectionId
 router.delete('/:id/collections/:collectionId', teacherAuth, async (req, res) => {
+  console.log('\n[DELETE /:id/collections/:collectionId] ROUTE HIT');
   try {
     if (String(req.params.id) !== String(req.staff._id)) {
+      console.log('[DELETE /:id/collections/:collectionId] ERROR: Forbidden');
       return res.status(403).json({ error: "Forbidden" });
     }
     const collection = await Collection.findByIdAndDelete(req.params.collectionId);
-    if (!collection) return res.status(404).json({ error: "Collection not found" });
+    if (!collection) {
+      console.log('[DELETE /:id/collections/:collectionId] ERROR: Collection not found');
+      return res.status(404).json({ error: "Collection not found" });
+    }
+    console.log('[DELETE /:id/collections/:collectionId] Collection deleted');
     res.json({ success: true });
   } catch (err) {
+    console.error('[DELETE /:id/collections/:collectionId] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
@@ -340,8 +445,10 @@ router.delete('/:id/collections/:collectionId', teacherAuth, async (req, res) =>
 
 // GET /api/teachers/:id/cbt-results
 router.get('/:id/cbt-results', teacherAuth, async (req, res) => {
+  console.log('[GET /:id/cbt-results] ROUTE HIT - ID:', req.params.id);
   try {
     if (String(req.params.id) !== String(req.staff._id)) {
+      console.log('[GET /:id/cbt-results] ERROR: Forbidden');
       return res.status(403).json({ error: "Forbidden" });
     }
 
@@ -351,6 +458,7 @@ router.get('/:id/cbt-results', teacherAuth, async (req, res) => {
     let query = {};
     if (req.query.classId) {
       if (!classIds.includes(req.query.classId)) {
+        console.log('[GET /:id/cbt-results] ERROR: Not assigned to this class');
         return res.status(403).json({ error: "Not assigned to this class" });
       }
       query.class = req.query.classId;
@@ -377,23 +485,30 @@ router.get('/:id/cbt-results', teacherAuth, async (req, res) => {
       answers: r.answers
     }));
 
+    console.log('[GET /:id/cbt-results] Results found:', formatted.length);
     res.json({ results: formatted });
   } catch (err) {
+    console.error('[GET /:id/cbt-results] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 // GET /api/teachers/:id/cbt-results/:resultId
 router.get('/:id/cbt-results/:resultId', teacherAuth, async (req, res) => {
+  console.log('[GET /:id/cbt-results/:resultId] ROUTE HIT');
   try {
     if (String(req.params.id) !== String(req.staff._id)) {
+      console.log('[GET /:id/cbt-results/:resultId] ERROR: Forbidden');
       return res.status(403).json({ error: "Forbidden" });
     }
     const result = await ResultCBT.findById(req.params.resultId)
       .populate('student', 'firstname surname')
       .populate('class', 'name')
       .populate('exam', 'title');
-    if (!result) return res.status(404).json({ error: "Result not found" });
+    if (!result) {
+      console.log('[GET /:id/cbt-results/:resultId] ERROR: Result not found');
+      return res.status(404).json({ error: "Result not found" });
+    }
     res.json({
       _id: result._id,
       studentName: result.student ? `${result.student.firstname} ${result.student.surname}` : '',
@@ -406,24 +521,29 @@ router.get('/:id/cbt-results/:resultId', teacherAuth, async (req, res) => {
       answers: result.answers
     });
   } catch (err) {
+    console.error('[GET /:id/cbt-results/:resultId] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 // GET /api/teachers/:id/assignments
 router.get('/:id/assignments', teacherAuth, async (req, res) => {
+  console.log('[GET /:id/assignments] ROUTE HIT - ID:', req.params.id);
   try {
     const assignments = await Assignment.find({ teacher: req.params.id })
       .populate({ path: 'class', select: 'name' })
       .sort({ dueDate: 1 });
+    console.log('[GET /:id/assignments] Assignments found:', assignments.length);
     res.json({ assignments });
   } catch (err) {
+    console.error('[GET /:id/assignments] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 // POST /api/teachers/:id/assignments
 router.post('/:id/assignments', teacherAuth, async (req, res) => {
+  console.log('[POST /:id/assignments] ROUTE HIT - ID:', req.params.id);
   try {
     const { class: classId, subject, title, description, dueDate, cbt } = req.body;
     const assignment = new Assignment({
@@ -437,71 +557,95 @@ router.post('/:id/assignments', teacherAuth, async (req, res) => {
     });
     await assignment.save();
     await assignment.populate({ path: 'class', select: 'name' });
+    console.log('[POST /:id/assignments] Assignment created:', assignment._id);
     res.status(201).json({ assignment });
   } catch (err) {
+    console.error('[POST /:id/assignments] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 // PATCH /api/teachers/:id/assignments/:assignmentId
 router.patch('/:id/assignments/:assignmentId', teacherAuth, async (req, res) => {
+  console.log('[PATCH /:id/assignments/:assignmentId] ROUTE HIT');
   try {
     const assignment = await Assignment.findOneAndUpdate(
       { _id: req.params.assignmentId, teacher: req.params.id },
       req.body,
       { new: true }
     );
-    if (!assignment) return res.status(404).json({ error: "Assignment not found or not owned by teacher." });
+    if (!assignment) {
+      console.log('[PATCH /:id/assignments/:assignmentId] ERROR: Assignment not found');
+      return res.status(404).json({ error: "Assignment not found or not owned by teacher." });
+    }
+    console.log('[PATCH /:id/assignments/:assignmentId] Assignment updated');
     res.json({ success: true, assignment });
   } catch (err) {
+    console.error('[PATCH /:id/assignments/:assignmentId] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 // DELETE /api/teachers/:id/assignments/:assignmentId
 router.delete('/:id/assignments/:assignmentId', teacherAuth, async (req, res) => {
+  console.log('[DELETE /:id/assignments/:assignmentId] ROUTE HIT');
   try {
     const assignment = await Assignment.findOneAndDelete({ _id: req.params.assignmentId, teacher: req.params.id });
-    if (!assignment) return res.status(404).json({ error: "Assignment not found or not owned by teacher." });
+    if (!assignment) {
+      console.log('[DELETE /:id/assignments/:assignmentId] ERROR: Assignment not found');
+      return res.status(404).json({ error: "Assignment not found or not owned by teacher." });
+    }
+    console.log('[DELETE /:id/assignments/:assignmentId] Assignment deleted');
     res.json({ success: true });
   } catch (err) {
+    console.error('[DELETE /:id/assignments/:assignmentId] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 // GET /api/teachers/:id/notifications
 router.get('/:id/notifications', teacherAuth, async (req, res) => {
+  console.log('[GET /:id/notifications] ROUTE HIT - ID:', req.params.id);
   try {
     const notifications = await Notification.find({ teacher: req.params.id }).sort({ date: -1 });
     res.json({ notifications });
   } catch (err) {
+    console.error('[GET /:id/notifications] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 // DELETE /api/teachers/:id/notifications/:notificationId
 router.delete('/:id/notifications/:notificationId', teacherAuth, async (req, res) => {
+  console.log('[DELETE /:id/notifications/:notificationId] ROUTE HIT');
   try {
     const notification = await Notification.findOneAndDelete({ _id: req.params.notificationId, teacher: req.params.id });
-    if (!notification) return res.status(404).json({ error: "Notification not found or not owned by teacher." });
+    if (!notification) {
+      console.log('[DELETE /:id/notifications/:notificationId] ERROR: Notification not found');
+      return res.status(404).json({ error: "Notification not found or not owned by teacher." });
+    }
     res.json({ success: true });
   } catch (err) {
+    console.error('[DELETE /:id/notifications/:notificationId] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 // GET /api/teachers/:id/draft-results
 router.get('/:id/draft-results', teacherAuth, async (req, res) => {
+  console.log('[GET /:id/draft-results] ROUTE HIT - ID:', req.params.id);
   try {
     const draftResults = await DraftResult.find({ teacher: req.params.id });
     res.json({ draftResults });
   } catch (err) {
+    console.error('[GET /:id/draft-results] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 // POST /api/teachers/:id/draft-results
 router.post('/:id/draft-results', teacherAuth, async (req, res) => {
+  console.log('[POST /:id/draft-results] ROUTE HIT - ID:', req.params.id);
   try {
     const input = req.body;
     let draft = await DraftResult.findOne({
@@ -519,19 +663,25 @@ router.post('/:id/draft-results', teacherAuth, async (req, res) => {
     await draft.save();
     res.json({ draftResult: draft });
   } catch (err) {
+    console.error('[POST /:id/draft-results] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 // === UNIFIED QUESTION BANK ENDPOINT ===
 router.get('/:id/question-bank', teacherAuth, async (req, res) => {
+  console.log('[GET /:id/question-bank] ROUTE HIT - ID:', req.params.id);
   try {
     if (String(req.params.id) !== String(req.staff._id)) {
+      console.log('[GET /:id/question-bank] ERROR: Forbidden');
       return res.status(403).json({ error: "Forbidden" });
     }
 
     const collections = await Collection.find({ teacher: req.staff._id }).sort({ createdAt: -1 });
     const cbts = await CBT.find({ teacher: req.staff._id }).sort({ createdAt: -1 });
+
+    console.log('[GET /:id/question-bank] Collections found:', collections.length);
+    console.log('[GET /:id/question-bank] CBTs found:', cbts.length);
 
     const legacyCBTCollections = cbts.map(cbt => ({
       _id: cbt._id,
@@ -565,16 +715,20 @@ router.get('/:id/question-bank', teacherAuth, async (req, res) => {
       ...legacyCBTCollections
     ];
 
+    console.log('[GET /:id/question-bank] Total question banks:', allQuestionBanks.length);
     res.json({ questionBanks: allQuestionBanks });
   } catch (err) {
+    console.error('[GET /:id/question-bank] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 // POST /api/teachers/:id/cbt
 router.post('/:id/cbt', teacherAuth, async (req, res) => {
+  console.log('[POST /:id/cbt] ROUTE HIT - ID:', req.params.id);
   try {
     if (String(req.params.id) !== String(req.staff._id)) {
+      console.log('[POST /:id/cbt] ERROR: Forbidden');
       return res.status(403).json({ error: "Forbidden" });
     }
     const { class: classId, subject, title, duration, questions } = req.body;
@@ -591,79 +745,107 @@ router.post('/:id/cbt', teacherAuth, async (req, res) => {
       { path: 'class', select: 'name' },
       { path: 'subject', select: 'name' }
     ]);
+    console.log('[POST /:id/cbt] CBT created:', cbt._id);
     res.status(201).json({ cbt });
   } catch (err) {
+    console.error('[POST /:id/cbt] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 // GET /api/teachers/:id/cbt
 router.get('/:id/cbt', teacherAuth, async (req, res) => {
+  console.log('[GET /:id/cbt] ROUTE HIT - ID:', req.params.id);
   try {
     if (String(req.params.id) !== String(req.staff._id)) {
+      console.log('[GET /:id/cbt] ERROR: Forbidden');
       return res.status(403).json({ error: "Forbidden" });
     }
     const cbts = await CBT.find({ teacher: req.staff._id })
       .populate('class', 'name')
       .populate('subject', 'name');
+    console.log('[GET /:id/cbt] CBTs found:', cbts.length);
     res.json({ cbts });
   } catch (err) {
+    console.error('[GET /:id/cbt] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 // GET /api/teachers/:id/cbt/:cbtId
 router.get('/:id/cbt/:cbtId', teacherAuth, async (req, res) => {
+  console.log('[GET /:id/cbt/:cbtId] ROUTE HIT');
   try {
     const cbt = await CBT.findOne({ _id: req.params.cbtId, teacher: req.params.id })
       .populate('class', 'name')
       .populate('subject', 'name');
-    if (!cbt) return res.status(404).json({ error: "CBT not found or not owned by teacher." });
+    if (!cbt) {
+      console.log('[GET /:id/cbt/:cbtId] ERROR: CBT not found');
+      return res.status(404).json({ error: "CBT not found or not owned by teacher." });
+    }
     res.json({ cbt });
   } catch (err) {
+    console.error('[GET /:id/cbt/:cbtId] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 // DELETE /api/teachers/:id/cbt/:cbtId
 router.delete('/:id/cbt/:cbtId', teacherAuth, async (req, res) => {
+  console.log('[DELETE /:id/cbt/:cbtId] ROUTE HIT');
   try {
     const cbt = await CBT.findOneAndDelete({ _id: req.params.cbtId, teacher: req.params.id });
-    if (!cbt) return res.status(404).json({ error: "CBT not found or not owned by teacher." });
+    if (!cbt) {
+      console.log('[DELETE /:id/cbt/:cbtId] ERROR: CBT not found');
+      return res.status(404).json({ error: "CBT not found or not owned by teacher." });
+    }
+    console.log('[DELETE /:id/cbt/:cbtId] CBT deleted');
     res.json({ success: true });
   } catch (err) {
+    console.error('[DELETE /:id/cbt/:cbtId] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 // PATCH /api/teachers/:id/cbt/:cbtId
 router.patch('/:id/cbt/:cbtId', teacherAuth, async (req, res) => {
+  console.log('[PATCH /:id/cbt/:cbtId] ROUTE HIT');
   try {
     const cbt = await CBT.findOneAndUpdate(
       { _id: req.params.cbtId, teacher: req.params.id },
       req.body,
       { new: true }
     );
-    if (!cbt) return res.status(404).json({ error: "CBT not found or not owned by teacher." });
+    if (!cbt) {
+      console.log('[PATCH /:id/cbt/:cbtId] ERROR: CBT not found');
+      return res.status(404).json({ error: "CBT not found or not owned by teacher." });
+    }
     await cbt.populate([
       { path: 'class', select: 'name' },
       { path: 'subject', select: 'name' }
     ]);
+    console.log('[PATCH /:id/cbt/:cbtId] CBT updated');
     res.json({ success: true, cbt });
   } catch (err) {
+    console.error('[PATCH /:id/cbt/:cbtId] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 // POST /api/teachers/:id/cbt/push
 router.post('/:id/cbt/push', teacherAuth, async (req, res) => {
+  console.log('[POST /:id/cbt/push] ROUTE HIT');
   try {
     const { cbtIds } = req.body;
     if (!Array.isArray(cbtIds) || !cbtIds.length) {
+      console.log('[POST /:id/cbt/push] ERROR: cbtIds array is required');
       return res.status(400).json({ error: "cbtIds array is required" });
     }
     const cbts = await CBT.find({ _id: { $in: cbtIds }, teacher: req.params.id });
-    if (!cbts.length) return res.status(404).json({ error: "No CBTs found" });
+    if (!cbts.length) {
+      console.log('[POST /:id/cbt/push] ERROR: No CBTs found');
+      return res.status(404).json({ error: "No CBTs found" });
+    }
 
     let pushed = [];
     for (const cbt of cbts) {
@@ -677,8 +859,10 @@ router.post('/:id/cbt/push', teacherAuth, async (req, res) => {
       await exam.save();
       pushed.push(exam._id);
     }
+    console.log('[POST /:id/cbt/push] CBTs pushed:', pushed.length);
     res.json({ success: true, pushed });
   } catch (err) {
+    console.error('[POST /:id/cbt/push] ERROR:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
