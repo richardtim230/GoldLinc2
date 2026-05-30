@@ -105,7 +105,7 @@ app.use('/api/result', resultscbtRoute);
 app.use('/api/activity', activityRoute);
 app.use('/api/upload', uploadRoute);
 app.use('/api/cloud', require('./routes/cloud'));
-app.use('/api/teachers', teacherResultsRoute);
+app.use('/api/teacher', teacherResultsRoute);
 app.use('/api/teachers', teachersRoute);
 app.use('/api/assignments', assignmentsRoute);
 app.use('/api/hostel', hostelRoute);
