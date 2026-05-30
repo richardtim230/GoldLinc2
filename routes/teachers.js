@@ -12,6 +12,7 @@ const teacherAuth = require('../middleware/teacherAuth'); // Should set req.staf
 const ResultCBT = require('../models/ResultCBT');
 const CBT = require('../models/CBTExam'); // If your results reference Exam
 const Collection = require('../models/Collection');
+
 // GET /api/teachers/me - Get own teacher profile + classes + subjects
 router.get('/me', teacherAuth, async (req, res) => {
   const teacher = req.staff;
@@ -371,6 +372,61 @@ router.delete('/:id/notifications/:notificationId', teacherAuth, async (req, res
     res.status(500).json({ error: err.message });
   }
 });
+
+// === UNIFIED QUESTION BANK ENDPOINT - Fetch from BOTH CBT & Collection models ===
+// GET /api/teachers/:id/question-bank - Get ALL questions from both CBT documents and Collection model
+router.get('/:id/question-bank', teacherAuth, async (req, res) => {
+  try {
+    if (String(req.params.id) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    // Fetch from Collections (new model)
+    const collections = await Collection.find({ teacher: req.staff._id }).sort({ createdAt: -1 });
+
+    // Fetch from CBT documents (legacy - for migration)
+    const cbts = await CBT.find({ teacher: req.staff._id }).sort({ createdAt: -1 });
+
+    // Transform CBT documents into collection format for legacy data
+    const legacyCBTCollections = cbts.map(cbt => ({
+      _id: cbt._id,
+      name: cbt.title || 'Legacy CBT',
+      teacher: cbt.teacher,
+      class: cbt.class,
+      subject: cbt.subject,
+      questions: (cbt.questions || []).map((q, idx) => ({
+        id: `cbt_${cbt._id}_${idx}`,
+        text: q.text,
+        options: (q.options || []).map((opt, optIdx) => ({
+          text: typeof opt === 'string' ? opt : opt.value || opt,
+          isCorrect: q.answer === optIdx || (Array.isArray(q.answer) && q.answer.includes(optIdx))
+        })),
+        imageUrl: null,
+        explanation: null,
+        createdAt: cbt.createdAt
+      })),
+      description: 'Legacy CBT Document - Auto-migrated',
+      createdAt: cbt.createdAt,
+      isMigrated: false, // Mark as legacy/not migrated
+      source: 'CBT'
+    }));
+
+    // Combine both sources - new collections first, then legacy CBT
+    const allQuestionBanks = [
+      ...collections.map(c => ({ 
+        ...c.toObject(), 
+        isMigrated: true,
+        source: 'Collection'
+      })),
+      ...legacyCBTCollections
+    ];
+
+    res.json({ questionBanks: allQuestionBanks });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // POST /api/teachers/:id/cbt - Upload new CBT
 router.post('/:id/cbt', teacherAuth, async (req, res) => {
   try {
@@ -477,7 +533,7 @@ router.post('/:id/cbt/push', teacherAuth, async (req, res) => {
     // For each CBT, create a new Exam entry (universal document)
     let pushed = [];
     for (const cbt of cbts) {
-      const exam = new Exam({
+      const exam = new CBT({
         title: cbt.title,
         class: cbt.class, // make sure this matches Exam model's expectations
         subject: cbt.subject,
@@ -492,15 +548,14 @@ router.post('/:id/cbt/push', teacherAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-// GET /api/teachers/:id/collections - Get all question bank collections for teacher
+
+// GET /api/teachers/:id/collections - Get only new Collection model data
 router.get('/:id/collections', teacherAuth, async (req, res) => {
   try {
     if (String(req.params.id) !== String(req.staff._id)) {
       return res.status(403).json({ error: "Forbidden" });
     }
-    // Assuming you have a Collection model, fetch all collections for this teacher
-    const collections = await Collection.find({ teacher: req.staff._id })
-      .populate('questions');
+    const collections = await Collection.find({ teacher: req.staff._id }).sort({ createdAt: -1 });
     res.json({ collections });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -513,10 +568,15 @@ router.post('/:id/collections', teacherAuth, async (req, res) => {
     if (String(req.params.id) !== String(req.staff._id)) {
       return res.status(403).json({ error: "Forbidden" });
     }
-    const { name } = req.body;
+    const { name, classId, subjectId, description } = req.body;
+    if (!name) return res.status(400).json({ error: "Collection name is required" });
+
     const collection = new Collection({
       teacher: req.staff._id,
       name,
+      class: classId || null,
+      subject: subjectId || null,
+      description: description || '',
       questions: []
     });
     await collection.save();
@@ -533,19 +593,59 @@ router.post('/:id/collections/:collectionId/questions', teacherAuth, async (req,
       return res.status(403).json({ error: "Forbidden" });
     }
     const { text, options, imageUrl, explanation } = req.body;
+    
+    if (!text || !options || options.length === 0) {
+      return res.status(400).json({ error: "Question text and options are required" });
+    }
+
     const collection = await Collection.findById(req.params.collectionId);
     if (!collection) return res.status(404).json({ error: "Collection not found" });
-    
+    if (String(collection.teacher) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
     const question = {
-      id: `question_${Date.now()}`,
+      id: `question_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       text,
       options,
-      imageUrl,
-      explanation
+      imageUrl: imageUrl || null,
+      explanation: explanation || null,
+      createdAt: new Date()
     };
+
     collection.questions.push(question);
     await collection.save();
+    
     res.status(201).json({ question });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PATCH /api/teachers/:id/collections/:collectionId/questions/:questionId - Update question
+router.patch('/:id/collections/:collectionId/questions/:questionId', teacherAuth, async (req, res) => {
+  try {
+    if (String(req.params.id) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    const { text, options, imageUrl, explanation } = req.body;
+
+    const collection = await Collection.findById(req.params.collectionId);
+    if (!collection) return res.status(404).json({ error: "Collection not found" });
+    if (String(collection.teacher) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const questionIndex = collection.questions.findIndex(q => q.id === req.params.questionId);
+    if (questionIndex === -1) return res.status(404).json({ error: "Question not found" });
+
+    if (text !== undefined) collection.questions[questionIndex].text = text;
+    if (options !== undefined) collection.questions[questionIndex].options = options;
+    if (imageUrl !== undefined) collection.questions[questionIndex].imageUrl = imageUrl;
+    if (explanation !== undefined) collection.questions[questionIndex].explanation = explanation;
+
+    await collection.save();
+    res.json({ question: collection.questions[questionIndex] });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -557,7 +657,8 @@ router.delete('/:id/collections/:collectionId', teacherAuth, async (req, res) =>
     if (String(req.params.id) !== String(req.staff._id)) {
       return res.status(403).json({ error: "Forbidden" });
     }
-    await Collection.findByIdAndDelete(req.params.collectionId);
+    const collection = await Collection.findByIdAndDelete(req.params.collectionId);
+    if (!collection) return res.status(404).json({ error: "Collection not found" });
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -571,6 +672,11 @@ router.delete('/:id/collections/:collectionId/questions/:questionId', teacherAut
       return res.status(403).json({ error: "Forbidden" });
     }
     const collection = await Collection.findById(req.params.collectionId);
+    if (!collection) return res.status(404).json({ error: "Collection not found" });
+    if (String(collection.teacher) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
     collection.questions = collection.questions.filter(q => q.id !== req.params.questionId);
     await collection.save();
     res.json({ success: true });
@@ -578,6 +684,7 @@ router.delete('/:id/collections/:collectionId/questions/:questionId', teacherAut
     res.status(500).json({ error: err.message });
   }
 });
+
 /* Note: For student update/delete, those should be in the students.js route file. */
 
 module.exports = router;
