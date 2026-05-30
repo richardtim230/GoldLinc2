@@ -1,1308 +1,1296 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=0.80">
-    <title>Gold and Linc Schools | Faculty LMS & Multi-Editor Console</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&family=Playfair+Display:ital,wght=0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0284c7', 
-                            800: '#075985', 
-                            900: '#0c4a6e', 
-                        },
-                        gold: {
-                            400: '#fbbf24',
-                            500: '#d97706',
-                            600: '#b45309',
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif'],
-                    }
-                }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gold and Linc Schools | Faculty LMS Production Console</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&family=Playfair+Display:ital,wght=0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#0b2a44',
+              gold: '#ffe066',
+              blue: '#3b82f6',
+              purple: '#6366f1',
+              muted: '#6b7280'
             }
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+            serif: ['Playfair Display', 'serif']
+          }
         }
-    </script>
-    <style>
-        .parabolic-top {
-            border-top-left-radius: 50% 40px;
-            border-top-right-radius: 50% 40px;
-        }
-        .sidebar-btn-active {
-            background: linear-gradient(to right, #075985, #0284c7) !important;
-            color: #ffffff !important;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-        }
-        .sidebar-btn-inactive:hover {
-            background-color: rgba(15, 23, 42, 0.2);
-            color: #ffffff;
-        }
-        /* Custom Quill standard heights for modal layout integrity */
-        .ql-container {
-            height: 100px;
-            font-size: 13px;
-            border-bottom-left-radius: 0.5rem;
-            border-bottom-right-radius: 0.5rem;
-        }
-        .option-editor-container .ql-container {
-            height: 60px;
-        }
-        .explanation-editor-container .ql-container {
-            height: 80px;
-        }
-        .assignment-editor-container .ql-container {
-            height: 120px;
-        }
-        .ql-toolbar {
-            border-top-left-radius: 0.5rem;
-            border-top-right-radius: 0.5rem;
-            background-color: #f8fafc;
-            padding: 4px 8px !important;
-        }
-    </style>
+      }
+    };
+  </script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: linear-gradient(180deg, #f6f8ff, #eef2ff);
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    .page-loader {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(4px);
+      flex-direction: column;
+    }
+    .page-loader.active {
+      display: flex;
+    }
+    .page-loader .spinner {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 6px solid rgba(0, 0, 0, 0.06);
+      border-top-color: #3b82f6;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .quill-editor {
+      background: #fff;
+      border: 1px solid #e6e9ef;
+      border-radius: 8px;
+      min-height: 120px;
+    }
+    
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed !important;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+  </style>
 </head>
-<body class="bg-[#f8fafc] text-slate-800 font-sans antialiased min-h-screen flex flex-col md:flex-row overflow-x-hidden" onload="initSystemNode();">
 
-    <aside class="hidden md:flex flex-col w-72 bg-brand-900 text-white shrink-0 shadow-2xl relative z-30 border-r border-brand-800">
-        <div class="p-6 border-b border-brand-800/60 bg-brand-950/20 flex items-center space-x-3">
-            <div class="bg-white p-1 rounded-xl shadow-inner flex items-center justify-center shrink-0">
-                <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779961202/editor-uploads/frngf21mg4fcrnmccobm.png" class="h-9 w-auto object-contain" alt="Gold and Linc Logo">
-            </div>
-            <div>
-                <span class="block text-base font-extrabold tracking-tight uppercase font-serif">Gold & Linc</span>
-                <span class="block text-[10px] text-brand-500 uppercase tracking-widest font-extrabold -mt-0.5">Faculty Terminal</span>
-            </div>
+<body class="text-brand-navy min-h-screen antialiased">
+
+  <div id="pageLoader" class="page-loader" role="status" aria-live="polite" aria-hidden="true">
+    <div class="spinner" aria-hidden="true"></div>
+    <div class="mt-4 font-extrabold text-brand-navy text-lg" id="loaderMsg">Initializing Environment...</div>
+    <div class="text-brand-muted text-sm" id="loaderSub">Synchronizing multi-editor parameters with deployment node.</div>
+  </div>
+
+  <div class="flex min-h-screen">
+    <aside id="sidebar" class="w-72 fixed inset-y-0 left-0 bg-slate-900 text-white p-4 flex flex-col gap-4 shadow-xl z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+      <div class="flex items-center gap-3 pb-4 border-b border-slate-800">
+        <img src="../logo.png" alt="School Seal" class="w-10 h-10 rounded-lg bg-white p-0.5 object-contain">
+        <div>
+          <div class="font-extrabold text-sm text-brand-gold">Faculty Multi-Editor</div>
+          <div class="text-xs text-slate-400 font-medium">Gold and Linc Schools</div>
         </div>
+      </div>
 
-        <div class="p-4 mx-4 my-4 bg-brand-800/50 rounded-2xl border border-brand-500/30 backdrop-blur-sm text-xs">
-            <p class="text-[10px] font-bold text-brand-500 uppercase tracking-wider mb-1 px-1">Department</p>
-            <p id="sidebarDept" class="text-sm font-bold text-white px-1">Senior Biological Sciences</p>
-            <p id="sidebarLevels" class="text-[10px] text-brand-100/70 px-1 mt-0.5">Assigned: SS1, SS2, SS3 Track</p>
+      <nav class="flex flex-col gap-1.5 overflow-y-auto flex-1 text-sm font-semibold" aria-label="Faculty Console Modules">
+        <a href="#overview" data-tab="overview" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-brand-gold transition-all active">
+          <i class="fa fa-chart-pie w-5 text-center"></i> Dashboard Overview
+        </a>
+        <a href="#classes" data-tab="classes" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-brand-gold transition-all">
+          <i class="fa fa-chalkboard-teacher w-5 text-center"></i> Managed Classes
+        </a>
+        <a href="#attendance" data-tab="attendance" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-brand-gold transition-all">
+          <i class="fa fa-calendar-check w-5 text-center"></i> Smart Attendance
+        </a>
+        <a href="#assignments" data-tab="assignments" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-brand-gold transition-all">
+          <i class="fa fa-scroll w-5 text-center"></i> Assignment Matrix
+        </a>
+        <a href="#gradebook" data-tab="gradebook" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-brand-gold transition-all">
+          <i class="fa fa-book-open w-5 text-center"></i> Production Gradebook
+        </a>
+        <a href="#cbtQuestions" data-tab="cbtQuestions" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-brand-gold transition-all">
+          <i class="fa fa-laptop-code w-5 text-center"></i> CBT Authoring Tool
+        </a>
+        <a href="#myCBTQuestions" data-tab="myCBTQuestions" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-brand-gold transition-all">
+          <i class="fa fa-folder-tree w-5 text-center"></i> CBT Deployment Vault
+        </a>
+        <a href="#notifications" data-tab="notifications" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-brand-gold transition-all">
+          <i class="fa fa-bell w-5 text-center"></i> Broadcast Alerts
+        </a>
+        <a href="#settings" data-tab="settings" class="tab-trigger flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-brand-gold transition-all">
+          <i class="fa fa-sliders w-5 text-center"></i> Faculty Configuration
+        </a>
+      </nav>
+
+      <div class="pt-4 border-t border-slate-800 flex items-center gap-3">
+        <img src="../avatar.jpg" alt="Profile avatar" id="teacherAvatar" class="w-10 h-10 rounded-lg object-cover border-2 border-brand-gold">
+        <div class="min-w-0 flex-1">
+          <div id="teacherName" class="font-bold text-sm text-slate-100 truncate">Loading Account...</div>
+          <div id="teacherDept" class="text-xs text-slate-400 font-medium truncate">Validating context...</div>
         </div>
-
-        <nav class="flex-grow px-4 space-y-1 overflow-y-auto pb-4" id="lmsMenu">
-            <p class="text-[10px] font-bold text-brand-500 uppercase tracking-widest px-3 mb-2">LMS Components</p>
-            
-            <button id="btn-overview" onclick="switchPanel('overview')" type="button" class="sidebar-btn-active w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition-all text-brand-100">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"/></svg>
-                Course Performance Desk
-            </button>
-
-            <button id="btn-assessments" onclick="switchPanel('assessments')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition-all text-brand-100">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                Question Bank Categories
-            </button>
-
-            <button id="btn-assignments" onclick="switchPanel('assignments')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition-all text-brand-100">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                Assignments Hub
-            </button>
-
-            <button id="btn-students" onclick="switchPanel('students')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition-all text-brand-100">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                Student Rosters
-            </button>
-            
-            <button id="btn-grading" onclick="switchPanel('grading')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition-all text-brand-100">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                Gradebook & Mark Sheet
-            </button>
-            
-            <button id="btn-profile" onclick="switchPanel('profile')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition-all text-brand-100">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                Faculty Profile Desk
-            </button>
-        </nav>
-
-        <div class="p-4 border-t border-brand-800/60 bg-brand-950/20 text-[11px] text-center text-brand-100/60">
-            System Node: <strong class="text-white font-semibold">Faculty_LMS_2026</strong>
-        </div>
+      </div>
     </aside>
 
-    <header class="md:hidden w-full bg-brand-900 text-white h-16 px-4 flex items-center justify-between shadow-md sticky top-0 z-40">
-        <div class="flex items-center space-x-2.5">
-            <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779961202/editor-uploads/frngf21mg4fcrnmccobm.png" class="h-7 w-auto bg-white p-0.5 rounded-lg" alt="Logo">
-            <span class="font-serif font-bold text-sm tracking-wide">Gold & Linc LMS</span>
+    <div class="flex-1 md:ml-72 flex flex-col min-w-0">
+      
+      <header class="h-20 bg-white/90 backdrop-blur-md border-b border-slate-200 fixed top-0 right-0 left-0 md:left-72 px-6 flex items-center justify-between z-40">
+        <div class="flex items-center gap-4">
+          <button id="sidebarToggle" class="md:hidden text-white bg-brand-blue p-2 rounded-lg hover:bg-brand-purple transition-colors" aria-label="Toggle navigation viewport">
+            <i class="fa fa-bars text-xl"></i>
+          </button>
+          <div>
+            <h1 class="text-lg font-black text-slate-900 tracking-tight" id="headerTitle">Academic Hub</h1>
+            <p class="text-xs font-semibold text-brand-muted" id="headerSubtitle">Active Processing Core Matrix</p>
+          </div>
         </div>
-        <button type="button" onclick="openBottomNav()" class="bg-brand-800 border border-brand-500/40 px-3 py-1.5 rounded-xl text-xs font-bold text-white transition active:scale-95 flex items-center space-x-1">
-            <span>LMS Menu</span>
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-        </button>
-    </header>
-
-    <div id="bottomDrawerOverlay" onclick="closeBottomNav(event)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden transition-opacity duration-300 opacity-0">
-        <div id="bottomDrawerCard" class="absolute bottom-0 inset-x-0 bg-brand-900 text-white parabolic-top transform translate-y-full transition-transform duration-300 border-t-2 border-gold-400 p-6 pt-12 space-y-4 max-h-[85vh] overflow-y-auto">
-            <div class="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-brand-800 rounded-full"></div>
-            <div class="grid grid-cols-1 gap-2 text-sm font-bold">
-                <button onclick="switchPanel('overview')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Course Performance Desk</span> &rarr;</button>
-                <button onclick="switchPanel('assessments')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Question Bank Categories</span> &rarr;</button>
-                <button onclick="switchPanel('assignments')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Assignments Hub</span> &rarr;</button>
-                <button onclick="switchPanel('students')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Student Rosters</span> &rarr;</button>
-                <button onclick="switchPanel('grading')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Gradebook & Mark Sheet</span> &rarr;</button>
-                <button onclick="switchPanel('profile')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Faculty Profile Desk</span> &rarr;</button>
-            </div>
+        <div class="flex items-center gap-4">
+          <div id="termInfo" class="text-xs font-bold bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200 text-slate-700">Dynamic Session Engine</div>
+          <img src="../avatar.jpg" alt="Profile header context" id="topbarAvatar" class="w-10 h-10 rounded-lg border-2 border-white shadow-sm object-cover">
         </div>
-    </div>
+      </header>
 
-    <main class="flex-grow p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto w-full overflow-hidden" id="lmsPanels">
+      <main class="flex-1 p-6 pt-28 max-w-full">
         
-        <section class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
-                <div class="p-2.5 bg-brand-50 rounded-lg text-brand-800 shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </div>
-                <div class="text-xs">
-                    <p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Active Faculty Staff</p>
-                    <p id="headerTeacherName" class="text-sm font-black text-slate-900">Mrs. Omolara Adeniran</p>
-                    <p id="headerTeacherTitle" class="text-slate-500 text-[11px]">Lead Educator, Science Division</p>
-                </div>
+        <section id="overview" class="view-panel space-y-6">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-brand-muted">Assigned Operations</span>
+              <span class="text-3xl font-black text-slate-900 my-2" id="statClasses">0</span>
+              <span class="text-xs text-emerald-600 font-semibold"><i class="fa fa-circle-check"></i> Active Course Tracks</span>
             </div>
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
-                <div class="p-2.5 bg-amber-50 rounded-lg text-gold-600 shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                </div>
-                <div class="text-xs">
-                    <p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Academic Term Node</p>
-                    <p class="text-sm font-black text-slate-900">2025/2026 Session &bull; First Term</p>
-                    <span class="inline-flex bg-brand-50 text-brand-800 font-bold px-1.5 py-0.5 rounded text-[10px] mt-0.5">Continuous Assessment Cycle</span>
-                </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-brand-muted">Monitored Enrolments</span>
+              <span class="text-3xl font-black text-slate-900 my-2" id="statStudents">0</span>
+              <span class="text-xs text-brand-blue font-semibold"><i class="fa fa-users"></i> Registered Records</span>
             </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-brand-muted">Pending Evaluations</span>
+              <span class="text-3xl font-black text-slate-900 my-2" id="statPending">0</span>
+              <span class="text-xs text-amber-500 font-semibold"><i class="fa fa-hourglass-half"></i> Submissions Awaiting Audit</span>
+            </div>
+          </div>
+          
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <h3 class="text-base font-black text-slate-900 mb-4 flex items-center gap-2"><i class="fa fa-folder-open text-brand-blue"></i> Live Class Roster Frameworks</h3>
+            <div id="class-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+          </div>
         </section>
 
-        <div id="panel-overview" class="space-y-6">
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Assigned Total Class Roll</p>
-                    <p class="text-xl font-black text-brand-900 mt-1">118 Students</p>
-                    <p class="text-[10px] text-slate-400 font-medium mt-1">Across SS2 & SS3 Biology classes</p>
-                </div>
-                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Overall Test Average</p>
-                    <p class="text-xl font-black text-emerald-600 mt-1">71.5%</p>
-                    <span class="inline-flex bg-emerald-50 text-emerald-700 text-[9px] font-bold px-1.5 py-0.5 rounded-full mt-1">Class Standing: Good</span>
-                </div>
-                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Active Categories</p>
-                    <p id="overviewCollectionCount" class="text-xl font-black text-amber-600 mt-1">2 Saved Collections</p>
-                </div>
-            </div>
-
-            <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                <div class="p-4 border-b border-slate-100 bg-slate-50/60">
-                    <h3 class="text-xs font-bold text-brand-900 uppercase tracking-wider">Assigned Form Class Cohort Summaries</h3>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead>
-                            <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
-                                <th class="p-3 pl-4">Target Form Level Class</th>
-                                <th class="p-3">Subject Focus</th>
-                                <th class="p-3 text-center">Active Tests Tracked</th>
-                                <th class="p-3 text-center">Current Class Mean</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
-                            <tr class="hover:bg-slate-50/40 transition">
-                                <td class="p-3 pl-4 font-bold text-brand-900">Senior Secondary Class 2 (SS2 Alpha)</td>
-                                <td class="p-3">Biology Core Tracks</td>
-                                <td class="p-3 text-center">2 Active Batches</td>
-                                <td class="p-3 text-center font-bold text-slate-900 font-mono">73.8%</td>
-                            </tr>
-                            <tr class="hover:bg-slate-50/40 transition">
-                                <td class="p-3 pl-4 font-bold text-brand-900">Senior Secondary Class 3 (SS3 Beta)</td>
-                                <td class="p-3">Advanced Biological Applications</td>
-                                <td class="p-3 text-center">1 Active Batch</td>
-                                <td class="p-3 text-center font-bold text-slate-900 font-mono">65.1%</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div id="panel-assessments" class="space-y-6 hidden">
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
-                
-                <div id="collectionControlHeader" class="flex flex-col sm:flex-row justify-between sm:items-start gap-4 border-b border-slate-100 pb-4">
-                    <div>
-                        <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Question Bank Categorization Deck</h2>
-                        <p class="text-xs text-slate-500">Isolate focus tracks to run standard objective items evaluation updates safely.</p>
-                    </div>
-                    <div class="flex gap-2 items-center w-full sm:w-auto">
-                        <input type="text" id="newCollectionName" placeholder="e.g., SS2 BIOLOGY TEST 1" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold p-2 focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none flex-grow">
-                        <button onclick="createCollection()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider transition whitespace-nowrap">
-                            Create Collection
-                        </button>
-                    </div>
-                </div>
-
-                <div id="collectionsContainer" class="space-y-4"></div>
-            </div>
-        </div>
-
-        <div id="panel-assignments" class="space-y-6 hidden">
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
-                <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                    <div>
-                        <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Term Project & Assignments Deployment</h2>
-                        <p class="text-xs text-slate-500">Track current terminal task pushes and target submission close points.</p>
-                    </div>
-                    <button onclick="openAssignmentModal()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider shadow-sm transition">
-                        + Open Deployment Modal
-                    </button>
-                </div>
-                <div id="assignmentsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            </div>
-        </div>
-
-        <div id="panel-students" class="space-y-6 hidden">
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-100 pb-3">
-                    <div>
-                        <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Secondary Form Cohort Registry</h2>
-                        <p class="text-xs text-slate-500">Review assigned class lines and student system codes cleanly.</p>
-                    </div>
-                    <select id="studentClassFilter" onchange="renderStudents()" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
-                        <option value="ALL">Display All Assigned Classes</option>
-                        <option value="SS2 Alpha">Senior Secondary 2 (SS2 Alpha)</option>
-                        <option value="SS3 Beta">Senior Secondary 3 (SS3 Beta)</option>
-                    </select>
-                </div>
-                <div class="overflow-x-auto rounded-xl border border-slate-100">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead>
-                            <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
-                                <th class="p-3 pl-4">Admission Code</th>
-                                <th class="p-3">Student Fullname</th>
-                                <th class="p-3">Assigned Class Tier</th>
-                                <th class="p-3 text-center">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="studentTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div id="panel-grading" class="space-y-6 hidden">
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div>
-                        <h3 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Result Upload Analytics</h3>
-                        <p class="text-base font-black text-brand-900 mt-0.5">Roster Capture Progress</p>
-                    </div>
-                    <div class="text-right text-xs">
-                        <span class="font-bold text-slate-500">Completed Data Cells: </span>
-                        <span id="progressStatsCount" class="font-mono font-black text-brand-900 bg-slate-100 px-2 py-0.5 rounded-md">0 / 0</span>
-                        <span id="progressStatsLeft" class="ml-2 font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">0 Cells Left</span>
-                    </div>
-                </div>
-                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden shadow-inner">
-                    <div id="progressBarFill" class="bg-gradient-to-r from-brand-500 to-emerald-500 h-full w-0 transition-all duration-300"></div>
-                </div>
-            </div>
-
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-slate-100 pb-4">
-                    <div>
-                        <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Secondary Gradebook Mark Sheet Matrix</h2>
-                        <p class="text-xs text-slate-500">Pushes score modifications straight to parent profile views. Weights: CA1 (20%), CA2 (20%), Exam (60%).</p>
-                    </div>
-                    <div class="flex space-x-2 shrink-0">
-                        <select id="gradebookClassFilter" onchange="renderGradebook()" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
-                            <option value="SS2 Alpha">SS2 Alpha - Biology Core</option>
-                            <option value="SS3 Beta">SS3 Beta - Advanced Biology</option>
-                        </select>
-                        <button onclick="saveGradebookChanges()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider shadow transition">
-                            Bulk Save Class
-                        </button>
-                    </div>
-                </div>
-                <div class="overflow-x-auto rounded-xl border border-slate-100">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead>
-                            <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
-                                <th class="p-3 pl-4">Admission Code</th>
-                                <th class="p-3">Student Name</th>
-                                <th class="p-3 text-center w-20">CA1 (20)</th>
-                                <th class="p-3 text-center w-20">CA2 (20)</th>
-                                <th class="p-3 text-center w-20">Exam (60)</th>
-                                <th class="p-3 text-center w-24">Total Outcome</th>
-                                <th class="p-3 text-center w-36">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="gradebookTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div id="panel-profile" class="space-y-6 hidden">
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
-                <div class="border-b border-slate-100 pb-3">
-                    <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Faculty Profile Management Desk</h2>
-                </div>
-                <form id="profileForm" onsubmit="updateTeacherProfile(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                    <div>
-                        <label class="block font-bold text-slate-400 mb-1">Full Instructor Name</label>
-                        <input type="text" id="profileName" value="Mrs. Omolara Adeniran" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-400 mb-1">Faculty Rank Title</label>
-                        <input type="text" id="profileTitle" value="Lead Educator, Science Division" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-400 mb-1">Assigned Subject Department</label>
-                        <input type="text" id="profileDept" value="Senior Biological Sciences" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-400 mb-1">Assigned Form Class Tracks</label>
-                        <input type="text" id="profileLevels" value="Assigned: SS1, SS2, SS3 Track" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                    </div>
-                    <div class="sm:col-span-2 flex justify-end">
-                        <button type="submit" class="bg-brand-900 text-white font-bold px-5 py-2 rounded-xl uppercase transition hover:bg-brand-800">Update Profile</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </main>
-
-    <div id="questionModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl border border-slate-200 w-full max-w-3xl shadow-2xl flex flex-col overflow-hidden max-h-[92vh]">
-            
-            <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-                <div>
-                    <h3 id="modalTitle" class="text-xs font-extrabold text-brand-900 uppercase tracking-wider">Configure Assessment Item</h3>
-                    <p class="text-[11px] text-slate-500">Edit stems, diagrams, multi-editor response spaces, and answer keys.</p>
-                </div>
-                <button onclick="closeQuestionModal()" class="text-slate-400 hover:text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md font-bold">&times;</button>
+        <section id="classes" class="view-panel space-y-6 hidden">
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
+              <div>
+                <h2 class="text-base font-black text-slate-900">Roster Registry Terminal</h2>
+                <p class="text-xs font-semibold text-brand-muted">Execute student directory queries against current terms</p>
+              </div>
+              <div class="flex gap-2 min-w-[260px]">
+                <select id="classSelect" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 p-2.5 focus:ring-2 focus:ring-brand-blue w-full"></select>
+              </div>
             </div>
             
-            <div class="p-5 space-y-4 overflow-y-auto text-xs">
+            <div class="overflow-x-auto">
+              <table id="rosterTable" class="w-full text-left text-sm">
+                <thead>
+                  <tr class="border-b border-slate-100 text-brand-muted font-bold text-xs uppercase tracking-wider bg-slate-50/70">
+                    <th class="p-3">Index</th>
+                    <th class="p-3">Full Student Legal Identity</th>
+                    <th class="p-3">Admission Code</th>
+                    <th class="p-3">Network Access Route</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 font-medium text-slate-700"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="attendance" class="view-panel space-y-6 hidden">
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
+              <div>
+                <label class="text-xs font-bold text-slate-700 block mb-1.5">Target Management Boundary</label>
+                <select id="attendance-class" class="bg-white border border-slate-200 rounded-xl text-xs font-semibold p-2.5 focus:ring-2 focus:ring-brand-blue"></select>
+              </div>
+              <div>
+                <label class="text-xs font-bold text-slate-700 block mb-1.5">Date Variable Pointer</label>
+                <input type="date" id="attDate" class="bg-white border border-slate-200 rounded-xl text-xs font-semibold p-2.5 focus:ring-2 focus:ring-brand-blue">
+              </div>
+              <button id="loadAttendanceBtn" class="bg-brand-blue text-white rounded-xl text-xs font-bold p-3 hover:bg-brand-purple transition-all flex items-center justify-center gap-2">
+                <i class="fa fa-arrow-rotate-right"></i> Synchronize Roster Parameters
+              </button>
+            </div>
+
+            <form id="attendance-form" class="hidden">
+              <div class="overflow-x-auto rounded-xl border border-slate-100 mb-4">
+                <table class="w-full text-left text-sm">
+                  <thead>
+                    <tr class="bg-slate-50 text-xs font-bold text-brand-muted border-b border-slate-100">
+                      <th class="p-3">Student Name</th>
+                      <th class="p-3 text-center">Present</th>
+                      <th class="p-3 text-center">Absent</th>
+                      <th class="p-3 text-center">Excused</th>
+                    </tr>
+                  </thead>
+                  <tbody id="attendance-students" class="divide-y divide-slate-100 font-semibold text-slate-700"></tbody>
+                </table>
+              </div>
+              <button type="submit" id="saveAttendanceSubmitBtn" class="bg-slate-900 text-white font-bold text-xs px-5 py-3 rounded-xl hover:bg-brand-blue transition-all">
+                <i class="fa fa-floppy-disk mr-1.5"></i> Commit Log Matrix to Ledger
+              </button>
+            </form>
+          </div>
+        </section>
+
+        <section id="assignments" class="view-panel space-y-6 hidden">
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4 mb-4">
+              <div>
+                <h2 class="text-base font-black text-slate-900">Task Matrix Hub</h2>
+                <p class="text-xs font-semibold text-brand-muted">Instantiate and manage curriculum assignments</p>
+              </div>
+              <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                <select id="assignment-filter-class" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 p-2.5 focus:ring-2 focus:ring-brand-blue min-w-[160px]"></select>
+                <button id="newAssignBtn" class="bg-brand-blue text-white rounded-xl text-xs font-bold px-4 py-2.5 hover:bg-brand-purple transition-all flex items-center gap-2">
+                  <i class="fa fa-plus"></i> Compose Directive Template
+                </button>
+              </div>
+            </div>
+            <div id="assignment-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+          </div>
+        </section>
+
+        <section id="gradebook" class="view-panel space-y-6 hidden">
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4 mb-4">
+              <div>
+                <h2 class="text-base font-black text-slate-900">Gradebook Matrix Terminal</h2>
+                <p class="text-xs font-semibold text-brand-muted">Commit operational academic continuous assessments and exams</p>
+              </div>
+              <div class="flex gap-2 w-full sm:w-auto">
+                <select id="gradebook-class" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 p-2.5 focus:ring-2 focus:ring-brand-blue min-w-[180px]"></select>
+                <button id="saveGradesBtn" class="bg-brand-blue text-white rounded-xl text-xs font-bold px-4 py-2.5 hover:bg-brand-purple transition-all flex items-center gap-2">
+                  <i class="fa fa-cloud-arrow-up"></i> Pipeline Record Manifest
+                </button>
+              </div>
+            </div>
+            <div id="gradebook-table" class="overflow-x-auto rounded-xl border border-slate-100"></div>
+          </div>
+        </section>
+
+        <section id="cbtQuestions" class="view-panel space-y-6 hidden">
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <div class="border-b border-slate-100 pb-3 mb-5">
+              <h2 class="text-base font-black text-slate-900">CBT Evaluation Parameters</h2>
+              <p class="text-xs font-semibold text-brand-muted">Compose evaluation banks with transactional localStorage validation state redundancy</p>
+            </div>
+            
+            <form id="cbt-question-form" autocomplete="off" class="space-y-6">
+              <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div>
-                    <label class="block font-extrabold text-slate-400 uppercase tracking-wider mb-1.5">Question Stem Body (Rich Text)</label>
-                    <div id="quillQuestionStem" class="bg-white rounded-xl"></div>
+                  <label class="text-xs font-bold text-slate-700 block mb-1">Target Class Bound</label>
+                  <select id="cbt-class-select" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5"></select>
                 </div>
-                
-                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-                    <label class="block font-extrabold text-slate-500 uppercase tracking-wider text-[11px]">Attach Diagram Vector / Diagram Image Asset</label>
-                    <div class="flex gap-2">
-                        <input type="url" id="modalImageUrl" placeholder="Paste structural image URL path here (e.g., https://...)" class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none focus:ring-1 focus:ring-brand-500">
-                        <button onclick="previewModalImage()" class="bg-slate-200 hover:bg-slate-300 font-bold px-3 py-2 rounded-lg transition text-[11px] uppercase">Preview</button>
-                    </div>
-                    <img id="modalImagePreview" src="" class="hidden max-h-32 w-auto object-contain rounded border border-slate-200 bg-white p-1">
+                <div>
+                  <label class="text-xs font-bold text-slate-700 block mb-1">Subject Scope Taxonomy</label>
+                  <select id="cbt-subject-select" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5"></select>
                 </div>
+                <div>
+                  <label class="text-xs font-bold text-slate-700 block mb-1">Assessment Run Identity</label>
+                  <input type="text" id="cbt-title" placeholder="e.g., Session Midterm" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5">
+                </div>
+                <div>
+                  <label class="text-xs font-bold text-slate-700 block mb-1">Execution Limit (Min)</label>
+                  <input type="number" id="cbt-duration" min="1" placeholder="e.g., 45" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5">
+                </div>
+              </div>
 
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center">
-                        <label class="block font-extrabold text-slate-400 uppercase tracking-wider">Dynamic Response Option Fields</label>
-                        <button onclick="appendBlankOptionField()" class="text-brand-800 hover:text-brand-900 font-bold text-[11px] bg-brand-50 px-2.5 py-1 rounded-lg border border-brand-200 transition">+ Append Option Row</button>
-                    </div>
-                    <div id="modalOptionsWrapper" class="space-y-4"></div>
-                </div>
+              <div>
+                <h3 class="text-sm font-extrabold text-slate-900 mb-3 flex items-center justify-between">
+                  <span>Questions Registry Matrix</span>
+                  <button type="button" id="cbt-add-question-btn" class="bg-slate-100 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-slate-200 transition-all flex items-center gap-1.5">
+                    <i class="fa fa-plus text-brand-blue"></i> Append Node Structure
+                  </button>
+                </h3>
+                <div id="cbt-questions-list" class="space-y-4"></div>
+              </div>
 
-                <div class="space-y-1.5">
-                    <label class="block font-extrabold text-slate-400 uppercase tracking-wider">Optional Grading Explanation & Marking Rationale</label>
-                    <div class="explanation-editor-container">
-                        <div id="quillExplanation" class="bg-white rounded-xl"></div>
-                    </div>
-                </div>
+              <button type="submit" id="cbt-upload-btn" class="w-full bg-slate-900 text-white font-bold text-xs p-3.5 rounded-xl hover:bg-brand-blue transition-all shadow-sm">
+                <i class="fa fa-server mr-2"></i> Deploy Full Structural Assessment Matrix To Render Server
+              </button>
+              <div id="cbt-upload-msg" class="text-xs text-center font-bold"></div>
+            </form>
+          </div>
+        </section>
+
+        <section id="myCBTQuestions" class="view-panel space-y-6 hidden">
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4 mb-4">
+              <div>
+                <h2 class="text-base font-black text-slate-900">CBT Evaluation Inventories</h2>
+                <p class="text-xs font-semibold text-brand-muted">Active evaluations configured across remote nodes</p>
+              </div>
+              <button id="pushToUniversalBtn" disabled class="bg-slate-900 text-white rounded-xl text-xs font-bold px-4 py-2.5 hover:bg-brand-blue transition-all disabled:opacity-40 flex items-center gap-2">
+                <i class="fa fa-share-nodes"></i> Batch Push Assets to Global Question Bank
+              </button>
             </div>
+            <div id="myCBTQuestionsList" class="overflow-x-auto rounded-xl border border-slate-100"></div>
+          </div>
+        </section>
 
-            <div class="p-3.5 border-t border-slate-100 bg-slate-50 flex justify-end space-x-2">
-                <button onclick="closeQuestionModal()" class="bg-white border border-slate-200 text-slate-600 font-bold px-4 py-1.5 rounded-xl text-[11px] uppercase">Cancel</button>
-                <button onclick="saveModalQuestionData()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold px-5 py-1.5 rounded-xl text-[11px] uppercase">Commit Changes</button>
-            </div>
-        </div>
+        <section id="notifications" class="view-panel space-y-6 hidden">
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <h2 class="text-base font-black text-slate-900 mb-1">Administrative Message Logs</h2>
+            <p class="text-xs font-semibold text-brand-muted mb-4">Inbound notifications from central operations core platform</p>
+            <div id="notification-list" class="divide-y divide-slate-100"></div>
+          </div>
+        </section>
+
+        <section id="settings" class="view-panel space-y-6 hidden">
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 max-w-xl">
+            <h2 class="text-base font-black text-slate-900 mb-1">Identity Vector Parameters</h2>
+            <p class="text-xs font-semibold text-brand-muted mb-5">Modify operational faculty directory authentication profiles</p>
+            
+            <form id="profile-form" class="space-y-4">
+              <div>
+                <label class="text-xs font-bold text-slate-700 block mb-1">Legal Public Name Descriptor</label>
+                <input type="text" id="profile-name" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5">
+              </div>
+              <div>
+                <label class="text-xs font-bold text-slate-700 block mb-1">Official Institutional Designation</label>
+                <input type="text" id="profile-designation" required placeholder="e.g., Lead Organic Chemist" class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5">
+              </div>
+              <div>
+                <label class="text-xs font-bold text-slate-700 block mb-1">Network Route Email Entity</label>
+                <input type="email" id="profile-email" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5">
+              </div>
+              <div>
+                <label class="text-xs font-bold text-slate-700 block mb-1">Secret Key Credentials (Optional)</label>
+                <input type="password" id="profile-password" placeholder="Pass null or remain un-entered to bypass update routine" class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5">
+              </div>
+              <button type="submit" id="profileSaveSubmitBtn" class="bg-brand-blue text-white rounded-xl text-xs font-bold px-5 py-3 hover:bg-brand-purple transition-all flex items-center gap-2">
+                <i class="fa fa-user-gear"></i> Update Faculty Context Directory
+              </button>
+            </form>
+          </div>
+        </section>
+
+      </main>
     </div>
+  </div>
 
-    <div id="assignmentModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl border border-slate-200 w-full max-w-3xl shadow-2xl flex flex-col overflow-hidden max-h-[92vh]">
-            
-            <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-                <div>
-                    <h3 class="text-xs font-extrabold text-brand-900 uppercase tracking-wider">Deploy New Assignment Portfolio</h3>
-                    <p class="text-[11px] text-slate-500">Configure parameters, distribute tasks, or select MCQ rows from core categories.</p>
-                </div>
-                <button onclick="closeAssignmentModal()" class="text-slate-400 hover:text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md font-bold">&times;</button>
-            </div>
-
-            <div class="p-5 space-y-4 overflow-y-auto text-xs">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block font-bold text-slate-400 mb-1">Assignment Title</label>
-                        <input type="text" id="asmModalTitle" placeholder="e.g., Photosynthesis Pathways" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-400 mb-1">Target Class Cohort</label>
-                        <select id="asmModalClass" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                            <option value="SS2 Alpha">SS2 Alpha - Biology Core</option>
-                            <option value="SS3 Beta">SS3 Beta - Advanced Biology</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-400 mb-1">Submission Deadline</label>
-                        <input type="date" id="asmModalDue" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block font-bold text-slate-400 mb-1">Task Deployment Routing Type</label>
-                    <select id="asmModalType" onchange="toggleAssignmentTypeSection()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500 text-brand-900">
-                        <option value="STANDARD">Standard Task Portfolio (Rich Text & Instructions)</option>
-                        <option value="QUESTION_BANK">Question Bank Evaluation (Allocate Dynamic MCQs)</option>
-                    </select>
-                </div>
-
-                <div id="asmTypeStandardWrapper" class="space-y-1.5">
-                    <label class="block font-extrabold text-slate-400 uppercase tracking-wider">Task Guidelines & Instructions (Rich Text)</label>
-                    <div class="assignment-editor-container">
-                        <div id="quillAssignmentBody" class="bg-white rounded-xl"></div>
-                    </div>
-                </div>
-
-                <div id="asmTypeQuestionBankWrapper" class="space-y-3 hidden p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-200 pb-2">
-                        <div>
-                            <h4 class="font-extrabold text-brand-900 text-xs uppercase tracking-wide">Question Bank Matrix Mapper</h4>
-                            <p class="text-[11px] text-slate-500">Select which objective questions to link with this task assignment.</p>
-                        </div>
-                        <select id="asmBankCategorySelector" onchange="loadQuestionsForAllocation()" class="bg-white border border-slate-200 rounded-xl text-[11px] font-bold text-slate-700 p-1.5 outline-none focus:ring-1 focus:ring-brand-500">
-                            </select>
-                    </div>
-
-                    <div id="asmAllocationQuestionsContainer" class="space-y-3 max-h-60 overflow-y-auto pt-1">
-                        </div>
-                </div>
-            </div>
-
-            <div class="p-3.5 border-t border-slate-100 bg-slate-50 flex justify-end space-x-2">
-                <button onclick="closeAssignmentModal()" class="bg-white border border-slate-200 text-slate-600 font-bold px-4 py-1.5 rounded-xl text-[11px] uppercase">Cancel</button>
-                <button onclick="commitAssignmentDeployment()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold px-5 py-1.5 rounded-xl text-[11px] uppercase tracking-wider transition">Deploy Task Portfolio</button>
-            </div>
+  <div id="assignmentModalBg" class="form-modal-bg fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-2xl w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
+      <button class="absolute top-4 right-4 text-slate-400 hover:text-slate-900 text-2xl font-bold transition-all" onclick="closeAssignmentModal()">&times;</button>
+      <h3 class="text-base font-black text-slate-900 mb-4 flex items-center gap-2"><i class="fa fa-pen-ruler text-brand-blue"></i> Compose Task Parameters</h3>
+      
+      <form id="assignmentForm" class="space-y-4">
+        <input type="hidden" id="assignment-id-edit" value="">
+        <div>
+          <label class="text-xs font-bold text-slate-700 block mb-1">Target Class Assignment Group *</label>
+          <select id="assignment-class" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5"></select>
         </div>
-    </div>
-
-    <div id="mediaPickerDialog" class="fixed inset-0 z-[100] overflow-y-auto bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="bg-white rounded-xl border border-slate-200 w-full max-w-md shadow-2xl p-5 space-y-4 text-xs">
-            <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-                <h4 class="font-extrabold text-brand-900 uppercase tracking-wider">Insert Rich Text Image</h4>
-                <button onclick="closeMediaPicker()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">&times;</button>
-            </div>
-            
-            <div class="space-y-3">
-                <div>
-                    <label class="block font-bold text-slate-500 uppercase tracking-wider text-[10px] mb-1">Option A: Upload Local Asset File</label>
-                    <input type="file" id="mediaLocalFileInput" accept="image/*" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs outline-none focus:ring-1 focus:ring-brand-500">
-                </div>
-                
-                <div class="relative flex py-2 items-center">
-                    <div class="flex-grow border-t border-slate-200"></div>
-                    <span class="flex-shrink mx-3 text-slate-400 font-bold text-[10px] uppercase">Or</span>
-                    <div class="flex-grow border-t border-slate-200"></div>
-                </div>
-
-                <div>
-                    <label class="block font-bold text-slate-500 uppercase tracking-wider text-[10px] mb-1">Option B: Link Asset URL Address</label>
-                    <input type="url" id="mediaUrlInput" placeholder="https://example.com/image.png" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs outline-none focus:ring-1 focus:ring-brand-500">
-                </div>
-            </div>
-
-            <div class="pt-2 flex justify-end space-x-2 border-t border-slate-100">
-                <button onclick="closeMediaPicker()" class="bg-white border border-slate-200 text-slate-600 font-bold px-3 py-1.5 rounded-lg uppercase text-[10px]">Close</button>
-                <button onclick="commitMediaAssetInsertion()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold px-4 py-1.5 rounded-lg uppercase text-[10px]">Insert Image</button>
-            </div>
+        <div>
+          <label class="text-xs font-bold text-slate-700 block mb-1">Task Nomenclature Descriptor *</label>
+          <input type="text" id="assignment-title" placeholder="e.g., Alkanol Synthesis Reaction Map" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5">
         </div>
+        <div>
+          <label class="text-xs font-bold text-slate-700 block mb-1">Subject Framework Core Scope</label>
+          <select id="assignment-subject" class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5">
+            <option value="">Select Target Taxonomy Subject Context</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-700 block mb-1">Structural Instruction Matrix *</label>
+          <textarea id="assignment-desc" placeholder="Provide complete instruction metrics..." required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5 h-24 resize-none"></textarea>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-700 block mb-1">Closing Submission Due Date *</label>
+          <input type="date" id="assignment-due" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5">
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" class="bg-slate-100 text-slate-700 text-xs font-bold px-4 py-2 rounded-xl" onclick="closeAssignmentModal()">Dismiss</button>
+          <button type="submit" id="assignmentSubmitButton" class="bg-brand-blue text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-brand-purple transition-all">Commit Task Object</button>
+        </div>
+      </form>
     </div>
+  </div>
 
-    <script>
-        const overlay = document.getElementById('bottomDrawerOverlay');
-        const card = document.getElementById('bottomDrawerCard');
+  <div id="gradebookUploadModalBg" class="form-modal-bg fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-2xl w-full max-w-md p-6 relative">
+      <button class="absolute top-4 right-4 text-slate-400 hover:text-slate-900 text-2xl font-bold transition-all" onclick="window.closeGradebookUploadModal()">&times;</button>
+      <h3 class="text-base font-black text-slate-900 mb-4 flex items-center gap-2"><i class="fa fa-cloud-arrow-up text-brand-blue"></i> Structural Manifest Upload Pipeline</h3>
+      
+      <form id="gradebookUploadForm" class="space-y-4" onsubmit="event.preventDefault(); window.submitGradebookResults();">
+        <div>
+          <label class="text-xs font-bold text-slate-700 block mb-1">Academic Session Cycle Node</label>
+          <select id="gb-session-select" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5 w-full">
+            <option value="">Select Active Session</option>
+            <option value="2027-2028">2027–2028 Academic Run</option>
+            <option value="2026-2027">2026–2027 Academic Run</option>
+            <option value="2025-2026">2025–2026 Academic Run</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-700 block mb-1">Operational Term Pointer</label>
+          <select id="gb-term-select" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5 w-full">
+            <option value="">Select Run Term Pointer</option>
+            <option value="FIRST TERM">FIRST TERM LOGISTIC</option>
+            <option value="SECOND TERM">SECOND TERM LOGISTIC</option>
+            <option value="THIRD TERM">THIRD TERM LOGISTIC</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-700 block mb-1">Continuous Evaluation Type Metric</label>
+          <select id="gb-result-type-select" required class="border border-slate-200 rounded-xl text-xs font-semibold p-2.5 w-full">
+            <option value="">Select Structural Evaluation Type</option>
+            <option value="exam">Examination Assessment Module</option>
+            <option value="ca1">Continuous Assessment Registry Block 1</option>
+            <option value="ca2">Continuous Assessment Registry Block 2</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" class="bg-slate-100 text-slate-700 text-xs font-bold px-4 py-2 rounded-xl" onclick="window.closeGradebookUploadModal()">Cancel</button>
+          <button type="submit" id="gradebookUploadSubmitBtn" class="bg-brand-blue text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-brand-purple transition-all">Pipeline Data Packages</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+  <script>
+    (function () {
+      // ============ PRODUCTION LIVE CONFIGURATION CONFIGS ============
+      const API_BASE_URL = "https://goldlincschools.onrender.com";
+      const token = localStorage.getItem('teacherToken') || localStorage.getItem('token') || "";
+
+      // ============ CACHE STORAGE HOOK REGISTRIES ============
+      let teacher = null;
+      let studentsByClass = {};
+      let subjectsByClass = {};
+      let notifications = [];
+      let attendanceRecords = [];
+      let assignments = [];
+      let myUploadedCBTs = [];
+      let cbtQuestions = [];
+      let selectedCBTIds = [];
+      let cbtDraftKey = 'cbtDraft_current';
+      let selectedClassId = null;
+
+      // ============ LAZY LOADER HOOK OPERATIONS ============
+      const pageLoader = document.getElementById('pageLoader');
+      const loaderMsg = document.getElementById('loaderMsg');
+      const loaderSub = document.getElementById('loaderSub');
+
+      function showLoader(msg, sub) {
+        if (msg) loaderMsg.textContent = msg;
+        if (sub) loaderSub.textContent = sub;
+        pageLoader.classList.add('active');
+        pageLoader.setAttribute('aria-hidden', 'false');
+      }
+
+      function hideLoader() {
+        pageLoader.classList.remove('active');
+        pageLoader.setAttribute('aria-hidden', 'true');
+      }
+
+      // ============ BUTTON BUTTON INTERACTION CONTEXT SPINNER CONTROL ============
+      function toggleButtonLoading(btnEl, isLoading) {
+        if (!btnEl) return;
+        if (isLoading) {
+          btnEl.disabled = true;
+          btnEl.setAttribute('data-original-content', btnEl.innerHTML);
+          btnEl.innerHTML = `<i class="fa fa-spinner fa-spin mr-2"></i> Syncing Engine...`;
+        } else {
+          const originalContent = btnEl.getAttribute('data-original-content');
+          if (originalContent) {
+            btnEl.innerHTML = originalContent;
+          }
+          btnEl.disabled = false;
+          btnEl.removeAttribute('data-original-content');
+        }
+      }
+
+      async function fetchWithSpinLock(buttonId, asyncCallback) {
+        const btn = document.getElementById(buttonId);
+        toggleButtonLoading(btn, true);
+        try {
+          await asyncCallback();
+        } catch (err) {
+          console.error(`Production pipeline context fault tracked on element: ${buttonId}`, err);
+          alert("A downstream system operation returned an processing network error code.");
+        } finally {
+          toggleButtonLoading(btn, false);
+        }
+      }
+
+      function authHeaders() {
+        return token ? { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token } : { 'Content-Type': 'application/json' };
+      }
+
+      // ============ PRODUCTION CORE REST ENDPOINT LAYERS ============
+      async function fetchTeacherProfile() {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/teachers/me`, { headers: authHeaders() });
+          return res.ok ? await res.json() : null;
+        } catch { return null; }
+      }
+
+      async function fetchTeacherClasses() {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/teachers/classes`, { headers: authHeaders() });
+          if (!res.ok) return [];
+          const data = await res.json();
+          return Array.isArray(data) ? data : [];
+        } catch { return []; }
+      }
+
+      async function fetchTeacherNotifications() {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/notifications`, { headers: authHeaders() });
+          if (!res.ok) return [];
+          const data = await res.json();
+          return Array.isArray(data.notifications) ? data.notifications : [];
+        } catch { return []; }
+      }
+
+      async function fetchStudentsByClass(classId) {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/teachers/students?classId=${encodeURIComponent(classId)}`, { headers: authHeaders() });
+          if (!res.ok) return [];
+          const data = await res.json();
+          return Array.isArray(data) ? data : [];
+        } catch { return []; }
+      }
+
+      async function fetchSubjectsByClass(classId) {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/teachers/subjects?classId=${encodeURIComponent(classId)}`, { headers: authHeaders() });
+          if (!res.ok) return [];
+          const data = await res.json();
+          return Array.isArray(data) ? data : [];
+        } catch { return []; }
+      }
+
+      async function fetchAssignments() {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/assignments`, { headers: authHeaders() });
+          if (!res.ok) return [];
+          const data = await res.json();
+          return Array.isArray(data.assignments) ? data.assignments : [];
+        } catch { return []; }
+      }
+
+      async function fetchMyCBTQuestions() {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/cbt`, { headers: authHeaders() });
+          if (!res.ok) return [];
+          const data = await res.json();
+          return Array.isArray(data) ? data : (data.cbts || []);
+        } catch { return []; }
+      }
+
+      // ============ UI RE-RENDER AND SYNCHRONIZATION BINDINGS ============
+      function syncDashboardUI(data) {
+        // Hydrate Core Identity Vectors
+        document.getElementById('teacherName').textContent = data.teacher.name || "Faculty Member";
+        document.getElementById('teacherDept').textContent = data.teacher.designation || "Department Academic Core";
         
-        let activeIsolatedCollectionId = null;
-        let activeTargetModalMode = 'CREATE';
-        let contextualTargetQuestionId = null;
+        // Stats Matrices Data Remapping
+        document.getElementById('statClasses').textContent = data.classes.length;
+        let runningCount = 0;
+        for (const cid in data.studentsByClass) { runningCount += data.studentsByClass[cid].length; }
+        document.getElementById('statStudents').textContent = runningCount;
+        document.getElementById('statPending').textContent = data.assignments.reduce((acc, curr) => acc + (curr.pendingCount || 0), 0);
 
-        let stemQuillInstance = null;
-        let explanationQuillInstance = null;
-        let assignmentQuillInstance = null;
-        let optionQuillRegistry = {}; 
+        // Core UI Lists Builders
+        const listContainer = document.getElementById('class-list');
+        listContainer.innerHTML = '';
+        
+        const classSelects = ['classSelect', 'attendance-class', 'assignment-filter-class', 'gradebook-class', 'cbt-class-select', 'assignment-class'];
+        classSelects.forEach(id => {
+          const selectEl = document.getElementById(id);
+          if (selectEl) {
+            selectEl.innerHTML = id === 'assignment-filter-class' ? '<option value="">All Viewport Classes</option>' : '';
+          }
+        });
 
-        // Active context tracking variables for media asset injection redirection
-        let activeMediaTargetQuillInstance = null;
-
-        // STATE DATABASES
-        let assessmentDatabase = [
-            {
-                id: "collection_1",
-                name: "SS2 BIOLOGY TEST 1",
-                questions: [
-                    {
-                        id: "q_1_1",
-                        text: "<p>Study the provided biological matrix. Which of the following organelles forms the primary site for cellular respiration pathways within animal tissue layers?</p>",
-                        imageUrl: "https://images.unsplash.com/photo-1532187863486-abf9d39d6618?auto=format&fit=crop&w=300&q=80",
-                        options: [
-                            { text: "<p>Mitochondrion structures</p>", isCorrect: true },
-                            { text: "<p>Ribosomal body complexes</p>", isCorrect: false },
-                            { text: "<p>Lysosomal waste paths</p>", isCorrect: false },
-                            { text: "<p>Nucleolus core bounds</p>", isCorrect: false }
-                        ],
-                        explanation: "<p>The mitochondrion orchestrates adenosine triphosphate generation through systematic citric acid cycle configurations.</p>"
-                    },
-                    {
-                        id: "q_1_2",
-                        text: "<p>Identify the primary function of rough endoplasmic reticulum sheets during cellular adaptation sequences.</p>",
-                        imageUrl: "",
-                        options: [
-                            { text: "<p>Polypeptide structure synthesis</p>", isCorrect: true },
-                            { text: "<p>Lipid synthesis matrix chains</p>", isCorrect: false }
-                        ],
-                        explanation: "<p>Rough endoplasmic reticulum holds ribosomes explicitly for surface translation pathways.</p>"
-                    }
-                ]
-            },
-            {
-                id: "collection_2",
-                name: "SS3 MOCK EXAM PRACTICALS",
-                questions: [
-                    {
-                        id: "q_2_1",
-                        text: "<p>During mammalian respiration modeling setups, what specific color variation shows up inside lime water when exposed to unpurified carbon dioxide bubbles?</p>",
-                        imageUrl: "",
-                        options: [
-                            { text: "<p>Milky precipitation formation</p>", isCorrect: true },
-                            { text: "<p>Translucent azure blue shift</p>", isCorrect: false }
-                        ],
-                        explanation: "<p>Insoluble calcium carbonate precipitates form cleanly inside the water solution.</p>"
-                    }
-                ]
-            }
-        ];
-
-        let studentRegistry = [
-            { code: "GLS/2024/048", name: "Samuel Adeniyi", classGroup: "SS2 Alpha", ca1Mark: 17, ca2Mark: 17, examMark: 48, standing: "Active" },
-            { code: "GLS/2024/091", name: "Chidi Okafor", classGroup: "SS2 Alpha", ca1Mark: 14, ca2Mark: 14, examMark: 42, standing: "Active" },
-            { code: "GLS/2023/012", name: "Fatima Bello", classGroup: "SS3 Beta", ca1Mark: 15, ca2Mark: 16, examMark: 51, standing: "Active" }
-        ];
-
-        let assignmentsDatabase = [
-            { id: "asm_1", title: "Mendelian Genetics Punnett Square Deck", classGroup: "SS2 Alpha", due: "2026-06-04", status: "Open", type: "STANDARD", questionsAllocated: [] },
-            { id: "asm_2", title: "Mammalian Circulatory Pathway Tracking Portfolio", classGroup: "SS3 Beta", due: "2026-06-09", status: "Open", type: "STANDARD", questionsAllocated: [] }
-        ];
-
-        // ONLOAD RUNTIME SETUP
-        function initSystemNode() {
-            renderCollections(); 
-            renderStudents(); 
-            renderAssignments(); 
-            renderGradebook();
+        if (data.classes.length === 0) {
+          listContainer.innerHTML = `<div class="col-span-full border-2 border-dashed border-slate-200 p-8 rounded-xl text-center text-xs font-bold text-brand-muted">No operational class boundaries assigned to this faculty context.</div>`;
+          return;
         }
 
-        // EXPLICIT RUNTIME TAB CONTROL ENGINE
-        function switchPanel(panelId) {
-            const panels = ['overview', 'assessments', 'assignments', 'students', 'grading', 'profile'];
-            
-            panels.forEach(p => {
-                const targetPanel = document.getElementById(`panel-${p}`);
-                const targetButton = document.getElementById(`btn-${p}`);
-                
-                if (p === panelId) {
-                    if (targetPanel) targetPanel.classList.remove('hidden');
-                    if (targetButton) {
-                        targetButton.classList.remove('sidebar-btn-inactive');
-                        targetButton.classList.add('sidebar-btn-active');
-                    }
-                } else {
-                    if (targetPanel) targetPanel.classList.add('hidden');
-                    if (targetButton) {
-                        targetButton.classList.remove('sidebar-btn-active');
-                        targetButton.classList.add('sidebar-btn-inactive');
-                    }
-                }
+        data.classes.forEach(cls => {
+          // Cards Population
+          const card = document.createElement('div');
+          card.className = "p-4 border border-slate-200/60 bg-slate-50/50 hover:bg-slate-50 rounded-xl transition-all flex justify-between items-center";
+          card.innerHTML = `
+            <div>
+              <div class="font-extrabold text-sm text-slate-900">${cls.name}</div>
+              <div class="text-xs text-brand-muted font-bold mt-0.5">${data.studentsByClass[cls.id]?.length || 0} Registered Scholars</div>
+            </div>
+            <i class="fa fa-angle-right text-slate-400"></i>
+          `;
+          listContainer.appendChild(card);
+
+          // Select Filters Population
+          classSelects.forEach(id => {
+            const selectEl = document.getElementById(id);
+            if (selectEl) {
+              const opt = document.createElement('option');
+              opt.value = cls.id;
+              opt.textContent = cls.name;
+              selectEl.appendChild(opt);
+            }
+          });
+        });
+
+        // Trigger dynamic sub-list updates for the default chosen options
+        renderRosterTable(document.getElementById('classSelect').value);
+        renderAssignmentList(document.getElementById('assignment-filter-class').value);
+        renderGradebookMatrix(document.getElementById('gradebook-class').value);
+        populateSubjectDropdowns(document.getElementById('cbt-class-select').value);
+        renderCBTInventoryVault();
+        renderBroadcastAlerts();
+      }
+
+      function renderRosterTable(classId) {
+        const tbody = document.querySelector('#rosterTable tbody');
+        tbody.innerHTML = '';
+        const roster = studentsByClass[classId] || [];
+        if (roster.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-xs font-bold text-brand-muted">No student accounts found matching this operational boundary matrix.</td></tr>`;
+          return;
+        }
+        roster.forEach((student, idx) => {
+          const row = document.createElement('tr');
+          row.className = "border-b border-slate-100 hover:bg-slate-50/40 text-xs font-bold text-slate-700";
+          row.innerHTML = `
+            <td class="p-3 text-brand-muted">${idx + 1}</td>
+            <td class="p-3 text-slate-900">${student.firstname || ''} ${student.surname || ''}</td>
+            <td class="p-3"><span class="bg-slate-100 px-2 py-1 rounded text-slate-600 font-mono">${student.code || student.regNo || '—'}</span></td>
+            <td class="p-3 text-brand-blue font-medium">${student.email || '—'}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      }
+
+      async function renderAttendanceRoster(classId, dateStr) {
+        const container = document.getElementById('attendance-form');
+        const tbody = document.getElementById('attendance-students');
+        tbody.innerHTML = '';
+        attendanceRecords = [];
+        const roster = studentsByClass[classId] || [];
+
+        if (roster.length === 0) {
+          container.classList.add('hidden');
+          alert("Cannot populate verification rosters—current operational layer contains 0 accounts.");
+          return;
+        }
+
+        roster.forEach(student => {
+          const recId = student.id || student._id;
+          attendanceRecords.push({ studentId: recId, date: dateStr, status: "Present" });
+
+          const row = document.createElement('tr');
+          row.className = "border-b border-slate-100 hover:bg-slate-50/40 text-xs text-slate-800";
+          row.innerHTML = `
+            <td class="p-3 font-bold">${student.firstname || ''} ${student.surname || ''}</td>
+            <td class="p-3 text-center">
+              <input type="radio" name="att-${recId}" value="Present" checked class="w-4 h-4 text-brand-blue focus:ring-brand-blue border-slate-300">
+            </td>
+            <td class="p-3 text-center">
+              <input type="radio" name="att-${recId}" value="Absent" class="w-4 h-4 text-red-600 focus:ring-red-500 border-slate-300">
+            </td>
+            <td class="p-3 text-center">
+              <input type="radio" name="att-${recId}" value="Excused" class="w-4 h-4 text-amber-500 focus:ring-amber-500 border-slate-300">
+            </td>
+          `;
+          
+          // Wire live variable mutations to option array updates
+          row.querySelectorAll(`input[name="att-${recId}"]`).forEach(radio => {
+            radio.addEventListener('change', (e) => {
+              const matched = attendanceRecords.find(r => r.studentId === recId);
+              if (matched) matched.status = e.target.value;
             });
-            
-            closeBottomNav(null);
+          });
+
+          tbody.appendChild(row);
+        });
+
+        container.classList.remove('hidden');
+      }
+
+      function renderAssignmentList(filterClassId) {
+        const container = document.getElementById('assignment-list');
+        container.innerHTML = '';
+        const filtered = filterClassId ? assignments.filter(a => a.classId === filterClassId) : assignments;
+
+        if (filtered.length === 0) {
+          container.innerHTML = `<div class="col-span-full border-2 border-dashed border-slate-200 p-8 rounded-2xl text-center text-xs font-bold text-brand-muted">No assignments dispatched to target classes.</div>`;
+          return;
         }
 
-        // MOBILE DRAWER LOGIC
-        function openBottomNav() {
-            overlay.classList.remove('hidden');
-            setTimeout(() => { overlay.classList.remove('opacity-0'); card.classList.remove('translate-y-full'); }, 20);
-        }
-        function closeBottomNav(event) {
-            if (!event || event.target === overlay) {
-                overlay.classList.add('opacity-0'); card.classList.add('translate-y-full');
-                setTimeout(() => { overlay.classList.add('hidden'); }, 300);
-            }
-        }
+        filtered.forEach(assign => {
+          const card = document.createElement('div');
+          card.className = "bg-slate-50 border border-slate-200/80 p-5 rounded-2xl flex flex-col justify-between hover:border-slate-300 transition-all";
+          card.innerHTML = `
+            <div>
+              <div class="flex justify-between items-start gap-2">
+                <h4 class="font-black text-sm text-slate-900">${assign.title}</h4>
+                <span class="bg-brand-blue/10 text-brand-blue font-extrabold text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full">${assign.className || 'Core Boundary'}</span>
+              </div>
+              <p class="text-xs text-slate-600 font-medium mt-2 line-clamp-3">${assign.description || ''}</p>
+            </div>
+            <div class="border-t border-slate-200/60 pt-3 mt-4 flex justify-between items-center text-xs font-bold text-brand-muted">
+              <span><i class="fa fa-calendar-clock mr-1"></i> Due: ${assign.dueDate ? new Date(assign.dueDate).toLocaleDateString() : '—'}</span>
+              <span class="text-brand-purple"><i class="fa fa-inbox-in mr-1"></i> ${assign.pendingCount || 0} Awaiting Audit</span>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      }
 
-        /* -----------------------------------------------------------
-           MEDIA PICKER LOGIC AND OVERRIDE HANDLER
-           ----------------------------------------------------------- */
-        function triggerCustomMediaPicker(quillInstance) {
-            activeMediaTargetQuillInstance = quillInstance;
-            document.getElementById('mediaLocalFileInput').value = '';
-            document.getElementById('mediaUrlInput').value = '';
-            document.getElementById('mediaPickerDialog').style.display = 'flex';
-        }
+      function renderGradebookMatrix(classId) {
+        const container = document.getElementById('gradebook-table');
+        container.innerHTML = '';
+        const roster = studentsByClass[classId] || [];
 
-        function closeMediaPicker() {
-            document.getElementById('mediaPickerDialog').style.display = 'none';
-            activeMediaTargetQuillInstance = null;
-        }
-
-        function commitMediaAssetInsertion() {
-            if (!activeMediaTargetQuillInstance) return;
-            
-            const localFile = document.getElementById('mediaLocalFileInput').files[0];
-            const urlAddress = document.getElementById('mediaUrlInput').value.trim();
-            
-            const range = activeMediaTargetQuillInstance.getSelection(true);
-
-            if (localFile) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    activeMediaTargetQuillInstance.insertEmbed(range.index, 'image', e.target.result);
-                    activeMediaTargetQuillInstance.setSelection(range.index + 1);
-                    closeMediaPicker();
-                };
-                reader.readAsDataURL(localFile);
-            } else if (urlAddress) {
-                activeMediaTargetQuillInstance.insertEmbed(range.index, 'image', urlAddress);
-                activeMediaTargetQuillInstance.setSelection(range.index + 1);
-                closeMediaPicker();
-            } else {
-                alert("Please complete an upload path or append a verified URL address link path.");
-            }
+        if (roster.length === 0) {
+          container.innerHTML = `<div class="border-2 border-dashed border-slate-200 p-8 rounded-2xl text-center text-xs font-bold text-brand-muted">Select an operational class track containing valid account datasets to build matrix matrices.</div>`;
+          return;
         }
 
-        /* -----------------------------------------------------------
-           QUESTION BANK LAYOUT ENGINE
-           ----------------------------------------------------------- */
-        function renderCollections() {
-            const container = document.getElementById('collectionsContainer');
-            container.innerHTML = '';
-            document.getElementById('overviewCollectionCount').innerText = `${assessmentDatabase.length} Saved Collections`;
+        let html = `
+          <table class="w-full text-left text-sm">
+            <thead>
+              <tr class="bg-slate-50 text-xs font-bold text-brand-muted uppercase border-b border-slate-200">
+                <th class="p-3">Student Identity</th>
+                <th class="p-3 text-center">CA 1 Max (20)</th>
+                <th class="p-3 text-center">CA 2 Max (20)</th>
+                <th class="p-3 text-center">Exam Bound Max (60)</th>
+                <th class="p-3 text-center">Calculated Composite</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 font-bold text-slate-700">
+        `;
 
-            if(assessmentDatabase.length === 0) {
-                container.innerHTML = `<div class="text-center p-8 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-xs font-bold">No active evaluation collections registered.</div>`;
-                return;
-            }
+        roster.forEach(student => {
+          html += `
+            <tr data-student-id="${student.id || student._id}" class="hover:bg-slate-50/40 text-xs">
+              <td class="p-3 text-slate-900 font-extrabold">${student.firstname || ''} ${student.surname || ''}</td>
+              <td class="p-2"><input type="number" min="0" max="20" placeholder="0" class="ca1-input w-20 text-center bg-white border border-slate-200 rounded-lg p-1.5 focus:ring-1 focus:ring-brand-blue mx-auto block"></td>
+              <td class="p-2"><input type="number" min="0" max="20" placeholder="0" class="ca2-input w-20 text-center bg-white border border-slate-200 rounded-lg p-1.5 focus:ring-1 focus:ring-brand-blue mx-auto block"></td>
+              <td class="p-2"><input type="number" min="0" max="60" placeholder="0" class="exam-input w-25 text-center bg-white border border-slate-200 rounded-lg p-1.5 focus:ring-1 focus:ring-brand-blue mx-auto block"></td>
+              <td class="p-3 text-center text-sm font-black text-brand-blue"><span class="total-span">0</span></td>
+            </tr>
+          `;
+        });
 
-            assessmentDatabase.forEach((collection) => {
-                const isSomeActive = activeIsolatedCollectionId !== null;
-                const isThisActive = activeIsolatedCollectionId === collection.id;
+        html += `</tbody></table>`;
+        container.innerHTML = html;
 
-                if (isSomeActive && !isThisActive) return;
-
-                let questionsHtml = '';
-                if (isThisActive) {
-                    if(collection.questions.length === 0) {
-                        questionsHtml = `<div class="text-center p-6 bg-white border border-slate-150 rounded-xl text-slate-400 text-[11px] font-bold">No active objective questions inside this category array.</div>`;
-                    } else {
-                        collection.questions.forEach((q, index) => {
-                            let choicesMarkup = '';
-                            q.options.forEach((opt, oIdx) => {
-                                const letter = String.fromCharCode(65 + oIdx);
-                                choicesMarkup += `
-                                    <div class="p-2.5 rounded-lg border ${opt.isCorrect ? 'bg-emerald-50/70 border-emerald-300 text-emerald-900 font-bold' : 'bg-slate-50 border-slate-100'} text-xs">
-                                        <div class="flex items-start"><span class="font-bold mr-1.5">${letter}.</span> <div class="w-full">${opt.text}</div></div>
-                                    </div>`;
-                            });
-
-                            questionsHtml += `
-                                <div class="p-5 bg-white border border-slate-200 rounded-xl space-y-3 relative shadow-inner">
-                                    <div class="flex justify-between items-center text-[11px]">
-                                        <span class="font-extrabold text-brand-500 font-mono">OBJECTIVE QUESTION ${index + 1}</span>
-                                        <div class="flex space-x-1.5">
-                                            <button onclick="openEditQuestionModal('${collection.id}', '${q.id}')" class="text-brand-800 hover:text-white hover:bg-brand-800 font-bold uppercase text-[10px] bg-brand-50 px-2.5 py-1 rounded-lg transition border border-brand-200">Edit</button>
-                                            <button onclick="deleteQuestion('${collection.id}', '${q.id}')" class="text-rose-600 hover:text-white hover:bg-rose-600 font-bold uppercase text-[10px] bg-rose-50 px-2.5 py-1 rounded-lg transition border border-rose-100">Delete</button>
-                                        </div>
-                                    </div>
-                                    <div class="text-xs font-bold text-slate-900 leading-relaxed">${q.text}</div>
-                                    ${q.imageUrl ? `<img src="${q.imageUrl}" class="max-h-36 w-auto object-contain rounded border border-slate-200 bg-slate-50 p-1">` : ''}
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">${choicesMarkup}</div>
-                                    ${q.explanation ? `<div class="p-2.5 bg-amber-50/60 border border-amber-200 text-amber-900 rounded-lg text-[11px] font-medium"><strong class="font-bold">Rationale:</strong> ${q.explanation}</div>` : ''}
-                                </div>`;
-                        });
-                    }
-                }
-
-                const actionButtonHtml = isThisActive 
-                    ? `<button onclick="toggleCollectionFocus(null)" class="bg-slate-700 hover:bg-slate-800 text-white font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">&larr; Collapse View</button>`
-                    : `<button onclick="toggleCollectionFocus('${collection.id}')" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">View Items (${collection.questions.length}) &rarr;</button>`;
-
-                container.innerHTML += `
-                    <div class="p-5 border border-slate-200 rounded-2xl bg-slate-50/60 space-y-4 shadow-sm relative">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-3">
-                            <div>
-                                <span class="inline-block text-[9px] font-black tracking-widest bg-brand-900 text-white px-2 py-0.5 rounded uppercase font-mono">Category Track</span>
-                                <h3 class="text-sm font-black text-slate-900 mt-1 uppercase tracking-wide font-serif">${collection.name}</h3>
-                            </div>
-                            <div class="flex items-center space-x-1.5 self-end sm:self-auto">
-                                ${isThisActive ? `
-                                <button onclick="openCreateQuestionModal('${collection.id}')" class="bg-brand-50 border border-brand-200 hover:bg-brand-100 text-brand-900 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">
-                                    + Insert Question
-                                </button>` : ''}
-                                ${actionButtonHtml}
-                                <button onclick="deleteCollection('${collection.id}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">Drop Category</button>
-                            </div>
-                        </div>
-                        ${isThisActive ? `<div class="space-y-3 pt-2 animate-[fadeIn_0.25s_ease-out]">${questionsHtml}</div>` : ''}
-                    </div>`;
+        // Auto-calculating operational listener vectors
+        container.querySelectorAll('tbody tr').forEach(row => {
+          const inputs = row.querySelectorAll('input');
+          const totalSpan = row.querySelector('.total-span');
+          inputs.forEach(input => {
+            input.addEventListener('input', () => {
+              const ca1 = parseInt(row.querySelector('.ca1-input').value) || 0;
+              const ca2 = parseInt(row.querySelector('.ca2-input').value) || 0;
+              const exam = parseInt(row.querySelector('.exam-input').value) || 0;
+              totalSpan.textContent = ca1 + ca2 + exam;
             });
-        }
+          });
+        });
+      }
 
-        function toggleCollectionFocus(collectionId) {
-            activeIsolatedCollectionId = collectionId;
-            document.getElementById('collectionControlHeader').classList.toggle('hidden', collectionId !== null);
-            renderCollections();
-        }
-
-        function createCollection() {
-            const input = document.getElementById('newCollectionName');
-            const nameValue = input.value.trim().toUpperCase();
-            if(!nameValue) { alert("Please declare a legal collection title."); return; }
-            assessmentDatabase.push({ id: `collection_${Date.now()}`, name: nameValue, questions: [] });
-            input.value = '';
-            renderCollections();
-        }
-
-        function deleteCollection(collectionId) {
-            if(confirm("Are you certain you want to purge this full testing category?")) {
-                assessmentDatabase = assessmentDatabase.filter(c => c.id !== collectionId);
-                if(activeIsolatedCollectionId === collectionId) toggleCollectionFocus(null);
-                renderCollections();
-            }
-        }
-
-        /* -----------------------------------------------------------
-           MODAL RICH TEXT STACK MUTATOR METHODS
-           ----------------------------------------------------------- */
-        function initModalStemsIfRequired() {
-            if(!stemQuillInstance) {
-                stemQuillInstance = new Quill('#quillQuestionStem', {
-                    theme: 'snow',
-                    placeholder: 'Enter rich-text biology assessment item stem...',
-                    modules: { toolbar: [['bold', 'italic', 'underline'], ['image'], ['clean']] }
-                });
-                stemQuillInstance.getModule('toolbar').addHandler('image', function() {
-                    triggerCustomMediaPicker(stemQuillInstance);
-                });
-            }
-            if(!explanationQuillInstance) {
-                explanationQuillInstance = new Quill('#quillExplanation', {
-                    theme: 'snow',
-                    placeholder: 'Provide step-by-step resolution rationale for student correction paths...',
-                    modules: { toolbar: [['bold', 'italic', 'underline'], ['image'], ['clean']] }
-                });
-                explanationQuillInstance.getModule('toolbar').addHandler('image', function() {
-                    triggerCustomMediaPicker(explanationQuillInstance);
-                });
-            }
-        }
-
-        function appendBlankOptionField(initialHtml = '', checkedState = false) {
-            const wrapper = document.getElementById('modalOptionsWrapper');
-            const fieldIndex = `opt_row_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
-            
-            const rowDiv = document.createElement('div');
-            rowDiv.id = fieldIndex;
-            rowDiv.className = "p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2 relative";
-            
-            rowDiv.innerHTML = `
-                <div class="flex items-center justify-between border-b border-slate-200/60 pb-1.5">
-                    <label class="flex items-center space-x-2 text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
-                        <input type="radio" name="correctAnswerRadio" class="w-3.5 h-3.5 text-brand-500 bg-white border-slate-300 focus:ring-1 focus:ring-brand-500" ${checkedState ? 'checked' : ''}>
-                        <span>Correct Evaluation Key Option</span>
-                    </label>
-                    <button onclick="removeOptionField('${fieldIndex}')" class="text-rose-500 hover:text-rose-700 font-bold uppercase text-[10px] bg-white border border-rose-100 px-2 py-0.5 rounded shadow-sm">Remove Field</button>
-                </div>
-                <div class="option-editor-container">
-                    <div id="editor_${fieldIndex}" class="bg-white rounded-lg"></div>
-                </div>`;
-            
-            wrapper.appendChild(rowDiv);
-
-            const optQuill = new Quill(`#editor_${fieldIndex}`, {
-                theme: 'snow',
-                placeholder: 'Write response option choices...',
-                modules: { toolbar: [['bold', 'italic', 'underline'], ['image'], ['clean']] }
+      function populateSubjectDropdowns(classId) {
+        const subjects = subjectsByClass[classId] || [];
+        const targets = ['cbt-subject-select', 'assignment-subject'];
+        targets.forEach(id => {
+          const select = document.getElementById(id);
+          if (select) {
+            select.innerHTML = id === 'assignment-subject' ? '<option value="">Select Subject Context Frame</option>' : '';
+            subjects.forEach(sub => {
+              const opt = document.createElement('option');
+              opt.value = sub.id || sub._id;
+              opt.textContent = sub.name;
+              select.appendChild(opt);
             });
+          }
+        });
+      }
+
+      function renderCBTInventoryVault() {
+        const container = document.getElementById('myCBTQuestionsList');
+        container.innerHTML = '';
+
+        if (myUploadedCBTs.length === 0) {
+          container.innerHTML = `<div class="border-2 border-dashed border-slate-200 p-8 rounded-2xl text-center text-xs font-bold text-brand-muted">No computer-based assessments committed to repository architecture.</div>`;
+          document.getElementById('pushToUniversalBtn').disabled = true;
+          return;
+        }
+
+        let html = `
+          <table class="w-full text-left text-sm">
+            <thead>
+              <tr class="bg-slate-50 text-xs font-bold text-brand-muted border-b border-slate-200">
+                <th class="p-3 text-center w-12">Select</th>
+                <th class="p-3">Assessment Title</th>
+                <th class="p-3">Track Context</th>
+                <th class="p-3">Runtime Quantizer</th>
+                <th class="p-3 text-center">Structure Size</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 font-bold text-slate-700 text-xs">
+        `;
+
+        myUploadedCBTs.forEach(cbt => {
+          html += `
+            <tr class="hover:bg-slate-50/40">
+              <td class="p-3 text-center"><input type="checkbox" value="${cbt.id || cbt._id}" class="cbt-select-box w-4 h-4 rounded text-brand-blue focus:ring-brand-blue border-slate-300"></td>
+              <td class="p-3 text-slate-900 font-extrabold">${cbt.title}</td>
+              <td class="p-3"><span class="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md font-semibold">${cbt.className || 'Dispatched Track'}</span></td>
+              <td class="p-3 text-brand-muted"><i class="fa fa-clock mr-1"></i> ${cbt.duration || 0} Minutes</td>
+              <td class="p-3 text-center text-brand-purple font-black">${cbt.questions?.length || 0} Qs</td>
+            </tr>
+          `;
+        });
+
+        html += `</tbody></table>`;
+        container.innerHTML = html;
+
+        container.querySelectorAll('.cbt-select-box').forEach(box => {
+          box.addEventListener('change', () => {
+            selectedCBTIds = Array.from(container.querySelectorAll('.cbt-select-box:checked')).map(b => b.value);
+            document.getElementById('pushToUniversalBtn').disabled = selectedCBTIds.length === 0;
+          });
+        });
+      }
+
+      function renderBroadcastAlerts() {
+        const container = document.getElementById('notification-list');
+        container.innerHTML = '';
+
+        if (notifications.length === 0) {
+          container.innerHTML = `<div class="border-2 border-dashed border-slate-200 p-8 rounded-2xl text-center text-xs font-bold text-brand-muted">Broadcast array returns empty context profiles.</div>`;
+          return;
+        }
+
+        notifications.forEach(notif => {
+          const item = document.createElement('div');
+          item.className = "py-4 flex gap-4 items-start font-medium text-slate-700 text-xs";
+          item.innerHTML = `
+            <div class="bg-slate-100 p-2 rounded-xl text-brand-blue mt-0.5"><i class="fa fa-circle-exclamation text-sm"></i></div>
+            <div>
+              <div class="text-slate-900 font-extrabold text-sm">${notif.title || 'System Broadcast Alert'}</div>
+              <p class="text-slate-600 mt-1 font-semibold leading-relaxed">${notif.message || ''}</p>
+              <div class="text-[10px] text-brand-muted font-bold mt-2"><i class="fa fa-clock mr-1"></i> ${notif.createdAt ? new Date(notif.createdAt).toLocaleString() : 'Processing Timeframe'}</div>
+            </div>
+          `;
+          container.appendChild(item);
+        });
+      }
+
+      // ============ CBT INLINE STRUCTURAL ARRAY MUTATION CONTROLLERS ============
+      function appendNewCBTQuestionBlock() {
+        const container = document.getElementById('cbt-questions-list');
+        const qIndex = container.children.length;
+        
+        const block = document.createElement('div');
+        block.className = "bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-3 relative q-block-node";
+        block.innerHTML = `
+          <button type="button" class="absolute top-3 right-3 text-red-500 font-bold hover:text-red-700 remove-q-btn text-base">&times;</button>
+          <div class="text-xs font-black text-brand-purple uppercase tracking-wider">Question Node Element Layer #${qIndex + 1}</div>
+          
+          <div>
+            <label class="text-xs font-bold text-slate-700 block mb-1">Query Body Content Text</label>
+            <input type="text" placeholder="Enter objective evaluation prompt string" required class="q-prompt border-slate-200 text-xs font-semibold rounded-xl">
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs font-bold text-slate-600 block mb-0.5">Option Alternative A</label>
+              <input type="text" required class="q-opt-A border-slate-200 text-xs font-medium rounded-lg p-2 bg-white">
+            </div>
+            <div>
+              <label class="text-xs font-bold text-slate-600 block mb-0.5">Option Alternative B</label>
+              <input type="text" required class="q-opt-B border-slate-200 text-xs font-medium rounded-lg p-2 bg-white">
+            </div>
+            <div>
+              <label class="text-xs font-bold text-slate-600 block mb-0.5">Option Alternative C</label>
+              <input type="text" required class="q-opt-C border-slate-200 text-xs font-medium rounded-lg p-2 bg-white">
+            </div>
+            <div>
+              <label class="text-xs font-bold text-slate-600 block mb-0.5">Option Alternative D</label>
+              <input type="text" required class="q-opt-D border-slate-200 text-xs font-medium rounded-lg p-2 bg-white">
+            </div>
+          </div>
+
+          <div class="w-1/2">
+            <label class="text-xs font-bold text-slate-700 block mb-1">Authoritative Key Mapping Anchor</label>
+            <select class="q-correct border-slate-200 text-xs font-bold rounded-xl bg-white p-2">
+              <option value="A">Alternative Option A Key</option>
+              <option value="B">Alternative Option B Key</option>
+              <option value="C">Alternative Option C Key</option>
+              <option value="D">Alternative Option D Key</option>
+            </select>
+          </div>
+        `;
+
+        block.querySelector('.remove-q-btn').addEventListener('click', () => {
+          block.remove();
+          reindexCBTQuestionBlocks();
+          saveCBTDraftToLocalStorage();
+        });
+
+        block.querySelectorAll('input, select').forEach(el => el.addEventListener('input', saveCBTDraftToLocalStorage));
+
+        container.appendChild(block);
+        saveCBTDraftToLocalStorage();
+      }
+
+      function reindexCBTQuestionBlocks() {
+        const blocks = document.querySelectorAll('.q-block-node');
+        blocks.forEach((b, idx) => {
+          b.querySelector('.text-brand-purple').textContent = `Question Node Element Layer #${idx + 1}`;
+        });
+      }
+
+      function parseCBTQuestionsPayload() {
+        const blocks = document.querySelectorAll('.q-block-node');
+        const list = [];
+        blocks.forEach(b => {
+          list.push({
+            question: b.querySelector('.q-prompt').value,
+            options: [
+              b.querySelector('.q-opt-A').value,
+              b.querySelector('.q-opt-B').value,
+              b.querySelector('.q-opt-C').value,
+              b.querySelector('.q-opt-D').value
+            ],
+            answer: b.querySelector('.q-correct').value
+          });
+        });
+        cbtQuestions = list;
+      }
+
+      function saveCBTDraftToLocalStorage() {
+        parseCBTQuestionsPayload();
+        const draft = {
+          classId: document.getElementById('cbt-class-select')?.value || '',
+          subjectId: document.getElementById('cbt-subject-select')?.value || '',
+          title: document.getElementById('cbt-title')?.value || '',
+          duration: document.getElementById('cbt-duration')?.value || '',
+          questions: cbtQuestions
+        };
+        localStorage.setItem(cbtDraftKey, JSON.stringify(draft));
+      }
+
+      function loadAndHydrateCBTDraft() {
+        const raw = localStorage.getItem(cbtDraftKey);
+        if (!raw) return;
+        try {
+          const draft = JSON.parse(raw);
+          if (!draft) return;
+          
+          if (draft.classId) document.getElementById('cbt-class-select').value = draft.classId;
+          if (draft.subjectId) document.getElementById('cbt-subject-select').value = draft.subjectId;
+          if (draft.title) document.getElementById('cbt-title').value = draft.title;
+          if (draft.duration) document.getElementById('cbt-duration').value = draft.duration;
+
+          const container = document.getElementById('cbt-questions-list');
+          container.innerHTML = '';
+          
+          if (Array.isArray(draft.questions)) {
+            draft.questions.forEach((q) => {
+              appendNewCBTQuestionBlock();
+              const blocks = container.querySelectorAll('.q-block-node');
+              const targetBlock = blocks[blocks.length - 1];
+              
+              targetBlock.querySelector('.q-prompt').value = q.question || '';
+              if (q.options && q.options.length >= 4) {
+                targetBlock.querySelector('.q-opt-A').value = q.options[0] || '';
+                targetBlock.querySelector('.q-opt-B').value = q.options[1] || '';
+                targetBlock.querySelector('.q-opt-C').value = q.options[2] || '';
+                targetBlock.querySelector('.q-opt-D').value = q.options[3] || '';
+              }
+              targetBlock.querySelector('.q-correct').value = q.answer || 'A';
+            });
+          }
+        } catch (e) {
+          console.error("Failed executing draft state rehydration routine", e);
+        }
+      }
+
+      // ============ GLOBAL INTERACTIVE WORKFLOW HANDLERS ============
+      window.openAssignmentModal = function () {
+        document.getElementById('assignmentForm').reset();
+        document.getElementById('assignment-id-edit').value = '';
+        document.getElementById('assignmentModalBg').classList.remove('hidden');
+      };
+
+      window.closeAssignmentModal = function () {
+        document.getElementById('assignmentModalBg').classList.add('hidden');
+      };
+
+      window.openGradebookUploadModal = function () {
+        document.getElementById('gradebookUploadForm').reset();
+        document.getElementById('gradebookUploadModalBg').classList.remove('hidden');
+      };
+
+      window.closeGradebookUploadModal = function () {
+        document.getElementById('gradebookUploadModalBg').classList.add('hidden');
+      };
+
+      window.submitGradebookResults = function () {
+        fetchWithSpinLock('gradebookUploadSubmitBtn', async () => {
+          const targetClassId = document.getElementById('gradebook-class').value;
+          const rows = document.querySelectorAll('#gradebook-table tbody tr');
+          const resultsPayload = [];
+
+          rows.forEach(row => {
+            resultsPayload.push({
+              studentId: row.getAttribute('data-student-id'),
+              ca1: parseInt(row.querySelector('.ca1-input').value) || 0,
+              ca2: parseInt(row.querySelector('.ca2-input').value) || 0,
+              exam: parseInt(row.querySelector('.exam-input').value) || 0
+            });
+          });
+
+          const postBody = {
+            classId: targetClassId,
+            session: document.getElementById('gb-session-select').value,
+            term: document.getElementById('gb-term-select').value,
+            type: document.getElementById('gb-result-type-select').value,
+            records: resultsPayload
+          };
+
+          const res = await fetch(`${API_BASE_URL}/api/teachers/gradebook/upload`, {
+            method: 'POST',
+            headers: authHeaders(),
+            body: JSON.stringify(postBody)
+          });
+
+          if (res.ok) {
+            alert("Gradebook records successfully written to processing core storage array.");
+            window.closeGradebookUploadModal();
+          } else {
+            alert("Transactional transmission rejection encountered on data endpoint channel.");
+          }
+        });
+      };
+
+      // ============ APPLICATION INITIALIZATION ENGINE ROUTINE ============
+      async function bootstrapApplicationEngine() {
+        showLoader("Synchronizing Faculty Profile Security Matrix...", "Validating active encryption keys");
+        
+        if (!token) {
+          alert("Operational credentials drop caught inside interface pipeline. Redirecting to access terminal.");
+          window.location.href = "/login.html";
+          return;
+        }
+
+        teacher = await fetchTeacherProfile();
+        if (!teacher) {
+          alert("Severe Exception: Profile identity dropped by authorization nodes.");
+          hideLoader();
+          return;
+        }
+
+        const baselineClasses = await fetchTeacherClasses();
+        notifications = await fetchTeacherNotifications();
+        assignments = await fetchAssignments();
+        myUploadedCBTs = await fetchMyCBTQuestions();
+
+        // Enforce safe mapping loops over class bounds to fetch active student registries
+        for (const targetClass of baselineClasses) {
+          studentsByClass[targetClass.id] = await fetchStudentsByClass(targetClass.id);
+          subjectsByClass[targetClass.id] = await fetchSubjectsByClass(targetClass.id);
+        }
+
+        // Pass direct state object data references to internal ecosystem managers
+        syncDashboardUI({ teacher, classes: baselineClasses, notifications, assignments, myUploadedCBTs, studentsByClass, subjectsByClass });
+        loadAndHydrateCBTDraft();
+
+        hideLoader();
+      }
+
+      // ============ EVENT BINDINGS INTERCEPTORS FOR CONTROLLERS ============
+      document.addEventListener('DOMContentLoaded', () => {
+        bootstrapApplicationEngine();
+
+        // View Tab Route Layout Mutation Engine Handler
+        const triggers = document.querySelectorAll('.tab-trigger');
+        triggers.forEach(t => {
+          t.addEventListener('click', (e) => {
+            e.preventDefault();
+            const destinationId = t.getAttribute('data-tab');
             
-            optQuill.getModule('toolbar').addHandler('image', function() {
-                triggerCustomMediaPicker(optQuill);
-            });
+            document.querySelectorAll('.view-panel').forEach(panel => panel.classList.add('hidden'));
+            triggers.forEach(trigger => trigger.classList.remove('bg-slate-800', 'text-brand-gold'));
             
-            if(initialHtml) optQuill.root.innerHTML = initialHtml;
-            optionQuillRegistry[fieldIndex] = optQuill;
-        }
-
-        function removeOptionField(id) {
-            const row = document.getElementById(id);
-            if(row) { row.remove(); delete optionQuillRegistry[id]; }
-        }
-
-        function previewModalImage() {
-            const url = document.getElementById('modalImageUrl').value.trim();
-            const preview = document.getElementById('modalImagePreview');
-            if(url) { preview.src = url; preview.classList.remove('hidden'); }
-            else { preview.classList.add('hidden'); }
-        }
-
-        function openCreateQuestionModal(collectionId) {
-            activeTargetModalMode = 'CREATE';
-            activeIsolatedCollectionId = collectionId;
-            document.getElementById('modalTitle').innerText = "Deploy New Objective Item Structure";
-            
-            initModalStemsIfRequired();
-            stemQuillInstance.setText('');
-            explanationQuillInstance.setText('');
-            document.getElementById('modalImageUrl').value = '';
-            document.getElementById('modalImagePreview').classList.add('hidden');
-            document.getElementById('modalOptionsWrapper').innerHTML = '';
-            optionQuillRegistry = {};
-
-            appendBlankOptionField('', false);
-            appendBlankOptionField('', false);
-            appendBlankOptionField('', false);
-            appendBlankOptionField('', false);
-
-            document.getElementById('questionModal').style.display = 'flex';
-        }
-
-        function openEditQuestionModal(collectionId, questionId) {
-            activeTargetModalMode = 'EDIT';
-            activeIsolatedCollectionId = collectionId;
-            contextualTargetQuestionId = questionId;
-            document.getElementById('modalTitle').innerText = "Refine Saved Objective Item Parameters";
-
-            initModalStemsIfRequired();
-            const col = assessmentDatabase.find(c => c.id === collectionId);
-            const q = col.questions.find(item => item.id === questionId);
-
-            if(q) {
-                stemQuillInstance.root.innerHTML = q.text;
-                document.getElementById('modalImageUrl').value = q.imageUrl || '';
-                previewModalImage();
-                explanationQuillInstance.root.innerHTML = q.explanation || '';
-                document.getElementById('modalOptionsWrapper').innerHTML = '';
-                optionQuillRegistry = {};
-
-                q.options.forEach(opt => {
-                    appendBlankOptionField(opt.text, opt.isCorrect);
-                });
-
-                document.getElementById('questionModal').style.display = 'flex';
+            const targetPanel = document.getElementById(destinationId);
+            if (targetPanel) {
+              targetPanel.classList.remove('hidden');
+              t.classList.add('bg-slate-800', 'text-brand-gold');
+              document.getElementById('headerTitle').textContent = t.textContent.trim();
+              window.location.hash = destinationId;
             }
-        }
+          });
+        });
 
-        function closeQuestionModal() { document.getElementById('questionModal').style.display = 'none'; }
+        // Filter Controls Sync Core Triggers
+        document.getElementById('classSelect')?.addEventListener('change', (e) => renderRosterTable(e.target.value));
+        document.getElementById('assignment-filter-class')?.addEventListener('change', (e) => renderAssignmentList(e.target.value));
+        document.getElementById('gradebook-class')?.addEventListener('change', (e) => renderGradebookMatrix(e.target.value));
+        document.getElementById('cbt-class-select')?.addEventListener('change', (e) => {
+          populateSubjectDropdowns(e.target.value);
+          saveCBTDraftToLocalStorage();
+        });
 
-        function saveModalQuestionData() {
-            const stemHtml = stemQuillInstance.root.innerHTML.trim();
-            const plainStem = stemQuillInstance.getText().trim();
-            const imgUrl = document.getElementById('modalImageUrl').value.trim();
-            const expHtml = explanationQuillInstance.root.innerHTML.trim();
-
-            if(!plainStem) { alert("Question stem body value is required."); return; }
-
-            const optionRows = document.getElementById('modalOptionsWrapper').children;
-            if(optionRows.length < 2) { alert("Declare at least two option rows."); return; }
-
-            let compileOptions = [];
-            let chosenCorrectKey = false;
-
-            for(let row of optionRows) {
-                const id = row.id;
-                const inst = optionQuillRegistry[id];
-                const optHtml = inst.root.innerHTML.trim();
-                const optPlain = inst.getText().trim();
-                const radioCheck = row.querySelector('input[name="correctAnswerRadio"]').checked;
-
-                if(!optPlain) { alert("Empty option rows values are rejected."); return; }
-                if(radioCheck) chosenCorrectKey = true;
-
-                compileOptions.push({ text: optHtml, isCorrect: radioCheck });
+        // Smart Attendance Engine Dispatch Call
+        document.getElementById('loadAttendanceBtn')?.addEventListener('click', (e) => {
+          e.preventDefault();
+          fetchWithSpinLock('loadAttendanceBtn', async () => {
+            const chosenClass = document.getElementById('attendance-class').value;
+            const chosenDate = document.getElementById('attDate').value;
+            if (!chosenClass || !chosenDate) {
+              alert("Operation cancelled: Parameters required to map evaluation vectors are null.");
+              return;
             }
+            await renderAttendanceRoster(chosenClass, chosenDate);
+          });
+        });
 
-            if(!chosenCorrectKey) { alert("Flag one valid target response correct key selection."); return; }
-
-            const col = assessmentDatabase.find(c => c.id === activeIsolatedCollectionId);
-            if(!col) return;
-
-            if (activeTargetModalMode === 'CREATE') {
-                col.questions.push({
-                    id: `q_${Date.now()}`, text: stemHtml, imageUrl: imgUrl, options: compileOptions, explanation: expHtml
-                });
-            } else {
-                const q = col.questions.find(item => item.id === contextualTargetQuestionId);
-                if(q) { q.text = stemHtml; q.imageUrl = imgUrl; q.options = compileOptions; q.explanation = expHtml; }
-            }
-
-            closeQuestionModal();
-            renderCollections();
-        }
-
-        function deleteQuestion(collectionId, questionId) {
-            const targetCollection = assessmentDatabase.find(c => c.id === collectionId);
-            if(targetCollection && confirm("Drop this isolated test question?")) {
-                targetCollection.questions = targetCollection.questions.filter(q => q.id !== questionId);
-                renderCollections();
-            }
-        }
-
-        /* -----------------------------------------------------------
-           ASSIGNMENTS DESIGN PORTFOLIO WITH MCQ ALLOCATION LOGIC
-           ----------------------------------------------------------- */
-        function renderAssignments() {
-            const container = document.getElementById('assignmentsContainer');
-            container.innerHTML = '';
-
-            if(assignmentsDatabase.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center p-6 border rounded-xl text-slate-400 font-bold">No assignments distributed.</div>`;
-                return;
-            }
-
-            assignmentsDatabase.forEach(a => {
-                const typeLabel = a.type === 'QUESTION_BANK' 
-                    ? `<span class="bg-indigo-100 text-indigo-800 border border-indigo-200 text-[10px] px-2 py-0.5 rounded font-bold uppercase">MCQ Question Bank Assessment</span>`
-                    : `<span class="bg-slate-100 text-slate-700 border border-slate-200 text-[10px] px-2 py-0.5 rounded font-bold uppercase">Standard Task Instructions</span>`;
-
-                let innerMetaHtml = '';
-                if(a.type === 'QUESTION_BANK') {
-                    innerMetaHtml = `<p class="text-[11px] text-brand-800 font-bold bg-brand-50 p-2 rounded-lg border border-brand-100">&bull; Allocated Evaluation Total: ${a.questionsAllocated ? a.questionsAllocated.length : 0} Objective Items Linked</p>`;
-                } else if(a.instructions) {
-                    innerMetaHtml = `<div class="text-[11px] text-slate-500 line-clamp-2 bg-slate-50 p-2 rounded border border-slate-150">${a.instructions.replace(/<[^>]*>/g, '')}</div>`;
-                }
-
-                container.innerHTML += `
-                    <div class="p-5 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-sm relative">
-                        <div class="flex justify-between items-start">
-                            <span class="text-[9px] font-black bg-brand-900 text-white px-2 py-0.5 rounded tracking-widest uppercase font-mono">${a.classGroup}</span>
-                            <span class="text-[10px] text-slate-400 font-bold">Due Parameter: ${a.due}</span>
-                        </div>
-                        <h4 class="text-xs font-black text-slate-900 uppercase font-serif tracking-wide leading-snug">${a.title}</h4>
-                        <div class="py-0.5">${typeLabel}</div>
-                        ${innerMetaHtml}
-                        <div class="flex justify-between items-center pt-2.5 text-[11px] border-t border-slate-100">
-                            <span class="text-emerald-600 font-extrabold">&bull; Tracking Link: ${a.status}</span>
-                            <button onclick="alert('Launching student performance response portfolio tracking dashboards...')" class="text-brand-800 font-bold hover:underline tracking-wider uppercase text-[10px]">Analytics Desk &rarr;</button>
-                        </div>
-                    </div>`;
+        // Smart Attendance Serialization Transaction Commitment 
+        document.getElementById('attendance-form')?.addEventListener('submit', (e) => {
+          e.preventDefault();
+          fetchWithSpinLock('saveAttendanceSubmitBtn', async () => {
+            const res = await fetch(`${API_BASE_URL}/api/teachers/attendance`, {
+              method: 'POST',
+              headers: authHeaders(),
+              body: JSON.stringify({ records: attendanceRecords })
             });
-        }
+            if (res.ok) alert("Roster attendance logs verified and stamped successfully.");
+          });
+        });
 
-        function openAssignmentModal() {
-            if(!assignmentQuillInstance) {
-                assignmentQuillInstance = new Quill('#quillAssignmentBody', {
-                    theme: 'snow',
-                    placeholder: 'Define tasks, instructions, objectives or research specifications...',
-                    modules: { toolbar: [['bold', 'italic', 'underline'], ['image'], ['clean']] }
-                });
-                assignmentQuillInstance.getModule('toolbar').addHandler('image', function() {
-                    triggerCustomMediaPicker(assignmentQuillInstance);
-                });
-            }
+        // Task Form Schema Serialization Dispatch Commit Routine
+        document.getElementById('assignmentForm')?.addEventListener('submit', (e) => {
+          e.preventDefault();
+          fetchWithSpinLock('assignmentSubmitButton', async () => {
+            const payload = {
+              classId: document.getElementById('assignment-class').value,
+              title: document.getElementById('assignment-title').value,
+              subjectId: document.getElementById('assignment-subject').value,
+              description: document.getElementById('assignment-desc').value,
+              dueDate: document.getElementById('assignment-due').value
+            };
 
-            // Reset Fields
-            document.getElementById('asmModalTitle').value = '';
-            document.getElementById('asmModalDue').value = '';
-            document.getElementById('asmModalType').value = 'STANDARD';
-            assignmentQuillInstance.setText('');
-            
-            toggleAssignmentTypeSection();
-            populateAssignmentBankCategories();
-
-            document.getElementById('assignmentModal').style.display = 'flex';
-        }
-
-        function closeAssignmentModal() {
-            document.getElementById('assignmentModal').style.display = 'none';
-        }
-
-        function toggleAssignmentTypeSection() {
-            const type = document.getElementById('asmModalType').value;
-            const standardWrapper = document.getElementById('asmTypeStandardWrapper');
-            const bankWrapper = document.getElementById('asmTypeQuestionBankWrapper');
-
-            if(type === 'STANDARD') {
-                standardWrapper.classList.remove('hidden');
-                bankWrapper.classList.add('hidden');
-            } else {
-                standardWrapper.classList.add('hidden');
-                bankWrapper.classList.remove('hidden');
-                loadQuestionsForAllocation();
-            }
-        }
-
-        function populateAssignmentBankCategories() {
-            const selector = document.getElementById('asmBankCategorySelector');
-            selector.innerHTML = '';
-            assessmentDatabase.forEach(c => {
-                selector.innerHTML += `<option value="${c.id}">${c.name} (${c.questions.length} Items)</option>`;
-            });
-        }
-
-        function loadQuestionsForAllocation() {
-            const catId = document.getElementById('asmBankCategorySelector').value;
-            const container = document.getElementById('asmAllocationQuestionsContainer');
-            container.innerHTML = '';
-
-            if(!catId) {
-                container.innerHTML = `<p class="text-slate-400 font-bold text-[11px] py-2">Create a Question Bank Category first.</p>`;
-                return;
-            }
-
-            const col = assessmentDatabase.find(c => c.id === catId);
-            if(!col || col.questions.length === 0) {
-                container.innerHTML = `<p class="text-slate-400 font-bold text-[11px] py-2">No question tracks found in this category portfolio loop.</p>`;
-                return;
-            }
-
-            col.questions.forEach((q, index) => {
-                // Stripping HTML tags for pristine clean label preview
-                const cleanTextPreview = q.text.replace(/<[^>]*>/g, '');
-                container.innerHTML += `
-                    <label class="flex items-start space-x-3 p-2.5 bg-white border border-slate-200 rounded-xl hover:border-brand-300 transition cursor-pointer select-none">
-                        <input type="checkbox" value="${q.id}" class="asm-allocated-checkbox mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
-                        <div class="text-[11px] font-medium text-slate-800">
-                            <span class="font-extrabold text-brand-600 block mb-0.5">ITEM ROW #${index+1}</span>
-                            <span class="line-clamp-2 text-slate-600 font-semibold">${cleanTextPreview}</span>
-                        </div>
-                    </label>`;
-            });
-        }
-
-        function commitAssignmentDeployment() {
-            const titleValue = document.getElementById('asmModalTitle').value.trim();
-            const classValue = document.getElementById('asmModalClass').value;
-            const dueValue = document.getElementById('asmModalDue').value;
-            const typeValue = document.getElementById('asmModalType').value;
-
-            if(!titleValue || !dueValue) {
-                alert("Please write a valid assignment title and select a clear deadline date point.");
-                return;
-            }
-
-            let allocatedArray = [];
-            let instructionsHtml = '';
-
-            if(typeValue === 'STANDARD') {
-                instructionsHtml = assignmentQuillInstance.root.innerHTML.trim();
-            } else {
-                const checkedBoxes = document.querySelectorAll('.asm-allocated-checkbox:checked');
-                checkedBoxes.forEach(cb => {
-                    allocatedArray.push(cb.value);
-                });
-
-                if(allocatedArray.length === 0) {
-                    alert("Please select at least one checkable MCQ box block to allocate to this assessment portfolio.");
-                    return;
-                }
-            }
-
-            // Inject object instance cleanly into tracking state database
-            assignmentsDatabase.push({
-                id: `asm_${Date.now()}`,
-                title: titleValue.toUpperCase(),
-                classGroup: classValue,
-                due: dueValue,
-                status: "Open",
-                type: typeValue,
-                instructions: instructionsHtml,
-                questionsAllocated: allocatedArray
-            });
-
-            closeAssignmentModal();
-            renderAssignments();
-            alert(`Task data structure deployed cleanly for target group ${classValue}.`);
-        }
-
-        /* -----------------------------------------------------------
-           STUDENT ROSTERS MANAGEMENT
-           ----------------------------------------------------------- */
-        function renderStudents() {
-            const filter = document.getElementById('studentClassFilter').value;
-            const tbody = document.getElementById('studentTableBody');
-            tbody.innerHTML = '';
-
-            const data = filter === 'ALL' ? studentRegistry : studentRegistry.filter(s => s.classGroup === filter);
-
-            if(data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400 font-bold">No students registered to this track class code loop.</td></tr>`;
-                return;
-            }
-
-            data.forEach(s => {
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50/50 transition">
-                        <td class="p-3 pl-4 font-mono font-bold text-brand-900">${s.code}</td>
-                        <td class="p-3 text-slate-900 font-bold">${s.name}</td>
-                        <td class="p-3 text-slate-500 font-medium">${s.classGroup}</td>
-                        <td class="p-3 text-center"><span class="bg-emerald-50 text-emerald-700 border border-emerald-100 text-[10px] px-2 py-0.5 rounded-full font-bold">${s.standing}</span></td>
-                    </tr>`;
-            });
-        }
-
-        /* -----------------------------------------------------------
-           GRADEBOOK ENTRY MATRIX ENGINE
-           ----------------------------------------------------------- */
-        function renderGradebook() {
-            const filter = document.getElementById('gradebookClassFilter').value;
-            const tbody = document.getElementById('gradebookTableBody');
-            tbody.innerHTML = '';
-
-            const targetStudents = studentRegistry.filter(s => s.classGroup === filter);
-
-            targetStudents.forEach((s) => {
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50/50 transition" data-student-code="${s.code}">
-                        <td class="p-3 pl-4 font-mono font-bold text-brand-900">${s.code}</td>
-                        <td class="p-3 font-bold text-slate-800">${s.name}</td>
-                        <td class="p-3 text-center">
-                            <input type="number" min="0" max="20" value="${s.ca1Mark}" oninput="calculateRowTotal(this)" class="ca1-input w-14 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono font-bold p-1 text-xs focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
-                        </td>
-                        <td class="p-3 text-center">
-                            <input type="number" min="0" max="20" value="${s.ca2Mark}" oninput="calculateRowTotal(this)" class="ca2-input w-14 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono font-bold p-1 text-xs focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
-                        </td>
-                        <td class="p-3 text-center">
-                            <input type="number" min="0" max="60" value="${s.examMark}" oninput="calculateRowTotal(this)" class="exam-input w-14 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono font-bold p-1 text-xs focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
-                        </td>
-                        <td class="p-3 text-center font-mono font-black text-slate-900 tracking-wide">
-                            <span class="total-span">${s.ca1Mark + s.ca2Mark + s.examMark}</span>/100
-                        </td>
-                        <td class="p-3 text-center space-x-1 whitespace-nowrap">
-                            <button onclick="saveSingleRow(this)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[10px] px-2.5 py-1 rounded-md uppercase tracking-wider transition">Save Row</button>
-                            <button onclick="clearSingleRow(this)" class="bg-white border border-slate-200 text-slate-500 hover:bg-slate-100 font-extrabold text-[10px] px-2.5 py-1 rounded-md uppercase tracking-wider transition">Clear</button>
-                        </td>
-                    </tr>`;
+            const res = await fetch(`${API_BASE_URL}/api/teachers/assignments/create`, {
+              method: 'POST',
+              headers: authHeaders(),
+              body: JSON.stringify(payload)
             });
 
-            updateProgressMetrics();
-        }
+            if (res.ok) {
+              alert("Task directive payload built and deployed downchannel.");
+              assignments = await fetchAssignments();
+              renderAssignmentList(document.getElementById('assignment-filter-class').value);
+              window.closeAssignmentModal();
+            }
+          });
+        });
 
-        function calculateRowTotal(inputElement) {
-            const row = inputElement.closest('tr');
-            const ca1 = parseInt(row.querySelector('.ca1-input').value) || 0;
-            const ca2 = parseInt(row.querySelector('.ca2-input').value) || 0;
-            const exam = parseInt(row.querySelector('.exam-input').value) || 0;
-            
-            row.querySelector('.total-span').innerText = ca1 + ca2 + exam;
-            updateProgressMetrics();
-        }
+        // Append Question Vector Node Trigger Link
+        document.getElementById('cbt-add-question-btn')?.addEventListener('click', appendNewCBTQuestionBlock);
 
-        function updateProgressMetrics() {
-            const rows = document.getElementById('gradebookTableBody').children;
-            const totalStudents = rows.length;
-            const totalExpectedCells = totalStudents * 3; 
-            let completedCells = 0;
-
-            for(let row of rows) {
-                const ca1Val = row.querySelector('.ca1-input').value;
-                const ca2Val = row.querySelector('.ca2-input').value;
-                const examVal = row.querySelector('.exam-input').value;
-
-                if (ca1Val !== "" && !isNaN(ca1Val)) completedCells++;
-                if (ca2Val !== "" && !isNaN(ca2Val)) completedCells++;
-                if (examVal !== "" && !isNaN(examVal)) completedCells++;
+        // CBT Package Post Deployment Matrix Core Hook
+        document.getElementById('cbt-question-form')?.addEventListener('submit', (e) => {
+          e.preventDefault();
+          fetchWithSpinLock('cbt-upload-btn', async () => {
+            parseCBTQuestionsPayload();
+            if (cbtQuestions.length === 0) {
+              alert("Validation failure: CBT assessment payload structure requires > 0 query blocks.");
+              return;
             }
 
-            const cellsLeft = totalExpectedCells - completedCells;
-            document.getElementById('progressStatsCount').innerText = `${completedCells} / ${totalExpectedCells}`;
-            document.getElementById('progressStatsLeft').innerText = `${cellsLeft} Input Cells Left`;
+            const payload = {
+              classId: document.getElementById('cbt-class-select').value,
+              subjectId: document.getElementById('cbt-subject-select').value,
+              title: document.getElementById('cbt-title').value,
+              duration: parseInt(document.getElementById('cbt-duration').value),
+              questions: cbtQuestions
+            };
 
-            const percentage = totalExpectedCells > 0 ? (completedCells / totalExpectedCells) * 100 : 0;
-            document.getElementById('progressBarFill').style.width = `${percentage}%`;
-        }
+            const res = await fetch(`${API_BASE_URL}/api/teachers/cbt/upload`, {
+              method: 'POST',
+              headers: authHeaders(),
+              body: JSON.stringify(payload)
+            });
 
-        function saveSingleRow(buttonElement) {
-            const row = buttonElement.closest('tr');
-            const code = row.getAttribute('data-student-code');
-            const ca1Val = parseInt(row.querySelector('.ca1-input').value) || 0;
-            const ca2Val = parseInt(row.querySelector('.ca2-input').value) || 0;
-            const examVal = parseInt(row.querySelector('.exam-input').value) || 0;
-
-            if (ca1Val > 20 || ca2Val > 20 || examVal > 60) {
-                alert("Validation error: Marks exceed limits! Max caps are CA1: 20, CA2: 20, Exam: 60.");
-                return;
+            if (res.ok) {
+              localStorage.removeItem(cbtDraftKey);
+              document.getElementById('cbt-questions-list').innerHTML = '';
+              document.getElementById('cbt-question-form').reset();
+              alert("Structural assessment components written completely to server repositories.");
+              myUploadedCBTs = await fetchMyCBTQuestions();
+              renderCBTInventoryVault();
             }
+          });
+        });
 
-            const student = studentRegistry.find(s => s.code === code);
-            if(student) {
-                student.ca1Mark = ca1Val;
-                student.ca2Mark = ca2Val;
-                student.examMark = examVal;
-                alert(`Scores for student ${student.name} saved successfully.`);
-            }
-            updateProgressMetrics();
-        }
+        // Batch Shared Question Bank Dispatch Trigger Pipeline
+        document.getElementById('pushToUniversalBtn')?.addEventListener('click', () => {
+          fetchWithSpinLock('pushToUniversalBtn', async () => {
+            const res = await fetch(`${API_BASE_URL}/api/teachers/cbt/push-universal`, {
+              method: 'POST',
+              headers: authHeaders(),
+              body: JSON.stringify({ cbtIds: selectedCBTIds })
+            });
+            if (res.ok) alert("Selected evaluations aggregated into universal shared questions pool.");
+          });
+        });
 
-        function clearSingleRow(buttonElement) {
-            const row = buttonElement.closest('tr');
-            row.querySelector('.ca1-input').value = '';
-            row.querySelector('.ca2-input').value = '';
-            row.querySelector('.exam-input').value = '';
-            row.querySelector('.total-span').innerText = '0';
-            updateProgressMetrics();
-        }
+        // Faculty Identity Update Account Pipeline Commit Hook
+        document.getElementById('profile-form')?.addEventListener('submit', (e) => {
+          e.preventDefault();
+          fetchWithSpinLock('profileSaveSubmitBtn', async () => {
+            const payload = {
+              name: document.getElementById('profile-name').value,
+              designation: document.getElementById('profile-designation').value,
+              email: document.getElementById('profile-email').value
+            };
+            const pwd = document.getElementById('profile-password').value;
+            if (pwd) payload.password = pwd;
 
-        function saveGradebookChanges() {
-            const rows = document.getElementById('gradebookTableBody').children;
-            let boundsError = false;
+            const res = await fetch(`${API_BASE_URL}/api/teachers/profile/update`, {
+              method: 'PUT',
+              headers: authHeaders(),
+              body: JSON.stringify(payload)
+            });
 
-            for(let row of rows) {
-                const code = row.getAttribute('data-student-code');
-                const ca1Val = parseInt(row.querySelector('.ca1-input').value) || 0;
-                const ca2Val = parseInt(row.querySelector('.ca2-input').value) || 0;
-                const examVal = parseInt(row.querySelector('.exam-input').value) || 0;
+            if (res.ok) alert("Faculty account identity structural updates applied.");
+          });
+        });
 
-                if (ca1Val > 20 || ca2Val > 20 || examVal > 60) {
-                    boundsError = true;
-                    continue;
-                }
-
-                const student = studentRegistry.find(s => s.code === code);
-                if(student) {
-                    student.ca1Mark = ca1Val;
-                    student.ca2Mark = ca2Val;
-                    student.examMark = examVal;
-                }
-            }
-
-            if (boundsError) {
-                alert("Some grades exceeded limits (CA1: 20, CA2: 20, Exam: 60) and could not be bulk saved.");
-            } else {
-                alert("Gradebook updates synced completely across all active database files.");
-            }
-            renderGradebook();
-        }
-
-        /* -----------------------------------------------------------
-           FACULTY PROFILE ACTIONS
-           ----------------------------------------------------------- */
-        function updateTeacherProfile(event) {
-            event.preventDefault();
-            document.getElementById('headerTeacherName').innerText = document.getElementById('profileName').value;
-            document.getElementById('headerTeacherTitle').innerText = document.getElementById('profileTitle').value;
-            document.getElementById('sidebarDept').innerText = document.getElementById('profileDept').value;
-            document.getElementById('sidebarLevels').innerText = document.getElementById('profileLevels').value;
-            alert("Faculty identity profile parameters modified successfully.");
-        }
-    </script>
+        // Side Responsive Drawer View Toggle Hook
+        document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+          const sidebar = document.getElementById('sidebar');
+          sidebar.classList.toggle('-translate-x-full');
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
