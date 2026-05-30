@@ -573,35 +573,70 @@
         }
 // ✅ NEW: Fetch collections from backend
 async function fetchTeacherCollections() {
+    console.log('[fetchTeacherCollections] Fetching collections');
     try {
-        const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections`, { 
-            headers: authHeaders() 
-        });
-        if (!res.ok) return [];
+        const url = `${API_BASE_URL}/api/teachers/collections/list`;
+        console.log('[fetchTeacherCollections] Request URL:', url);
+        const res = await fetch(url, { headers: authHeaders() });
+        console.log('[fetchTeacherCollections] Response Status:', res.status);
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error('[fetchTeacherCollections] Error:', errorText);
+            return [];
+        }
         const data = await res.json();
+        console.log('[fetchTeacherCollections] ✅ Collections:', data.collections.length);
         return Array.isArray(data.collections) ? data.collections : [];
     } catch (e) {
-        console.error('Error fetching collections:', e);
+        console.error('[fetchTeacherCollections] CATCH ERROR:', e);
         return [];
     }
 }
 
 // ✅ NEW: Create collection on backend
-async function createCollectionAPI(name) {
+async function createCollection() {
+    const name = document.getElementById('newCollectionName').value.trim();
+    
+    if (!name) {
+        alert('Please enter a collection name');
+        return;
+    }
+
+    console.log('\n[createCollection] ====== START ======');
+    console.log('[createCollection] Name:', name);
+
     try {
-        const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections`, {
+        const url = `${API_BASE_URL}/api/teachers/collections/create`;
+        console.log('[createCollection] URL:', url);
+
+        const res = await fetch(url, {
             method: 'POST',
             headers: authHeaders(),
-            body: JSON.stringify({ name: name })
+            body: JSON.stringify({ name })
         });
-        if (!res.ok) throw new Error('Failed to create collection');
+
+        console.log('[createCollection] Response Status:', res.status);
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error('[createCollection] Error Response:', errorText);
+            alert('Failed to create collection');
+            return;
+        }
+
         const data = await res.json();
-        return data.collection;
-    } catch (e) {
-        console.error('Error creating collection:', e);
-        return null;
+        console.log('[createCollection] ✅ Created:', data.collection._id);
+
+        assessmentDatabase.push(data.collection);
+        document.getElementById('newCollectionName').value = '';
+        renderCollections();
+        alert('Collection created successfully!');
+    } catch (error) {
+        console.error('[createCollection] CATCH ERROR:', error);
+        alert('Error creating collection: ' + error.message);
     }
 }
+
 
 // ✅ NEW: Add question to collection on backend
 async function addQuestionToCollectionAPI(collectionId, questionData) {
@@ -1039,20 +1074,36 @@ async function createCollection() {
 }
 
 async function deleteCollection(collectionId) {
-    if (confirm("Are you certain you want to purge this full testing category?")) {
-        // ✅ Delete from backend
-        const success = await deleteCollectionAPI(collectionId);
-        if (success) {
-            assessmentDatabase = assessmentDatabase.filter(c => c._id !== collectionId);
-            if (activeIsolatedCollectionId === collectionId) toggleCollectionFocus(null);
-            renderCollections();
-            alert('Collection deleted!');
-        } else {
-            alert('Failed to delete collection.');
+    console.log('[deleteCollection] Deleting:', collectionId);
+
+    if (!confirm('Are you sure you want to delete this collection?')) {
+        return;
+    }
+
+    try {
+        const url = `${API_BASE_URL}/api/teachers/collections/${collectionId}`;
+        console.log('[deleteCollection] URL:', url);
+
+        const res = await fetch(url, {
+            method: 'DELETE',
+            headers: authHeaders()
+        });
+
+        console.log('[deleteCollection] Response Status:', res.status);
+
+        if (!res.ok) {
+            alert('Failed to delete collection');
+            return;
         }
+
+        console.log('[deleteCollection] ✅ Deleted');
+        assessmentDatabase = assessmentDatabase.filter(c => c._id !== collectionId);
+        renderCollections();
+    } catch (error) {
+        console.error('[deleteCollection] CATCH ERROR:', error);
+        alert('Error deleting collection: ' + error.message);
     }
 }
-
 async function deleteQuestion(collectionId, questionId) {
     if (confirm("Delete this question?")) {
         // ✅ Delete from backend
@@ -1188,80 +1239,66 @@ async function deleteQuestion(collectionId, questionId) {
             document.getElementById('questionModal').style.display = 'none';
         }
 
-        async function saveModalQuestionData() {
-    const stemHtml = stemQuillInstance.root.innerHTML.trim();
-    const plainStem = stemQuillInstance.getText().trim();
-    const imgUrl = document.getElementById('modalImageUrl').value.trim();
-    const expHtml = explanationQuillInstance.root.innerHTML.trim();
+async function saveModalQuestionData() {
+    console.log('\n[saveModalQuestionData] ====== START ======');
+    console.log('[saveModalQuestionData] Mode:', activeTargetModalMode);
 
-    if (!plainStem) {
-        alert("Question stem body value is required.");
+    const text = stemQuillInstance && stemQuillInstance.getLength() > 1 ? stemQuillInstance.getText().trim() : '';
+    const explanation = explanationQuillInstance && explanationQuillInstance.getLength() > 1 ? explanationQuillInstance.getText().trim() : '';
+    const imageUrl = document.getElementById('modalImageUrl').value || null;
+
+    const optionFields = document.querySelectorAll('#modalOptionsWrapper .option-field');
+    const options = [];
+    optionFields.forEach(field => {
+        const textInput = field.querySelector('.option-text-input');
+        const checkbox = field.querySelector('.option-correct-checkbox');
+        if (textInput && textInput.value.trim()) {
+            options.push({
+                text: textInput.value.trim(),
+                isCorrect: checkbox ? checkbox.checked : false
+            });
+        }
+    });
+
+    if (!text || options.length === 0) {
+        alert('Please provide question text and at least one option');
         return;
     }
 
-    const optionRows = document.getElementById('modalOptionsWrapper').children;
-    if (optionRows.length < 2) {
-        alert("Declare at least two option rows.");
-        return;
-    }
+    try {
+        const url = activeTargetModalMode === 'CREATE'
+            ? `${API_BASE_URL}/api/teachers/collections/${activeIsolatedCollectionId}/add-question`
+            : `${API_BASE_URL}/api/teachers/collections/${activeIsolatedCollectionId}/question/${contextualTargetQuestionId}`;
 
-    let compileOptions = [];
-    let chosenCorrectKey = false;
+        const method = activeTargetModalMode === 'CREATE' ? 'POST' : 'PATCH';
+        console.log('[saveModalQuestionData] URL:', url);
+        console.log('[saveModalQuestionData] Method:', method);
 
-    for (let row of optionRows) {
-        const id = row.id;
-        const inst = optionQuillRegistry[id];
-        const optHtml = inst.root.innerHTML.trim();
-        const optPlain = inst.getText().trim();
-        const radioCheck = row.querySelector('input[name="correctAnswerRadio"]').checked;
+        const res = await fetch(url, {
+            method,
+            headers: authHeaders(),
+            body: JSON.stringify({ text, explanation, imageUrl, options })
+        });
 
-        if (!optPlain) {
-            alert("Empty option rows values are rejected.");
+        console.log('[saveModalQuestionData] Response Status:', res.status);
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error('[saveModalQuestionData] Error:', errorText);
+            alert('Failed to save question');
             return;
         }
-        if (radioCheck) chosenCorrectKey = true;
 
-        compileOptions.push({ text: optHtml, isCorrect: radioCheck });
-    }
-
-    if (!chosenCorrectKey) {
-        alert("Flag one valid target response correct key selection.");
-        return;
-    }
-
-    const col = assessmentDatabase.find(c => c._id === activeIsolatedCollectionId);
-    if (!col) return;
-
-    const questionData = {
-        text: stemHtml,
-        imageUrl: imgUrl || null,
-        options: compileOptions,
-        explanation: expHtml || null
-    };
-
-    if (activeTargetModalMode === 'CREATE') {
-        // ✅ Save new question to backend
-        const result = await addQuestionToCollectionAPI(activeIsolatedCollectionId, questionData);
-        if (result && result.question) {
-            col.questions.push(result.question);
-            renderCollections();
-            closeQuestionModal();
-            alert('Question saved successfully!');
-        }
-    } else {
-        // ✅ Update existing question on backend
-        const result = await updateQuestionAPI(activeIsolatedCollectionId, contextualTargetQuestionId, questionData);
-        if (result && result.question) {
-            const qIdx = col.questions.findIndex(q => q.id === contextualTargetQuestionId);
-            if (qIdx !== -1) {
-                col.questions[qIdx] = result.question;
-            }
-            renderCollections();
-            closeQuestionModal();
-            alert('Question updated successfully!');
-        }
+        console.log('[saveModalQuestionData] ✅ SUCCESS');
+        closeQuestionModal();
+        renderCollections();
+        alert('Question saved successfully!');
+    } catch (error) {
+        console.error('[saveModalQuestionData] CATCH ERROR:', error);
+        alert('Error saving question: ' + error.message);
     }
 }
+
 
         function deleteQuestion(collectionId, questionId) {
             const targetCollection = assessmentDatabase.find(c => c.id === collectionId);
