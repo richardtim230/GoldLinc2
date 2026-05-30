@@ -11,7 +11,7 @@ const Student = require('../models/Student');
 const teacherAuth = require('../middleware/teacherAuth'); // Should set req.staff
 const ResultCBT = require('../models/ResultCBT');
 const CBT = require('../models/CBTExam'); // If your results reference Exam
-
+const Collection = require('../models/Collection');
 // GET /api/teachers/me - Get own teacher profile + classes + subjects
 router.get('/me', teacherAuth, async (req, res) => {
   const teacher = req.staff;
@@ -488,6 +488,92 @@ router.post('/:id/cbt/push', teacherAuth, async (req, res) => {
       pushed.push(exam._id);
     }
     res.json({ success: true, pushed });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+// GET /api/teachers/:id/collections - Get all question bank collections for teacher
+router.get('/:id/collections', teacherAuth, async (req, res) => {
+  try {
+    if (String(req.params.id) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    // Assuming you have a Collection model, fetch all collections for this teacher
+    const collections = await Collection.find({ teacher: req.staff._id })
+      .populate('questions');
+    res.json({ collections });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/teachers/:id/collections - Create new collection
+router.post('/:id/collections', teacherAuth, async (req, res) => {
+  try {
+    if (String(req.params.id) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    const { name } = req.body;
+    const collection = new Collection({
+      teacher: req.staff._id,
+      name,
+      questions: []
+    });
+    await collection.save();
+    res.status(201).json({ collection });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/teachers/:id/collections/:collectionId/questions - Add question to collection
+router.post('/:id/collections/:collectionId/questions', teacherAuth, async (req, res) => {
+  try {
+    if (String(req.params.id) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    const { text, options, imageUrl, explanation } = req.body;
+    const collection = await Collection.findById(req.params.collectionId);
+    if (!collection) return res.status(404).json({ error: "Collection not found" });
+    
+    const question = {
+      id: `question_${Date.now()}`,
+      text,
+      options,
+      imageUrl,
+      explanation
+    };
+    collection.questions.push(question);
+    await collection.save();
+    res.status(201).json({ question });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/teachers/:id/collections/:collectionId - Delete collection
+router.delete('/:id/collections/:collectionId', teacherAuth, async (req, res) => {
+  try {
+    if (String(req.params.id) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    await Collection.findByIdAndDelete(req.params.collectionId);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/teachers/:id/collections/:collectionId/questions/:questionId
+router.delete('/:id/collections/:collectionId/questions/:questionId', teacherAuth, async (req, res) => {
+  try {
+    if (String(req.params.id) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    const collection = await Collection.findById(req.params.collectionId);
+    collection.questions = collection.questions.filter(q => q.id !== req.params.questionId);
+    await collection.save();
+    res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
