@@ -79,18 +79,74 @@ const cbtAuthRoutes = require('./routes/cbt-auth');
 
 /* ================= Route Mounting ================= */
 
-// API Keys Management
-app.use('/api/api-keys', apiKeysRoute);
+// --- 1. SPECIFIC RESOURCE API ENDPOINTS (MUST BE FIRST) ---
+
+// Teachers & Teacher Results
+app.use('/api/teachers', teachersRoute);       // ✅ Explicit plural first handles /me cleanly now
+app.use('/api/teacher', teacherResultsRoute);
+
+// Students
+app.use('/api/students', studentsRoute);
+app.use('/api/student', studentsRoute);
+
+// Staff Management
+app.use('/api/staffs', staffsRoute);
+app.use('/api/staff', staffRoute);
+
+// Families & Parents
+app.use('/api/families', familiesRoute);
+app.use('/api/parents', parentsRoute);
+
+// Exams, Results & CBT
+app.use('/api/exam', examRoute);
+app.use('/api/result', resultscbtRoute);
+app.use('/api/results', resultsRoute);
 app.use('/api/cbt/auth', cbtAuthRoutes);
-// Demo Requests & Schools Management
+
+// Academic Structures & Activities
+app.use('/api/classes', authMiddleware, adminAuth, classesRoute);
+app.use('/api/subjects', subjectsRoute);
+app.use('/api/assignments', assignmentsRoute);
+app.use('/api/activity', activityRoute);
+app.use('/api/academics', academicsRoute);
+
+// Logistics & Utilities
+app.use('/api/hostel', hostelRoute);
+app.use('/api/transport', transportRoute);
+app.use('/api/upload', uploadRoute);
+
+// Cloud, Sync, Uploads & Keys
+app.use('/api/api-keys', apiKeysRoute);
+app.use('/api/cloud', universalUploadRoute);
+app.use('/api/cloud/sync', require('./routes/cloud'));
+
+// Finances, Payments & Administration
+app.use('/api/fees', feesRoute);
+app.use('/api/finance', financeRoute);
+app.use('/api/payments', paymentsRoute);
+app.use('/api/admission', admissionRoute);
+app.use('/api/admin', adminRoute);
+app.use('/api/application', applicationRoute);
+const demoRequestsRouteFix = require('./routes/demoRequests'); 
 app.use('/api/demo-requests', demoRequestsRoute);
 app.use('/api/schools', schoolsRoute);
 
-// ✅ NEW: Universal Cloud Sync & Upload
-app.use('/api/cloud', universalUploadRoute);
-// Cloud/Universal Upload Routes
-app.use('/api/cloud/sync', require('./routes/cloud'));
-// Static page routes
+// Verification, Preferences & Settings
+app.use('/api/res', verificationRoute);
+app.use('/api/auth', authRoute);
+app.use('/api/report/preferences', require('./routes/reportPreferences'));
+app.use('/api/report/session', sessionSettingsRoute);
+
+
+// --- 2. BROAD CATCH-ALL GENERIC ENDPOINTS (MUST BE LAST) ---
+app.use('/api', schoolAdminRoute);
+app.use('/api', schoolAdminsRoute);
+app.use('/api', dashboardRoute); // ✅ Generic catch-all moved safely to the bottom
+
+
+/* ================= Static Page Routes ================= */
+
+// Static HTML page routes
 app.get('/demo-request', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'demo-request.html'));
 });
@@ -99,69 +155,10 @@ app.get('/admin-dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'administrator.html'));
 });
 
-// Exam & Results
-app.use('/api/exam', examRoute);
-app.use('/api/result', resultscbtRoute);
-app.use('/api/activity', activityRoute);
-app.use('/api/upload', uploadRoute);
-app.use('/api/cloud', require('./routes/cloud'));
-app.use('/api/teacher', teacherResultsRoute);
-app.use('/api/teachers', teachersRoute);
-app.use('/api/assignments', assignmentsRoute);
-app.use('/api/hostel', hostelRoute);
-app.use('/api/subjects', subjectsRoute);
-app.use('/api/transport', transportRoute);
-app.use('/api', schoolAdminRoute);
-app.use('/api', schoolAdminsRoute);
-
-// Finances & Academics
-app.use('/api/fees', feesRoute);
-app.use('/api/academics', academicsRoute);
-app.use('/api/finance', financeRoute);
-
-// Families & Parents
-app.use('/api/families', familiesRoute);
-app.use('/api/parents', parentsRoute);
-
-// Authentication
-app.use('/api/auth', authRoute);
-
-// ✅ NEW: Verification & Reports
-app.use('/api/res', verificationRoute);
-
-// Staff Management
-app.use('/api/staff', staffRoute);
-app.use('/api/staffs', staffsRoute);
-
-// Dashboard & Admin
-app.use('/api', dashboardRoute);
-app.use('/api/results', resultsRoute);
-app.use('/api/classes', authMiddleware, adminAuth, classesRoute);
-
-// Students
-app.use('/api/student', studentsRoute);
-app.use('/api/students', studentsRoute);
-
-// Admin & Admissions
-app.use('/api/admin', adminRoute);
-app.use('/api/admission', admissionRoute);
-
-// Report & Settings
-app.use('/api/report/preferences', require('./routes/reportPreferences'));
-app.use('/api/report/session', sessionSettingsRoute);
-
-// Payments & Applications
-app.use('/api/payments', paymentsRoute);
-app.use('/api/application', applicationRoute);
-
-/* ================= Static Page Routes ================= */
-
-// Serve platform landing page
 app.get('/platform', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'platform-landing.html'));
 });
 
-// Serve individual feature pages
 app.get('/features', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'features.html'));
 });
@@ -182,7 +179,6 @@ app.get('/roadmap', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'roadmap.html'));
 });
 
-// Application form page
 app.get('/application', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'application.html'));
 });
@@ -201,7 +197,6 @@ app.get('/api/dashboard', authMiddleware, (req, res) => {
 app.use((err, req, res, next) => {
   console.error('Error:', err);
 
-  // Handle multer errors
   if (err.name === 'MulterError') {
     if (err.code === 'FILE_TOO_LARGE') {
       return res.status(413).json({ message: 'File too large. Maximum 8MB allowed.' });
@@ -209,22 +204,18 @@ app.use((err, req, res, next) => {
     return res.status(400).json({ message: 'File upload error: ' + err.message });
   }
 
-  // Handle validation errors
   if (err.name === 'ValidationError') {
     return res.status(400).json({ message: 'Validation error: ' + err.message });
   }
 
-  // Handle MongoDB errors
   if (err.name === 'MongoError' || err.name === 'MongoServerError') {
     return res.status(500).json({ message: 'Database error: ' + err.message });
   }
 
-  // Handle CORS errors
   if (err.message && err.message.includes('CORS')) {
     return res.status(403).json({ message: 'CORS error: ' + err.message });
   }
 
-  // Generic error
   res.status(err.status || 500).json({
     message: err.message || 'An unexpected error occurred'
   });
