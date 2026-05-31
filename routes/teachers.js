@@ -13,7 +13,7 @@ const teacherAuth = require('../middleware/teacherAuth'); // Should set req.staf
 const ResultCBT = require('../models/ResultCBT');
 const CBT = require('../models/CBTExam'); // If your results reference Exam
 const Collection = require('../models/Collection');
-
+const AssignmentSubmission = require('../models/AssignmentSubmission');
 // GET /api/teachers/me - Get own teacher profile + classes + subjects
 router.get('/me', teacherAuth, async (req, res) => {
   const teacher = req.staff;
@@ -576,7 +576,82 @@ router.post('/:id/cbt/push', teacherAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// GET /api/teachers/:id/assignments/:assignmentId/submissions
+router.get(
+  '/:id/assignments/:assignmentId/submissions',
+  teacherAuth,
+  async (req, res) => {
+    try {
 
+      if (String(req.params.id) !== String(req.staff._id)) {
+        return res.status(403).json({
+          error: 'Forbidden'
+        });
+      }
+
+      const assignment = await Assignment.findById(
+        req.params.assignmentId
+      );
+
+      if (!assignment) {
+        return res.status(404).json({
+          error: 'Assignment not found'
+        });
+      }
+
+      if (
+        String(assignment.teacher) !==
+        String(req.staff._id)
+      ) {
+        return res.status(403).json({
+          error: 'Forbidden'
+        });
+      }
+
+      const submissions =
+        await AssignmentSubmission.find({
+          assignment: req.params.assignmentId
+        })
+          .populate(
+            'student',
+            'firstname surname regNo studentEmail'
+          )
+          .sort({
+            submittedAt: -1
+          });
+
+      const formatted =
+        submissions.map(sub => ({
+          _id: sub._id,
+          studentId: sub.student?._id,
+          studentName: sub.student
+            ? `${sub.student.firstname} ${sub.student.surname}`
+            : 'Unknown Student',
+          regNo: sub.student?.regNo || '',
+          email:
+            sub.student?.studentEmail || '',
+          status: sub.status,
+          score: sub.score,
+          totalScore: sub.totalScore,
+          feedback: sub.feedback,
+          submittedAt: sub.submittedAt,
+          submissionFile:
+            sub.submissionFile || null
+        }));
+
+      res.json({
+        submissions: formatted
+      });
+
+    } catch (err) {
+
+      res.status(500).json({
+        error: err.message
+      });
+
+    }
+  }
+);
 // ✅ FIXED: POST /api/teachers/:id/collections/:collectionId/convert-to-cbt
 // Convert collection to CBT format and return the CBT ID
 router.post('/:id/collections/:collectionId/convert-to-cbt', teacherAuth, async (req, res) => {
