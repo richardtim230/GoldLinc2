@@ -1327,77 +1327,134 @@
     }
 
     async function saveModalQuestionData(event) {
-        if (event) event.preventDefault();
-        const button = event ? event.target : document.querySelector('#questionModal button[onclick*="saveModalQuestionData"]');
-        
+    if (event) event.preventDefault();
+
+    const button = event
+        ? event.target
+        : document.querySelector('#questionModal button[onclick*="saveModalQuestionData"]');
+
+    try {
         await executeWithLoading(button, async () => {
-            // Extract content as clean HTML
-            const stemHtml = stemQuillInstance.root.innerHTML;
-            
-            if (!stemHtml.trim() || stemHtml === '<p><br></p>') {
+
+            if (!stemQuillInstance) {
+                throw new Error('Question editor is not initialized');
+            }
+
+            const stemHtml = stemQuillInstance.root.innerHTML.trim();
+
+            if (!stemHtml || stemHtml === '<p><br></p>') {
                 throw new Error('Question stem cannot be empty');
             }
 
-            // Collect options
             const options = [];
-            document.querySelectorAll('#modalOptionsWrapper .option-editor-container').forEach((div) => {
-                const quillDiv = div.querySelector('.quill-option-editor');
-                const checkbox = div.querySelector('input[type="checkbox"]');
-                
-                let optionQuillInstance = null;
 
-Object.values(optionQuillRegistry).forEach(item => {
-    if (item.element === div) {
-        optionQuillInstance = item.quill;
-    }
-});
+            document.querySelectorAll('#modalOptionsWrapper .option-editor-container')
+                .forEach((div) => {
 
-                if (optionQuillInstance) {
-                    const optionText = optionQuillInstance.root.innerHTML;
-                    if (optionText.trim() && optionText !== '<p><br></p>') {
+                    const checkbox = div.querySelector('input[type="checkbox"]');
+
+                    let optionQuillInstance = null;
+
+                    Object.values(optionQuillRegistry).forEach(item => {
+                        if (
+                            item &&
+                            item.element === div &&
+                            item.quill
+                        ) {
+                            optionQuillInstance = item.quill;
+                        }
+                    });
+
+                    if (!optionQuillInstance) {
+                        return;
+                    }
+
+                    const optionHtml = optionQuillInstance.root.innerHTML.trim();
+
+                    if (
+                        optionHtml &&
+                        optionHtml !== '<p><br></p>'
+                    ) {
                         options.push({
-                            text: optionText,
-                            isCorrect: checkbox.checked
+                            text: optionHtml,
+                            isCorrect: checkbox ? checkbox.checked : false
                         });
                     }
-                }
-            });
+                });
 
             if (options.length === 0) {
                 throw new Error('Please add at least one option');
             }
 
-            const hasCorrect = options.some(opt => opt.isCorrect);
-            if (!hasCorrect) {
+            if (!options.some(opt => opt.isCorrect)) {
                 throw new Error('Please mark at least one option as correct');
             }
 
-            const explanationHtml = explanationQuillInstance.root.innerHTML;
+            const explanationHtml = explanationQuillInstance
+                ? explanationQuillInstance.root.innerHTML
+                : '';
 
-            // Save to API
+            let result = null;
+
             if (activeTargetModalMode === 'CREATE') {
-                await addQuestionToCollectionAPI(activeIsolatedCollectionId, {
-                    text: stemHtml,
-                    options: options,
-                    imageUrl: null,
-                    explanation: explanationHtml
-                });
+
+                result = await addQuestionToCollectionAPI(
+                    activeIsolatedCollectionId,
+                    {
+                        text: stemHtml,
+                        options,
+                        imageUrl: null,
+                        explanation: explanationHtml
+                    }
+                );
+
             } else if (activeTargetModalMode === 'EDIT') {
-                await updateQuestionAPI(activeIsolatedCollectionId, contextualTargetQuestionId, {
-                    text: stemHtml,
-                    options: options,
-                    imageUrl: null,
-                    explanation: explanationHtml
-                });
+
+                result = await updateQuestionAPI(
+                    activeIsolatedCollectionId,
+                    contextualTargetQuestionId,
+                    {
+                        text: stemHtml,
+                        options,
+                        imageUrl: null,
+                        explanation: explanationHtml
+                    }
+                );
             }
 
-            // Refresh and close
+            if (!result) {
+                throw new Error(
+                    'The server did not confirm the save operation.'
+                );
+            }
+
             assessmentDatabase = await fetchUnifiedQuestionBank();
+
             renderCollections();
             closeQuestionModal();
-            await showCustomModal({ title: 'Success', message: 'Question saved successfully', type: 'alert', icon: '✅' });
+
+            await showCustomModal({
+                title: 'Success',
+                message: activeTargetModalMode === 'CREATE'
+                    ? 'Question created successfully.'
+                    : 'Question updated successfully.',
+                type: 'alert',
+                icon: '✅'
+            });
+        });
+
+    } catch (err) {
+
+        console.error('saveModalQuestionData error:', err);
+
+        await showCustomModal({
+            title: 'Save Failed',
+            message: err.message || 'An unexpected error occurred.',
+            type: 'alert',
+            icon: '⚠️'
         });
     }
+}
 
     function openCreateQuestionModal(collectionId) {
         activeIsolatedCollectionId = collectionId;
