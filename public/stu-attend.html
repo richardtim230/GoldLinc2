@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=0.85">
     <title>Gold & Linc | Faculty Attendance Terminal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -237,11 +237,11 @@
         // ============ INITIALIZATION ============
         async function initializeAttendancePage() {
             try {
-                // Get class ID from URL parameter (could be class name or ID)
+                // Get class identifier from URL parameter
                 const urlParams = new URLSearchParams(window.location.search);
-                let classId = urlParams.get('classId');
+                let classIdentifier = urlParams.get('classId');
 
-                if (!classId) {
+                if (!classIdentifier) {
                     await showCustomModal({ 
                         title: 'Invalid Request', 
                         message: 'No class selected. Redirecting to dashboard...', 
@@ -251,6 +251,8 @@
                     setTimeout(() => window.location.href = 'rt.html', 2000);
                     return;
                 }
+
+                console.log('Class identifier from URL:', classIdentifier);
 
                 // Fetch teacher profile first
                 teacher = await fetchTeacherProfile();
@@ -267,12 +269,12 @@
                 // Update header with teacher info
                 updateHeaderInfo();
 
-                // Resolve class name to MongoDB ID if needed
-                classId = await resolveClassToId(classId);
-                if (!classId) {
+                // Resolve class identifier to MongoDB ID
+                const resolvedClassId = await resolveClassToId(classIdentifier);
+                if (!resolvedClassId) {
                     await showCustomModal({ 
                         title: 'Class Not Found', 
-                        message: 'The selected class could not be found. Redirecting to dashboard...', 
+                        message: `The class "${classIdentifier}" could not be found. Redirecting to dashboard...`, 
                         type: 'alert', 
                         icon: '⚠️' 
                     });
@@ -280,10 +282,14 @@
                     return;
                 }
 
-                selectedClass = classId;
+                selectedClass = resolvedClassId;
+                console.log('Selected class ID:', selectedClass);
 
                 // Fetch class students using resolved ID
-                await loadClassStudents();
+                const studentLoadResult = await loadClassStudents();
+                if (!studentLoadResult || classStudents.length === 0) {
+                    console.warn('No students found for this class');
+                }
 
                 // Set today's date
                 setTodayDate();
@@ -298,7 +304,7 @@
                 console.error('Initialization error:', error);
                 await showCustomModal({ 
                     title: 'Error', 
-                    message: 'Failed to initialize attendance page.', 
+                    message: 'Failed to initialize attendance page. Check console for details.', 
                     type: 'alert', 
                     icon: '❌' 
                 });
@@ -319,6 +325,8 @@
                 }
 
                 const classes = await res.json();
+                console.log('All classes fetched:', classes);
+
                 if (!Array.isArray(classes)) {
                     console.error('Invalid classes response');
                     return null;
@@ -326,39 +334,68 @@
 
                 // Try to find the class by:
                 // 1. Exact MongoDB ID match
-                // 2. Class name match
-                // 3. Class code match
+                // 2. Class arms field (since it shows "arms" in the response)
+                // 3. Class name match (case-insensitive)
+                // 4. Class code match (case-insensitive)
 
-                let foundClass = classes.find(c => c._id === classIdentifier);
-                
-                if (!foundClass) {
-                    foundClass = classes.find(c => 
-                        c.name && c.name.toLowerCase() === classIdentifier.toLowerCase()
-                    );
-                }
+                let foundClass = null;
 
-                if (!foundClass) {
-                    foundClass = classes.find(c => 
-                        c.code && c.code.toLowerCase() === classIdentifier.toLowerCase()
-                    );
-                }
-
+                // Try exact ID match
+                foundClass = classes.find(c => c._id === classIdentifier);
                 if (foundClass) {
-                    // Update the class name badge with actual class details
-                    document.getElementById('classNameBadge').textContent = foundClass.name || foundClass.code || classIdentifier;
-                    if (foundClass.subject) {
-                        document.getElementById('subjectBadge').textContent = foundClass.subject;
-                    }
-                    console.log('Class resolved:', foundClass._id);
+                    console.log('Found by _id:', foundClass);
+                    updateClassBadges(foundClass);
                     return foundClass._id;
                 }
 
-                console.error('Class not found:', classIdentifier);
+                // Try matching against arms array or name
+                for (let classItem of classes) {
+                    // Check if classIdentifier matches any arm
+                    if (classItem.arms && Array.isArray(classItem.arms)) {
+                        const armMatch = classItem.arms.find(arm => 
+                            arm.name && arm.name.toLowerCase() === classIdentifier.toLowerCase()
+                        );
+                        if (armMatch) {
+                            console.log('Found by arm name:', classItem, armMatch);
+                            updateClassBadges(classItem, armMatch.name);
+                            return classItem._id;
+                        }
+                    }
+
+                    // Check if classIdentifier matches class name
+                    if (classItem.name && classItem.name.toLowerCase() === classIdentifier.toLowerCase()) {
+                        console.log('Found by class name:', classItem);
+                        updateClassBadges(classItem);
+                        return classItem._id;
+                    }
+
+                    // Check if classIdentifier matches class code
+                    if (classItem.code && classItem.code.toLowerCase() === classIdentifier.toLowerCase()) {
+                        console.log('Found by class code:', classItem);
+                        updateClassBadges(classItem);
+                        return classItem._id;
+                    }
+                }
+
+                console.error('Class not found with identifier:', classIdentifier);
+                console.log('Available classes:', classes.map(c => ({ id: c._id, name: c.name, code: c.code, arms: c.arms })));
                 return null;
 
             } catch (error) {
                 console.error('Error resolving class:', error);
                 return null;
+            }
+        }
+
+        // Helper function to update class badges
+        function updateClassBadges(classData, armName = null) {
+            const displayName = armName || classData.name || classData.code || 'Unknown Class';
+            document.getElementById('classNameBadge').textContent = displayName;
+            
+            if (classData.subject) {
+                document.getElementById('subjectBadge').textContent = classData.subject;
+            } else if (classData.subjectSpecialization) {
+                document.getElementById('subjectBadge').textContent = classData.subjectSpecialization;
             }
         }
 
@@ -376,6 +413,7 @@
 
         async function loadClassStudents() {
             try {
+                console.log('Loading students for class:', selectedClass);
                 const res = await fetch(`${API_BASE_URL}/api/teachers/students?classId=${encodeURIComponent(selectedClass)}`, { 
                     headers: authHeaders() 
                 });
@@ -515,7 +553,7 @@
             document.getElementById('inspectFullName').textContent = studentName;
             document.getElementById('inspectAdmissionCode').textContent = studentCode;
             document.getElementById('inspectCohort').textContent = selectedClass;
-            document.getElementById('inspectParentContact').textContent = student.parentContact || '--';
+            document.getElementById('inspectParentContact').textContent = student.parentContact || student.parentPhone || '--';
 
             const nameParts = studentName.split(" ");
             document.getElementById('inspectAvatarInitials').textContent = nameParts.length > 1 
@@ -529,7 +567,7 @@
             const gridContainer = document.getElementById('calendarGridBlocks');
             gridContainer.innerHTML = "";
 
-            // Generate 5 weeks of placeholder days
+            // Generate 4 weeks of weekday calendar
             const today = new Date();
             const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
             
