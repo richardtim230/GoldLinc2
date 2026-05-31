@@ -34,7 +34,6 @@
     </script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
-        /* Custom scrollbar adjustments for desktop ledger cleanliness */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -90,9 +89,9 @@
                     </div>
                 </div>
             </div>
-            <button onclick="saveTodayAttendanceData()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-6 py-2.5 rounded-xl uppercase tracking-wider transition flex items-center gap-1.5 justify-center">
+            <button id="saveButton" onclick="saveTodayAttendanceData()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-6 py-2.5 rounded-xl uppercase tracking-wider transition flex items-center gap-1.5 justify-center">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                Commit Daily Logs
+                <span id="saveButtonText">Commit Daily Logs</span>
             </button>
         </div>
 
@@ -644,26 +643,78 @@
 
         async function saveTodayAttendanceData() {
             try {
+                // Disable button during submission
+                const saveBtn = document.getElementById('saveButton');
+                const saveBtnText = document.getElementById('saveButtonText');
+                saveBtn.disabled = true;
+                saveBtnText.textContent = 'Saving...';
+
                 // Prepare attendance data for submission
+                const today = new Date();
+                const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD format
+
                 const attendanceData = {
                     classId: selectedClass,
-                    date: new Date().toISOString().split('T')[0],
+                    date: dateStr,
                     attendance: workingSessionAttendanceState
                 };
 
                 console.log('Submitting attendance:', attendanceData);
 
+                // Get teacher ID
+                let teacherId = teacher ? teacher.id : localStorage.getItem('teacherId');
+                
+                if (!teacherId) {
+                    throw new Error('Teacher ID not found. Please login again.');
+                }
+
+                // Submit attendance to backend
+                const submitRes = await fetch(
+                    `${API_BASE_URL}/api/teachers/${teacherId}/attendance`,
+                    {
+                        method: 'POST',
+                        headers: authHeaders(),
+                        body: JSON.stringify(attendanceData)
+                    }
+                );
+
+                if (!submitRes.ok) {
+                    const errorData = await submitRes.json();
+                    throw new Error(errorData.error || 'Failed to save attendance');
+                }
+
+                const result = await submitRes.json();
+
+                console.log('Attendance saved successfully:', result);
+
                 await showCustomModal({ 
-                    title: 'Attendance Saved', 
-                    message: 'Daily attendance records have been successfully saved to the system.',
+                    title: 'Attendance Saved ✅', 
+                    message: `Daily attendance records for ${result.recordsCount} students have been successfully saved to the system.`,
                     type: 'alert', 
                     icon: '💾' 
                 });
+
+                // Reset button
+                saveBtn.disabled = false;
+                saveBtnText.textContent = 'Commit Daily Logs';
+
+                // Redirect after success
+                setTimeout(() => {
+                    window.location.href = 'rt.html';
+                }, 2000);
+
             } catch (error) {
                 console.error('Error saving attendance:', error);
+
+                // Re-enable button
+                const saveBtn = document.getElementById('saveButton');
+                const saveBtnText = document.getElementById('saveButtonText');
+                saveBtn.disabled = false;
+                saveBtnText.textContent = 'Commit Daily Logs';
+
                 await showCustomModal({ 
-                    title: 'Error', 
-                    message: 'Failed to save attendance records.',
+                    title: 'Error ❌', 
+                    message: `Failed to save attendance records: ${error.message}`,
                     type: 'alert', 
                     icon: '❌' 
                 });
