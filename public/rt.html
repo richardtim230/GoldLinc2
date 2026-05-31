@@ -1349,8 +1349,7 @@ async function viewAssignmentSubmissions(assignmentId) {
     }
 }
 
-
-    async function viewAssignment(assignmentId) {
+async function viewAssignment(assignmentId) {
     const assignment = allAssignments.find(
         a => a._id === assignmentId
     );
@@ -1372,20 +1371,20 @@ async function viewAssignmentSubmissions(assignmentId) {
           })
         : 'N/A';
 
-    let content = '';
+    let contentString = '';
 
     if ((assignment.type || 'STANDARD') === 'QUESTION_BANK') {
-        content = `
-            <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+        contentString = `
+            <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm text-left dark:bg-gray-800 dark:border-gray-700">
                 <dl class="grid grid-cols-1 gap-y-3 sm:grid-cols-2 sm:gap-x-4 text-xs">
                     
-                    <!-- Title (Full Width) -->
+                    
                     <div class="sm:col-span-2 border-b border-slate-100 pb-2 dark:border-gray-700">
                         <dt class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-0.5">Title</dt>
                         <dd class="text-sm font-black text-brand-900 dark:text-white">${assignment.title}</dd>
                     </div>
 
-                    <!-- Class -->
+                    
                     <div>
                         <dt class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-0.5">Class</dt>
                         <dd class="font-bold text-slate-700 dark:text-gray-300">
@@ -1395,13 +1394,13 @@ async function viewAssignmentSubmissions(assignmentId) {
                         </dd>
                     </div>
 
-                    <!-- Subject -->
+                    
                     <div>
                         <dt class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-0.5">Subject</dt>
                         <dd class="font-bold text-slate-800 dark:text-gray-200">${assignment.subject?.name || 'Not Assigned'}</dd>
                     </div>
 
-                    <!-- Due Date -->
+                    
                     <div>
                         <dt class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-0.5">Due Date</dt>
                         <dd class="inline-flex items-center font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded text-[11px] dark:bg-amber-900/20 dark:text-amber-400">
@@ -1412,7 +1411,7 @@ async function viewAssignmentSubmissions(assignmentId) {
                         </dd>
                     </div>
 
-                    <!-- Assignment Type -->
+                    
                     <div>
                         <dt class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-0.5">Assignment Type</dt>
                         <dd class="font-bold text-slate-800 dark:text-gray-200 flex items-center">
@@ -1421,7 +1420,7 @@ async function viewAssignmentSubmissions(assignmentId) {
                         </dd>
                     </div>
 
-                    <!-- Questions Allocated (Full Width Footer) -->
+                    
                     <div class="sm:col-span-2 pt-2.5 border-t border-slate-100 mt-1 dark:border-gray-700 flex justify-between items-center">
                         <dt class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Questions Allocated</dt>
                         <dd class="font-mono font-black text-xs text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-lg dark:bg-gray-700 dark:text-white">
@@ -1433,8 +1432,8 @@ async function viewAssignmentSubmissions(assignmentId) {
             </div>
         `;
     } else {
-        content = `
-            <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+        contentString = `
+            <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm text-left dark:bg-gray-800 dark:border-gray-700">
                 <dl class="grid grid-cols-1 gap-y-3 sm:grid-cols-2 sm:gap-x-4 text-xs mb-4">
                     
                     <!-- Title (Full Width) -->
@@ -1453,13 +1452,12 @@ async function viewAssignmentSubmissions(assignmentId) {
                         </dd>
                     </div>
 
-                    <!-- Subject -->
+            
                     <div>
                         <dt class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-0.5">Subject</dt>
                         <dd class="font-bold text-slate-800 dark:text-gray-200">${assignment.subject?.name || 'Not Assigned'}</dd>
                     </div>
 
-                    <!-- Due Date (Full Width Layout) -->
                     <div class="sm:col-span-2 pt-1">
                         <dt class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-0.5">Due Date</dt>
                         <dd class="inline-flex items-center font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-md text-[11px] dark:bg-amber-900/20 dark:text-amber-400">
@@ -1470,8 +1468,6 @@ async function viewAssignmentSubmissions(assignmentId) {
                         </dd>
                     </div>
                 </dl>
-
-                <!-- Instructions Section Block -->
                 <div class="pt-4 border-t border-slate-100 dark:border-gray-700">
                     <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">
                         Instructions
@@ -1488,9 +1484,15 @@ async function viewAssignmentSubmissions(assignmentId) {
         `;
     }
 
+    // Fix: Convert the HTML string into a true browser-ready DOM Element node
+    // This forces your custom modal engine to append it cleanly instead of rendering text tags.
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(contentString, 'text/html');
+    const parsedHtmlNode = doc.body.firstElementChild;
+
     showCustomModal({
         title: 'Assignment Details',
-        message: content,
+        message: parsedHtmlNode, // Sent as object element
         type: 'alert',
         icon: '📚'
     });
