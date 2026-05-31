@@ -896,8 +896,8 @@
                     : '';
 
                 const actionButtonHtml = isThisActive 
-                    ? `<button onclick="toggleCollectionFocus(null)" class="bg-slate-700 hover:bg-slate-800 text-white font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">Collapse</button>`
-                    : `<button onclick="toggleCollectionFocus('${collection._id}')" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">Expand</button>`;
+    ? `<button onclick="toggleCollectionFocus(null)" class="bg-slate-700 hover:bg-slate-800 text-white font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">Collapse</button>`
+    : `<button onclick="toggleCollectionFocus('${collection._id}')" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">Expand</button>`;
 
                 container.innerHTML += `
                     <div class="p-5 border border-slate-200 rounded-2xl bg-slate-50/60 space-y-4 shadow-sm relative">
@@ -911,19 +911,48 @@
                                 <p class="text-[11px] text-slate-500 mt-0.5 font-semibold">${questionCount} Question${questionCount !== 1 ? 's' : ''}</p>
                             </div>
                             <div class="flex items-center space-x-1.5 self-end sm:self-auto">
-                                ${isThisActive && collection.source !== 'CBT' ? `
-                                <button onclick="openCreateQuestionModal('${collection._id}')" class="bg-brand-50 border border-brand-200 hover:bg-brand-100 text-brand-900 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase">
-                                    + Insert Question
-                                </button>` : ''}
-                                ${actionButtonHtml}
-                                ${collection.source !== 'CBT' ? `<button onclick="deleteCollection('${collection._id}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase">Delete</button>` : ''}
-                            </div>
+    ${isThisActive && collection.source !== 'CBT' ? `
+    <button onclick="openCreateQuestionModal('${collection._id}')" class="bg-brand-50 border border-brand-200 hover:bg-brand-100 text-brand-900 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase">
+        + Insert Question
+    </button>` : ''}
+    ${actionButtonHtml}
+    ${collection.source === 'Collection' ? `
+    <button onclick="pushCollectionToCBT('${collection._id}')" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase">📤 Push</button>
+    ` : ''}
+    ${collection.source !== 'CBT' ? `<button onclick="deleteCollection('${collection._id}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase">Delete</button>` : ''}
+</div>
                         </div>
                         ${isThisActive ? `<div class="space-y-3 pt-2 animate-[fadeIn_0.25s_ease-out]">${questionsHtml}</div>` : ''}
                     </div>`;
             });
         }
 
+        // Add this function in the JavaScript section
+async function pushCollectionToCBT(collectionId) {
+    if (confirm('Push this collection to CBT Exam model? This will create a new CBT document.')) {
+        try {
+            const res = await fetch(
+                `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}/push`,
+                {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({})
+                }
+            );
+
+            if (!res.ok) throw new Error('Failed to push collection');
+            const data = await res.json();
+            
+            alert(`✅ ${data.message}`);
+            
+            // Refresh the question bank
+            assessmentDatabase = await fetchUnifiedQuestionBank();
+            renderCollections();
+        } catch (err) {
+            alert('Error pushing collection: ' + err.message);
+        }
+    }
+}
         function renderAssignments() {
             const container = document.getElementById('assignmentsContainer');
             container.innerHTML = '';
