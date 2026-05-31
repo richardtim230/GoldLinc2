@@ -423,63 +423,169 @@
         </div>
     </div>
 
-    <div id="assignmentModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl border border-slate-200 w-full max-w-3xl shadow-2xl flex flex-col overflow-hidden max-h-[92vh]">
-            <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-                <div>
-                    <h3 class="text-xs font-extrabold text-brand-900 uppercase tracking-wider">Deploy New Assignment Portfolio</h3>
-                    <p class="text-[11px] text-slate-500">Configure parameters, distribute tasks, or select MCQ rows from core categories.</p>
-                </div>
-                <button onclick="closeAssignmentModal()" class="text-slate-400 hover:text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md font-bold text-lg">&times;</button>
+<div id="assignmentModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 w-full max-w-4xl shadow-2xl flex flex-col overflow-hidden max-h-[92vh]">
+
+        <!-- Header -->
+        <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+            <div>
+                <h3 class="text-xs font-extrabold text-brand-900 uppercase tracking-wider">
+                    Deploy New Assignment Portfolio
+                </h3>
+                <p class="text-[11px] text-slate-500">
+                    Configure parameters, distribute tasks, or select MCQ rows from core categories.
+                </p>
             </div>
-            <div class="p-5 space-y-4 overflow-y-auto text-xs">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block font-bold text-slate-400 mb-1">Assignment Title</label>
-                        <input type="text" id="asmModalTitle" placeholder="e.g., Photosynthesis Pathways" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-400 mb-1">Target Class Cohort</label>
-                        <select id="asmModalClass" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-400 mb-1">Submission Deadline</label>
-                        <input type="date" id="asmModalDue" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                    </div>
-                </div>
+
+            <button
+                onclick="closeAssignmentModal()"
+                class="text-slate-400 hover:text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md font-bold text-lg">
+                &times;
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-5 space-y-4 overflow-y-auto text-xs">
+
+            <!-- Main Details -->
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+
+                <!-- Assignment Title -->
                 <div>
-                    <label class="block font-bold text-slate-400 mb-1">Task Deployment Routing Type</label>
-                    <select id="asmModalType" onchange="toggleAssignmentTypeSection()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                        <option value="STANDARD">Standard Task Portfolio (Rich Text & Instructions)</option>
-                        <option value="QUESTION_BANK">Question Bank Evaluation (Allocate Dynamic MCQs)</option>
+                    <label class="block font-bold text-slate-400 mb-1">
+                        Assignment Title
+                    </label>
+                    <input
+                        type="text"
+                        id="asmModalTitle"
+                        placeholder="e.g., Photosynthesis Pathways"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                </div>
+
+                <!-- Class -->
+                <div>
+                    <label class="block font-bold text-slate-400 mb-1">
+                        Target Class Cohort
+                    </label>
+                    <select
+                        id="asmModalClass"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
                     </select>
                 </div>
-                <div id="asmTypeStandardWrapper" class="space-y-1.5">
-                    <label class="block font-extrabold text-slate-400 uppercase tracking-wider">Task Guidelines & Instructions (Rich Text)</label>
-                    <div class="assignment-editor-container">
-                        <div id="quillAssignmentBody" class="bg-white rounded-xl"></div>
-                    </div>
+
+                <!-- Subject -->
+                <div>
+                    <label class="block font-bold text-slate-400 mb-1">
+                        Subject
+                    </label>
+                    <select
+                        id="asmModalSubject"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                        <option value="">Select Subject</option>
+                    </select>
                 </div>
-                <div id="asmTypeQuestionBankWrapper" class="space-y-3 hidden p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-200 pb-2">
-                        <div>
-                            <h4 class="font-extrabold text-brand-900 text-xs uppercase tracking-wide">Question Bank Matrix Mapper</h4>
-                            <p class="text-[11px] text-slate-500">Select which objective questions to link with this task assignment.</p>
-                        </div>
-                        <select id="asmBankCategorySelector" onchange="loadQuestionsForAllocation()" class="bg-white border border-slate-200 rounded-xl text-[11px] font-bold text-slate-700 p-1.5 outline-none focus:ring-1 focus:ring-brand-500">
-                        </select>
-                    </div>
-                    <div id="asmAllocationQuestionsContainer" class="space-y-3 max-h-60 overflow-y-auto pt-1">
-                    </div>
+
+                <!-- Due Date -->
+                <div>
+                    <label class="block font-bold text-slate-400 mb-1">
+                        Submission Deadline
+                    </label>
+                    <input
+                        type="date"
+                        id="asmModalDue"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
                 </div>
+
             </div>
-            <div class="p-3.5 border-t border-slate-100 bg-slate-50 flex justify-end space-x-2">
-                <button onclick="closeAssignmentModal()" class="bg-white border border-slate-200 text-slate-600 font-bold px-4 py-1.5 rounded-xl text-[11px] uppercase">Cancel</button>
-                <button onclick="commitAssignmentDeployment()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold px-5 py-1.5 rounded-xl text-[11px] uppercase tracking-wider transition">Deploy</button>
+
+            <!-- Assignment Type -->
+            <div>
+                <label class="block font-bold text-slate-400 mb-1">
+                    Task Deployment Routing Type
+                </label>
+
+                <select
+                    id="asmModalType"
+                    onchange="toggleAssignmentTypeSection()"
+                    class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+
+                    <option value="STANDARD">
+                        Standard Task Portfolio (Rich Text & Instructions)
+                    </option>
+
+                    <option value="QUESTION_BANK">
+                        Question Bank Evaluation (Allocate Dynamic MCQs)
+                    </option>
+
+                </select>
             </div>
+
+            <!-- Standard Assignment -->
+            <div id="asmTypeStandardWrapper" class="space-y-1.5">
+
+                <label class="block font-extrabold text-slate-400 uppercase tracking-wider">
+                    Task Guidelines & Instructions (Rich Text)
+                </label>
+
+                <div class="assignment-editor-container">
+                    <div id="quillAssignmentBody" class="bg-white rounded-xl"></div>
+                </div>
+
+            </div>
+
+            <!-- Question Bank Assignment -->
+            <div
+                id="asmTypeQuestionBankWrapper"
+                class="space-y-3 hidden p-4 bg-slate-50 border border-slate-200 rounded-xl">
+
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-200 pb-2">
+
+                    <div>
+                        <h4 class="font-extrabold text-brand-900 text-xs uppercase tracking-wide">
+                            Question Bank Matrix Mapper
+                        </h4>
+
+                        <p class="text-[11px] text-slate-500">
+                            Select which objective questions to link with this task assignment.
+                        </p>
+                    </div>
+
+                    <select
+                        id="asmBankCategorySelector"
+                        onchange="loadQuestionsForAllocation()"
+                        class="bg-white border border-slate-200 rounded-xl text-[11px] font-bold text-slate-700 p-1.5 outline-none focus:ring-1 focus:ring-brand-500">
+                    </select>
+
+                </div>
+
+                <div
+                    id="asmAllocationQuestionsContainer"
+                    class="space-y-3 max-h-60 overflow-y-auto pt-1">
+                </div>
+
+            </div>
+
         </div>
+
+        <!-- Footer -->
+        <div class="p-3.5 border-t border-slate-100 bg-slate-50 flex justify-end space-x-2">
+
+            <button
+                onclick="closeAssignmentModal()"
+                class="bg-white border border-slate-200 text-slate-600 font-bold px-4 py-1.5 rounded-xl text-[11px] uppercase">
+                Cancel
+            </button>
+
+            <button
+                onclick="commitAssignmentDeployment()"
+                class="bg-brand-900 hover:bg-brand-800 text-white font-bold px-5 py-1.5 rounded-xl text-[11px] uppercase tracking-wider transition">
+                Deploy
+            </button>
+
+        </div>
+
     </div>
+</div>
 
 
 <script>
@@ -1592,27 +1698,84 @@
 
     // ============ ASSIGNMENT MODAL ============
     function openAssignmentModal() {
-        if (!assignmentQuillInstance) {
-            assignmentQuillInstance = new Quill('#quillAssignmentBody', {
+
+    if (!assignmentQuillInstance) {
+
+        assignmentQuillInstance = new Quill(
+            '#quillAssignmentBody',
+            {
                 theme: 'snow',
                 placeholder: 'Enter assignment instructions...',
                 modules: {
-                    toolbar: [['bold', 'italic', 'underline', 'code'], ['image']]
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'code'],
+                        ['image']
+                    ]
                 }
-            });
-        }
-        assignmentQuillInstance.setContents({ ops: [{ insert: '' }] });
-        document.getElementById('asmModalTitle').value = '';
-        document.getElementById('asmModalClass').value = '';
-        document.getElementById('asmModalDue').value = '';
-        document.getElementById('asmModalType').value = 'STANDARD';
-        toggleAssignmentTypeSection();
-        document.getElementById('assignmentModal').classList.remove('hidden');
+            }
+        );
     }
 
-    function closeAssignmentModal() {
-        document.getElementById('assignmentModal').classList.add('hidden');
+    // Reset editor
+    assignmentQuillInstance.setContents([
+        { insert: '\n' }
+    ]);
+
+    // Reset form fields
+    document.getElementById('asmModalTitle').value = '';
+
+    document.getElementById('asmModalClass').value = '';
+
+    document.getElementById('asmModalSubject').innerHTML =
+        '<option value="">Select Subject</option>';
+
+    document.getElementById('asmModalSubject').value = '';
+
+    document.getElementById('asmModalDue').value = '';
+
+    document.getElementById('asmModalType').value =
+        'STANDARD';
+
+    // Reset question bank selections
+    const questionContainer =
+        document.getElementById(
+            'asmAllocationQuestionsContainer'
+        );
+
+    if (questionContainer) {
+        questionContainer.innerHTML = '';
     }
+
+    const bankSelector =
+        document.getElementById(
+            'asmBankCategorySelector'
+        );
+
+    if (bankSelector) {
+        bankSelector.selectedIndex = 0;
+    }
+
+    // Show correct section
+    toggleAssignmentTypeSection();
+
+    // Open modal
+    document
+        .getElementById('assignmentModal')
+        .classList.remove('hidden');
+
+    document
+        .getElementById('assignmentModal')
+        .classList.add('flex');
+}
+
+    function closeAssignmentModal() {
+
+    const modal =
+        document.getElementById('assignmentModal');
+
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
 
     function toggleAssignmentTypeSection() {
         const type = document.getElementById('asmModalType').value;
@@ -1652,59 +1815,155 @@
     }
 
     async function commitAssignmentDeployment(event) {
-        if (event) event.preventDefault();
-        const button = event ? event.target : document.querySelector('#assignmentModal button[onclick*="commitAssignmentDeployment"]');
+    if (event) event.preventDefault();
 
-        await executeWithLoading(button, async () => {
-            const title = document.getElementById('asmModalTitle').value.trim();
-            const classId = document.getElementById('asmModalClass').value;
-            const dueDate = document.getElementById('asmModalDue').value;
-            const type = document.getElementById('asmModalType').value;
+    const button = event
+        ? event.target
+        : document.querySelector(
+            '#assignmentModal button[onclick*="commitAssignmentDeployment"]'
+        );
 
-            if (!title || !classId || !dueDate) {
-                throw new Error('Please fill in all required fields');
+    await executeWithLoading(button, async () => {
+
+        const title = document.getElementById('asmModalTitle').value.trim();
+        const classId = document.getElementById('asmModalClass').value;
+        const subjectId = document.getElementById('asmModalSubject').value;
+        const dueDate = document.getElementById('asmModalDue').value;
+        const type = document.getElementById('asmModalType').value;
+
+        // Validation
+        if (
+            !title ||
+            !classId ||
+            !subjectId ||
+            !dueDate
+        ) {
+            throw new Error(
+                'Please fill in all required fields'
+            );
+        }
+
+        let assignmentBody = "";
+        let allocatedQuestions = [];
+
+        if (type === 'STANDARD') {
+
+            assignmentBody =
+                assignmentQuillInstance.root.innerHTML;
+
+            if (
+                !assignmentBody.trim() ||
+                assignmentBody === '<p><br></p>'
+            ) {
+                throw new Error(
+                    'Please enter assignment instructions'
+                );
             }
 
-            let assignmentBody = {};
-            if (type === 'STANDARD') {
-                assignmentBody = assignmentQuillInstance.root.innerHTML;
-                if (!assignmentBody.trim() || assignmentBody === '<p><br></p>') {
-                    throw new Error('Please enter assignment instructions');
-                }
-            } else {
-                // Question bank type
-                const selected = document.querySelectorAll('#asmAllocationQuestionsContainer input[type="checkbox"]:checked');
-                if (selected.length === 0) {
-                    throw new Error('Please select at least one question');
-                }
-                assignmentBody = Array.from(selected).map(cb => cb.value);
+        } else if (type === 'QUESTION_BANK') {
+
+            const selected =
+                document.querySelectorAll(
+                    '#asmAllocationQuestionsContainer input[type="checkbox"]:checked'
+                );
+
+            if (selected.length === 0) {
+                throw new Error(
+                    'Please select at least one question'
+                );
             }
+
+            allocatedQuestions =
+                Array.from(selected).map(cb => cb.value);
+
+            // Must remain a string because schema expects String
+            assignmentBody =
+                `Question Bank Assignment (${allocatedQuestions.length} Questions)`;
+        }
+
+        const res = await fetch(
+            `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/assignments`,
+            {
+                method: 'POST',
+                headers: authHeaders(),
+
+                body: JSON.stringify({
+                    class: classId,
+                    subject: subjectId,
+                    title: title,
+                    description: assignmentBody,
+                    dueDate: dueDate,
+                    type: type,
+                    questionsAllocated: allocatedQuestions
+                })
+            }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(
+                data.error ||
+                'Failed to create assignment'
+            );
+        }
+
+        allAssignments =
+            await fetchTeacherAssignments();
+
+        renderAssignments();
+
+        closeAssignmentModal();
+
+        await showCustomModal({
+            title: 'Success',
+            message: 'Assignment deployed successfully',
+            type: 'alert',
+            icon: '✅'
+        });
+    });
+}
+    document
+    .getElementById('asmModalClass')
+    .addEventListener('change', async function () {
+
+        const classId = this.value;
+
+        const subjectSelect =
+            document.getElementById('asmModalSubject');
+
+        subjectSelect.innerHTML =
+            '<option value="">Loading...</option>';
+
+        try {
 
             const res = await fetch(
-                `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/assignments`,
+                `${API_BASE_URL}/api/teachers/subjects?classId=${classId}`,
                 {
-                    method: 'POST',
-                    headers: authHeaders(),
-                    body: JSON.stringify({
-                        class: classId,
-                        title: title,
-                        description: assignmentBody,
-                        dueDate: dueDate,
-                        type: type,
-                        questionsAllocated: type === 'QUESTION_BANK' ? assignmentBody : []
-                    })
+                    headers: authHeaders()
                 }
             );
 
-            if (!res.ok) throw new Error('Failed to create assignment');
+            const subjects = await res.json();
 
-            allAssignments = await fetchTeacherAssignments();
-            renderAssignments();
-            closeAssignmentModal();
-            await showCustomModal({ title: 'Success', message: 'Assignment deployed successfully', type: 'alert', icon: '✅' });
-        });
-    }
+            subjectSelect.innerHTML =
+                '<option value="">Select Subject</option>';
 
+            subjects.forEach(subject => {
+
+                subjectSelect.innerHTML += `
+                    <option value="${subject.id}">
+                        ${subject.name}
+                    </option>
+                `;
+            });
+
+        } catch (err) {
+
+            subjectSelect.innerHTML =
+                '<option value="">Failed to load subjects</option>';
+        }
+    });
     function editAssignment(assignmentId) {
         showCustomModal({ title: 'Info', message: 'Edit functionality coming soon', type: 'alert', icon: 'ℹ️' });
     }
