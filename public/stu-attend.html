@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gold & Linc | Student Attendance Terminal</title>
+    <title>Gold & Linc | Faculty Attendance Terminal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,391 +34,425 @@
     </script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        /* Custom scrollbar adjustments for desktop ledger cleanliness */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
-<body class="antialiased min-h-screen text-slate-800">
+<body class="antialiased min-h-screen text-slate-800 flex flex-col">
 
-    <!-- Top Navigation Bar Header -->
-    <header class="bg-brand-900 text-white shadow-md border-b border-brand-800 sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <header class="bg-brand-900 text-white shadow-sm border-b border-brand-800 sticky top-0 z-40 shrink-0">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
                 <div class="h-9 w-9 bg-white text-brand-900 rounded-xl flex items-center justify-center font-black text-sm tracking-tighter shadow-inner">
                     G&L
                 </div>
                 <div>
                     <h1 class="text-xs font-black tracking-widest uppercase text-brand-200">Faculty Terminal</h1>
-                    <p class="text-xs font-medium opacity-80">Attendance & Profile Registry</p>
+                    <p class="text-xs font-medium opacity-80">Institutional Attendance Management Deck</p>
                 </div>
             </div>
-            <div class="flex items-center space-x-4">
-                <div class="text-right hidden sm:block">
+            <div class="flex items-center space-x-6">
+                <div class="text-right hidden md:block border-r border-brand-800 pr-6">
                     <p class="text-xs font-bold text-white">Dr. Sarah Jenkins</p>
                     <p class="text-[10px] font-mono text-brand-200">Dept. of Biological Sciences</p>
                 </div>
-                <div class="h-8 w-8 rounded-full bg-brand-500 flex items-center justify-center font-bold text-xs text-white border-2 border-brand-200 shadow-sm">
-                    SJ
+                <div class="flex items-center space-x-2">
+                    <div class="h-8 w-8 rounded-full bg-brand-500 flex items-center justify-center font-bold text-xs text-white border border-brand-200">
+                        SJ
+                    </div>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Main Workspace Container -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="space-y-6">
-            
-            <!-- Breadcrumb Navigation & Date Ribbon Bar -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-                <div class="flex items-center space-x-4">
-                    <button onclick="triggerAlertNotification('Navigation Mock', 'Returning to the teacher dashboard home sequence.', 'ℹ️')" type="button" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-2 rounded-xl text-xs flex items-center transition">
-                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                        </svg>
-                        Return to Hub
-                    </button>
-                    <div>
-                        <h2 class="text-base font-black text-brand-900 uppercase tracking-wide">Daily Roll Call Registry</h2>
-                        <div class="flex flex-wrap items-center gap-2 mt-1 text-[11px] font-bold text-slate-500">
-                            <span class="bg-brand-50 text-brand-800 px-2 py-0.5 rounded">SS2 Science A</span>
-                            <span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded">Biology Core</span>
-                            <span class="text-slate-400">&bull;</span>
-                            <span class="flex items-center text-brand-600 font-extrabold">
-                                <svg class="w-3.5 h-3.5 mr-1 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                Session Date: <span id="currentDateBadge" class="ml-1">Sunday, May 31, 2026</span>
-                            </span>
-                        </div>
-                    </div>
-                </div>
+    <main class="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 flex flex-col space-y-6 overflow-hidden">
+        
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm shrink-0">
+            <div class="flex items-center space-x-4">
+                <button onclick="triggerAlertNotification('Navigation Link', 'Routing request back to Main Terminal Hub...', 'ℹ️')" type="button" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3.5 py-2 rounded-xl text-xs flex items-center transition shrink-0">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Return to Hub
+                </button>
                 <div>
-                    <button onclick="saveTodayAttendanceData()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl uppercase tracking-wider transition shadow-sm flex items-center justify-center">
-                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" stroke-linecaps="round" d="M5 13l4 4L19 7"/></svg>
-                        Commit Daily Logs
-                    </button>
+                    <h2 class="text-base font-black text-brand-900 uppercase tracking-wide">Daily Roll Call Registry</h2>
+                    <div class="flex flex-wrap items-center gap-2 mt-0.5 text-[11px] font-bold text-slate-500">
+                        <span class="bg-brand-50 text-brand-800 px-2 py-0.5 rounded">SS2 Science A</span>
+                        <span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded">Biology Core</span>
+                        <span class="text-slate-300">|</span>
+                        <span class="flex items-center text-brand-600 font-extrabold">
+                            <svg class="w-3.5 h-3.5 mr-1 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            Today: <span id="currentDateLabel" class="ml-1 text-slate-900">Friday, May 29, 2026</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <button onclick="saveTodayAttendanceData()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-6 py-2.5 rounded-xl uppercase tracking-wider transition shadow-sm flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                Commit Daily Logs
+            </button>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
+            <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
+                <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Total Cohort Enrolled</p>
+                <p class="text-2xl font-black text-slate-900 mt-0.5" id="metricTotal">0</p>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
+                <p class="text-[10px] font-extrabold text-emerald-600 uppercase tracking-wider">Present Today</p>
+                <p class="text-2xl font-black text-emerald-600 mt-0.5" id="metricPresent">0</p>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
+                <p class="text-[10px] font-extrabold text-rose-600 uppercase tracking-wider">Absent Today</p>
+                <p class="text-2xl font-black text-rose-600 mt-0.5" id="metricAbsent">0</p>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
+                <p class="text-[10px] font-extrabold text-amber-600 uppercase tracking-wider">Excused Leaves</p>
+                <p class="text-2xl font-black text-amber-600 mt-0.5" id="metricExcused">0</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-1 overflow-hidden">
+            
+            <div class="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col max-h-[680px] overflow-hidden">
+                <div class="pb-3 border-b border-slate-100 flex justify-between items-center shrink-0">
+                    <div>
+                        <h3 class="text-xs font-bold text-brand-900 uppercase tracking-wider">Roster Registry Sheets</h3>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Click rows to pull profile calendar structures into desktop sidecar monitor view.</p>
+                    </div>
+                    <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-bold" id="rosterCountBadge">0 Registered</span>
+                </div>
+
+                <div class="overflow-y-auto mt-4 border border-slate-100 rounded-xl flex-1">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100 sticky top-0 z-10">
+                                <th class="p-3 pl-4">Student Identification</th>
+                                <th class="p-3 text-center">Status Action Toggles (Weekdays Only)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rosterTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium">
+                            </tbody>
+                    </table>
                 </div>
             </div>
 
-            <!-- Operational Metrics Deck -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Total Enrolled</p>
-                    <p class="text-2xl font-black text-slate-900 mt-1" id="metricTotal">0</p>
-                </div>
-                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-                    <p class="text-[10px] font-extrabold text-emerald-600 uppercase tracking-wider">Present Today</p>
-                    <p class="text-2xl font-black text-emerald-600 mt-1" id="metricPresent">0</p>
-                </div>
-                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-                    <p class="text-[10px] font-extrabold text-rose-600 uppercase tracking-wider">Absent Today</p>
-                    <p class="text-2xl font-black text-rose-600 mt-1" id="metricAbsent">0</p>
-                </div>
-                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-                    <p class="text-[10px] font-extrabold text-amber-600 uppercase tracking-wider">Excused Absences</p>
-                    <p class="text-2xl font-black text-amber-600 mt-1" id="metricExcused">0</p>
-                </div>
-            </div>
-
-            <!-- Balanced Split Screen Workspace -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col max-h-[680px] overflow-hidden">
                 
-                <!-- Left Column Component: Roster Control & Sheet Input Ledger (7/12 width) -->
-                <div class="lg:col-span-7 space-y-4">
-                    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                <div id="inspectorEmptyState" class="py-24 px-6 text-center text-slate-400 flex flex-col items-center justify-center my-auto">
+                    <div class="text-5xl mb-3">📅</div>
+                    <h4 class="text-xs font-black uppercase tracking-wider text-slate-700">No Target Registry Selected</h4>
+                    <p class="text-[11px] mt-2 text-slate-400 max-w-sm leading-relaxed">Select a student record entry item inside the primary roll call ledger sheet to instantly trace historical term calendars, weekday analysis charts, and personal metadata profiles.</p>
+                </div>
+
+                <div id="inspectorProfileContainer" class="hidden flex flex-col h-full overflow-hidden space-y-4">
+                    
+                    <div class="flex items-start justify-between pb-3 border-b border-slate-100 shrink-0">
+                        <div class="flex items-center space-x-3">
+                            <div id="inspectAvatarInitials" class="h-12 w-12 bg-brand-900 text-white rounded-xl flex items-center justify-center font-black text-sm tracking-wider shadow-sm">
+                                --
+                            </div>
+                            <div>
+                                <h3 id="inspectFullName" class="text-sm font-black text-slate-900 uppercase tracking-tight">Student Name</h3>
+                                <p id="inspectAdmissionCode" class="text-[10px] font-mono text-slate-400 mt-0.5">GL-202X-0000</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span id="inspectTermAverage" class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-extrabold px-2.5 py-1 rounded-lg block">100%</span>
+                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mt-1">Term Ratio</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 bg-slate-50 p-3 rounded-xl border border-slate-100 text-[11px] shrink-0">
                         <div>
-                            <h3 class="text-xs font-bold text-brand-900 uppercase tracking-wider">Roster Sheet Matrix</h3>
-                            <p class="text-[11px] text-slate-500 mt-0.5">Toggle states to set metrics. Click a student row boundary to inspect historical records inside the side panel deck.</p>
+                            <span class="block text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Guardian Contact</span>
+                            <span id="inspectParentContact" class="font-bold text-slate-700 block mt-0.5">--</span>
                         </div>
-
-                        <div class="overflow-x-auto rounded-xl border border-slate-100">
-                            <table class="w-full text-left text-xs border-collapse">
-                                <thead>
-                                    <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
-                                        <th class="p-3 pl-4">Student Details</th>
-                                        <th class="p-3 text-center">Today's Attendance Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="rosterTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium">
-                                    <!-- Populated dynamically by script data -->
-                                </tbody>
-                            </table>
+                        <div>
+                            <span class="block text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Classroom Allocation</span>
+                            <span id="inspectCohort" class="font-bold text-brand-900 block mt-0.5">--</span>
                         </div>
                     </div>
+
+                    <div class="flex flex-col flex-1 overflow-hidden space-y-2">
+                        <div class="flex justify-between items-center shrink-0 pt-2">
+                            <h4 class="text-[10px] font-extrabold text-brand-900 uppercase tracking-wider">Attendance Ledger Matrix Grid (May 2026)</h4>
+                            <span class="text-[9px] font-mono text-rose-600 font-extrabold bg-rose-50 px-2 py-0.5 rounded border border-rose-100">Weekends Excluded 🚫</span>
+                        </div>
+
+                        <div class="grid grid-cols-5 gap-2 text-center text-[9px] font-extrabold text-slate-400 uppercase tracking-wider bg-slate-50/80 py-1.5 rounded-lg border border-slate-100 shrink-0">
+                            <div>Mon</div>
+                            <div>Tue</div>
+                            <div>Wed</div>
+                            <div>Thu</div>
+                            <div>Fri</div>
+                        </div>
+
+                        <div id="calendarGridBlocks" class="grid grid-cols-5 gap-2 flex-1 overflow-y-auto p-1 bg-slate-50/40 border border-slate-100 rounded-xl min-h-[220px]">
+                            </div>
+                    </div>
+
                 </div>
 
-                <!-- Right Column Component: Contextual Target Inspection Frame Profile Panel (5/12 width) -->
-                <div class="lg:col-span-5 space-y-4">
-                    <div id="inspectorEmptyState" class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl p-12 text-center text-slate-400">
-                        <div class="text-4xl mb-2">👤</div>
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700">No Student Profile Selected</h4>
-                        <p class="text-[11px] mt-1 text-slate-400 max-w-xs mx-auto">Select a student name item from the main registry tracker list to fetch comprehensive logs, history logs, and historical tracking summaries.</p>
-                    </div>
-
-                    <div id="inspectorProfileContainer" class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-5 hidden animate-fade-in">
-                        <!-- Profile Header Meta -->
-                        <div class="flex items-start justify-between border-b border-slate-100 pb-4">
-                            <div class="flex items-center space-x-3">
-                                <div class="h-11 w-11 bg-brand-100 text-brand-900 font-black rounded-xl flex items-center justify-center text-sm shadow-sm" id="inspectAvatarInitials">
-                                    --
-                                </div>
-                                <div>
-                                    <h3 class="text-sm font-black text-slate-900" id="inspectFullName">Student Full Name</h3>
-                                    <p class="text-[10px] font-mono text-slate-400 mt-0.5" id="inspectAdmissionCode">GL-202X-0000</p>
-                                </div>
-                            </div>
-                            <span class="bg-brand-50 text-brand-800 font-mono font-bold text-[10px] px-2 py-0.5 rounded" id="inspectCohort">Classroom Group</span>
-                        </div>
-
-                        <!-- Info Grid Details -->
-                        <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100 text-[11px]">
-                            <div>
-                                <span class="block text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Guardian Contact</span>
-                                <span class="font-bold text-slate-700 block mt-0.5" id="inspectParentContact">--</span>
-                            </div>
-                            <div>
-                                <span class="block text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Attendance Rate</span>
-                                <span class="font-extrabold text-emerald-600 block mt-0.5 text-xs" id="inspectTermAverage">0.0%</span>
-                            </div>
-                        </div>
-
-                        <!-- Historical Record Preview Deck -->
-                        <div class="space-y-2.5">
-                            <div class="flex justify-between items-center">
-                                <h4 class="text-[10px] font-bold text-brand-900 uppercase tracking-wider">Historical Preview (Prior Sessions)</h4>
-                                <span class="text-[9px] font-mono font-bold text-slate-400 bg-slate-100 px-1.5 py-0.2 rounded">Calendar View</span>
-                            </div>
-                            
-                            <!-- Day Records Interactive Ledger Logs Grid -->
-                            <div class="space-y-2 max-h-56 overflow-y-auto pr-1" id="historicalLogsWrapper">
-                                <!-- Populated dynamically based on historic log objects -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
             </div>
+
         </div>
     </main>
 
-    <!-- UI MODAL: ALERT & NOTIFICATION SUITE OVERLAY -->
     <div id="customAlertModal" class="fixed inset-0 bg-slate-900/60 items-center justify-center z-50 flex hidden backdrop-blur-sm transition-all duration-300">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center shadow-xl border border-slate-200/80 mx-4 transform transition-all scale-95 opacity-0 duration-300" id="customAlertBox">
-            <div id="modalIcon" class="text-4xl mb-3 animate-bounce">✅</div>
-            <h3 id="modalTitle" class="text-sm font-black uppercase text-slate-900 tracking-wide">System Notification</h3>
-            <p id="modalMessage" class="text-xs text-slate-500 font-medium mt-2 leading-relaxed">Action processed accurately.</p>
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center shadow-xl border border-slate-200 mx-4 transform transition-all scale-95 opacity-0 duration-300" id="customAlertBox">
+            <div id="modalIcon" class="text-4xl mb-3">✅</div>
+            <h3 id="modalTitle" class="text-sm font-black uppercase text-slate-900 tracking-wide">System Feedback</h3>
+            <p id="modalMessage" class="text-xs text-slate-500 font-medium mt-2 leading-relaxed">Action parsed correctly.</p>
             <button onclick="closeAlertNotification()" class="mt-5 w-full bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition uppercase tracking-wider shadow-sm">
-                Acknowledge
+                Acknowledge Parameters
             </button>
         </div>
     </div>
 
-    <!-- DATA MANAGEMENT SYSTEM INTERACTIVE SCRIPT FRAMEWORK -->
     <script>
-        // --- 1. LIVE MOCK STATE REPOSITORY DATABASE ---
-        const studentDatabase = [
-            { id: "stu-01", name: "Chinedu Okafor", code: "GL-2024-0042", parent: "Mr. C. Okafor", cohort: "SS2 Science A" },
-            { id: "stu-02", name: "Amina Yusuf", code: "GL-2024-0119", parent: "Dr. Y. Yusuf", cohort: "SS2 Science A" },
-            { id: "stu-03", name: "Oluwaseun Adebayo", code: "GL-2024-0085", parent: "Mrs. O. Adebayo", cohort: "SS2 Science A" },
-            { id: "stu-04", name: "Efe Montgomery", code: "GL-2023-0941", parent: "Engr. Montgomery", cohort: "SS2 Science A" },
-            { id: "stu-05", name: "Zainab Abubakar", code: "GL-2024-0312", parent: "Alh. Abubakar", cohort: "SS2 Science A" }
+        // --- 1. SEED DATABASE (Excludes Sat/Sun Frameworks completely) ---
+        const localCohortRegistry = [
+            { id: "stu-901", name: "Chinedu Okafor", code: "GL-2024-0042", parent: "Mr. C. Okafor", cohort: "SS2 Science A" },
+            { id: "stu-902", name: "Amina Yusuf", code: "GL-2024-0119", parent: "Dr. Y. Yusuf", cohort: "SS2 Science A" },
+            { id: "stu-903", name: "Oluwaseun Adebayo", code: "GL-2024-0085", parent: "Mrs. O. Adebayo", cohort: "SS2 Science A" },
+            { id: "stu-904", name: "Efe Montgomery", code: "GL-2023-0941", parent: "Engr. Montgomery", cohort: "SS2 Science A" },
+            { id: "stu-905", name: "Zainab Abubakar", code: "GL-2024-0312", parent: "Alh. Abubakar", cohort: "SS2 Science A" }
         ];
 
-        // Today's Live Active Working Session Memory Record Dictionary Map
-        let dailyAttendanceState = {
-            "stu-01": "PRESENT",
-            "stu-02": "PRESENT",
-            "stu-03": "ABSENT",
-            "stu-04": "EXCUSED",
-            "stu-05": "PRESENT"
+        // Today's Date Working Array (Friday, May 29, 2026)
+        let workingSessionAttendanceState = {
+            "stu-901": "PRESENT",
+            "stu-902": "PRESENT",
+            "stu-903": "ABSENT",
+            "stu-904": "EXCUSED",
+            "stu-905": "PRESENT"
         };
 
-        // Static multi-day historical data matrix for student lookup previews
-        const historicalRecordsArchive = {
-            "stu-01": [
-                { date: "Thursday, May 28, 2026", status: "PRESENT" },
-                { date: "Wednesday, May 27, 2026", status: "PRESENT" },
-                { date: "Tuesday, May 26, 2026", status: "PRESENT" },
-                { date: "Monday, May 25, 2026", status: "PRESENT" }
-            ],
-            "stu-02": [
-                { date: "Thursday, May 28, 2026", status: "ABSENT" },
-                { date: "Wednesday, May 27, 2026", status: "PRESENT" },
-                { date: "Tuesday, May 26, 2026", status: "PRESENT" },
-                { date: "Monday, May 25, 2026", status: "PRESENT" }
-            ],
-            "stu-03": [
-                { date: "Thursday, May 28, 2026", status: "ABSENT" },
-                { date: "Wednesday, May 27, 2026", status: "ABSENT" },
-                { date: "Tuesday, May 26, 2026", status: "PRESENT" },
-                { date: "Monday, May 25, 2026", status: "PRESENT" }
-            ],
-            "stu-04": [
-                { date: "Thursday, May 28, 2026", status: "PRESENT" },
-                { date: "Wednesday, May 27, 2026", status: "EXCUSED" },
-                { date: "Tuesday, May 26, 2026", status: "PRESENT" },
-                { date: "Monday, May 25, 2026", status: "PRESENT" }
-            ],
-            "stu-05": [
-                { date: "Thursday, May 28, 2026", status: "PRESENT" },
-                { date: "Wednesday, May 27, 2026", status: "PRESENT" },
-                { date: "Tuesday, May 26, 2026", status: "PRESENT" },
-                { date: "Monday, May 25, 2026", status: "ABSENT" }
-            ]
+        // Complete May 2026 Historical Archive Dictionary (Excludes Weekends)
+        // Mapped exclusively to Weekdays (Mon-Fri) for the month of May 2026
+        const historicalArchiveDatabase = {
+            "stu-901": {
+                4: "PRESENT",  5: "PRESENT",  6: "PRESENT",  7: "PRESENT",  8: "PRESENT",
+                11: "PRESENT", 12: "PRESENT", 13: "ABSENT",  14: "PRESENT", 15: "PRESENT",
+                18: "PRESENT", 19: "PRESENT", 20: "PRESENT", 21: "PRESENT", 22: "PRESENT",
+                25: "PRESENT", 26: "PRESENT", 27: "PRESENT", 28: "PRESENT"
+            },
+            "stu-902": {
+                4: "PRESENT",  5: "ABSENT",   6: "PRESENT",  7: "PRESENT",  8: "PRESENT",
+                11: "PRESENT", 12: "PRESENT", 13: "PRESENT", 14: "PRESENT", 15: "PRESENT",
+                18: "PRESENT", 19: "PRESENT", 20: "PRESENT", 21: "PRESENT", 22: "ABSENT",
+                25: "PRESENT", 26: "PRESENT", 27: "PRESENT", 28: "PRESENT"
+            },
+            "stu-903": {
+                4: "ABSENT",   5: "ABSENT",   6: "PRESENT",  7: "PRESENT",  8: "PRESENT",
+                11: "PRESENT", 12: "PRESENT", 13: "ABSENT",  14: "PRESENT", 15: "PRESENT",
+                18: "PRESENT", 19: "PRESENT", 20: "PRESENT", 21: "PRESENT", 22: "PRESENT",
+                25: "ABSENT",  26: "PRESENT", 27: "PRESENT", 28: "PRESENT"
+            },
+            "stu-904": {
+                4: "PRESENT",  5: "PRESENT",  6: "PRESENT",  7: "EXCUSED",  8: "PRESENT",
+                11: "PRESENT", 12: "PRESENT", 13: "PRESENT", 14: "PRESENT", 15: "PRESENT",
+                18: "EXCUSED", 19: "PRESENT", 20: "PRESENT", 21: "PRESENT", 22: "PRESENT",
+                25: "PRESENT", 26: "PRESENT", 27: "PRESENT", 28: "EXCUSED"
+            },
+            "stu-905": {
+                4: "PRESENT",  5: "PRESENT",  6: "PRESENT",  7: "PRESENT",  8: "PRESENT",
+                11: "PRESENT", 12: "PRESENT", 13: "PRESENT", 14: "PRESENT", 15: "ABSENT",
+                18: "PRESENT", 19: "PRESENT", 20: "PRESENT", 21: "PRESENT", 22: "PRESENT",
+                25: "PRESENT", 26: "PRESENT", 27: "PRESENT", 28: "PRESENT"
+            }
         };
 
-        let currentActiveInspectedStudentId = null;
+        // Ordered Array List mapping Weekdays for May 2026 (Excluding Sat & Sun)
+        // May 1st is a Friday, May 4th is a Monday, etc.
+        const may2026WeekdayListSequence = [
+            { dayNum: 1, label: "May 1 (Fri)" },
+            { dayNum: 4, label: "May 4 (Mon)" }, { dayNum: 5, label: "May 5 (Tue)" }, { dayNum: 6, label: "May 6 (Wed)" }, { dayNum: 7, label: "May 7 (Thu)" }, { dayNum: 8, label: "May 8 (Fri)" },
+            { dayNum: 11, label: "May 11 (Mon)" }, { dayNum: 12, label: "May 12 (Tue)" }, { dayNum: 13, label: "May 13 (Wed)" }, { dayNum: 14, label: "May 14 (Thu)" }, { dayNum: 15, label: "May 15 (Fri)" },
+            { dayNum: 18, label: "May 18 (Mon)" }, { dayNum: 19, label: "May 19 (Tue)" }, { dayNum: 20, label: "May 20 (Wed)" }, { dayNum: 21, label: "May 21 (Thu)" }, { dayNum: 22, label: "May 22 (Fri)" },
+            { dayNum: 25, label: "May 25 (Mon)" }, { dayNum: 26, label: "May 26 (Tue)" }, { dayNum: 27, label: "May 27 (Wed)" }, { dayNum: 28, label: "May 28 (Thu)" },
+            { dayNum: 29, label: "Today (Fri)", isToday: true }
+        ];
 
-        // --- 2. RENDER PIPELINES ---
-        function initializeAttendanceWorkspace() {
-            const tableBody = document.getElementById('rosterTableBody');
-            tableBody.innerHTML = "";
+        let activeSelectedStudentId = null;
 
-            studentDatabase.forEach(student => {
-                const currentStatus = dailyAttendanceState[student.id] || "PRESENT";
+        // --- 2. WORKSPACE CORE RENDERING METHODS ---
+        function populateRosterLedgerView() {
+            document.getElementById('rosterCountBadge').textContent = `${localCohortRegistry.length} Enrolled`;
+            
+            const tbody = document.getElementById('rosterTableBody');
+            tbody.innerHTML = "";
+
+            localCohortRegistry.forEach(student => {
+                const currentStatus = workingSessionAttendanceState[student.id] || "PRESENT";
                 
                 const tr = document.createElement('tr');
-                tr.id = `row-${student.id}`;
-                tr.className = "hover:bg-slate-50 cursor-pointer transition-all border-l-4 border-transparent";
+                tr.id = `student-row-${student.id}`;
+                tr.className = "hover:bg-slate-50/80 transition-all border-l-4 border-transparent cursor-pointer";
                 
-                // Highlight row configuration if current inspected target is loaded
-                if (student.id === currentActiveInspectedStudentId) {
-                    tr.classList.add('bg-brand-50/50', 'border-brand-500');
+                // Active configuration match select highlight toggle style
+                if (student.id === activeSelectedStudentId) {
+                    tr.classList.add('bg-brand-50/60', 'border-brand-500');
                 }
 
-                // Setup row content layout with localized action button groups inside cells
                 tr.innerHTML = `
-                    <td class="p-3 pl-4" onclick="inspectStudentProfile('${student.id}')">
+                    <td class="p-3 pl-4" onclick="inspectStudentCalendar('${student.id}')">
                         <p class="font-bold text-slate-900">${student.name}</p>
-                        <span class="block text-[10px] text-slate-400 font-mono font-normal">${student.code}</span>
+                        <span class="block text-[10px] font-mono text-slate-400 font-normal tracking-tight">${student.code}</span>
                     </td>
                     <td class="p-3">
-                        <div class="flex items-center justify-center space-x-1.5">
-                            <button onclick="updateStudentStatus(event, '${student.id}', 'PRESENT')" 
-                                    class="status-btn-${student.id} font-extrabold text-[10px] px-2.5 py-1.5 rounded-lg uppercase transition-all flex-1 text-center border ${currentStatus === 'PRESENT' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}">
+                        <div class="flex items-center space-x-2 max-w-md mx-auto">
+                            <button onclick="overrideTodayStatus(event, '${student.id}', 'PRESENT')" 
+                                    class="text-[10px] font-extrabold px-3 py-2 rounded-xl uppercase flex-1 border transition-all ${currentStatus === 'PRESENT' ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm' : 'bg-slate-50 text-slate-400 border-slate-200 hover:bg-slate-100'}">
                                 Present
                             </button>
-                            <button onclick="updateStudentStatus(event, '${student.id}', 'ABSENT')" 
-                                    class="status-btn-${student.id} font-extrabold text-[10px] px-2.5 py-1.5 rounded-lg uppercase transition-all flex-1 text-center border ${currentStatus === 'ABSENT' ? 'bg-rose-600 text-white border-rose-600' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}">
+                            <button onclick="overrideTodayStatus(event, '${student.id}', 'ABSENT')" 
+                                    class="text-[10px] font-extrabold px-3 py-2 rounded-xl uppercase flex-1 border transition-all ${currentStatus === 'ABSENT' ? 'bg-rose-600 text-white border-rose-600 shadow-sm' : 'bg-slate-50 text-slate-400 border-slate-200 hover:bg-slate-100'}">
                                 Absent
                             </button>
-                            <button onclick="updateStudentStatus(event, '${student.id}', 'EXCUSED')" 
-                                    class="status-btn-${student.id} font-extrabold text-[10px] px-2.5 py-1.5 rounded-lg uppercase transition-all flex-1 text-center border ${currentStatus === 'EXCUSED' ? 'bg-amber-500 text-white border-amber-500' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}">
+                            <button onclick="overrideTodayStatus(event, '${student.id}', 'EXCUSED')" 
+                                    class="text-[10px] font-extrabold px-3 py-2 rounded-xl uppercase flex-1 border transition-all ${currentStatus === 'EXCUSED' ? 'bg-amber-500 text-white border-amber-500 shadow-sm' : 'bg-slate-50 text-slate-400 border-slate-200 hover:bg-slate-100'}">
                                 Excused
                             </button>
                         </div>
                     </td>
                 `;
-                tableBody.appendChild(tr);
+                tbody.appendChild(tr);
             });
 
-            recomputeStatisticalMetricsDashboard();
+            syncStatisticalSummaryMetrics();
         }
 
-        function recomputeStatisticalMetricsDashboard() {
-            let total = studentDatabase.length;
-            let present = 0;
-            let absent = 0;
-            let excused = 0;
+        function syncStatisticalSummaryMetrics() {
+            let presentCount = 0, absentCount = 0, excusedCount = 0;
 
-            Object.values(dailyAttendanceState).forEach(status => {
-                if (status === "PRESENT") present++;
-                if (status === "ABSENT") absent++;
-                if (status === "EXCUSED") excused++;
+            Object.values(workingSessionAttendanceState).forEach(status => {
+                if (status === "PRESENT") presentCount++;
+                if (status === "ABSENT") absentCount++;
+                if (status === "EXCUSED") excusedCount++;
             });
 
-            document.getElementById('metricTotal').textContent = total;
-            document.getElementById('metricPresent').textContent = present;
-            document.getElementById('metricAbsent').textContent = absent;
-            document.getElementById('metricExcused').textContent = excused;
+            document.getElementById('metricTotal').textContent = localCohortRegistry.length;
+            document.getElementById('metricPresent').textContent = presentCount;
+            document.getElementById('metricAbsent').textContent = absentCount;
+            document.getElementById('metricExcused').textContent = excusedCount;
         }
 
-        // --- 3. PROFILE INSPECTION ENGINE (PREVIEW OTHER DAYS) ---
-        function inspectStudentProfile(studentId) {
-            currentActiveInspectedStudentId = studentId;
-            
-            // Re-render table rows silently to handle highlighted state styles transitions
-            document.querySelectorAll('#rosterTableBody tr').forEach(row => {
-                row.classList.remove('bg-brand-50/50', 'border-brand-500');
-            });
-            document.getElementById(`row-${studentId}`).classList.add('bg-brand-50/50', 'border-brand-500');
+        // --- 3. DYNAMIC CALENDAR GENERATION PORTS ---
+        function inspectStudentCalendar(studentId) {
+            activeSelectedStudentId = studentId;
 
-            const student = studentDatabase.find(s => s.id === studentId);
+            // Shift highlighters lines selection layout focus frames
+            document.querySelectorAll('#rosterTableBody tr').forEach(r => r.classList.remove('bg-brand-50/60', 'border-brand-500'));
+            document.getElementById(`student-row-${studentId}`).classList.add('bg-brand-50/60', 'border-brand-500');
+
+            const student = localCohortRegistry.find(s => s.id === studentId);
             if (!student) return;
 
-            // Compute structural UI configuration initial transformations
+            // Switch profile block panels screens viewport modes elements visibility states
             document.getElementById('inspectorEmptyState').classList.add('hidden');
-            const container = document.getElementById('inspectorProfileContainer');
-            container.classList.remove('hidden');
+            document.getElementById('inspectorProfileContainer').classList.remove('hidden');
 
-            // Set Meta fields
+            // Populate text parameters metrics values inside head blocks cards panels
             document.getElementById('inspectFullName').textContent = student.name;
             document.getElementById('inspectAdmissionCode').textContent = student.code;
             document.getElementById('inspectCohort').textContent = student.cohort;
             document.getElementById('inspectParentContact').textContent = student.parent;
 
-            // Generate structural avatar shorthand initials loop
-            const names = student.name.split(" ");
-            document.getElementById('inspectAvatarInitials').textContent = names.length > 1 ? `${names[0][0]}${names[1][0]}` : `${names[0][0]}`;
+            // Parse Shorthand dynamic avatar profile icon initials letters
+            const splitNames = student.name.split(" ");
+            document.getElementById('inspectAvatarInitials').textContent = splitNames.length > 1 ? `${splitNames[0][0]}${splitNames[1][0]}` : `${splitNames[0][0]}`;
 
-            // Sync, loop, and pull historical records log tracking
-            const logsWrapper = document.getElementById('historicalLogsWrapper');
-            logsWrapper.innerHTML = "";
+            // Build structural calendar blocks matrix elements cells
+            const gridContainer = document.getElementById('calendarGridBlocks');
+            gridContainer.innerHTML = "";
 
-            // Gather all entries including today's live toggled state session
-            const currentTodayStatus = dailyAttendanceState[studentId] || "PRESENT";
-            const structuralTodayLogNode = { date: "Today (Sunday, May 31, 2026)", status: currentTodayStatus, isCurrent: true };
+            const personalHistoryDictionary = historicalArchiveDatabase[studentId] || {};
             
-            const historyList = historicalRecordsArchive[studentId] || [];
-            const completeCombinedTimelineList = [structuralTodayLogNode, ...historyList];
+            // May 1st 2026 lands on a Friday. To shift the grid alignment so that May 1st aligns 
+            // under the "Fri" column header properly, insert 4 blank placeholder blocks corresponding to Mon, Tue, Wed, Thu.
+            for (let b = 0; b < 4; b++) {
+                const blankBlock = document.createElement('div');
+                blankBlock.className = "bg-slate-100/40 rounded-lg border border-dashed border-slate-200/50 hidden sm:block opacity-40";
+                gridContainer.appendChild(blankBlock);
+            }
 
-            // Math aggregate calculations to get current structural percentage value tracking ratios
-            let standardPresentScoresTotalCount = 0;
-            completeCombinedTimelineList.forEach(log => { if (log.status === "PRESENT" || log.status === "EXCUSED") standardPresentScoresTotalCount++; });
-            const aggregateRatioPercentage = ((standardPresentScoresTotalCount / completeCombinedTimelineList.length) * 100).toFixed(1);
-            document.getElementById('inspectTermAverage').textContent = `${aggregateRatioPercentage}%`;
+            let validPresentSummations = 0;
 
-            // Loop populate nodes items elements inside visual stack view list container items
-            completeCombinedTimelineList.forEach(item => {
-                let statusBadgeStyle = "";
-                if (item.status === "PRESENT") statusBadgeStyle = "bg-emerald-50 text-emerald-700 border-emerald-200";
-                if (item.status === "ABSENT") statusBadgeStyle = "bg-rose-50 text-rose-700 border-rose-200";
-                if (item.status === "EXCUSED") statusBadgeStyle = "bg-amber-50 text-amber-700 border-amber-200";
+            // Generate contextual weekday grid day cards items matrices layouts 
+            may2026WeekdayListSequence.forEach(daySpec => {
+                let statusValue = "PRESENT";
+                
+                if (daySpec.isToday) {
+                    statusValue = workingSessionAttendanceState[studentId] || "PRESENT";
+                } else {
+                    statusValue = personalHistoryDictionary[daySpec.dayNum] || "PRESENT";
+                }
 
-                const logRow = document.createElement('div');
-                logRow.className = `flex justify-between items-center p-2.5 rounded-xl border text-[11px] ${item.isCurrent ? 'bg-brand-50/40 border-brand-200 font-bold' : 'bg-slate-50/60 border-slate-100'}`;
-                logRow.innerHTML = `
-                    <div class="flex items-center space-x-2">
-                        ${item.isCurrent ? '<span class="h-2 w-2 bg-brand-500 rounded-full animate-ping"></span>' : ''}
-                        <span class="text-slate-600">${item.date}</span>
+                if (statusValue === "PRESENT" || statusValue === "EXCUSED") {
+                    validPresentSummations++;
+                }
+
+                let colorStylesClass = "";
+                let indicatorCircle = "";
+
+                if (statusValue === "PRESENT") {
+                    colorStylesClass = "bg-emerald-50/80 border-emerald-200 text-emerald-900";
+                    indicatorCircle = "bg-emerald-500";
+                } else if (statusValue === "ABSENT") {
+                    colorStylesClass = "bg-rose-50/80 border-rose-200 text-rose-900";
+                    indicatorCircle = "bg-rose-500";
+                } else if (statusValue === "EXCUSED") {
+                    colorStylesClass = "bg-amber-50/80 border-amber-200 text-amber-900";
+                    indicatorCircle = "bg-amber-500";
+                }
+
+                const dayCard = document.createElement('div');
+                dayCard.className = `border rounded-xl p-2 flex flex-col justify-between transition-all min-h-[54px] shadow-2xs ${colorStylesClass} ${daySpec.isToday ? 'ring-2 ring-brand-500 ring-offset-1 font-bold' : ''}`;
+                
+                dayCard.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <span class="text-[10px] font-mono font-bold">${daySpec.dayNum}</span>
+                        <span class="h-1.5 w-1.5 rounded-full ${indicatorCircle}"></span>
                     </div>
-                    <span class="px-2 py-0.5 border text-[10px] font-bold rounded-md uppercase ${statusBadgeStyle}">${item.status}</span>
+                    <div class="text-[8px] font-extrabold uppercase tracking-wide opacity-80 mt-1 truncate">
+                        ${daySpec.isToday ? 'TODAY' : statusValue}
+                    </div>
                 `;
-                logsWrapper.appendChild(logRow);
+                gridContainer.appendChild(dayCard);
             });
+
+            // Compute dynamic attendance metrics profile summary percentage value 
+            const ratioPercentage = ((validPresentSummations / may2026WeekdayListSequence.length) * 100).toFixed(1);
+            document.getElementById('inspectTermAverage').textContent = `${ratioPercentage}%`;
         }
 
-        // --- 4. ACTION INTERACTORS ---
-        function updateStudentStatus(event, studentId, newStatus) {
-            event.stopPropagation(); // Avoid triggering parent row row profile selection sequence context frame
+        // --- 4. ACTION CONTROLLER PIPELINE TRIGGERS ---
+        function overrideTodayStatus(event, studentId, newStatus) {
+            event.stopPropagation(); // Block parent matrix bubble row click events triggers 
             
-            dailyAttendanceState[studentId] = newStatus;
-            
-            // Refresh main visualizations components
-            initializeAttendanceWorkspace();
-            
-            // If the modified student profile is actively open on inspector frame workspace deck, hot reload update it dynamically
-            if (currentActiveInspectedStudentId === studentId) {
-                inspectStudentProfile(studentId);
+            workingSessionAttendanceState[studentId] = newStatus;
+            populateRosterLedgerView();
+
+            // Hot reload active inspector window view states seamlessly on data changes
+            if (activeSelectedStudentId === studentId) {
+                inspectStudentCalendar(studentId);
             }
         }
 
         function saveTodayAttendanceData() {
-            // Processing load state sequence mock simulation wrapper context
             triggerAlertNotification(
-                "Logs Uploaded Successfully", 
-                "Daily attendance data matrices for May 31, 2026, have been committed to cloud storage nodes. Student continuous ledger parameters have synchronized correctly.", 
+                "Logs Synchronized",
+                "Daily attendance registry sheet profiles for Friday, May 29, 2026, have been signed, verified, and safely written to institution data arrays.",
                 "💾"
             );
         }
 
-        // --- 5. SYSTEM ALERT SUITE NOTIFICATION FRAMEWORK ENGINE ---
+        // --- 5. SYSTEM CUSTOM MODAL NOTIFICATION CHANNELS ---
         function triggerAlertNotification(title, message, icon) {
             document.getElementById('modalTitle').textContent = title;
             document.getElementById('modalMessage').textContent = message;
@@ -443,9 +477,9 @@
             setTimeout(() => overlay.classList.add('hidden'), 200);
         }
 
-        // Boot system startup execution frame binding logic hook handlers
+        // Boot system startup entry points configurations bindings 
         document.addEventListener("DOMContentLoaded", () => {
-            initializeAttendanceWorkspace();
+            populateRosterLedgerView();
         });
     </script>
 </body>
