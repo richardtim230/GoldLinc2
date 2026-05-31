@@ -521,6 +521,7 @@ router.patch('/:id/cbt/:cbtId', teacherAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 // POST /api/teachers/:id/cbt/push
 router.post('/:id/cbt/push', teacherAuth, async (req, res) => {
   try {
@@ -546,6 +547,52 @@ router.post('/:id/cbt/push', teacherAuth, async (req, res) => {
       pushed.push(exam._id);
     }
     res.json({ success: true, pushed });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ✅ NEW: POST /api/teachers/:id/collections/:collectionId/convert-to-cbt
+// Convert collection to CBT format and return the CBT ID
+router.post('/:id/collections/:collectionId/convert-to-cbt', teacherAuth, async (req, res) => {
+  try {
+    if (String(req.params.id) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    // Find the collection
+    const collection = await Collection.findById(req.params.collectionId);
+    if (!collection) return res.status(404).json({ error: "Collection not found" });
+    if (String(collection.teacher) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    // Transform collection questions to CBT format
+    const transformedQuestions = (collection.questions || []).map(q => ({
+      text: q.text,
+      options: q.options.map(opt => opt.text), // Extract just the text for CBT format
+      answer: q.options.findIndex(opt => opt.isCorrect), // Find the index of correct answer
+      imageUrl: q.imageUrl || null,
+      explanation: q.explanation || null
+    }));
+
+    // Create new CBT document from collection
+    const cbt = new CBT({
+      teacher: req.staff._id,
+      title: collection.name,
+      class: collection.class,
+      subject: collection.subject,
+      duration: 60, // Default duration
+      questions: transformedQuestions,
+      description: collection.description || ''
+    });
+
+    await cbt.save();
+    
+    res.json({ 
+      success: true, 
+      cbtId: cbt._id
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
