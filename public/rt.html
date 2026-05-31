@@ -333,16 +333,10 @@
                 <div class="overflow-x-auto rounded-xl border border-slate-100">
                     <table class="w-full text-left text-xs border-collapse">
                         <thead>
-                            <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
-                                <th class="p-3 pl-4">Admission Code</th>
-                                <th class="p-3">Student Name</th>
-                                <th class="p-3 text-center w-20">CA1 (20)</th>
-                                <th class="p-3 text-center w-20">CA2 (20)</th>
-                                <th class="p-3 text-center w-20">Exam (60)</th>
-                                <th class="p-3 text-center w-24">Total Outcome</th>
-                                <th class="p-3 text-center w-28">Standing Term</th>
-                                <th class="p-3 text-center w-36">Actions</th>
-                            </tr>
+                            <tr
+    id="gradebookSubjectsHeader"
+    class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
+</tr>
                         </thead>
                         <tbody id="gradebookTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
                     </table>
@@ -1546,36 +1540,92 @@ async function viewAssignment(assignmentId) {
     }
 
     function renderGradebook() {
-        const classFilter = document.getElementById('gradebookClassFilter')?.value;
-        const tbody = document.getElementById('gradebookTableBody');
-        tbody.innerHTML = '';
+const classId = document.getElementById('gradebookClassFilter')?.value;
+const tbody = document.getElementById('gradebookTableBody');
 
-        let studentsToShow = [];
-        if (classFilter) {
-            studentsToShow = studentsByClass[classFilter] || [];
-        }
+if (!tbody) return;
 
-        if (studentsToShow.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400 text-xs">No students for this class</td></tr>`;
-            return;
-        }
+tbody.innerHTML = '';
 
-        studentsToShow.forEach(student => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td class="p-3 pl-4 font-bold text-brand-900">${student.regNo || '—'}</td>
-                <td class="p-3">${student.name || '—'}</td>
-                <td class="p-3 text-center"><input type="number" class="w-12 text-center bg-white border border-slate-200 rounded p-1 text-xs" placeholder="0" max="20"></td>
-                <td class="p-3 text-center"><input type="number" class="w-12 text-center bg-white border border-slate-200 rounded p-1 text-xs" placeholder="0" max="20"></td>
-                <td class="p-3 text-center"><input type="number" class="w-12 text-center bg-white border border-slate-200 rounded p-1 text-xs" placeholder="0" max="60"></td>
-                <td class="p-3 text-center font-bold text-slate-900">--</td>
-                <td class="p-3 text-center text-xs font-bold text-emerald-600">Excellent</td>
-                <td class="p-3 text-center space-x-1"><button class="text-xs font-bold text-brand-800 hover:bg-brand-50 px-2 py-1 rounded">View</button></td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
+const students = studentsByClass[classId] || [];
+const subjects = subjectsByClass[classId] || [];
 
+// Update table headers dynamically
+const theadRow = document.querySelector('#gradebookSubjectsHeader');
+if (theadRow) {
+    theadRow.innerHTML = `
+        <th class="p-3 pl-4">Admission Code</th>
+        <th class="p-3">Student Name</th>
+    `;
+
+    subjects.forEach(subject => {
+        theadRow.innerHTML += `
+            <th class="p-3 text-center min-w-[120px]">
+                ${subject.name || subject}
+            </th>
+        `;
+    });
+
+    theadRow.innerHTML += `
+        <th class="p-3 text-center w-36">Actions</th>
+    `;
+}
+
+if (!students.length) {
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="${subjects.length + 3}"
+                class="p-4 text-center text-slate-400 text-xs">
+                No students found for this class
+            </td>
+        </tr>
+    `;
+    return;
+}
+
+students.forEach(student => {
+    const tr = document.createElement('tr');
+
+    let subjectCells = '';
+
+    subjects.forEach(subject => {
+        subjectCells += `
+            <td class="p-3 text-center">
+                <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    placeholder="0"
+                    class="w-16 text-center bg-white border border-slate-200 rounded p-1 text-xs">
+            </td>
+        `;
+    });
+
+    tr.innerHTML = `
+        <td class="p-3 pl-4 font-bold text-brand-900">
+            ${student.regNo || student.student_id || '—'}
+        </td>
+
+        <td class="p-3">
+            ${student.name || '—'}
+        </td>
+
+        ${subjectCells}
+
+        <td class="p-3 text-center">
+            <button
+                class="text-xs font-bold text-brand-800 hover:bg-brand-50 px-2 py-1 rounded">
+                View
+            </button>
+        </td>
+    `;
+
+    tbody.appendChild(tr);
+});
+
+updateGradebookProgress();
+
+}
     // ============ MODAL FUNCTIONS ============
     function openQuestionModal() {
         if (!stemQuillInstance) {
