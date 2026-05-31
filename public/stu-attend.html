@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gold & Linc | Student Attendance Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+    </style>
+</head>
+<body class="antialiased min-h-screen text-slate-800">
+
+    <!-- Top Navigation Bar Header -->
+    <header class="bg-brand-900 text-white shadow-md border-b border-brand-800 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="h-9 w-9 bg-white text-brand-900 rounded-xl flex items-center justify-center font-black text-sm tracking-tighter shadow-inner">
+                    G&L
+                </div>
+                <div>
+                    <h1 class="text-xs font-black tracking-widest uppercase text-brand-200">Faculty Terminal</h1>
+                    <p class="text-xs font-medium opacity-80">Attendance & Profile Registry</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="text-right hidden sm:block">
+                    <p class="text-xs font-bold text-white">Dr. Sarah Jenkins</p>
+                    <p class="text-[10px] font-mono text-brand-200">Dept. of Biological Sciences</p>
+                </div>
+                <div class="h-8 w-8 rounded-full bg-brand-500 flex items-center justify-center font-bold text-xs text-white border-2 border-brand-200 shadow-sm">
+                    SJ
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="space-y-6">
+            
+            <!-- Breadcrumb Navigation & Date Ribbon Bar -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+                <div class="flex items-center space-x-4">
+                    <button onclick="triggerAlertNotification('Navigation Mock', 'Returning to the teacher dashboard home sequence.', 'ℹ️')" type="button" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-2 rounded-xl text-xs flex items-center transition">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Return to Hub
+                    </button>
+                    <div>
+                        <h2 class="text-base font-black text-brand-900 uppercase tracking-wide">Daily Roll Call Registry</h2>
+                        <div class="flex flex-wrap items-center gap-2 mt-1 text-[11px] font-bold text-slate-500">
+                            <span class="bg-brand-50 text-brand-800 px-2 py-0.5 rounded">SS2 Science A</span>
+                            <span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded">Biology Core</span>
+                            <span class="text-slate-400">&bull;</span>
+                            <span class="flex items-center text-brand-600 font-extrabold">
+                                <svg class="w-3.5 h-3.5 mr-1 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                Session Date: <span id="currentDateBadge" class="ml-1">Sunday, May 31, 2026</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <button onclick="saveTodayAttendanceData()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl uppercase tracking-wider transition shadow-sm flex items-center justify-center">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" stroke-linecaps="round" d="M5 13l4 4L19 7"/></svg>
+                        Commit Daily Logs
+                    </button>
+                </div>
+            </div>
+
+            <!-- Operational Metrics Deck -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Total Enrolled</p>
+                    <p class="text-2xl font-black text-slate-900 mt-1" id="metricTotal">0</p>
+                </div>
+                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
+                    <p class="text-[10px] font-extrabold text-emerald-600 uppercase tracking-wider">Present Today</p>
+                    <p class="text-2xl font-black text-emerald-600 mt-1" id="metricPresent">0</p>
+                </div>
+                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
+                    <p class="text-[10px] font-extrabold text-rose-600 uppercase tracking-wider">Absent Today</p>
+                    <p class="text-2xl font-black text-rose-600 mt-1" id="metricAbsent">0</p>
+                </div>
+                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
+                    <p class="text-[10px] font-extrabold text-amber-600 uppercase tracking-wider">Excused Absences</p>
+                    <p class="text-2xl font-black text-amber-600 mt-1" id="metricExcused">0</p>
+                </div>
+            </div>
+
+            <!-- Balanced Split Screen Workspace -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Left Column Component: Roster Control & Sheet Input Ledger (7/12 width) -->
+                <div class="lg:col-span-7 space-y-4">
+                    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                        <div>
+                            <h3 class="text-xs font-bold text-brand-900 uppercase tracking-wider">Roster Sheet Matrix</h3>
+                            <p class="text-[11px] text-slate-500 mt-0.5">Toggle states to set metrics. Click a student row boundary to inspect historical records inside the side panel deck.</p>
+                        </div>
+
+                        <div class="overflow-x-auto rounded-xl border border-slate-100">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
+                                        <th class="p-3 pl-4">Student Details</th>
+                                        <th class="p-3 text-center">Today's Attendance Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rosterTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium">
+                                    <!-- Populated dynamically by script data -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column Component: Contextual Target Inspection Frame Profile Panel (5/12 width) -->
+                <div class="lg:col-span-5 space-y-4">
+                    <div id="inspectorEmptyState" class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl p-12 text-center text-slate-400">
+                        <div class="text-4xl mb-2">👤</div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700">No Student Profile Selected</h4>
+                        <p class="text-[11px] mt-1 text-slate-400 max-w-xs mx-auto">Select a student name item from the main registry tracker list to fetch comprehensive logs, history logs, and historical tracking summaries.</p>
+                    </div>
+
+                    <div id="inspectorProfileContainer" class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-5 hidden animate-fade-in">
+                        <!-- Profile Header Meta -->
+                        <div class="flex items-start justify-between border-b border-slate-100 pb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="h-11 w-11 bg-brand-100 text-brand-900 font-black rounded-xl flex items-center justify-center text-sm shadow-sm" id="inspectAvatarInitials">
+                                    --
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-black text-slate-900" id="inspectFullName">Student Full Name</h3>
+                                    <p class="text-[10px] font-mono text-slate-400 mt-0.5" id="inspectAdmissionCode">GL-202X-0000</p>
+                                </div>
+                            </div>
+                            <span class="bg-brand-50 text-brand-800 font-mono font-bold text-[10px] px-2 py-0.5 rounded" id="inspectCohort">Classroom Group</span>
+                        </div>
+
+                        <!-- Info Grid Details -->
+                        <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100 text-[11px]">
+                            <div>
+                                <span class="block text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Guardian Contact</span>
+                                <span class="font-bold text-slate-700 block mt-0.5" id="inspectParentContact">--</span>
+                            </div>
+                            <div>
+                                <span class="block text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Attendance Rate</span>
+                                <span class="font-extrabold text-emerald-600 block mt-0.5 text-xs" id="inspectTermAverage">0.0%</span>
+                            </div>
+                        </div>
+
+                        <!-- Historical Record Preview Deck -->
+                        <div class="space-y-2.5">
+                            <div class="flex justify-between items-center">
+                                <h4 class="text-[10px] font-bold text-brand-900 uppercase tracking-wider">Historical Preview (Prior Sessions)</h4>
+                                <span class="text-[9px] font-mono font-bold text-slate-400 bg-slate-100 px-1.5 py-0.2 rounded">Calendar View</span>
+                            </div>
+                            
+                            <!-- Day Records Interactive Ledger Logs Grid -->
+                            <div class="space-y-2 max-h-56 overflow-y-auto pr-1" id="historicalLogsWrapper">
+                                <!-- Populated dynamically based on historic log objects -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </main>
+
+    <!-- UI MODAL: ALERT & NOTIFICATION SUITE OVERLAY -->
+    <div id="customAlertModal" class="fixed inset-0 bg-slate-900/60 items-center justify-center z-50 flex hidden backdrop-blur-sm transition-all duration-300">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center shadow-xl border border-slate-200/80 mx-4 transform transition-all scale-95 opacity-0 duration-300" id="customAlertBox">
+            <div id="modalIcon" class="text-4xl mb-3 animate-bounce">✅</div>
+            <h3 id="modalTitle" class="text-sm font-black uppercase text-slate-900 tracking-wide">System Notification</h3>
+            <p id="modalMessage" class="text-xs text-slate-500 font-medium mt-2 leading-relaxed">Action processed accurately.</p>
+            <button onclick="closeAlertNotification()" class="mt-5 w-full bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition uppercase tracking-wider shadow-sm">
+                Acknowledge
+            </button>
+        </div>
+    </div>
+
+    <!-- DATA MANAGEMENT SYSTEM INTERACTIVE SCRIPT FRAMEWORK -->
+    <script>
+        // --- 1. LIVE MOCK STATE REPOSITORY DATABASE ---
+        const studentDatabase = [
+            { id: "stu-01", name: "Chinedu Okafor", code: "GL-2024-0042", parent: "Mr. C. Okafor", cohort: "SS2 Science A" },
+            { id: "stu-02", name: "Amina Yusuf", code: "GL-2024-0119", parent: "Dr. Y. Yusuf", cohort: "SS2 Science A" },
+            { id: "stu-03", name: "Oluwaseun Adebayo", code: "GL-2024-0085", parent: "Mrs. O. Adebayo", cohort: "SS2 Science A" },
+            { id: "stu-04", name: "Efe Montgomery", code: "GL-2023-0941", parent: "Engr. Montgomery", cohort: "SS2 Science A" },
+            { id: "stu-05", name: "Zainab Abubakar", code: "GL-2024-0312", parent: "Alh. Abubakar", cohort: "SS2 Science A" }
+        ];
+
+        // Today's Live Active Working Session Memory Record Dictionary Map
+        let dailyAttendanceState = {
+            "stu-01": "PRESENT",
+            "stu-02": "PRESENT",
+            "stu-03": "ABSENT",
+            "stu-04": "EXCUSED",
+            "stu-05": "PRESENT"
+        };
+
+        // Static multi-day historical data matrix for student lookup previews
+        const historicalRecordsArchive = {
+            "stu-01": [
+                { date: "Thursday, May 28, 2026", status: "PRESENT" },
+                { date: "Wednesday, May 27, 2026", status: "PRESENT" },
+                { date: "Tuesday, May 26, 2026", status: "PRESENT" },
+                { date: "Monday, May 25, 2026", status: "PRESENT" }
+            ],
+            "stu-02": [
+                { date: "Thursday, May 28, 2026", status: "ABSENT" },
+                { date: "Wednesday, May 27, 2026", status: "PRESENT" },
+                { date: "Tuesday, May 26, 2026", status: "PRESENT" },
+                { date: "Monday, May 25, 2026", status: "PRESENT" }
+            ],
+            "stu-03": [
+                { date: "Thursday, May 28, 2026", status: "ABSENT" },
+                { date: "Wednesday, May 27, 2026", status: "ABSENT" },
+                { date: "Tuesday, May 26, 2026", status: "PRESENT" },
+                { date: "Monday, May 25, 2026", status: "PRESENT" }
+            ],
+            "stu-04": [
+                { date: "Thursday, May 28, 2026", status: "PRESENT" },
+                { date: "Wednesday, May 27, 2026", status: "EXCUSED" },
+                { date: "Tuesday, May 26, 2026", status: "PRESENT" },
+                { date: "Monday, May 25, 2026", status: "PRESENT" }
+            ],
+            "stu-05": [
+                { date: "Thursday, May 28, 2026", status: "PRESENT" },
+                { date: "Wednesday, May 27, 2026", status: "PRESENT" },
+                { date: "Tuesday, May 26, 2026", status: "PRESENT" },
+                { date: "Monday, May 25, 2026", status: "ABSENT" }
+            ]
+        };
+
+        let currentActiveInspectedStudentId = null;
+
+        // --- 2. RENDER PIPELINES ---
+        function initializeAttendanceWorkspace() {
+            const tableBody = document.getElementById('rosterTableBody');
+            tableBody.innerHTML = "";
+
+            studentDatabase.forEach(student => {
+                const currentStatus = dailyAttendanceState[student.id] || "PRESENT";
+                
+                const tr = document.createElement('tr');
+                tr.id = `row-${student.id}`;
+                tr.className = "hover:bg-slate-50 cursor-pointer transition-all border-l-4 border-transparent";
+                
+                // Highlight row configuration if current inspected target is loaded
+                if (student.id === currentActiveInspectedStudentId) {
+                    tr.classList.add('bg-brand-50/50', 'border-brand-500');
+                }
+
+                // Setup row content layout with localized action button groups inside cells
+                tr.innerHTML = `
+                    <td class="p-3 pl-4" onclick="inspectStudentProfile('${student.id}')">
+                        <p class="font-bold text-slate-900">${student.name}</p>
+                        <span class="block text-[10px] text-slate-400 font-mono font-normal">${student.code}</span>
+                    </td>
+                    <td class="p-3">
+                        <div class="flex items-center justify-center space-x-1.5">
+                            <button onclick="updateStudentStatus(event, '${student.id}', 'PRESENT')" 
+                                    class="status-btn-${student.id} font-extrabold text-[10px] px-2.5 py-1.5 rounded-lg uppercase transition-all flex-1 text-center border ${currentStatus === 'PRESENT' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}">
+                                Present
+                            </button>
+                            <button onclick="updateStudentStatus(event, '${student.id}', 'ABSENT')" 
+                                    class="status-btn-${student.id} font-extrabold text-[10px] px-2.5 py-1.5 rounded-lg uppercase transition-all flex-1 text-center border ${currentStatus === 'ABSENT' ? 'bg-rose-600 text-white border-rose-600' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}">
+                                Absent
+                            </button>
+                            <button onclick="updateStudentStatus(event, '${student.id}', 'EXCUSED')" 
+                                    class="status-btn-${student.id} font-extrabold text-[10px] px-2.5 py-1.5 rounded-lg uppercase transition-all flex-1 text-center border ${currentStatus === 'EXCUSED' ? 'bg-amber-500 text-white border-amber-500' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}">
+                                Excused
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            recomputeStatisticalMetricsDashboard();
+        }
+
+        function recomputeStatisticalMetricsDashboard() {
+            let total = studentDatabase.length;
+            let present = 0;
+            let absent = 0;
+            let excused = 0;
+
+            Object.values(dailyAttendanceState).forEach(status => {
+                if (status === "PRESENT") present++;
+                if (status === "ABSENT") absent++;
+                if (status === "EXCUSED") excused++;
+            });
+
+            document.getElementById('metricTotal').textContent = total;
+            document.getElementById('metricPresent').textContent = present;
+            document.getElementById('metricAbsent').textContent = absent;
+            document.getElementById('metricExcused').textContent = excused;
+        }
+
+        // --- 3. PROFILE INSPECTION ENGINE (PREVIEW OTHER DAYS) ---
+        function inspectStudentProfile(studentId) {
+            currentActiveInspectedStudentId = studentId;
+            
+            // Re-render table rows silently to handle highlighted state styles transitions
+            document.querySelectorAll('#rosterTableBody tr').forEach(row => {
+                row.classList.remove('bg-brand-50/50', 'border-brand-500');
+            });
+            document.getElementById(`row-${studentId}`).classList.add('bg-brand-50/50', 'border-brand-500');
+
+            const student = studentDatabase.find(s => s.id === studentId);
+            if (!student) return;
+
+            // Compute structural UI configuration initial transformations
+            document.getElementById('inspectorEmptyState').classList.add('hidden');
+            const container = document.getElementById('inspectorProfileContainer');
+            container.classList.remove('hidden');
+
+            // Set Meta fields
+            document.getElementById('inspectFullName').textContent = student.name;
+            document.getElementById('inspectAdmissionCode').textContent = student.code;
+            document.getElementById('inspectCohort').textContent = student.cohort;
+            document.getElementById('inspectParentContact').textContent = student.parent;
+
+            // Generate structural avatar shorthand initials loop
+            const names = student.name.split(" ");
+            document.getElementById('inspectAvatarInitials').textContent = names.length > 1 ? `${names[0][0]}${names[1][0]}` : `${names[0][0]}`;
+
+            // Sync, loop, and pull historical records log tracking
+            const logsWrapper = document.getElementById('historicalLogsWrapper');
+            logsWrapper.innerHTML = "";
+
+            // Gather all entries including today's live toggled state session
+            const currentTodayStatus = dailyAttendanceState[studentId] || "PRESENT";
+            const structuralTodayLogNode = { date: "Today (Sunday, May 31, 2026)", status: currentTodayStatus, isCurrent: true };
+            
+            const historyList = historicalRecordsArchive[studentId] || [];
+            const completeCombinedTimelineList = [structuralTodayLogNode, ...historyList];
+
+            // Math aggregate calculations to get current structural percentage value tracking ratios
+            let standardPresentScoresTotalCount = 0;
+            completeCombinedTimelineList.forEach(log => { if (log.status === "PRESENT" || log.status === "EXCUSED") standardPresentScoresTotalCount++; });
+            const aggregateRatioPercentage = ((standardPresentScoresTotalCount / completeCombinedTimelineList.length) * 100).toFixed(1);
+            document.getElementById('inspectTermAverage').textContent = `${aggregateRatioPercentage}%`;
+
+            // Loop populate nodes items elements inside visual stack view list container items
+            completeCombinedTimelineList.forEach(item => {
+                let statusBadgeStyle = "";
+                if (item.status === "PRESENT") statusBadgeStyle = "bg-emerald-50 text-emerald-700 border-emerald-200";
+                if (item.status === "ABSENT") statusBadgeStyle = "bg-rose-50 text-rose-700 border-rose-200";
+                if (item.status === "EXCUSED") statusBadgeStyle = "bg-amber-50 text-amber-700 border-amber-200";
+
+                const logRow = document.createElement('div');
+                logRow.className = `flex justify-between items-center p-2.5 rounded-xl border text-[11px] ${item.isCurrent ? 'bg-brand-50/40 border-brand-200 font-bold' : 'bg-slate-50/60 border-slate-100'}`;
+                logRow.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        ${item.isCurrent ? '<span class="h-2 w-2 bg-brand-500 rounded-full animate-ping"></span>' : ''}
+                        <span class="text-slate-600">${item.date}</span>
+                    </div>
+                    <span class="px-2 py-0.5 border text-[10px] font-bold rounded-md uppercase ${statusBadgeStyle}">${item.status}</span>
+                `;
+                logsWrapper.appendChild(logRow);
+            });
+        }
+
+        // --- 4. ACTION INTERACTORS ---
+        function updateStudentStatus(event, studentId, newStatus) {
+            event.stopPropagation(); // Avoid triggering parent row row profile selection sequence context frame
+            
+            dailyAttendanceState[studentId] = newStatus;
+            
+            // Refresh main visualizations components
+            initializeAttendanceWorkspace();
+            
+            // If the modified student profile is actively open on inspector frame workspace deck, hot reload update it dynamically
+            if (currentActiveInspectedStudentId === studentId) {
+                inspectStudentProfile(studentId);
+            }
+        }
+
+        function saveTodayAttendanceData() {
+            // Processing load state sequence mock simulation wrapper context
+            triggerAlertNotification(
+                "Logs Uploaded Successfully", 
+                "Daily attendance data matrices for May 31, 2026, have been committed to cloud storage nodes. Student continuous ledger parameters have synchronized correctly.", 
+                "💾"
+            );
+        }
+
+        // --- 5. SYSTEM ALERT SUITE NOTIFICATION FRAMEWORK ENGINE ---
+        function triggerAlertNotification(title, message, icon) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('modalIcon').textContent = icon || "✅";
+            
+            const overlay = document.getElementById('customAlertModal');
+            const box = document.getElementById('customAlertBox');
+            
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                box.classList.remove('scale-95', 'opacity-0');
+                box.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeAlertNotification() {
+            const overlay = document.getElementById('customAlertModal');
+            const box = document.getElementById('customAlertBox');
+            
+            box.classList.remove('scale-100', 'opacity-100');
+            box.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => overlay.classList.add('hidden'), 200);
+        }
+
+        // Boot system startup execution frame binding logic hook handlers
+        document.addEventListener("DOMContentLoaded", () => {
+            initializeAttendanceWorkspace();
+        });
+    </script>
+</body>
+</html>
