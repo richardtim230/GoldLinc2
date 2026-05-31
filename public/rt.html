@@ -1225,77 +1225,49 @@
         document.getElementById('questionModal').classList.add('flex');
     }
 
-    // Function to open edit question modal
-async function openEditQuestionModal(collectionId, questionId) {
-  try {
-    activeIsolatedCollectionId = collectionId;
-    activeTargetModalMode = 'EDIT';
-    contextualTargetQuestionId = questionId;
-
-    // Find the question from assessmentDatabase
-    const collection = assessmentDatabase.find(c => c._id === collectionId);
-    if (!collection) return;
-
-    const question = collection.questions.find(q => q.id === questionId);
-    if (!question) return;
-
-    // Clear previous Quill instances
-    if (stemQuillInstance) stemQuillInstance.setContents({ ops: [{ insert: '' }] });
-    if (explanationQuillInstance) explanationQuillInstance.setContents({ ops: [{ insert: '' }] });
-
-    // Set stem content - PARSE HTML PROPERLY
-    if (question.text) {
-      stemQuillInstance.root.innerHTML = question.text;
-    }
-
-    // Clear and rebuild options
-    document.getElementById('modalOptionsWrapper').innerHTML = '';
-    if (question.options && question.options.length > 0) {
-      question.options.forEach((opt, index) => {
-        appendBlankOptionField();
+    function openEditQuestionModal(collectionId, questionId) {
+        activeIsolatedCollectionId = collectionId;
+        activeTargetModalMode = 'EDIT';
+        contextualTargetQuestionId = questionId;
         
-        // Get the newly created option editor
-        const optionDivs = document.querySelectorAll('#modalOptionsWrapper .option-editor-container');
-        const lastOptionDiv = optionDivs[optionDivs.length - 1];
-        const quillDiv = lastOptionDiv.querySelector('.quill-option-editor');
+        const collection = assessmentDatabase.find(c => c._id === collectionId);
+        const question = collection?.questions?.find(q => q.id === questionId);
         
-        // Find the corresponding Quill instance
-        let quillInstance = null;
-        Object.values(optionQuillRegistry).forEach(item => {
-          if (item.quill && item.quill.root === quillDiv) {
-            quillInstance = item.quill;
-          }
+        if (!question) {
+            showCustomModal({ title: 'Missing Item', message: 'Question payload tracking matrix missing.', type: 'alert', icon: '❌' });
+            return;
+        }
+        
+        document.getElementById('modalTitle').textContent = 'Edit Assessment Item';
+        
+        if (!stemQuillInstance) {
+            stemQuillInstance = new Quill('#quillQuestionStem', {
+                theme: 'snow',
+                placeholder: 'Enter question text here...',
+                modules: { toolbar: [['bold', 'italic', 'underline'], ['code-block'], ['image']] }
+            });
+        }
+        if (!explanationQuillInstance) {
+            explanationQuillInstance = new Quill('#quillExplanation', {
+                theme: 'snow',
+                placeholder: 'Optional explanation...',
+                modules: { toolbar: [['bold', 'italic'], ['image']] }
+            });
+        }
+        
+        stemQuillInstance.setContents([{ insert: question.text }]);
+        explanationQuillInstance.setContents([{ insert: question.explanation || '' }]);
+        document.getElementById('stemImageUrl').value = '';
+        document.getElementById('explanationImageUrl').value = '';
+        
+        document.getElementById('modalOptionsWrapper').innerHTML = '';
+        question.options.forEach(opt => {
+            addOptionFieldToModal(opt.text, opt.isCorrect);
         });
-
-        if (quillInstance) {
-          // Set option text - PARSE HTML PROPERLY
-          if (opt.text) {
-            quillInstance.root.innerHTML = opt.text;
-          }
-        }
-
-        // Mark correct answer
-        const checkbox = lastOptionDiv.querySelector('input[type="checkbox"]');
-        if (checkbox && opt.isCorrect) {
-          checkbox.checked = true;
-        }
-      });
+        
+        document.getElementById('questionModal').classList.remove('hidden');
+        document.getElementById('questionModal').classList.add('flex');
     }
-
-    // Set explanation - PARSE HTML PROPERLY
-    if (question.explanation) {
-      explanationQuillInstance.root.innerHTML = question.explanation;
-    }
-
-    // Show modal
-    document.getElementById('questionModal').classList.remove('hidden');
-    document.getElementById('modalTitle').textContent = 'Edit Assessment Item';
-
-  } catch (err) {
-    console.error('Error opening edit modal:', err);
-    showCustomModal({ title: 'Error', message: 'Failed to load question for editing', type: 'alert', icon: '❌' });
-  }
-}
 
     function appendBlankOptionField() {
         addOptionFieldToModal('', false);
@@ -1340,59 +1312,61 @@ async function openEditQuestionModal(collectionId, questionId) {
     }
 
     async function saveModalQuestionData() {
-  try {
-    // Extract content as clean HTML (not Delta)
-    const stemHtml = stemQuillInstance.root.innerHTML;
-    const explanationHtml = explanationQuillInstance.root.innerHTML;
-
-    // Collect options
-    const options = [];
-    document.querySelectorAll('#modalOptionsWrapper .option-editor-container').forEach((div) => {
-      const quillDiv = div.querySelector('.quill-option-editor');
-      const checkbox = div.querySelector('input[type="checkbox"]');
-      
-      let optionQuillInstance = null;
-      Object.values(optionQuillRegistry).forEach(item => {
-        if (item.quill && item.quill.root === quillDiv) {
-          optionQuillInstance = item.quill;
+        const stemText = stemQuillInstance.getText();
+        if (!stemText.trim()) {
+            await showCustomModal({ title: 'Validation Error', message: 'Please enter question payload text structural layout description.', type: 'alert', icon: '⚠️' });
+            return;
         }
-      });
-
-      if (optionQuillInstance) {
-        options.push({
-          text: optionQuillInstance.root.innerHTML,  // Store as HTML
-          isCorrect: checkbox.checked
+        
+        const freshOptions = [];
+        document.querySelectorAll('#modalOptionsWrapper .p-3').forEach((optDiv) => {
+            const quillDivs = optDiv.querySelectorAll('.quill-option-editor');
+            if (quillDivs.length > 0) {
+                const quillDiv = quillDivs[0];
+                const parentContainer = quillDiv.closest('.option-editor-container');
+                if (parentContainer && parentContainer.querySelector('.ql-editor')) {
+                    const text = parentContainer.querySelector('.ql-editor').innerText;
+                    const isCorrect = optDiv.querySelector('.option-correct-checkbox').checked;
+                    freshOptions.push({ text, isCorrect });
+                }
+            }
         });
-      }
-    });
-
-    // Save to API
-    if (activeTargetModalMode === 'CREATE') {
-      await addQuestionToCollectionAPI(activeIsolatedCollectionId, {
-        text: stemHtml,
-        options: options,
-        imageUrl: null,
-        explanation: explanationHtml
-      });
-    } else if (activeTargetModalMode === 'EDIT') {
-      await updateQuestionAPI(activeIsolatedCollectionId, contextualTargetQuestionId, {
-        text: stemHtml,
-        options: options,
-        imageUrl: null,
-        explanation: explanationHtml
-      });
+        
+        if (freshOptions.length === 0) {
+            await showCustomModal({ title: 'Validation Error', message: 'Please add at least one response evaluation choice track option.', type: 'alert', icon: '⚠️' });
+            return;
+        }
+        
+        const questionData = {
+            text: stemQuillInstance.root.innerHTML,
+            options: freshOptions,
+            imageUrl: null,
+            explanation: explanationQuillInstance.root.innerHTML || null
+        };
+        
+        if (activeTargetModalMode === 'CREATE') {
+            const result = await addQuestionToCollectionAPI(activeIsolatedCollectionId, questionData);
+            if (result) {
+                await showCustomModal({ title: 'Saved', message: 'Question added successfully.', type: 'alert', icon: '✅' });
+                assessmentDatabase = await fetchUnifiedQuestionBank();
+                renderCollections();
+                closeQuestionModal();
+            } else {
+                await showCustomModal({ title: 'Failed', message: 'Failed to write object evaluation question structural configuration node.', type: 'alert', icon: '❌' });
+            }
+        } else {
+            const result = await updateQuestionAPI(activeIsolatedCollectionId, contextualTargetQuestionId, questionData);
+            if (result) {
+                await showCustomModal({ title: 'Updated', message: 'Question tracking configuration updated successfully.', type: 'alert', icon: '✅' });
+                assessmentDatabase = await fetchUnifiedQuestionBank();
+                renderCollections();
+                closeQuestionModal();
+            } else {
+                await showCustomModal({ title: 'Error', message: 'Failed to balance update tracking patch configuration endpoint reference.', type: 'alert', icon: '❌' });
+            }
+        }
+        optionQuillRegistry = {};
     }
-
-    // Refresh and close
-    assessmentDatabase = await fetchUnifiedQuestionBank();
-    renderCollections();
-    closeQuestionModal();
-    showCustomModal({ title: 'Success', message: 'Question saved successfully', type: 'alert', icon: '✅' });
-  } catch (err) {
-    console.error('Error saving question:', err);
-    showCustomModal({ title: 'Error', message: 'Failed to save question: ' + err.message, type: 'alert', icon: '❌' });
-  }
-}
 
     function closeQuestionModal() {
         document.getElementById('questionModal').classList.add('hidden');
