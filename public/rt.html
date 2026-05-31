@@ -729,42 +729,57 @@
     })();
 
     function showCustomModal({ title, message, type = 'confirm', icon = '❓' }) {
-        return new Promise((resolve) => {
-            const modal = document.getElementById('notificationModal');
-            const titleEl = document.getElementById('notificationTitle');
-            const msgEl = document.getElementById('notificationMessage');
-            const iconEl = document.getElementById('notificationIcon');
-            const confirmBtn = document.getElementById('notificationConfirmBtn');
-            const cancelBtn = document.getElementById('notificationCancelBtn');
+    return new Promise((resolve) => {
+        const modal = document.getElementById('notificationModal');
+        const titleEl = document.getElementById('notificationTitle');
+        const msgEl = document.getElementById('notificationMessage');
+        const iconEl = document.getElementById('notificationIcon');
+        const confirmBtn = document.getElementById('notificationConfirmBtn');
+        const cancelBtn = document.getElementById('notificationCancelBtn');
 
-            titleEl.textContent = title;
+        titleEl.textContent = title;
+        iconEl.textContent = icon;
+
+        // Support both text and HTML elements
+        msgEl.innerHTML = '';
+
+        if (message instanceof HTMLElement) {
+            msgEl.appendChild(message);
+        } else {
             msgEl.textContent = message;
-            iconEl.textContent = icon;
+        }
 
-            if (type === 'alert') {
-                cancelBtn.style.display = 'none';
-                confirmBtn.textContent = 'OK';
-            } else {
-                cancelBtn.style.display = 'inline-block';
-                confirmBtn.textContent = 'Confirm';
-            }
+        if (type === 'alert') {
+            cancelBtn.style.display = 'none';
+            confirmBtn.textContent = 'OK';
+        } else {
+            cancelBtn.style.display = 'inline-block';
+            confirmBtn.textContent = 'Confirm';
+        }
 
-            modal.classList.remove('hidden');
+        modal.classList.remove('hidden');
 
-            function close(result) {
-                modal.classList.add('hidden');
-                confirmBtn.removeEventListener('click', onConfirm);
-                cancelBtn.removeEventListener('click', onCancel);
-                resolve(result);
-            }
+        function close(result) {
+            modal.classList.add('hidden');
 
-            function onConfirm() { close(true); }
-            function onCancel() { close(false); }
+            confirmBtn.removeEventListener('click', onConfirm);
+            cancelBtn.removeEventListener('click', onCancel);
 
-            confirmBtn.addEventListener('click', onConfirm);
-            cancelBtn.addEventListener('click', onCancel);
-        });
-    }
+            resolve(result);
+        }
+
+        function onConfirm() {
+            close(true);
+        }
+
+        function onCancel() {
+            close(false);
+        }
+
+        confirmBtn.addEventListener('click', onConfirm);
+        cancelBtn.addEventListener('click', onCancel);
+    });
+}
 
     // ============ IMAGE UPLOAD HANDLERS ============
     function insertImageFromFile(fileInput, target) {
