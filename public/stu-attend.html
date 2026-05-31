@@ -237,11 +237,11 @@
         // ============ INITIALIZATION ============
         async function initializeAttendancePage() {
             try {
-                // Get class ID from URL parameter
+                // Get class ID from URL parameter (could be class name or ID)
                 const urlParams = new URLSearchParams(window.location.search);
-                selectedClass = urlParams.get('classId');
+                let classId = urlParams.get('classId');
 
-                if (!selectedClass) {
+                if (!classId) {
                     await showCustomModal({ 
                         title: 'Invalid Request', 
                         message: 'No class selected. Redirecting to dashboard...', 
@@ -252,7 +252,7 @@
                     return;
                 }
 
-                // Fetch teacher profile
+                // Fetch teacher profile first
                 teacher = await fetchTeacherProfile();
                 if (!teacher) {
                     await showCustomModal({ 
@@ -267,7 +267,22 @@
                 // Update header with teacher info
                 updateHeaderInfo();
 
-                // Fetch class students
+                // Resolve class name to MongoDB ID if needed
+                classId = await resolveClassToId(classId);
+                if (!classId) {
+                    await showCustomModal({ 
+                        title: 'Class Not Found', 
+                        message: 'The selected class could not be found. Redirecting to dashboard...', 
+                        type: 'alert', 
+                        icon: '⚠️' 
+                    });
+                    setTimeout(() => window.location.href = 'rt.html', 2000);
+                    return;
+                }
+
+                selectedClass = classId;
+
+                // Fetch class students using resolved ID
                 await loadClassStudents();
 
                 // Set today's date
@@ -290,6 +305,63 @@
             }
         }
 
+        // ============ CLASS RESOLUTION ============
+        async function resolveClassToId(classIdentifier) {
+            try {
+                // First, fetch all teacher's classes
+                const res = await fetch(`${API_BASE_URL}/api/teachers/classes`, { 
+                    headers: authHeaders() 
+                });
+                
+                if (!res.ok) {
+                    console.error('Failed to fetch classes, status:', res.status);
+                    return null;
+                }
+
+                const classes = await res.json();
+                if (!Array.isArray(classes)) {
+                    console.error('Invalid classes response');
+                    return null;
+                }
+
+                // Try to find the class by:
+                // 1. Exact MongoDB ID match
+                // 2. Class name match
+                // 3. Class code match
+
+                let foundClass = classes.find(c => c._id === classIdentifier);
+                
+                if (!foundClass) {
+                    foundClass = classes.find(c => 
+                        c.name && c.name.toLowerCase() === classIdentifier.toLowerCase()
+                    );
+                }
+
+                if (!foundClass) {
+                    foundClass = classes.find(c => 
+                        c.code && c.code.toLowerCase() === classIdentifier.toLowerCase()
+                    );
+                }
+
+                if (foundClass) {
+                    // Update the class name badge with actual class details
+                    document.getElementById('classNameBadge').textContent = foundClass.name || foundClass.code || classIdentifier;
+                    if (foundClass.subject) {
+                        document.getElementById('subjectBadge').textContent = foundClass.subject;
+                    }
+                    console.log('Class resolved:', foundClass._id);
+                    return foundClass._id;
+                }
+
+                console.error('Class not found:', classIdentifier);
+                return null;
+
+            } catch (error) {
+                console.error('Error resolving class:', error);
+                return null;
+            }
+        }
+
         // ============ API CALLS ============
         async function fetchTeacherProfile() {
             try {
@@ -307,27 +379,18 @@
                 const res = await fetch(`${API_BASE_URL}/api/teachers/students?classId=${encodeURIComponent(selectedClass)}`, { 
                     headers: authHeaders() 
                 });
-                if (!res.ok) throw new Error('Failed to fetch students');
+                if (!res.ok) {
+                    console.error('Failed to fetch students, status:', res.status);
+                    throw new Error('Failed to fetch students');
+                }
                 classStudents = await res.json();
                 if (!Array.isArray(classStudents)) classStudents = [];
+                console.log('Loaded students:', classStudents.length);
                 return classStudents;
             } catch (e) {
                 console.error('Error fetching students:', e);
                 classStudents = [];
                 return [];
-            }
-        }
-
-        async function fetchClassDetails() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/teachers/classes/${encodeURIComponent(selectedClass)}`, { 
-                    headers: authHeaders() 
-                });
-                if (!res.ok) return null;
-                return await res.json();
-            } catch (e) {
-                console.error('Error fetching class details:', e);
-                return null;
             }
         }
 
@@ -355,7 +418,7 @@
         function initializeAttendanceState() {
             workingSessionAttendanceState = {};
             classStudents.forEach(student => {
-                workingSessionAttendanceState[student.id] = 'PRESENT';
+                workingSessionAttendanceState[student.id || student._id] = 'PRESENT';
             });
         }
 
@@ -373,10 +436,11 @@
             }
 
             classStudents.forEach(student => {
-                const currentStatus = workingSessionAttendanceState[student.id] || "PRESENT";
+                const studentId = student.id || student._id;
+                const currentStatus = workingSessionAttendanceState[studentId] || "PRESENT";
                 
                 const tr = document.createElement('tr');
-                tr.id = `student-row-${student.id}`;
+                tr.id = `student-row-${studentId}`;
                 tr.className = "hover:bg-slate-50/80 transition-all border-l-4 border-transparent cursor-pointer";
                 
                 if (student.id === activeSelectedStudentId) {
@@ -387,21 +451,21 @@
                 const studentCode = student.admissionCode || student.code || '--';
 
                 tr.innerHTML = `
-                    <td class="p-3 pl-4" onclick="inspectStudentCalendar('${student.id}')">
+                    <td class="p-3 pl-4" onclick="inspectStudentCalendar('${studentId}')">
                         <p class="font-bold text-slate-900">${studentName}</p>
                         <span class="block text-[10px] font-mono text-slate-400 font-normal tracking-tight">${studentCode}</span>
                     </td>
                     <td class="p-3">
                         <div class="flex items-center space-x-2 max-w-md mx-auto">
-                            <button onclick="overrideTodayStatus(event, '${student.id}', 'PRESENT')" 
+                            <button onclick="overrideTodayStatus(event, '${studentId}', 'PRESENT')" 
                                     class="text-[10px] font-extrabold px-3 py-2 rounded-xl uppercase flex-1 border transition-all ${currentStatus === 'PRESENT' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white border-slate-200 text-slate-600 hover:border-emerald-300'}">
                                 Present
                             </button>
-                            <button onclick="overrideTodayStatus(event, '${student.id}', 'ABSENT')" 
+                            <button onclick="overrideTodayStatus(event, '${studentId}', 'ABSENT')" 
                                     class="text-[10px] font-extrabold px-3 py-2 rounded-xl uppercase flex-1 border transition-all ${currentStatus === 'ABSENT' ? 'bg-rose-600 text-white border-rose-600' : 'bg-white border-slate-200 text-slate-600 hover:border-rose-300'}">
                                 Absent
                             </button>
-                            <button onclick="overrideTodayStatus(event, '${student.id}', 'EXCUSED')" 
+                            <button onclick="overrideTodayStatus(event, '${studentId}', 'EXCUSED')" 
                                     class="text-[10px] font-extrabold px-3 py-2 rounded-xl uppercase flex-1 border transition-all ${currentStatus === 'EXCUSED' ? 'bg-amber-500 text-white border-amber-500' : 'bg-white border-slate-200 text-slate-600 hover:border-amber-300'}">
                                 Excused
                             </button>
@@ -434,9 +498,12 @@
             activeSelectedStudentId = studentId;
 
             document.querySelectorAll('#rosterTableBody tr').forEach(r => r.classList.remove('bg-brand-50/60', 'border-brand-500'));
-            document.getElementById(`student-row-${studentId}`).classList.add('bg-brand-50/60', 'border-brand-500');
+            const rowElement = document.getElementById(`student-row-${studentId}`);
+            if (rowElement) {
+                rowElement.classList.add('bg-brand-50/60', 'border-brand-500');
+            }
 
-            const student = classStudents.find(s => s.id === studentId);
+            const student = classStudents.find(s => (s.id || s._id) === studentId);
             if (!student) return;
 
             document.getElementById('inspectorEmptyState').classList.add('hidden');
@@ -455,7 +522,6 @@
                 ? `${nameParts[0][0]}${nameParts[1][0]}` 
                 : `${nameParts[0][0]}`;
 
-            // For now, display placeholder calendar (backend integration can be added)
             generateCalendarPlaceholder(studentId);
         }
 
@@ -516,6 +582,15 @@
 
         async function saveTodayAttendanceData() {
             try {
+                // Prepare attendance data for submission
+                const attendanceData = {
+                    classId: selectedClass,
+                    date: new Date().toISOString().split('T')[0],
+                    attendance: workingSessionAttendanceState
+                };
+
+                console.log('Submitting attendance:', attendanceData);
+
                 await showCustomModal({ 
                     title: 'Attendance Saved', 
                     message: 'Daily attendance records have been successfully saved to the system.',
@@ -544,7 +619,7 @@
                 const titleEl = document.getElementById('modalTitle');
                 const msgEl = document.getElementById('modalMessage');
                 const iconEl = document.getElementById('modalIcon');
-                const confirmBtn = document.getElementById('customAlertModal').querySelector('button');
+                const confirmBtn = modal.querySelector('button');
 
                 titleEl.textContent = title;
                 iconEl.textContent = icon;
