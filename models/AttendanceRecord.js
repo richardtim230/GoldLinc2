@@ -6,7 +6,7 @@ const AttendanceRecordSchema = new mongoose.Schema({
   role: { type: String, enum: ['student', 'teaching', 'non-teaching'], required: true },
   class: String, // for students
   department: String, // for staff
-  status: { type: String, enum: ['Present', 'Absent', 'Late', 'Excused', 'Leave'], required: true },
+  status: { type: String, enum: ['EXCUSED', 'ABSENT', 'LATE', 'PRESENT', 'LEAVE'], required: true },
   remark: String,
   recordedBy: { type: String }, // admin/staff id or name
 }, { timestamps: true });
