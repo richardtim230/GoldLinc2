@@ -399,7 +399,160 @@ router.delete('/:id/notifications/:notificationId', teacherAuth, async (req, res
     res.status(500).json({ error: err.message });
   }
 });
+// POST /api/teachers/:id/attendance - Save daily attendance for a class
+router.post('/:id/attendance', teacherAuth, async (req, res) => {
+  try {
+    if (String(req.params.id) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
 
+    const { classId, date, attendance } = req.body;
+
+    if (!classId || !date || !attendance || Object.keys(attendance).length === 0) {
+      return res.status(400).json({ 
+        error: "classId, date, and attendance object are required" 
+      });
+    }
+
+    // Verify teacher has access to this class
+    const cls = await Class.findOne({ 
+      _id: classId, 
+      teachers: req.staff._id 
+    });
+
+    if (!cls) {
+      return res.status(403).json({ 
+        error: "Not assigned to this class" 
+      });
+    }
+
+    // Get students for this class
+    const students = await Student.find({ class: cls.name });
+    const studentMap = new Map(students.map(s => [String(s._id), s]));
+
+    // Create attendance records for each student
+    const AttendanceRecord = require('../models/AttendanceRecord');
+    const records = [];
+
+    for (const [studentId, status] of Object.entries(attendance)) {
+      const student = studentMap.get(studentId);
+      
+      if (!student) {
+        console.warn(`Student ${studentId} not found`);
+        continue;
+      }
+
+      // Check if record already exists for this date
+      let record = await AttendanceRecord.findOne({
+        userId: studentId,
+        date: new Date(date),
+        class: cls.name
+      });
+
+      if (record) {
+        // Update existing record
+        record.status = status;
+        record.recordedBy = req.staff._id;
+      } else {
+        // Create new record
+        record = new AttendanceRecord({
+          date: new Date(date),
+          userId: studentId,
+          name: `${student.firstname} ${student.surname}`,
+          role: 'student',
+          class: cls.name,
+          status: status,
+          recordedBy: req.staff._id
+        });
+      }
+
+      await record.save();
+      records.push(record);
+    }
+
+    res.json({
+      success: true,
+      message: `Attendance saved for ${records.length} students`,
+      classId: classId,
+      date: date,
+      recordsCount: records.length
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/teachers/:id/attendance - Get attendance records for a class
+router.get('/:id/attendance', teacherAuth, async (req, res) => {
+  try {
+    if (String(req.params.id) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const { classId, date } = req.query;
+
+    if (!classId) {
+      return res.status(400).json({ error: "classId is required" });
+    }
+
+    // Verify teacher has access to this class
+    const cls = await Class.findOne({ 
+      _id: classId, 
+      teachers: req.staff._id 
+    });
+
+    if (!cls) {
+      return res.status(403).json({ 
+        error: "Not assigned to this class" 
+      });
+    }
+
+    const AttendanceRecord = require('../models/AttendanceRecord');
+    let query = {
+      class: cls.name,
+      role: 'student'
+    };
+
+    if (date) {
+      const dateObj = new Date(date);
+      const nextDay = new Date(dateObj);
+      nextDay.setDate(nextDay.getDate() + 1);
+      
+      query.date = {
+        $gte: dateObj,
+        $lt: nextDay
+      };
+    }
+
+    const records = await AttendanceRecord.find(query).sort({ createdAt: -1 });
+
+    // Group by date
+    const grouped = {};
+    records.forEach(record => {
+      const dateKey = record.date.toISOString().split('T')[0];
+      if (!grouped[dateKey]) {
+        grouped[dateKey] = [];
+      }
+      grouped[dateKey].push({
+        studentId: record.userId,
+        name: record.name,
+        status: record.status,
+        date: record.date,
+        recordedAt: record.createdAt
+      });
+    });
+
+    res.json({
+      classId: classId,
+      className: cls.name,
+      records: grouped
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 // === UNIFIED QUESTION BANK ENDPOINT - Fetch from BOTH CBT & Collection models ===
 // GET /api/teachers/:id/question-bank - Get ALL questions from both CBT documents and Collection model
 router.get('/:id/question-bank', teacherAuth, async (req, res) => {
