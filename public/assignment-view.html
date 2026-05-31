@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gold & Linc | Assignment Evaluation Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+    </style>
+</head>
+<body class="antialiased min-h-screen text-slate-800">
+
+    <header class="bg-brand-900 text-white shadow-md border-b border-brand-800 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="h-9 w-9 bg-white text-brand-900 rounded-xl flex items-center justify-center font-black text-sm tracking-tighter shadow-inner">
+                    G&L
+                </div>
+                <div>
+                    <h1 class="text-xs font-black tracking-widest uppercase text-brand-200">Faculty Terminal</h1>
+                    <p class="text-xs font-medium opacity-80">Assignment Grading & Analytics Suite</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="text-right hidden sm:block">
+                    <p id="instructorName" class="text-xs font-bold text-white">Dr. Sarah Jenkins</p>
+                    <p class="text-[10px] font-mono text-brand-200">Dept. of Biological Sciences</p>
+                </div>
+                <div class="h-8 w-8 rounded-full bg-brand-500 flex items-center justify-center font-bold text-xs text-white border-2 border-brand-200 shadow-sm">
+                    SJ
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div id="panel-view-assignment" class="space-y-6">
+            
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+                <div class="flex items-center space-x-4">
+                    <a href="#" onclick="alert('Navigating back to main instructor hub dashboard mock..."); return false;" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-2 rounded-xl text-xs flex items-center transition">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Return to Hub
+                    </a>
+                    <div>
+                        <h2 id="viewAsmMainTitle" class="text-base font-black text-brand-900 uppercase tracking-wide">Loading Assignment...</h2>
+                        <div class="flex flex-wrap items-center gap-2 mt-1 text-[11px] font-bold text-slate-500">
+                            <span id="viewAsmClassBadge" class="bg-brand-50 text-brand-800 px-2 py-0.5 rounded">...</span>
+                            <span id="viewAsmSubjectBadge" class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded">...</span>
+                            <span class="text-slate-400">&bull;</span>
+                            <span class="flex items-center">
+                                <svg class="w-3.5 h-3.5 mr-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                Deadline: <span id="viewAsmDeadline" class="ml-1 text-rose-600 font-extrabold">...</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <button onclick="deleteCurrentAssignment()" type="button" class="bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider transition ml-auto sm:ml-0">
+                        Delete Task
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Class Size</p>
+                    <p class="text-2xl font-black text-slate-900 mt-1" id="viewAsmStatTotal">0</p>
+                    <p class="text-[9px] text-slate-400 font-medium mt-0.5">Assigned Students</p>
+                </div>
+                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Turned In</p>
+                    <p class="text-2xl font-black text-brand-600 mt-1" id="viewAsmStatSubmitted">0</p>
+                    <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mt-1.5 shadow-inner">
+                        <div id="viewAsmTurnedInBar" class="bg-brand-500 h-full w-0 transition-all duration-500"></div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Pending Grading</p>
+                    <p class="text-2xl font-black text-amber-600 mt-1" id="viewAsmStatPending">0</p>
+                    <p class="text-[9px] text-amber-600/80 font-bold mt-0.5 bg-amber-50 rounded px-1 inline-block">Requires Action</p>
+                </div>
+                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Graded Base</p>
+                    <p class="text-2xl font-black text-emerald-600 mt-1" id="viewAsmStatGraded">0</p>
+                    <p class="text-[9px] text-slate-400 font-medium mt-0.5">Marks Uploaded</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <div class="space-y-4 lg:col-span-1">
+                    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                        <div class="border-b border-slate-100 pb-2">
+                            <h3 class="text-xs font-bold text-brand-900 uppercase tracking-wider">Task Guidelines Portfolio</h3>
+                            <p id="viewAsmRoutingType" class="text-[10px] font-mono mt-0.5 font-bold uppercase tracking-wider text-slate-400">Type: Standard</p>
+                        </div>
+                        <div id="viewAsmMetaBodyContent" class="text-xs text-slate-600 font-medium leading-relaxed max-h-96 overflow-y-auto pr-1 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                            <div>
+                                <h3 class="text-xs font-bold text-brand-900 uppercase tracking-wider">Student Submission Tracker</h3>
+                                <p class="text-[11px] text-slate-500">View real-time workspace items and apply marks to core CA sheets instantly.</p>
+                            </div>
+                            <div>
+                                <span class="inline-flex bg-slate-100 text-slate-700 font-mono font-bold px-2 py-0.5 rounded text-[11px]" id="viewAsmClassTotalCounter">0 Records Found</span>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto rounded-xl border border-slate-100">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
+                                        <th class="p-3 pl-4">Student Fullname</th>
+                                        <th class="p-3">Status</th>
+                                        <th class="p-3">Attached Deliverable</th>
+                                        <th class="p-3 text-center w-28">Score / 100</th>
+                                        <th class="p-3 text-center w-36">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="viewAsmSubmissionsTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </main>
+
+    <div id="customAlertModal" class="fixed inset-0 bg-slate-900/60 items-center justify-center z-50 flex hidden backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center shadow-xl border border-slate-100 mx-4 transform transition-all">
+            <div id="modalIcon" class="text-4xl mb-3">✅</div>
+            <h3 id="modalTitle" class="text-sm font-black uppercase text-slate-900 tracking-wide">Action Successful</h3>
+            <p id="modalMessage" class="text-xs text-slate-500 font-medium mt-2 leading-relaxed">The student metric frame record has updated correctly.</p>
+            <button onclick="closeCustomModal()" class="mt-5 w-full bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition uppercase tracking-wider">
+                Acknowledge
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. MOCK DATA ARRAYS SIMULATING FULL DATABASE AND API STACK ---
+        const sampleAssignment = {
+            id: "asm-702-biology-lab",
+            title: "Advanced Lab Portfolio: Plant Mitosis Cells & Microscopic Analysis",
+            classCohort: "SS2 Science A",
+            subject: "Biology",
+            dueDate: "2026-06-15T23:59:00.000Z",
+            type: "STANDARD",
+            instructions: `<strong>Evaluation Directives:</strong><br/>Students must outline, describe, and compare structural deviations during early anaphase within onion root tip cell profiles. Deliverables must feature exact cell count parameters and cross-reference chromosome alignment profiles.<br/><br/><em>All references must maintain standard scientific annotations.</em>`
+        };
+
+        const localStudentRegistry = [
+            { id: "stu-101", name: "Chinedu Okafor", admissionCode: "GL-2024-0042" },
+            { id: "stu-102", name: "Amina Yusuf", admissionCode: "GL-2024-0119" },
+            { id: "stu-103", name: "Oluwaseun Adebayo", admissionCode: "GL-2024-0085" },
+            { id: "stu-104", name: "Efe Montgomery", admissionCode: "GL-2023-0941" },
+            { id: "stu-105", name: "Zainab Abubakar", admissionCode: "GL-2024-0312" }
+        ];
+
+        // Tracks live client status state transformations inside this view session
+        let submissionStateMatrix = [
+            { id: "sub-01", studentId: "stu-101", responseText: "Completed lab report analyzing 45 root tip configurations. Observed dynamic spindle pull metrics.", score: 88 },
+            { id: "sub-02", studentId: "stu-102", responseText: "Full scientific lab journal document uploaded. All charts attached.", score: null },
+            { id: "sub-03", studentId: "stu-103", responseText: "Mitosis documentation framework submission entry text field response.", score: 94 },
+            // Note: Students 'stu-104' and 'stu-105' remain unsubmitted initially to verify UI state variance
+        ];
+
+        // --- 2. MAIN LOGIC PIPELINE RENDER ENGINE ---
+        function loadAssignmentDetailWorkspace() {
+            // Bind static header metadata
+            document.getElementById('viewAsmMainTitle').textContent = sampleAssignment.title;
+            document.getElementById('viewAsmClassBadge').textContent = sampleAssignment.classCohort;
+            document.getElementById('viewAsmSubjectBadge').textContent = sampleAssignment.subject;
+            document.getElementById('viewAsmDeadline').textContent = sampleAssignment.dueDate.substring(0, 10);
+            document.getElementById('viewAsmMetaBodyContent').innerHTML = sampleAssignment.instructions;
+            
+            document.getElementById('viewAsmClassTotalCounter').textContent = `${localStudentRegistry.length} Students Allocated`;
+
+            // Operational Counter Trackers
+            let totalSubmitted = 0;
+            let totalPendingGrading = 0;
+            let totalGraded = 0;
+
+            const tableBody = document.getElementById('viewAsmSubmissionsTableBody');
+            tableBody.innerHTML = "";
+
+            localStudentRegistry.forEach(student => {
+                // Find submission match
+                const matchedSubmission = submissionStateMatrix.find(sub => sub.studentId === student.id);
+                
+                let statusBadge = "";
+                let deliverableCell = "";
+                let scoreInput = "";
+                let actionBtn = "";
+
+                if (matchedSubmission) {
+                    totalSubmitted++;
+                    const hasScore = matchedSubmission.score !== null && matchedSubmission.score !== undefined;
+                    
+                    if (hasScore) {
+                        totalGraded++;
+                        statusBadge = `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center">Graded</span>`;
+                    } else {
+                        totalPendingGrading++;
+                        statusBadge = `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center">Pending Review</span>`;
+                    }
+
+                    deliverableCell = `<div class="max-w-xs truncate text-[11px] text-slate-600 bg-slate-100 p-1.5 rounded font-mono border border-slate-200/60" title="${matchedSubmission.responseText}">${matchedSubmission.responseText}</div>`;
+                    
+                    scoreInput = `
+                        <input type="number" min="0" max="100" id="inlineScore-${matchedSubmission.id}" value="${hasScore ? matchedSubmission.score : ''}" placeholder="--" 
+                               class="w-16 bg-slate-50 border border-slate-300 rounded-lg p-1 text-center font-bold text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition-all">
+                    `;
+
+                    actionBtn = `
+                        <button onclick="commitInlineSubmissionScore(this, '${matchedSubmission.id}')" type="button" 
+                                class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-wide transition shadow-sm">
+                            Save Mark
+                        </button>
+                    `;
+                } else {
+                    // Not turned in structural configuration
+                    statusBadge = `<span class="bg-slate-100 text-slate-400 px-2 py-0.5 rounded-full text-[10px] font-bold">Unsubmitted</span>`;
+                    deliverableCell = `<span class="text-slate-400 italic font-normal text-[11px]">No deliverable submitted</span>`;
+                    scoreInput = `<input type="text" disabled value="--" class="w-16 bg-slate-100 border border-slate-200 rounded-lg p-1 text-center font-bold text-xs text-slate-400 cursor-not-allowed">`;
+                    actionBtn = `<button disabled class="bg-slate-200 text-slate-400 cursor-not-allowed font-bold text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-wide">Incomplete</button>`;
+                }
+
+                // Render operational row node
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/80 transition-all text-slate-700";
+                tr.innerHTML = `
+                    <td class="p-3 pl-4 font-bold text-slate-900">
+                        ${student.name} 
+                        <span class="block text-[10px] text-slate-400 font-mono font-normal tracking-tight">${student.admissionCode}</span>
+                    </td>
+                    <td class="p-3">${statusBadge}</td>
+                    <td class="p-3">${deliverableCell}</td>
+                    <td class="p-3 text-center">${scoreInput}</td>
+                    <td class="p-3 text-center">${actionBtn}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            // Update mathematical dashboards 
+            document.getElementById('viewAsmStatTotal').textContent = localStudentRegistry.length;
+            document.getElementById('viewAsmStatSubmitted').textContent = totalSubmitted;
+            document.getElementById('viewAsmStatPending').textContent = totalPendingGrading;
+            document.getElementById('viewAsmStatGraded').textContent = totalGraded;
+
+            // Compute structural bar animations
+            const ratioPercentage = localStudentRegistry.length > 0 ? (totalSubmitted / localStudentRegistry.length) * 100 : 0;
+            document.getElementById('viewAsmTurnedInBar').style.width = `${ratioPercentage}%`;
+        }
+
+        // --- 3. INTERACTIVE MUTATION ACTIONS FUNCTIONS ---
+        function commitInlineSubmissionScore(buttonElement, submissionId) {
+            const scoreInput = document.getElementById(`inlineScore-${submissionId}`);
+            if (!scoreInput) return;
+
+            const cleanValue = scoreInput.value.trim();
+            if (cleanValue === "" || isNaN(cleanValue) || parseFloat(cleanValue) < 0 || parseFloat(cleanValue) > 100) {
+                showCustomModal("⚠️ Input Validation Error", "Please assign a clear score metric baseline value falling between 0 and 100 points.", "❌");
+                return;
+            }
+
+            // Simulate loader spinner state transitions
+            const originalText = buttonElement.textContent;
+            buttonElement.disabled = true;
+            buttonElement.textContent = "Saving...";
+
+            setTimeout(() => {
+                // Find and update item inside active memory dataset array
+                const targetSub = submissionStateMatrix.find(s => s.id === submissionId);
+                if (targetSub) {
+                    targetSub.score = parseFloat(cleanValue);
+                }
+
+                buttonElement.disabled = false;
+                buttonElement.textContent = originalText;
+
+                // Sync workspace visualizations
+                loadAssignmentDetailWorkspace();
+                showCustomModal("Grade Documented", "The score profile has been verified and successfully calculated into the student's continuous assessment records.", "✅");
+            }, 750);
+        }
+
+        function deleteCurrentAssignment() {
+            const verification = confirm("Are you completely sure you want to delete this deployed assignment portfolio entry? All tracked student metrics will be unlinked.");
+            if (!verification) return;
+
+            showCustomModal("Task Eliminated", "This assignment framework has been deleted from the current workspace directory registry.", "🗑️");
+            
+            // Render basic empty shell framework placeholder status view state clear
+            document.getElementById('panel-view-assignment').innerHTML = `
+                <div class="bg-white border border-slate-200 rounded-2xl p-12 text-center shadow-sm max-w-xl mx-auto my-12">
+                    <div class="text-5xl mb-4">🗑️</div>
+                    <h3 class="text-base font-black text-slate-900 uppercase tracking-wide">Assignment Record Removed</h3>
+                    <p class="text-xs text-slate-500 font-medium mt-2">This assignment dashboard file context is now blank. Refresh the live browser panel viewport to re-instantiate mock variables.</p>
+                </div>
+            `;
+        }
+
+        // --- 4. SYSTEM UTILITY NOTIFICATION WINDOW FUNCTIONS ---
+        function showCustomModal(title, message, icon) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('modalIcon').textContent = icon || "✅";
+            document.getElementById('customAlertModal').classList.remove('hidden');
+        }
+
+        function closeCustomModal() {
+            document.getElementById('customAlertModal').classList.add('hidden');
+        }
+
+        // Initialize and fire up UI workspace view metrics immediately on load framework initialization 
+        document.addEventListener("DOMContentLoaded", loadAssignmentDetailWorkspace);
+    </script>
+</body>
+</html>
