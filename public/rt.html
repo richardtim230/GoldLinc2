@@ -2041,17 +2041,38 @@ function openAssignmentModal() {
 
     openAssignmentModal();
 
+    // Basic fields
     document.getElementById('asmModalTitle').value =
         assignment.title || '';
 
-    document.getElementById('asmModalClass').value =
-        assignment.class?._id || assignment.class || '';
+    const classId =
+        assignment.class?._id ||
+        assignment.class ||
+        '';
 
-    // Load subjects for selected class
+    document.getElementById('asmModalClass').value =
+        classId;
+
+    // Load subjects first
     await loadAssignmentSubjects();
 
-    document.getElementById('asmModalSubject').value =
-        assignment.subject?._id || assignment.subject || '';
+    const subjectId =
+        assignment.subject?._id ||
+        assignment.subject ||
+        '';
+
+    const subjectSelect =
+        document.getElementById('asmModalSubject');
+
+    subjectSelect.value = subjectId;
+
+    // If subject isn't found in options, log it
+    if (subjectId && subjectSelect.value !== subjectId) {
+        console.warn(
+            'Saved subject not found in loaded subjects:',
+            subjectId
+        );
+    }
 
     document.getElementById('asmModalDue').value =
         assignment.dueDate
@@ -2078,24 +2099,36 @@ function openAssignmentModal() {
         const allocated =
             assignment.questionsAllocated || [];
 
+        console.log(
+            'Allocated Questions:',
+            allocated
+        );
+
         await loadQuestionsForAllocation();
 
-        setTimeout(() => {
+        // Wait for DOM to finish rendering checkboxes
+        await new Promise(resolve =>
+            requestAnimationFrame(resolve)
+        );
 
-            allocated.forEach(id => {
+        const checkboxes =
+            document.querySelectorAll(
+                '#asmAllocationQuestionsContainer input[type="checkbox"]'
+            );
 
-                const checkbox =
-                    document.querySelector(
-                        `#asmAllocationQuestionsContainer input[value="${id}"]`
-                    );
+        console.log(
+            'Rendered Checkbox Values:',
+            Array.from(checkboxes).map(
+                cb => cb.value
+            )
+        );
 
-                if (checkbox) {
-                    checkbox.checked = true;
-                }
+        checkboxes.forEach(cb => {
 
-            });
+            cb.checked =
+                allocated.includes(cb.value);
 
-        }, 300);
+        });
     }
 
     const submitBtn =
@@ -2103,8 +2136,15 @@ function openAssignmentModal() {
             '#assignmentModal button[onclick*="commitAssignmentDeployment"]'
         );
 
-    submitBtn.textContent =
-        'Update Assignment';
+    if (submitBtn) {
+        submitBtn.textContent =
+            'Update Assignment';
+    }
+
+    console.log(
+        'Editing Assignment:',
+        assignment
+    );
 }
 
     async function deleteAssignment(event, assignmentId) {
