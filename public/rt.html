@@ -265,32 +265,38 @@
             </div>
         </div>
 
-        <div id="panel-students" class="space-y-6 hidden">
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-100 pb-3">
-                    <div>
-                        <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Secondary Form Cohort Registry</h2>
-                        <p class="text-xs text-slate-500">Review assigned class lines and student system codes cleanly.</p>
-                    </div>
-                    <select id="studentClassFilter" onchange="renderStudents()" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
-                        <option value="ALL">Display All Assigned Classes</option>
-                    </select>
-                </div>
-                <div class="overflow-x-auto rounded-xl border border-slate-100">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead>
-                            <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
-                                <th class="p-3 pl-4">Admission Code</th>
-                                <th class="p-3">Student Fullname</th>
-                                <th class="p-3">Assigned Class Tier</th>
-                                <th class="p-3 text-center">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="studentTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
-                    </table>
-                </div>
+<div id="panel-students" class="space-y-6 hidden">
+    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-100 pb-3">
+            <div>
+                <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Secondary Form Cohort Registry</h2>
+                <p class="text-xs text-slate-500">Review assigned class lines and student system codes cleanly.</p>
+            </div>
+            <div class="flex gap-2 items-center w-full sm:w-auto">
+                <select id="studentClassFilter" onchange="renderStudents()" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500 flex-1 sm:flex-none">
+                    <option value="ALL">Display All Assigned Classes</option>
+                </select>
+                <button onclick="redirectToAttendance()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider transition flex items-center gap-1 whitespace-nowrap">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Mark Attendance
+                </button>
             </div>
         </div>
+        <div class="overflow-x-auto rounded-xl border border-slate-100">
+            <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
+                        <th class="p-3 pl-4">Admission Code</th>
+                        <th class="p-3">Student Fullname</th>
+                        <th class="p-3">Assigned Class</th>
+                        <th class="p-3 text-center">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="studentTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
         <div id="panel-grading" class="space-y-6 hidden">
             <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
@@ -589,6 +595,25 @@
 
 
 <script>
+
+    // ============ ATTENDANCE REDIRECT FUNCTION ============
+function redirectToAttendance() {
+    const selectedClass = document.getElementById('studentClassFilter').value;
+    
+    if (selectedClass === 'ALL') {
+        showCustomModal({ 
+            title: 'Class Selection Required', 
+            message: 'Please select a specific class to mark attendance. You cannot mark attendance for all classes at once.',
+            type: 'alert', 
+            icon: '⚠️' 
+        });
+        return;
+    }
+    
+    // Pass the selected class ID as a URL parameter
+    const attendanceUrl = `stu-attend.html?classId=${encodeURIComponent(selectedClass)}`;
+    window.location.href = attendanceUrl;
+}
     // ============ API CONFIGURATION ============
     const API_BASE_URL = "https://goldlincschools.onrender.com";
     const token = localStorage.getItem('teacherToken') || localStorage.getItem('token') || "";
