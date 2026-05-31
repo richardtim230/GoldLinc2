@@ -230,7 +230,7 @@ router.get('/:id/assignments', teacherAuth, async (req, res) => {
 // POST /api/teachers/:id/assignments
 router.post('/:id/assignments', teacherAuth, async (req, res) => {
   try {
-    const { class: classId, subject, title, description, dueDate, cbt } = req.body;
+    const { class: classId, subject, title, description, dueDate, cbt, type, questionsAllocated } = req.body;
     const assignment = new Assignment({
       teacher: req.params.id,
       class: classId,
@@ -238,7 +238,9 @@ router.post('/:id/assignments', teacherAuth, async (req, res) => {
       title,
       description,
       dueDate,
-      cbt // <-- attach CBT here!
+      cbt,
+      type: type || 'STANDARD',
+      questionsAllocated: questionsAllocated || []
     });
     await assignment.save();
     await assignment.populate({ path: 'class', select: 'name' });
@@ -435,7 +437,7 @@ router.post('/:id/cbt', teacherAuth, async (req, res) => {
     }
     const { class: classId, subject, title, duration, questions } = req.body;
     const cbt = new CBT({
-      teacher: req.staff._id, // <--- use the authenticated teacher's ID only
+      teacher: req.staff._id,
       class: classId,
       subject,
       title,
@@ -459,7 +461,7 @@ router.get('/:id/cbt', teacherAuth, async (req, res) => {
     if (String(req.params.id) !== String(req.staff._id)) {
       return res.status(403).json({ error: "Forbidden" });
     }
-    const cbts = await CBT.find({ teacher: req.staff._id }) // <--- use the authenticated teacher's ID only
+    const cbts = await CBT.find({ teacher: req.staff._id })
       .populate('class', 'name')
       .populate('subject', 'name');
     res.json({ cbts });
@@ -535,7 +537,7 @@ router.post('/:id/cbt/push', teacherAuth, async (req, res) => {
     for (const cbt of cbts) {
       const exam = new CBT({
         title: cbt.title,
-        class: cbt.class, // make sure this matches Exam model's expectations
+        class: cbt.class,
         subject: cbt.subject,
         duration: cbt.duration,
         questions: cbt.questions
@@ -544,6 +546,56 @@ router.post('/:id/cbt/push', teacherAuth, async (req, res) => {
       pushed.push(exam._id);
     }
     res.json({ success: true, pushed });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ✅ NEW: POST /api/teachers/:id/collections/:collectionId/push - Push collection to CBT model
+router.post('/:id/collections/:collectionId/push', teacherAuth, async (req, res) => {
+  try {
+    if (String(req.params.id) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    // Find the collection
+    const collection = await Collection.findById(req.params.collectionId);
+    if (!collection) return res.status(404).json({ error: "Collection not found" });
+    if (String(collection.teacher) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    // Transform collection questions to CBT format
+    const transformedQuestions = (collection.questions || []).map(q => ({
+      text: q.text,
+      options: q.options.map(opt => opt.text), // Extract just the text for CBT format
+      answer: q.options.findIndex(opt => opt.isCorrect), // Find the index of correct answer
+      imageUrl: q.imageUrl || null,
+      explanation: q.explanation || null
+    }));
+
+    // Create new CBT document from collection
+    const cbt = new CBT({
+      teacher: req.staff._id,
+      title: collection.name,
+      class: collection.class,
+      subject: collection.subject,
+      duration: 60, // Default duration
+      questions: transformedQuestions,
+      description: collection.description || ''
+    });
+
+    await cbt.save();
+    await cbt.populate([
+      { path: 'class', select: 'name' },
+      { path: 'subject', select: 'name' }
+    ]);
+
+    res.json({ 
+      success: true, 
+      message: `Collection "${collection.name}" successfully pushed to CBT Exam`,
+      cbt 
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
