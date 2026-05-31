@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=0.85">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gold & Linc | Faculty Attendance Terminal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -332,53 +332,59 @@
                     return null;
                 }
 
-                // Try to find the class by:
-                // 1. Exact MongoDB ID match
-                // 2. Class arms field (since it shows "arms" in the response)
-                // 3. Class name match (case-insensitive)
-                // 4. Class code match (case-insensitive)
-
                 let foundClass = null;
 
-                // Try exact ID match
-                foundClass = classes.find(c => c._id === classIdentifier);
+                // Try exact ID match (check both _id and id fields)
+                foundClass = classes.find(c => c._id === classIdentifier || c.id === classIdentifier);
                 if (foundClass) {
-                    console.log('Found by _id:', foundClass);
+                    console.log('Found by ID:', foundClass);
                     updateClassBadges(foundClass);
-                    return foundClass._id;
+                    return foundClass._id || foundClass.id;
                 }
 
-                // Try matching against arms array or name
+                // Try matching against class name (case-insensitive)
+                foundClass = classes.find(c => 
+                    c.name && c.name.toLowerCase().trim() === classIdentifier.toLowerCase().trim()
+                );
+                if (foundClass) {
+                    console.log('Found by class name:', foundClass);
+                    updateClassBadges(foundClass);
+                    return foundClass._id || foundClass.id;
+                }
+
+                // Try matching against class code (case-insensitive)
+                foundClass = classes.find(c => 
+                    c.code && c.code.toLowerCase().trim() === classIdentifier.toLowerCase().trim()
+                );
+                if (foundClass) {
+                    console.log('Found by class code:', foundClass);
+                    updateClassBadges(foundClass);
+                    return foundClass._id || foundClass.id;
+                }
+
+                // Try matching against arms array
                 for (let classItem of classes) {
-                    // Check if classIdentifier matches any arm
                     if (classItem.arms && Array.isArray(classItem.arms)) {
                         const armMatch = classItem.arms.find(arm => 
-                            arm.name && arm.name.toLowerCase() === classIdentifier.toLowerCase()
+                            (typeof arm === 'string' && arm.toLowerCase().trim() === classIdentifier.toLowerCase().trim()) ||
+                            (typeof arm === 'object' && arm.name && arm.name.toLowerCase().trim() === classIdentifier.toLowerCase().trim())
                         );
                         if (armMatch) {
-                            console.log('Found by arm name:', classItem, armMatch);
-                            updateClassBadges(classItem, armMatch.name);
-                            return classItem._id;
+                            console.log('Found by arm:', classItem, armMatch);
+                            const armName = typeof armMatch === 'string' ? armMatch : armMatch.name;
+                            updateClassBadges(classItem, armName);
+                            return classItem._id || classItem.id;
                         }
-                    }
-
-                    // Check if classIdentifier matches class name
-                    if (classItem.name && classItem.name.toLowerCase() === classIdentifier.toLowerCase()) {
-                        console.log('Found by class name:', classItem);
-                        updateClassBadges(classItem);
-                        return classItem._id;
-                    }
-
-                    // Check if classIdentifier matches class code
-                    if (classItem.code && classItem.code.toLowerCase() === classIdentifier.toLowerCase()) {
-                        console.log('Found by class code:', classItem);
-                        updateClassBadges(classItem);
-                        return classItem._id;
                     }
                 }
 
                 console.error('Class not found with identifier:', classIdentifier);
-                console.log('Available classes:', classes.map(c => ({ id: c._id, name: c.name, code: c.code, arms: c.arms })));
+                console.log('Available classes:', classes.map(c => ({ 
+                    id: c._id || c.id, 
+                    name: c.name, 
+                    code: c.code, 
+                    arms: c.arms 
+                })));
                 return null;
 
             } catch (error) {
@@ -456,7 +462,8 @@
         function initializeAttendanceState() {
             workingSessionAttendanceState = {};
             classStudents.forEach(student => {
-                workingSessionAttendanceState[student.id || student._id] = 'PRESENT';
+                const studentId = student.id || student._id;
+                workingSessionAttendanceState[studentId] = 'PRESENT';
             });
         }
 
@@ -481,7 +488,7 @@
                 tr.id = `student-row-${studentId}`;
                 tr.className = "hover:bg-slate-50/80 transition-all border-l-4 border-transparent cursor-pointer";
                 
-                if (student.id === activeSelectedStudentId) {
+                if (activeSelectedStudentId === studentId) {
                     tr.classList.add('bg-brand-50/60', 'border-brand-500');
                 }
 
@@ -541,7 +548,11 @@
                 rowElement.classList.add('bg-brand-50/60', 'border-brand-500');
             }
 
-            const student = classStudents.find(s => (s.id || s._id) === studentId);
+            const student = classStudents.find(s => {
+                const sId = s.id || s._id;
+                return sId === studentId;
+            });
+            
             if (!student) return;
 
             document.getElementById('inspectorEmptyState').classList.add('hidden');
