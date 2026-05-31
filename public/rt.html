@@ -1161,39 +1161,337 @@
     }
 
     function renderAssignments() {
-        const container = document.getElementById('assignmentsContainer');
-        container.innerHTML = '';
 
-        if (allAssignments.length === 0) {
-            container.innerHTML = `<div class="col-span-full text-center p-8 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-xs font-bold">No assignments deployed yet.</div>`;
-            return;
-        }
+    const container =
+        document.getElementById(
+            'assignmentsContainer'
+        );
 
-        allAssignments.forEach((assignment) => {
-            const dueDate = new Date(assignment.dueDate).toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric', 
-                year: 'numeric' 
-            });
+    container.innerHTML = '';
 
-            container.innerHTML += `
-                <div class="bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 rounded-xl p-4 shadow-sm">
-                    <div class="flex justify-between items-start mb-3">
-                        <div>
-                            <h3 class="text-sm font-bold text-brand-900">${assignment.title || 'Untitled'}</h3>
-                            <p class="text-[11px] text-slate-500 mt-0.5">${assignment.class?.name || 'No Class'}</p>
-                        </div>
-                        <span class="inline-block text-[9px] font-black tracking-widest bg-brand-100 text-brand-800 px-2 py-1 rounded uppercase">${assignment.type || 'Standard'}</span>
+    if (!allAssignments.length) {
+
+        container.innerHTML = `
+            <div class="col-span-full text-center p-8 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-xs font-bold">
+                No assignments deployed yet.
+            </div>
+        `;
+
+        return;
+    }
+
+    allAssignments.forEach(assignment => {
+
+        const dueDate =
+            new Date(
+                assignment.dueDate
+            ).toLocaleDateString(
+                'en-US',
+                {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                }
+            );
+
+        container.innerHTML += `
+            <div class="bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 rounded-xl p-4 shadow-sm">
+
+                <div class="flex justify-between items-start mb-3">
+
+                    <div>
+                        <h3 class="text-sm font-bold text-brand-900">
+                            ${assignment.title || 'Untitled'}
+                        </h3>
+
+                        <p class="text-[11px] text-slate-500 mt-0.5">
+                            ${assignment.class?.name || 'No Class'}
+                        </p>
                     </div>
-                    <p class="text-xs text-slate-600 mb-3">Due: <strong class="font-bold">${dueDate}</strong></p>
-                    <div class="flex space-x-2">
-                        <button onclick="editAssignment('${assignment._id}')" class="flex-1 bg-brand-50 hover:bg-brand-100 text-brand-800 font-bold text-xs px-3 py-1.5 rounded-lg transition uppercase">Edit</button>
-                        <button onclick="deleteAssignment(event, '${assignment._id}')" class="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-800 font-bold text-xs px-3 py-1.5 rounded-lg transition uppercase">Delete</button>
-                    </div>
-                </div>`;
+
+                    <span class="inline-block text-[9px] font-black tracking-widest bg-brand-100 text-brand-800 px-2 py-1 rounded uppercase">
+                        ${assignment.type || 'STANDARD'}
+                    </span>
+
+                </div>
+
+                <p class="text-xs text-slate-600 mb-3">
+                    Due:
+                    <strong class="font-bold">
+                        ${dueDate}
+                    </strong>
+                </p>
+
+                <div class="grid grid-cols-2 gap-2">
+
+                    <button
+                        onclick="viewAssignment('${assignment._id}')"
+                        class="bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold text-xs px-3 py-1.5 rounded-lg transition uppercase">
+                        View
+                    </button>
+
+                    <button
+                        onclick="viewAssignmentSubmissions('${assignment._id}')"
+                        class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs px-3 py-1.5 rounded-lg transition uppercase">
+                        Submissions
+                    </button>
+
+                    <button
+                        onclick="editAssignment('${assignment._id}')"
+                        class="bg-brand-50 hover:bg-brand-100 text-brand-800 font-bold text-xs px-3 py-1.5 rounded-lg transition uppercase">
+                        Edit
+                    </button>
+
+                    <button
+                        onclick="deleteAssignment(event, '${assignment._id}')"
+                        class="bg-rose-50 hover:bg-rose-100 text-rose-800 font-bold text-xs px-3 py-1.5 rounded-lg transition uppercase">
+                        Delete
+                    </button>
+
+                </div>
+
+            </div>
+        `;
+    });
+}
+async function viewAssignment(assignmentId) {
+
+    const assignment = allAssignments.find(
+        a => a._id === assignmentId
+    );
+
+    if (!assignment) {
+        return showCustomModal({
+            title: 'Error',
+            message: 'Assignment not found',
+            type: 'alert',
+            icon: '❌'
         });
     }
 
+    const dueDate =
+        assignment.dueDate
+            ? new Date(
+                  assignment.dueDate
+              ).toLocaleDateString(
+                  'en-US',
+                  {
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric'
+                  }
+              )
+            : 'N/A';
+
+    let content = '';
+
+    if (
+        (assignment.type || 'STANDARD') ===
+        'QUESTION_BANK'
+    ) {
+
+        content = `
+            <div class="text-left space-y-3 text-sm">
+
+                <div>
+                    <strong>Title:</strong>
+                    ${assignment.title}
+                </div>
+
+                <div>
+                    <strong>Class:</strong>
+                    ${
+                        assignment.class?.name ||
+                        'Not Assigned'
+                    }
+                </div>
+
+                <div>
+                    <strong>Subject:</strong>
+                    ${
+                        assignment.subject?.name ||
+                        'Not Assigned'
+                    }
+                </div>
+
+                <div>
+                    <strong>Due Date:</strong>
+                    ${dueDate}
+                </div>
+
+                <div>
+                    <strong>Assignment Type:</strong>
+                    Question Bank
+                </div>
+
+                <div>
+                    <strong>Questions Allocated:</strong>
+                    ${
+                        assignment
+                            .questionsAllocated
+                            ?.length || 0
+                    }
+                </div>
+
+            </div>
+        `;
+
+    } else {
+
+        content = `
+            <div class="text-left space-y-3 text-sm">
+
+                <div>
+                    <strong>Title:</strong>
+                    ${assignment.title}
+                </div>
+
+                <div>
+                    <strong>Class:</strong>
+                    ${
+                        assignment.class?.name ||
+                        'Not Assigned'
+                    }
+                </div>
+
+                <div>
+                    <strong>Subject:</strong>
+                    ${
+                        assignment.subject?.name ||
+                        'Not Assigned'
+                    }
+                </div>
+
+                <div>
+                    <strong>Due Date:</strong>
+                    ${dueDate}
+                </div>
+
+                <hr>
+
+                <div class="font-bold">
+                    Instructions
+                </div>
+
+                <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 max-h-80 overflow-y-auto">
+                    ${
+                        assignment.description ||
+                        '<em>No instructions provided</em>'
+                    }
+                </div>
+
+            </div>
+        `;
+    }
+
+    showCustomModal({
+        title: 'Assignment Details',
+        message: content,
+        type: 'alert',
+        icon: '📚'
+    });
+}
+    async function viewAssignmentSubmissions(
+    assignmentId
+) {
+
+    try {
+
+        const res = await fetch(
+            `${API_BASE_URL}/api/teachers/${encodeURIComponent(
+                teacher.id
+            )}/assignments/${assignmentId}/submissions`,
+            {
+                headers: authHeaders()
+            }
+        );
+
+        const data =
+            await res.json();
+
+        if (!res.ok) {
+            throw new Error(
+                data.error ||
+                'Failed to load submissions'
+            );
+        }
+
+        const submissions =
+            data.submissions || [];
+
+        if (!submissions.length) {
+
+            return showCustomModal({
+                title: 'Submissions',
+                message:
+                    'No submissions have been received yet.',
+                type: 'alert',
+                icon: '📥'
+            });
+        }
+
+        let html = `
+            <div class="space-y-2 text-left max-h-[400px] overflow-y-auto">
+        `;
+
+        submissions.forEach(
+            submission => {
+
+                html += `
+                    <div class="border border-slate-200 rounded-xl p-3 bg-slate-50">
+
+                        <div class="font-bold text-brand-900">
+                            ${
+                                submission.studentName
+                            }
+                        </div>
+
+                        <div class="text-xs text-slate-500 mt-1">
+                            Submitted:
+                            ${
+                                new Date(
+                                    submission.submittedAt
+                                ).toLocaleString()
+                            }
+                        </div>
+
+                        ${
+                            submission.score !==
+                            undefined
+                                ? `
+                                <div class="mt-1 text-xs font-bold text-emerald-700">
+                                    Score:
+                                    ${submission.score}
+                                </div>
+                            `
+                                : ''
+                        }
+
+                    </div>
+                `;
+            }
+        );
+
+        html += '</div>';
+
+        showCustomModal({
+            title: 'Assignment Submissions',
+            message: html,
+            type: 'alert',
+            icon: '📥'
+        });
+
+    } catch (err) {
+
+        showCustomModal({
+            title: 'Error',
+            message: err.message,
+            type: 'alert',
+            icon: '❌'
+        });
+    }
+}
+    
     function renderStudents() {
         const classFilter = document.getElementById('studentClassFilter')?.value || 'ALL';
         const tbody = document.getElementById('studentTableBody');
