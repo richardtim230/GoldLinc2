@@ -1,3 +1,4 @@
+name=routes/teachers.js
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
@@ -552,7 +553,7 @@ router.post('/:id/cbt/push', teacherAuth, async (req, res) => {
   }
 });
 
-// ✅ NEW: POST /api/teachers/:id/collections/:collectionId/convert-to-cbt
+// ✅ FIXED: POST /api/teachers/:id/collections/:collectionId/convert-to-cbt
 // Convert collection to CBT format and return the CBT ID
 router.post('/:id/collections/:collectionId/convert-to-cbt', teacherAuth, async (req, res) => {
   try {
@@ -567,14 +568,31 @@ router.post('/:id/collections/:collectionId/convert-to-cbt', teacherAuth, async 
       return res.status(403).json({ error: "Forbidden" });
     }
 
-    // Transform collection questions to CBT format
-    const transformedQuestions = (collection.questions || []).map(q => ({
-      text: q.text,
-      options: q.options.map(opt => opt.text), // Extract just the text for CBT format
-      answer: q.options.findIndex(opt => opt.isCorrect), // Find the index of correct answer
-      imageUrl: q.imageUrl || null,
-      explanation: q.explanation || null
-    }));
+    // Validate collection has required fields
+    if (!collection.class) {
+      return res.status(400).json({ error: "Collection must have a class assigned" });
+    }
+    if (!collection.subject) {
+      return res.status(400).json({ error: "Collection must have a subject assigned" });
+    }
+
+    // ✅ FIXED: Transform collection questions to CBT format
+    // Collection has: { text, options: [{ text, isCorrect }], imageUrl, explanation }
+    // CBT expects: { text, options: [{ value }], answer: index, imageUrl, explanation }
+    const transformedQuestions = (collection.questions || []).map(q => {
+      // Find index of correct answer
+      const correctIndex = q.options.findIndex(opt => opt.isCorrect === true);
+      
+      return {
+        text: q.text,
+        options: q.options.map(opt => ({
+          value: opt.text  // Map Collection's 'text' to CBT's 'value'
+        })),
+        answer: correctIndex >= 0 ? correctIndex : 0, // Single correct answer index
+        imageUrl: q.imageUrl || null,
+        explanation: q.explanation || null
+      };
+    });
 
     // Create new CBT document from collection
     const cbt = new CBT({
@@ -584,7 +602,7 @@ router.post('/:id/collections/:collectionId/convert-to-cbt', teacherAuth, async 
       subject: collection.subject,
       duration: 60, // Default duration
       questions: transformedQuestions,
-      description: collection.description || ''
+      status: 'Draft'
     });
 
     await cbt.save();
@@ -598,7 +616,7 @@ router.post('/:id/collections/:collectionId/convert-to-cbt', teacherAuth, async 
   }
 });
 
-// ✅ NEW: POST /api/teachers/:id/collections/:collectionId/push - Push collection to CBT model
+// ✅ FIXED: POST /api/teachers/:id/collections/:collectionId/push - Push collection to CBT model
 router.post('/:id/collections/:collectionId/push', teacherAuth, async (req, res) => {
   try {
     if (String(req.params.id) !== String(req.staff._id)) {
@@ -612,14 +630,29 @@ router.post('/:id/collections/:collectionId/push', teacherAuth, async (req, res)
       return res.status(403).json({ error: "Forbidden" });
     }
 
-    // Transform collection questions to CBT format
-    const transformedQuestions = (collection.questions || []).map(q => ({
-      text: q.text,
-      options: q.options.map(opt => opt.text), // Extract just the text for CBT format
-      answer: q.options.findIndex(opt => opt.isCorrect), // Find the index of correct answer
-      imageUrl: q.imageUrl || null,
-      explanation: q.explanation || null
-    }));
+    // Validate collection has required fields
+    if (!collection.class) {
+      return res.status(400).json({ error: "Collection must have a class assigned" });
+    }
+    if (!collection.subject) {
+      return res.status(400).json({ error: "Collection must have a subject assigned" });
+    }
+
+    // ✅ FIXED: Transform collection questions to CBT format
+    const transformedQuestions = (collection.questions || []).map(q => {
+      // Find index of correct answer
+      const correctIndex = q.options.findIndex(opt => opt.isCorrect === true);
+      
+      return {
+        text: q.text,
+        options: q.options.map(opt => ({
+          value: opt.text  // Map Collection's 'text' to CBT's 'value'
+        })),
+        answer: correctIndex >= 0 ? correctIndex : 0, // Single correct answer index
+        imageUrl: q.imageUrl || null,
+        explanation: q.explanation || null
+      };
+    });
 
     // Create new CBT document from collection
     const cbt = new CBT({
@@ -629,7 +662,7 @@ router.post('/:id/collections/:collectionId/push', teacherAuth, async (req, res)
       subject: collection.subject,
       duration: 60, // Default duration
       questions: transformedQuestions,
-      description: collection.description || ''
+      status: 'Draft'
     });
 
     await cbt.save();
