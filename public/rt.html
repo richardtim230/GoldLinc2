@@ -571,73 +571,179 @@
                 return [];
             }
         }
+// ✅ NEW: Fetch collections from backend
+async function fetchTeacherCollections() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections`, { 
+            headers: authHeaders() 
+        });
+        if (!res.ok) return [];
+        const data = await res.json();
+        return Array.isArray(data.collections) ? data.collections : [];
+    } catch (e) {
+        console.error('Error fetching collections:', e);
+        return [];
+    }
+}
 
-        // ============ MAIN INITIALIZATION ============
-        async function initSystemNode() {
-            try {
-                teacher = await fetchTeacherProfile();
-                if (!teacher) {
-                    alert("Failed to load teacher profile. Please check your authentication.");
-                    return;
-                }
+// ✅ NEW: Create collection on backend
+async function createCollectionAPI(name) {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections`, {
+            method: 'POST',
+            headers: authHeaders(),
+            body: JSON.stringify({ name: name })
+        });
+        if (!res.ok) throw new Error('Failed to create collection');
+        const data = await res.json();
+        return data.collection;
+    } catch (e) {
+        console.error('Error creating collection:', e);
+        return null;
+    }
+}
 
-                // Update header with teacher info
-                document.getElementById('headerTeacherName').textContent = teacher.name || 'Teacher';
-                document.getElementById('headerTeacherTitle').textContent = teacher.designation || 'Faculty Member';
-                document.getElementById('sidebarDept').textContent = teacher.department || 'Department';
-                document.getElementById('profileName').value = teacher.name || '';
-                document.getElementById('profileTitle').value = teacher.designation || '';
-                document.getElementById('profileDept').value = teacher.department || '';
-
-                // Fetch classes and students
-                teacher.classes = await fetchTeacherClasses();
-                
-                for (const cls of teacher.classes) {
-                    studentsByClass[cls.id] = await fetchStudentsByClass(cls.id);
-                    subjectsByClass[cls.id] = await fetchSubjectsByClass(cls.id);
-                }
-
-                // Fetch assignments
-                allAssignments = await fetchTeacherAssignments() || [];
-
-                // Populate class selectors
-                const asmModalClass = document.getElementById('asmModalClass');
-                const gradebookClassFilter = document.getElementById('gradebookClassFilter');
-                const studentClassFilter = document.getElementById('studentClassFilter');
-
-                teacher.classes.forEach(cls => {
-                    // Assignment modal class selector
-                    const opt1 = document.createElement('option');
-                    opt1.value = cls.id;
-                    opt1.textContent = cls.name;
-                    asmModalClass.appendChild(opt1);
-
-                    // Gradebook class filter
-                    const opt2 = document.createElement('option');
-                    opt2.value = cls.id;
-                    opt2.textContent = cls.name;
-                    gradebookClassFilter.appendChild(opt2);
-
-                    // Student class filter
-                    const opt3 = document.createElement('option');
-                    opt3.value = cls.name;
-                    opt3.textContent = cls.name;
-                    studentClassFilter.appendChild(opt3);
-                });
-
-                // Render initial overview
-                renderOverview();
-                renderCollections();
-                renderAssignments();
-                renderStudents();
-                renderGradebook();
-
-            } catch (err) {
-                console.error('Initialization error:', err);
-                alert('Dashboard initialization failed: ' + err.message);
+// ✅ NEW: Add question to collection on backend
+async function addQuestionToCollectionAPI(collectionId, questionData) {
+    try {
+        const res = await fetch(
+            `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}/questions`,
+            {
+                method: 'POST',
+                headers: authHeaders(),
+                body: JSON.stringify(questionData)
             }
+        );
+        if (!res.ok) throw new Error('Failed to save question');
+        return await res.json();
+    } catch (e) {
+        console.error('Error saving question:', e);
+        return null;
+    }
+}
+
+// ✅ NEW: Update question on backend
+async function updateQuestionAPI(collectionId, questionId, questionData) {
+    try {
+        const res = await fetch(
+            `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}/questions/${questionId}`,
+            {
+                method: 'PATCH',
+                headers: authHeaders(),
+                body: JSON.stringify(questionData)
+            }
+        );
+        if (!res.ok) throw new Error('Failed to update question');
+        return await res.json();
+    } catch (e) {
+        console.error('Error updating question:', e);
+        return null;
+    }
+}
+
+// ✅ NEW: Delete question on backend
+async function deleteQuestionAPI(collectionId, questionId) {
+    try {
+        const res = await fetch(
+            `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}/questions/${questionId}`,
+            {
+                method: 'DELETE',
+                headers: authHeaders()
+            }
+        );
+        if (!res.ok) throw new Error('Failed to delete question');
+        return true;
+    } catch (e) {
+        console.error('Error deleting question:', e);
+        return false;
+    }
+}
+
+// ✅ NEW: Delete collection on backend
+async function deleteCollectionAPI(collectionId) {
+    try {
+        const res = await fetch(
+            `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}`,
+            {
+                method: 'DELETE',
+                headers: authHeaders()
+            }
+        );
+        if (!res.ok) throw new Error('Failed to delete collection');
+        return true;
+    } catch (e) {
+        console.error('Error deleting collection:', e);
+        return false;
+    }
+}
+        // ============ MAIN INITIALIZATION ============
+async function initSystemNode() {
+    try {
+        teacher = await fetchTeacherProfile();
+        if (!teacher) {
+            alert("Failed to load teacher profile. Please check your authentication.");
+            return;
         }
 
+        // Update header with teacher info
+        document.getElementById('headerTeacherName').textContent = teacher.name || 'Teacher';
+        document.getElementById('headerTeacherTitle').textContent = teacher.designation || 'Faculty Member';
+        document.getElementById('sidebarDept').textContent = teacher.department || 'Department';
+        document.getElementById('profileName').value = teacher.name || '';
+        document.getElementById('profileTitle').value = teacher.designation || '';
+        document.getElementById('profileDept').value = teacher.department || '';
+
+        // Fetch classes and students
+        teacher.classes = await fetchTeacherClasses();
+        
+        for (const cls of teacher.classes) {
+            studentsByClass[cls.id] = await fetchStudentsByClass(cls.id);
+            subjectsByClass[cls.id] = await fetchSubjectsByClass(cls.id);
+        }
+
+        // Fetch assignments
+        allAssignments = await fetchTeacherAssignments() || [];
+
+        // ✅ NEW: Fetch collections from backend
+        assessmentDatabase = await fetchTeacherCollections() || [];
+
+        // Populate class selectors
+        const asmModalClass = document.getElementById('asmModalClass');
+        const gradebookClassFilter = document.getElementById('gradebookClassFilter');
+        const studentClassFilter = document.getElementById('studentClassFilter');
+
+        teacher.classes.forEach(cls => {
+            // Assignment modal class selector
+            const opt1 = document.createElement('option');
+            opt1.value = cls.id;
+            opt1.textContent = cls.name;
+            asmModalClass.appendChild(opt1);
+
+            // Gradebook class filter
+            const opt2 = document.createElement('option');
+            opt2.value = cls.id;
+            opt2.textContent = cls.name;
+            gradebookClassFilter.appendChild(opt2);
+
+            // Student class filter
+            const opt3 = document.createElement('option');
+            opt3.value = cls.name;
+            opt3.textContent = cls.name;
+            studentClassFilter.appendChild(opt3);
+        });
+
+        // Render initial overview
+        renderOverview();
+        renderCollections();
+        renderAssignments();
+        renderStudents();
+        renderGradebook();
+
+    } catch (err) {
+        console.error('Initialization error:', err);
+        alert('Dashboard initialization failed: ' + err.message);
+    }
+}
         // ============ RENDER FUNCTIONS ============
         function renderOverview() {
             const totalStudents = (teacher.classes || []).reduce((s, c) => s + (studentsByClass[c.id] ? studentsByClass[c.id].length : 0), 0);
@@ -905,36 +1011,62 @@
             document.getElementById('progressBarFill').style.width = `${percentage}%`;
         }
 
-        // ============ COLLECTION MANAGEMENT ============
-        function toggleCollectionFocus(collectionId) {
-            activeIsolatedCollectionId = collectionId;
-            document.getElementById('collectionControlHeader').classList.toggle('hidden', collectionId !== null);
-            renderCollections();
-        }
+// ============ COLLECTION MANAGEMENT ============
+function toggleCollectionFocus(collectionId) {
+    activeIsolatedCollectionId = collectionId;
+    document.getElementById('collectionControlHeader').classList.toggle('hidden', collectionId !== null);
+    renderCollections();
+}
 
-        function createCollection() {
-            const input = document.getElementById('newCollectionName');
-            const nameValue = input.value.trim().toUpperCase();
-            if (!nameValue) {
-                alert("Please declare a legal collection title.");
-                return;
-            }
-            assessmentDatabase.push({ 
-                id: `collection_${Date.now()}`, 
-                name: nameValue, 
-                questions: [] 
-            });
-            input.value = '';
-            renderCollections();
-        }
+async function createCollection() {
+    const input = document.getElementById('newCollectionName');
+    const nameValue = input.value.trim().toUpperCase();
+    if (!nameValue) {
+        alert("Please declare a legal collection title.");
+        return;
+    }
+    
+    // ✅ Save to backend
+    const newCollection = await createCollectionAPI(nameValue);
+    if (newCollection) {
+        assessmentDatabase.push(newCollection);
+        input.value = '';
+        renderCollections();
+        alert('Collection created successfully!');
+    } else {
+        alert('Failed to create collection. Please try again.');
+    }
+}
 
-        function deleteCollection(collectionId) {
-            if (confirm("Are you certain you want to purge this full testing category?")) {
-                assessmentDatabase = assessmentDatabase.filter(c => c.id !== collectionId);
-                if (activeIsolatedCollectionId === collectionId) toggleCollectionFocus(null);
+async function deleteCollection(collectionId) {
+    if (confirm("Are you certain you want to purge this full testing category?")) {
+        // ✅ Delete from backend
+        const success = await deleteCollectionAPI(collectionId);
+        if (success) {
+            assessmentDatabase = assessmentDatabase.filter(c => c._id !== collectionId);
+            if (activeIsolatedCollectionId === collectionId) toggleCollectionFocus(null);
+            renderCollections();
+            alert('Collection deleted!');
+        } else {
+            alert('Failed to delete collection.');
+        }
+    }
+}
+
+async function deleteQuestion(collectionId, questionId) {
+    if (confirm("Delete this question?")) {
+        // ✅ Delete from backend
+        const success = await deleteQuestionAPI(collectionId, questionId);
+        if (success) {
+            const col = assessmentDatabase.find(c => c._id === collectionId);
+            if (col) {
+                col.questions = col.questions.filter(q => q.id !== questionId);
                 renderCollections();
+                alert('Question deleted!');
             }
         }
+    }
+}
 
         // ============ QUESTION MODAL FUNCTIONS ============
         function initModalStemsIfRequired() {
@@ -1056,71 +1188,80 @@
             document.getElementById('questionModal').style.display = 'none';
         }
 
-        function saveModalQuestionData() {
-            const stemHtml = stemQuillInstance.root.innerHTML.trim();
-            const plainStem = stemQuillInstance.getText().trim();
-            const imgUrl = document.getElementById('modalImageUrl').value.trim();
-            const expHtml = explanationQuillInstance.root.innerHTML.trim();
+        async function saveModalQuestionData() {
+    const stemHtml = stemQuillInstance.root.innerHTML.trim();
+    const plainStem = stemQuillInstance.getText().trim();
+    const imgUrl = document.getElementById('modalImageUrl').value.trim();
+    const expHtml = explanationQuillInstance.root.innerHTML.trim();
 
-            if (!plainStem) {
-                alert("Question stem body value is required.");
-                return;
-            }
+    if (!plainStem) {
+        alert("Question stem body value is required.");
+        return;
+    }
 
-            const optionRows = document.getElementById('modalOptionsWrapper').children;
-            if (optionRows.length < 2) {
-                alert("Declare at least two option rows.");
-                return;
-            }
+    const optionRows = document.getElementById('modalOptionsWrapper').children;
+    if (optionRows.length < 2) {
+        alert("Declare at least two option rows.");
+        return;
+    }
 
-            let compileOptions = [];
-            let chosenCorrectKey = false;
+    let compileOptions = [];
+    let chosenCorrectKey = false;
 
-            for (let row of optionRows) {
-                const id = row.id;
-                const inst = optionQuillRegistry[id];
-                const optHtml = inst.root.innerHTML.trim();
-                const optPlain = inst.getText().trim();
-                const radioCheck = row.querySelector('input[name="correctAnswerRadio"]').checked;
+    for (let row of optionRows) {
+        const id = row.id;
+        const inst = optionQuillRegistry[id];
+        const optHtml = inst.root.innerHTML.trim();
+        const optPlain = inst.getText().trim();
+        const radioCheck = row.querySelector('input[name="correctAnswerRadio"]').checked;
 
-                if (!optPlain) {
-                    alert("Empty option rows values are rejected.");
-                    return;
-                }
-                if (radioCheck) chosenCorrectKey = true;
-
-                compileOptions.push({ text: optHtml, isCorrect: radioCheck });
-            }
-
-            if (!chosenCorrectKey) {
-                alert("Flag one valid target response correct key selection.");
-                return;
-            }
-
-            const col = assessmentDatabase.find(c => c.id === activeIsolatedCollectionId);
-            if (!col) return;
-
-            if (activeTargetModalMode === 'CREATE') {
-                col.questions.push({
-                    id: `q_${Date.now()}`, 
-                    text: stemHtml, 
-                    imageUrl: imgUrl, 
-                    options: compileOptions, 
-                    explanation: expHtml
-                });
-            } else {
-                const q = col.questions.find(item => item.id === contextualTargetQuestionId);
-                if (q) {
-                    q.text = stemHtml;
-                    q.imageUrl = imgUrl;
-                    q.options = compileOptions;
-                    q.explanation = expHtml;
-                }
-            }
-
-            closeQuestionModal();
-            renderCollections();
+        if (!optPlain) {
+            alert("Empty option rows values are rejected.");
+            return;
         }
+        if (radioCheck) chosenCorrectKey = true;
+
+        compileOptions.push({ text: optHtml, isCorrect: radioCheck });
+    }
+
+    if (!chosenCorrectKey) {
+        alert("Flag one valid target response correct key selection.");
+        return;
+    }
+
+    const col = assessmentDatabase.find(c => c._id === activeIsolatedCollectionId);
+    if (!col) return;
+
+    const questionData = {
+        text: stemHtml,
+        imageUrl: imgUrl || null,
+        options: compileOptions,
+        explanation: expHtml || null
+    };
+
+    if (activeTargetModalMode === 'CREATE') {
+        // ✅ Save new question to backend
+        const result = await addQuestionToCollectionAPI(activeIsolatedCollectionId, questionData);
+        if (result && result.question) {
+            col.questions.push(result.question);
+            renderCollections();
+            closeQuestionModal();
+            alert('Question saved successfully!');
+        }
+    } else {
+        // ✅ Update existing question on backend
+        const result = await updateQuestionAPI(activeIsolatedCollectionId, contextualTargetQuestionId, questionData);
+        if (result && result.question) {
+            const qIdx = col.questions.findIndex(q => q.id === contextualTargetQuestionId);
+            if (qIdx !== -1) {
+                col.questions[qIdx] = result.question;
+            }
+            renderCollections();
+            closeQuestionModal();
+            alert('Question updated successfully!');
+        }
+    }
+}
 
         function deleteQuestion(collectionId, questionId) {
             const targetCollection = assessmentDatabase.find(c => c.id === collectionId);
