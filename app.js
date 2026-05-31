@@ -76,7 +76,11 @@ const apiKeysRoute = require('./routes/apiKeys');
 const universalUploadRoute = require('./routes/universalUpload');
 const verificationRoute = require('./routes/verification');
 const cbtAuthRoutes = require('./routes/cbt-auth');
+// Add this with your other route imports:
+const questionBankRouter = require('./routes/questionBank');
 
+// Add this with your other route middleware (after the teachers router):
+app.use('/api/question-bank', questionBankRouter);
 /* ================= Route Mounting ================= */
 
 // --- 1. SPECIFIC RESOURCE API ENDPOINTS (MUST BE FIRST) ---
