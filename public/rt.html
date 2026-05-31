@@ -72,6 +72,17 @@
             background-color: #f8fafc;
             padding: 4px 8px !important;
         }
+        /* Custom Quill image button styling */
+        .ql-snow .ql-picker.ql-image::before {
+            content: '🖼️';
+        }
+        .image-upload-input {
+            display: none;
+        }
+        .ql-custom-image-btn {
+            position: relative;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body class="bg-[#f8fafc] text-slate-800 font-sans antialiased min-h-screen flex flex-col md:flex-row overflow-x-hidden" onload="initSystemNode();">
@@ -376,17 +387,16 @@
             </div>
             <div class="p-5 space-y-4 overflow-y-auto text-xs">
                 <div>
-                    <label class="block font-extrabold text-slate-400 uppercase tracking-wider mb-1.5">Question Stem Body (Rich Text)</label>
+                    <label class="block font-extrabold text-slate-400 uppercase tracking-wider mb-1.5">Question Stem Body (Rich Text with Images)</label>
+                    <div class="mb-2 flex gap-1">
+                        <input type="file" id="stemImageUpload" accept="image/*" class="hidden" onchange="insertImageFromFile(this, 'stem')">
+                        <button type="button" onclick="document.getElementById('stemImageUpload').click()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-[11px] uppercase transition">📁 Upload Image</button>
+                        <input type="text" id="stemImageUrl" placeholder="Paste image URL..." class="flex-grow bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-[11px] outline-none focus:ring-1 focus:ring-brand-500">
+                        <button type="button" onclick="insertImageFromUrl('stem')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-[11px] uppercase transition">Insert URL</button>
+                    </div>
                     <div id="quillQuestionStem" class="bg-white rounded-xl"></div>
                 </div>
-                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-                    <label class="block font-extrabold text-slate-500 uppercase tracking-wider text-[11px]">Attach Diagram Vector / Diagram Image Asset</label>
-                    <div class="flex gap-2">
-                        <input type="url" id="modalImageUrl" placeholder="Paste structural image URL path here (e.g., https://...)" class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none focus:ring-1 focus:ring-brand-500">
-                        <button onclick="previewModalImage()" class="bg-slate-200 hover:bg-slate-300 font-bold px-3 py-2 rounded-lg transition text-[11px] uppercase">Preview</button>
-                    </div>
-                    <img id="modalImagePreview" src="" class="hidden max-h-32 w-auto object-contain rounded border border-slate-200 bg-white p-1">
-                </div>
+
                 <div class="space-y-3">
                     <div class="flex justify-between items-center">
                         <label class="block font-extrabold text-slate-400 uppercase tracking-wider">Dynamic Response Option Fields</label>
@@ -394,8 +404,15 @@
                     </div>
                     <div id="modalOptionsWrapper" class="space-y-4"></div>
                 </div>
+
                 <div class="space-y-1.5">
                     <label class="block font-extrabold text-slate-400 uppercase tracking-wider">Optional Grading Explanation & Marking Rationale</label>
+                    <div class="mb-2 flex gap-1">
+                        <input type="file" id="explanationImageUpload" accept="image/*" class="hidden" onchange="insertImageFromFile(this, 'explanation')">
+                        <button type="button" onclick="document.getElementById('explanationImageUpload').click()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-[11px] uppercase transition">📁 Upload Image</button>
+                        <input type="text" id="explanationImageUrl" placeholder="Paste image URL..." class="flex-grow bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-[11px] outline-none focus:ring-1 focus:ring-brand-500">
+                        <button type="button" onclick="insertImageFromUrl('explanation')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-[11px] uppercase transition">Insert URL</button>
+                    </div>
                     <div class="explanation-editor-container">
                         <div id="quillExplanation" class="bg-white rounded-xl"></div>
                     </div>
@@ -498,6 +515,60 @@
             return token 
                 ? { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token } 
                 : { 'Content-Type': 'application/json' };
+        }
+
+        // ============ IMAGE UPLOAD HANDLERS ============
+        function insertImageFromFile(fileInput, target) {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            // Simple base64 conversion for demo - in production use proper file upload
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imageUrl = e.target.result;
+                insertImageToQuill(target, imageUrl);
+                fileInput.value = ''; // Reset input
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function insertImageFromUrl(target) {
+            const urlInput = document.getElementById(`${target}ImageUrl`);
+            const imageUrl = urlInput.value.trim();
+            if (!imageUrl) {
+                alert('Please enter an image URL');
+                return;
+            }
+            insertImageToQuill(target, imageUrl);
+            urlInput.value = '';
+        }
+
+        function insertImageToQuill(target, imageUrl) {
+            let quillInstance;
+            if (target === 'stem') {
+                quillInstance = stemQuillInstance;
+            } else if (target === 'explanation') {
+                quillInstance = explanationQuillInstance;
+            } else if (target === 'option') {
+                // For options, get the currently focused quill
+                const optionDivs = document.querySelectorAll('#modalOptionsWrapper .option-editor-container');
+                if (optionDivs.length > 0) {
+                    const lastOptionDiv = optionDivs[optionDivs.length - 1];
+                    const quillDiv = lastOptionDiv.querySelector('.quill-option-editor');
+                    // Find corresponding quill instance
+                    Object.values(optionQuillRegistry).forEach(item => {
+                        if (item.quill && item.quill.root === quillDiv) {
+                            quillInstance = item.quill;
+                        }
+                    });
+                }
+            }
+
+            if (quillInstance) {
+                const range = quillInstance.getSelection(true);
+                quillInstance.insertEmbed(range.index, 'image', imageUrl);
+                quillInstance.setSelection(range.index + 1);
+            }
         }
 
         // ============ API CALLS ============
@@ -782,6 +853,8 @@
 
                 if (isSomeActive && !isThisActive) return;
 
+                const questionCount = collection.questions ? collection.questions.length : 0;
+
                 let questionsHtml = '';
                 if (isThisActive) {
                     if (!collection.questions || collection.questions.length === 0) {
@@ -835,6 +908,7 @@
                                     ${sourceLabel}
                                 </div>
                                 <h3 class="text-sm font-black text-slate-900 mt-1 uppercase tracking-wide font-serif">${collection.name}</h3>
+                                <p class="text-[11px] text-slate-500 mt-0.5 font-semibold">${questionCount} Question${questionCount !== 1 ? 's' : ''}</p>
                             </div>
                             <div class="flex items-center space-x-1.5 self-end sm:self-auto">
                                 ${isThisActive && collection.source !== 'CBT' ? `
@@ -1048,27 +1122,30 @@
             contextualTargetQuestionId = null;
             document.getElementById('modalTitle').textContent = 'Create New Assessment Item';
             
-            // Initialize Quill editors
+            // Initialize Quill editors with image support
             if (!stemQuillInstance) {
                 stemQuillInstance = new Quill('#quillQuestionStem', {
                     theme: 'snow',
                     placeholder: 'Enter question text here...',
-                    modules: { toolbar: [['bold', 'italic', 'underline'], ['code-block']] }
+                    modules: { 
+                        toolbar: [['bold', 'italic', 'underline'], ['code-block'], ['image']]
+                    }
                 });
             }
             if (!explanationQuillInstance) {
                 explanationQuillInstance = new Quill('#quillExplanation', {
                     theme: 'snow',
                     placeholder: 'Optional explanation...',
-                    modules: { toolbar: [['bold', 'italic']] }
+                    modules: { 
+                        toolbar: [['bold', 'italic'], ['image']]
+                    }
                 });
             }
             
             stemQuillInstance.setContents([]);
             explanationQuillInstance.setContents([]);
-            document.getElementById('modalImageUrl').value = '';
-            document.getElementById('modalImagePreview').classList.add('hidden');
-            document.getElementById('modalImagePreview').src = '';
+            document.getElementById('stemImageUrl').value = '';
+            document.getElementById('explanationImageUrl').value = '';
             document.getElementById('modalOptionsWrapper').innerHTML = '';
             
             appendBlankOptionField();
@@ -1092,30 +1169,30 @@
             
             document.getElementById('modalTitle').textContent = 'Edit Assessment Item';
             
-            // Initialize Quill editors
+            // Initialize Quill editors with image support
             if (!stemQuillInstance) {
                 stemQuillInstance = new Quill('#quillQuestionStem', {
                     theme: 'snow',
                     placeholder: 'Enter question text here...',
-                    modules: { toolbar: [['bold', 'italic', 'underline'], ['code-block']] }
+                    modules: { 
+                        toolbar: [['bold', 'italic', 'underline'], ['code-block'], ['image']]
+                    }
                 });
             }
             if (!explanationQuillInstance) {
                 explanationQuillInstance = new Quill('#quillExplanation', {
                     theme: 'snow',
                     placeholder: 'Optional explanation...',
-                    modules: { toolbar: [['bold', 'italic']] }
+                    modules: { 
+                        toolbar: [['bold', 'italic'], ['image']]
+                    }
                 });
             }
             
             stemQuillInstance.setContents([{ insert: question.text }]);
             explanationQuillInstance.setContents([{ insert: question.explanation || '' }]);
-            document.getElementById('modalImageUrl').value = question.imageUrl || '';
-            
-            if (question.imageUrl) {
-                document.getElementById('modalImagePreview').src = question.imageUrl;
-                document.getElementById('modalImagePreview').classList.remove('hidden');
-            }
+            document.getElementById('stemImageUrl').value = '';
+            document.getElementById('explanationImageUrl').value = '';
             
             document.getElementById('modalOptionsWrapper').innerHTML = '';
             question.options.forEach(opt => {
@@ -1135,13 +1212,21 @@
             const optionDiv = document.createElement('div');
             optionDiv.className = 'p-3 bg-white border border-slate-200 rounded-xl space-y-2';
             
+            const optionId = `option_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            
             optionDiv.innerHTML = `
                 <div class="flex justify-between items-center">
                     <label class="font-bold text-slate-500 text-[11px] uppercase">Option</label>
                     <button type="button" onclick="this.closest('div').remove()" class="text-rose-600 hover:text-white hover:bg-rose-600 font-bold text-[10px] px-2 py-1 rounded transition">Remove</button>
                 </div>
+                <div class="mb-1.5 flex gap-1">
+                    <input type="file" id="optionImageUpload_${optionId}" accept="image/*" class="hidden" onchange="insertImageFromFile(this, 'option')">
+                    <button type="button" onclick="document.getElementById('optionImageUpload_${optionId}').click()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2 py-1 rounded text-[10px] uppercase transition">📁</button>
+                    <input type="text" id="optionImageUrl_${optionId}" placeholder="Image URL..." class="flex-grow bg-slate-50 border border-slate-200 rounded p-1 text-[10px] outline-none focus:ring-1 focus:ring-brand-500">
+                    <button type="button" onclick="insertImageFromUrl('option')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2 py-1 rounded text-[10px] uppercase transition">Add</button>
+                </div>
                 <div class="option-editor-container">
-                    <div class="quill-option-editor bg-white rounded-xl"></div>
+                    <div class="quill-option-editor bg-white rounded-xl" data-option-id="${optionId}"></div>
                 </div>
                 <label class="flex items-center space-x-2 text-xs">
                     <input type="checkbox" class="option-correct-checkbox" ${isCorrect ? 'checked' : ''}>
@@ -1150,12 +1235,13 @@
             `;
             wrapper.appendChild(optionDiv);
             
-            const optionId = `option_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
             const optionEditor = optionDiv.querySelector('.quill-option-editor');
             const quill = new Quill(optionEditor, {
                 theme: 'snow',
                 placeholder: 'Option text...',
-                modules: { toolbar: [['bold', 'italic']] }
+                modules: { 
+                    toolbar: [['bold', 'italic'], ['image']]
+                }
             });
             optionQuillRegistry[optionId] = { quill, checkbox: optionDiv.querySelector('.option-correct-checkbox') };
             quill.setContents([{ insert: text }]);
@@ -1167,21 +1253,6 @@
                 alert('Please enter a question');
                 return;
             }
-            
-            const options = [];
-            document.querySelectorAll('#modalOptionsWrapper .option-editor-container').forEach(container => {
-                const quillDiv = container.querySelector('.quill-option-editor');
-                const quillInstances = Object.values(optionQuillRegistry);
-                if (quillInstances.length > 0) {
-                    const quillInst = quillInstances[quillInstances.length - 1];
-                    if (quillInst) {
-                        options.push({
-                            text: quillInst.quill.getText(),
-                            isCorrect: quillInst.checkbox.checked
-                        });
-                    }
-                }
-            });
             
             // Rebuild options from current state
             const freshOptions = [];
@@ -1204,10 +1275,10 @@
             }
             
             const questionData = {
-                text: stemText.trim(),
+                text: stemQuillInstance.root.innerHTML,
                 options: freshOptions,
-                imageUrl: document.getElementById('modalImageUrl').value || null,
-                explanation: explanationQuillInstance.getText().trim() || null
+                imageUrl: null,
+                explanation: explanationQuillInstance.root.innerHTML || null
             };
             
             if (activeTargetModalMode === 'CREATE') {
@@ -1267,17 +1338,6 @@
                     alert('Failed to delete collection');
                 }
             }
-        }
-
-        function previewModalImage() {
-            const url = document.getElementById('modalImageUrl').value;
-            if (!url) {
-                alert('Please enter an image URL');
-                return;
-            }
-            const preview = document.getElementById('modalImagePreview');
-            preview.src = url;
-            preview.classList.remove('hidden');
         }
 
         // ============ ASSIGNMENT MANAGEMENT ============
