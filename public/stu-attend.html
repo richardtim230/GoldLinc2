@@ -493,7 +493,8 @@
                 }
 
                 const studentName = student.fullName || student.name || 'Unknown';
-                const studentCode = student.admissionCode || student.code || '--';
+                // Try multiple possible field names for registration/admission number
+                const studentCode = student.admissionCode || student.regNo || student.registrationNumber || student.code || student.studentId || '--';
 
                 tr.innerHTML = `
                     <td class="p-3 pl-4" onclick="inspectStudentCalendar('${studentId}')">
@@ -559,12 +560,17 @@
             document.getElementById('inspectorProfileContainer').classList.remove('hidden');
 
             const studentName = student.fullName || student.name || 'Unknown';
-            const studentCode = student.admissionCode || student.code || '--';
+            // Try multiple possible field names for registration/admission number
+            const studentCode = student.admissionCode || student.regNo || student.registrationNumber || student.code || student.studentId || '--';
 
             document.getElementById('inspectFullName').textContent = studentName;
             document.getElementById('inspectAdmissionCode').textContent = studentCode;
-            document.getElementById('inspectCohort').textContent = selectedClass;
-            document.getElementById('inspectParentContact').textContent = student.parentContact || student.parentPhone || '--';
+            
+            // Display class name instead of ID
+            const className = getClassDisplayName();
+            document.getElementById('inspectCohort').textContent = className;
+            
+            document.getElementById('inspectParentContact').textContent = student.parentContact || student.parentPhone || student.guardian || '--';
 
             const nameParts = studentName.split(" ");
             document.getElementById('inspectAvatarInitials').textContent = nameParts.length > 1 
@@ -572,6 +578,13 @@
                 : `${nameParts[0][0]}`;
 
             generateCalendarPlaceholder(studentId);
+        }
+
+        // Helper function to get class display name
+        function getClassDisplayName() {
+            // Return the class name from the badge since we already resolved it
+            const badgeText = document.getElementById('classNameBadge').textContent;
+            return badgeText && badgeText !== 'Loading...' ? badgeText : selectedClass;
         }
 
         function generateCalendarPlaceholder(studentId) {
