@@ -1666,7 +1666,11 @@ students.forEach(student => {
 
     tbody.appendChild(tr);
 });
-
+document.querySelectorAll(
+    '#gradebookTableBody input[type="number"]'
+).forEach(input => {
+    input.addEventListener('input', updateGradebookProgress);
+});
 updateGradebookProgress();
 
 }
