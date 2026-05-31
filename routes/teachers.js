@@ -353,7 +353,31 @@ router.patch('/:id/assignments/:assignmentId', teacherAuth, async (req, res) => 
     res.status(500).json({ error: err.message });
   }
 });
+// PATCH /api/teachers/:id/collections/:collectionId - Update collection metadata
+router.patch('/:id/collections/:collectionId', teacherAuth, async (req, res) => {
+  try {
+    if (String(req.params.id) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    const { name, description, class: classId, subject: subjectId } = req.body;
 
+    const collection = await Collection.findById(req.params.collectionId);
+    if (!collection) return res.status(404).json({ error: "Collection not found" });
+    if (String(collection.teacher) !== String(req.staff._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    if (name !== undefined) collection.name = name;
+    if (description !== undefined) collection.description = description;
+    if (classId !== undefined) collection.class = classId;
+    if (subjectId !== undefined) collection.subject = subjectId;
+
+    await collection.save();
+    res.json({ success: true, collection });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 // DELETE /api/teachers/:id/assignments/:assignmentId - Delete assignment
 router.delete('/:id/assignments/:assignmentId', teacherAuth, async (req, res) => {
   try {
