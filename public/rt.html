@@ -322,13 +322,53 @@
                         <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Secondary Gradebook Mark Sheet Matrix</h2>
                         <p class="text-xs text-slate-500">Pushes score modifications straight to parent profile views. Weights: CA1 (20%), CA2 (20%), Exam (60%).</p>
                     </div>
-                    <div class="flex space-x-2 shrink-0">
-                        <select id="gradebookClassFilter" onchange="renderGradebook()" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
-                        </select>
-                        <button onclick="saveGradebookChanges(event)" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider shadow transition">
-                            Bulk Save Class
-                        </button>
-                    </div>
+                    <div class="flex flex-wrap gap-2 shrink-0">
+
+    <!-- Session -->
+    <select
+        id="gb-session-select"
+        class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
+        <option value="">Session</option>
+        <option value="2024/2025">2024/2025</option>
+        <option value="2025/2026" selected>2025/2026</option>
+        <option value="2026/2027">2026/2027</option>
+    </select>
+
+    <!-- Term -->
+    <select
+        id="gb-term-select"
+        class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
+        <option value="">Term</option>
+        <option value="First Term">First Term</option>
+        <option value="Second Term">Second Term</option>
+        <option value="Third Term">Third Term</option>
+    </select>
+
+    <!-- Result Type -->
+    <select
+        id="gb-result-type-select"
+        class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
+        <option value="">Result Type</option>
+        <option value="CA1">CA1</option>
+        <option value="CA2">CA2</option>
+        <option value="Exam" selected>Exam</option>
+    </select>
+
+    <!-- Class -->
+    <select
+        id="gradebookClassFilter"
+        onchange="renderGradebook()"
+        class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
+    </select>
+
+    <!-- Save -->
+    <button
+        onclick="saveGradebookChanges(event)"
+        class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider shadow transition">
+        Bulk Save Class
+    </button>
+
+</div>
                 </div>
                 <div class="overflow-x-auto rounded-xl border border-slate-100">
                     <table class="w-full text-left text-xs border-collapse">
