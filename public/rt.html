@@ -72,6 +72,21 @@
             background-color: #f8fafc;
             padding: 4px 8px !important;
         }
+        .collection-card {
+            transition: all 0.3s ease;
+        }
+        .collection-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        .badge-legacy {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        .badge-new {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
     </style>
 </head>
 <body class="bg-[#f8fafc] text-slate-800 font-sans antialiased min-h-screen flex flex-col md:flex-row overflow-x-hidden" onload="initSystemNode();">
@@ -96,33 +111,33 @@
         <nav class="flex-grow px-4 space-y-1 overflow-y-auto pb-4" id="lmsMenu">
             <p class="text-[10px] font-bold text-brand-500 uppercase tracking-widest px-3 mb-2">LMS Components</p>
             
-            <button id="btn-overview" onclick="switchPanel('overview')" type="button" class="sidebar-btn-active w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition-all text-brand-100">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"/></svg>
+            <button id="btn-overview" onclick="switchPanel('overview')" type="button" class="sidebar-btn-active w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"></path></svg>
                 Course Performance Desk
             </button>
 
-            <button id="btn-assessments" onclick="switchPanel('assessments')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition-all text-brand-100">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            <button id="btn-assessments" onclick="switchPanel('assessments')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                 Question Bank Categories
             </button>
 
-            <button id="btn-assignments" onclick="switchPanel('assignments')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition-all text-brand-100">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <button id="btn-assignments" onclick="switchPanel('assignments')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                 Assignments Hub
             </button>
 
-            <button id="btn-students" onclick="switchPanel('students')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition-all text-brand-100">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            <button id="btn-students" onclick="switchPanel('students')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3a6 6 0 016-6h6a6 6 0 016 6H9z"></path></svg>
                 Student Rosters
             </button>
             
-            <button id="btn-grading" onclick="switchPanel('grading')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition-all text-brand-100">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            <button id="btn-grading" onclick="switchPanel('grading')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                 Gradebook & Mark Sheet
             </button>
             
-            <button id="btn-profile" onclick="switchPanel('profile')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition-all text-brand-100">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            <button id="btn-profile" onclick="switchPanel('profile')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                 Faculty Profile Desk
             </button>
         </nav>
@@ -137,14 +152,14 @@
             <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779961202/editor-uploads/frngf21mg4fcrnmccobm.png" class="h-7 w-auto bg-white p-0.5 rounded-lg" alt="Logo">
             <span class="font-serif font-bold text-sm tracking-wide">Gold & Linc LMS</span>
         </div>
-        <button type="button" onclick="openBottomNav()" class="bg-brand-800 border border-brand-500/40 px-3 py-1.5 rounded-xl text-xs font-bold text-white transition active:scale-95 flex items-center space-x-1">
+        <button type="button" onclick="openBottomNav()" class="bg-brand-800 border border-brand-500/40 px-3 py-1.5 rounded-xl text-xs font-bold text-white transition active:scale-95 flex items-center gap-2">
             <span>LMS Menu</span>
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
     </header>
 
     <div id="bottomDrawerOverlay" onclick="closeBottomNav(event)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden transition-opacity duration-300 opacity-0">
-        <div id="bottomDrawerCard" class="absolute bottom-0 inset-x-0 bg-brand-900 text-white parabolic-top transform translate-y-full transition-transform duration-300 border-t-2 border-gold-400 p-6 pt-12 space-y-4 max-h-[85vh] overflow-y-auto">
+        <div id="bottomDrawerCard" class="absolute bottom-0 inset-x-0 bg-brand-900 text-white parabolic-top transform translate-y-full transition-transform duration-300 border-t-2 border-gold-400 p-6 space-y-3 max-h-96 overflow-y-auto">
             <div class="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-brand-800 rounded-full"></div>
             <div class="grid grid-cols-1 gap-2 text-sm font-bold">
                 <button onclick="switchPanel('overview')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Course Performance Desk</span> &rarr;</button>
@@ -162,7 +177,7 @@
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
                 <div class="p-2.5 bg-brand-50 rounded-lg text-brand-800 shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16.5c3.562 0 6.868 1.476 9.121 3.804M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm6 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
                 <div class="text-xs">
                     <p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Active Faculty Staff</p>
@@ -172,7 +187,7 @@
             </div>
             <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
                 <div class="p-2.5 bg-amber-50 rounded-lg text-gold-600 shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 </div>
                 <div class="text-xs">
                     <p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Academic Term Node</p>
@@ -182,6 +197,7 @@
             </div>
         </section>
 
+        <!-- OVERVIEW PANEL -->
         <div id="panel-overview" class="space-y-6">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
@@ -199,1307 +215,307 @@
                     <p id="overviewCollectionCount" class="text-xl font-black text-amber-600 mt-1">0 Saved Collections</p>
                 </div>
             </div>
+        </div>
 
-            <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                <div class="p-4 border-b border-slate-100 bg-slate-50/60">
-                    <h3 class="text-xs font-bold text-brand-900 uppercase tracking-wider">Assigned Form Class Cohort Summaries</h3>
+        <!-- QUESTION BANK / ASSESSMENTS PANEL -->
+        <div id="panel-assessments" class="hidden space-y-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Question Bank</h2>
+                    <p class="text-sm text-slate-600 mt-1">Create and manage question collections and assessments</p>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead>
-                            <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
-                                <th class="p-3 pl-4">Target Form Level Class</th>
-                                <th class="p-3">Subject Focus</th>
-                                <th class="p-3 text-center">Active Tests Tracked</th>
-                                <th class="p-3 text-center">Current Class Mean</th>
-                            </tr>
-                        </thead>
-                        <tbody id="classCohortsBody" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
-                    </table>
+                <button onclick="openCreateCollectionModal()" class="bg-brand-800 hover:bg-brand-900 text-white font-bold px-4 py-2.5 rounded-xl transition">
+                    + New Collection
+                </button>
+            </div>
+
+            <!-- Filter and search -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <input type="text" id="collectionSearch" placeholder="Search collections..." class="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none text-sm" onkeyup="filterCollections()">
+            </div>
+
+            <!-- Collections List -->
+            <div id="collectionsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="col-span-full text-center py-12 text-slate-500">
+                    <p class="text-sm">Loading question collections...</p>
                 </div>
             </div>
         </div>
 
-        <div id="panel-assessments" class="space-y-6 hidden">
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
-                
-                <div id="collectionControlHeader" class="flex flex-col sm:flex-row justify-between sm:items-start gap-4 border-b border-slate-100 pb-4">
-                    <div>
-                        <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Question Bank Categorization Deck</h2>
-                        <p class="text-xs text-slate-500">Isolate focus tracks to run standard objective items evaluation updates safely.</p>
-                    </div>
-                    <div class="flex gap-2 items-center w-full sm:w-auto">
-                        <input type="text" id="newCollectionName" placeholder="e.g., SS2 BIOLOGY TEST 1" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold p-2 focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none flex-grow">
-                        <button onclick="createCollection()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider transition whitespace-nowrap">
-                            Create Collection
-                        </button>
-                    </div>
-                </div>
-
-                <div id="collectionsContainer" class="space-y-4"></div>
-            </div>
+        <!-- ASSIGNMENTS PANEL -->
+        <div id="panel-assignments" class="hidden space-y-4">
+            <h2 class="text-2xl font-bold text-slate-900">Assignments Hub</h2>
+            <p class="text-slate-600">Coming soon...</p>
         </div>
 
-        <div id="panel-assignments" class="space-y-6 hidden">
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
-                <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                    <div>
-                        <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Term Project & Assignments Deployment</h2>
-                        <p class="text-xs text-slate-500">Track current terminal task pushes and target submission close points.</p>
-                    </div>
-                    <button onclick="openAssignmentModal()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider shadow-sm transition">
-                        + Open Deployment Modal
-                    </button>
-                </div>
-                <div id="assignmentsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            </div>
+        <!-- STUDENTS PANEL -->
+        <div id="panel-students" class="hidden space-y-4">
+            <h2 class="text-2xl font-bold text-slate-900">Student Rosters</h2>
+            <p class="text-slate-600">Coming soon...</p>
         </div>
 
-        <div id="panel-students" class="space-y-6 hidden">
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-100 pb-3">
-                    <div>
-                        <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Secondary Form Cohort Registry</h2>
-                        <p class="text-xs text-slate-500">Review assigned class lines and student system codes cleanly.</p>
-                    </div>
-                    <select id="studentClassFilter" onchange="renderStudents()" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
-                        <option value="ALL">Display All Assigned Classes</option>
-                    </select>
-                </div>
-                <div class="overflow-x-auto rounded-xl border border-slate-100">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead>
-                            <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
-                                <th class="p-3 pl-4">Admission Code</th>
-                                <th class="p-3">Student Fullname</th>
-                                <th class="p-3">Assigned Class Tier</th>
-                                <th class="p-3 text-center">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="studentTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
-                    </table>
-                </div>
-            </div>
+        <!-- GRADING PANEL -->
+        <div id="panel-grading" class="hidden space-y-4">
+            <h2 class="text-2xl font-bold text-slate-900">Gradebook & Mark Sheet</h2>
+            <p class="text-slate-600">Coming soon...</p>
         </div>
 
-        <div id="panel-grading" class="space-y-6 hidden">
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div>
-                        <h3 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Result Upload Analytics</h3>
-                        <p class="text-base font-black text-brand-900 mt-0.5">Roster Capture Progress</p>
-                    </div>
-                    <div class="text-right text-xs">
-                        <span class="font-bold text-slate-500">Completed Data Cells: </span>
-                        <span id="progressStatsCount" class="font-mono font-black text-brand-900 bg-slate-100 px-2 py-0.5 rounded-md">0 / 0</span>
-                        <span id="progressStatsLeft" class="ml-2 font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">0 Cells Left</span>
-                    </div>
-                </div>
-                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden shadow-inner">
-                    <div id="progressBarFill" class="bg-gradient-to-r from-brand-500 to-emerald-500 h-full w-0 transition-all duration-300"></div>
-                </div>
-            </div>
-
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-slate-100 pb-4">
-                    <div>
-                        <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Secondary Gradebook Mark Sheet Matrix</h2>
-                        <p class="text-xs text-slate-500">Pushes score modifications straight to parent profile views. Weights: CA1 (20%), CA2 (20%), Exam (60%).</p>
-                    </div>
-                    <div class="flex space-x-2 shrink-0">
-                        <select id="gradebookClassFilter" onchange="renderGradebook()" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
-                        </select>
-                        <button onclick="saveGradebookChanges()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider shadow transition">
-                            Bulk Save Class
-                        </button>
-                    </div>
-                </div>
-                <div class="overflow-x-auto rounded-xl border border-slate-100">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead>
-                            <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
-                                <th class="p-3 pl-4">Admission Code</th>
-                                <th class="p-3">Student Name</th>
-                                <th class="p-3 text-center w-20">CA1 (20)</th>
-                                <th class="p-3 text-center w-20">CA2 (20)</th>
-                                <th class="p-3 text-center w-20">Exam (60)</th>
-                                <th class="p-3 text-center w-24">Total Outcome</th>
-                                <th class="p-3 text-center w-28">Standing Term</th>
-                                <th class="p-3 text-center w-36">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="gradebookTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
-                    </table>
-                </div>
-            </div>
+        <!-- PROFILE PANEL -->
+        <div id="panel-profile" class="hidden space-y-4">
+            <h2 class="text-2xl font-bold text-slate-900">Faculty Profile Desk</h2>
+            <p class="text-slate-600">Coming soon...</p>
         </div>
 
-        <div id="panel-profile" class="space-y-6 hidden">
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
-                <div class="border-b border-slate-100 pb-3">
-                    <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Faculty Profile Management Desk</h2>
-                </div>
-                <form id="profileForm" onsubmit="updateTeacherProfile(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                    <div>
-                        <label class="block font-bold text-slate-400 mb-1">Full Instructor Name</label>
-                        <input type="text" id="profileName" value="" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-400 mb-1">Faculty Rank Title</label>
-                        <input type="text" id="profileTitle" value="" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-400 mb-1">Assigned Subject Department</label>
-                        <input type="text" id="profileDept" value="" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-400 mb-1">Assigned Form Class Tracks</label>
-                        <input type="text" id="profileLevels" value="" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                    </div>
-                    <div class="sm:col-span-2 flex justify-end">
-                        <button type="submit" class="bg-brand-900 text-white font-bold px-5 py-2 rounded-xl uppercase transition hover:bg-brand-800">Update Profile</button>
-                    </div>
-                </form>
-            </div>
-        </div>
     </main>
 
-    <!-- MODALS -->
-    <div id="questionModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl border border-slate-200 w-full max-w-3xl shadow-2xl flex flex-col overflow-hidden max-h-[92vh]">
-            <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+    <!-- CREATE COLLECTION MODAL -->
+    <div id="createCollectionModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-lg">
+            <h3 class="text-xl font-bold text-slate-900 mb-4">Create New Collection</h3>
+            <div class="space-y-4">
                 <div>
-                    <h3 id="modalTitle" class="text-xs font-extrabold text-brand-900 uppercase tracking-wider">Configure Assessment Item</h3>
-                    <p class="text-[11px] text-slate-500">Edit stems, diagrams, multi-editor response spaces, and answer keys.</p>
-                </div>
-                <button onclick="closeQuestionModal()" class="text-slate-400 hover:text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md font-bold">&times;</button>
-            </div>
-            <div class="p-5 space-y-4 overflow-y-auto text-xs">
-                <div>
-                    <label class="block font-extrabold text-slate-400 uppercase tracking-wider mb-1.5">Question Stem Body (Rich Text)</label>
-                    <div id="quillQuestionStem" class="bg-white rounded-xl"></div>
-                </div>
-                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-                    <label class="block font-extrabold text-slate-500 uppercase tracking-wider text-[11px]">Attach Diagram Vector / Diagram Image Asset</label>
-                    <div class="flex gap-2">
-                        <input type="url" id="modalImageUrl" placeholder="Paste structural image URL path here (e.g., https://...)" class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none focus:ring-1 focus:ring-brand-500">
-                        <button onclick="previewModalImage()" class="bg-slate-200 hover:bg-slate-300 font-bold px-3 py-2 rounded-lg transition text-[11px] uppercase">Preview</button>
-                    </div>
-                    <img id="modalImagePreview" src="" class="hidden max-h-32 w-auto object-contain rounded border border-slate-200 bg-white p-1">
-                </div>
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center">
-                        <label class="block font-extrabold text-slate-400 uppercase tracking-wider">Dynamic Response Option Fields</label>
-                        <button onclick="appendBlankOptionField()" class="text-brand-800 hover:text-brand-900 font-bold text-[11px] bg-brand-50 px-2.5 py-1 rounded-lg border border-brand-200 transition">+ Append Option Row</button>
-                    </div>
-                    <div id="modalOptionsWrapper" class="space-y-4"></div>
-                </div>
-                <div class="space-y-1.5">
-                    <label class="block font-extrabold text-slate-400 uppercase tracking-wider">Optional Grading Explanation & Marking Rationale</label>
-                    <div class="explanation-editor-container">
-                        <div id="quillExplanation" class="bg-white rounded-xl"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="p-3.5 border-t border-slate-100 bg-slate-50 flex justify-end space-x-2">
-                <button onclick="closeQuestionModal()" class="bg-white border border-slate-200 text-slate-600 font-bold px-4 py-1.5 rounded-xl text-[11px] uppercase">Cancel</button>
-                <button onclick="saveModalQuestionData()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold px-5 py-1.5 rounded-xl text-[11px] uppercase">Commit Changes</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="assignmentModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl border border-slate-200 w-full max-w-3xl shadow-2xl flex flex-col overflow-hidden max-h-[92vh]">
-            <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-                <div>
-                    <h3 class="text-xs font-extrabold text-brand-900 uppercase tracking-wider">Deploy New Assignment Portfolio</h3>
-                    <p class="text-[11px] text-slate-500">Configure parameters, distribute tasks, or select MCQ rows from core categories.</p>
-                </div>
-                <button onclick="closeAssignmentModal()" class="text-slate-400 hover:text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md font-bold">&times;</button>
-            </div>
-            <div class="p-5 space-y-4 overflow-y-auto text-xs">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block font-bold text-slate-400 mb-1">Assignment Title</label>
-                        <input type="text" id="asmModalTitle" placeholder="e.g., Photosynthesis Pathways" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-400 mb-1">Target Class Cohort</label>
-                        <select id="asmModalClass" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-400 mb-1">Submission Deadline</label>
-                        <input type="date" id="asmModalDue" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                    </div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Collection Name</label>
+                    <input type="text" id="newCollectionName" placeholder="e.g., SS2 Biology Test 1" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none">
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-400 mb-1">Task Deployment Routing Type</label>
-                    <select id="asmModalType" onchange="toggleAssignmentTypeSection()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500 text-brand-900">
-                        <option value="STANDARD">Standard Task Portfolio (Rich Text & Instructions)</option>
-                        <option value="QUESTION_BANK">Question Bank Evaluation (Allocate Dynamic MCQs)</option>
-                    </select>
-                </div>
-                <div id="asmTypeStandardWrapper" class="space-y-1.5">
-                    <label class="block font-extrabold text-slate-400 uppercase tracking-wider">Task Guidelines & Instructions (Rich Text)</label>
-                    <div class="assignment-editor-container">
-                        <div id="quillAssignmentBody" class="bg-white rounded-xl"></div>
-                    </div>
-                </div>
-                <div id="asmTypeQuestionBankWrapper" class="space-y-3 hidden p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-200 pb-2">
-                        <div>
-                            <h4 class="font-extrabold text-brand-900 text-xs uppercase tracking-wide">Question Bank Matrix Mapper</h4>
-                            <p class="text-[11px] text-slate-500">Select which objective questions to link with this task assignment.</p>
-                        </div>
-                        <select id="asmBankCategorySelector" onchange="loadQuestionsForAllocation()" class="bg-white border border-slate-200 rounded-xl text-[11px] font-bold text-slate-700 p-1.5 outline-none focus:ring-1 focus:ring-brand-500">
-                        </select>
-                    </div>
-                    <div id="asmAllocationQuestionsContainer" class="space-y-3 max-h-60 overflow-y-auto pt-1">
-                    </div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Description (Optional)</label>
+                    <textarea id="newCollectionDesc" placeholder="Add a description..." class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none resize-none" rows="3"></textarea>
                 </div>
             </div>
-            <div class="p-3.5 border-t border-slate-100 bg-slate-50 flex justify-end space-x-2">
-                <button onclick="closeAssignmentModal()" class="bg-white border border-slate-200 text-slate-600 font-bold px-4 py-1.5 rounded-xl text-[11px] uppercase">Cancel</button>
-                <button onclick="commitAssignmentDeployment()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold px-5 py-1.5 rounded-xl text-[11px] uppercase tracking-wider transition">Deploy Task Portfolio</button>
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeCreateCollectionModal()" class="flex-1 px-4 py-2 border border-slate-200 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition">Cancel</button>
+                <button onclick="createNewCollection()" class="flex-1 px-4 py-2 bg-brand-800 hover:bg-brand-900 text-white font-semibold rounded-lg transition">Create</button>
             </div>
         </div>
     </div>
 
     <script>
-        // ============ API CONFIGURATION ============
-        const API_BASE_URL = "https://goldlincschools.onrender.com";
-        const token = localStorage.getItem('teacherToken') || localStorage.getItem('token') || "";
-
-        // ============ DATA CONTAINERS ============
-        let teacher = null;
-        let studentsByClass = {};
-        let subjectsByClass = {};
-        let allAssignments = [];
-        let assignmentSubmissions = {};
-        
-        let activeIsolatedCollectionId = null;
-        let activeTargetModalMode = 'CREATE';
-        let contextualTargetQuestionId = null;
-
-        let stemQuillInstance = null;
-        let explanationQuillInstance = null;
-        let assignmentQuillInstance = null;
-        let optionQuillRegistry = {};
-        let activeMediaTargetQuillInstance = null;
-
-        // STATE DATABASES
+        let teacher = {};
         let assessmentDatabase = [];
-        let studentRegistry = [];
-        let assignmentsDatabase = [];
+        const API_BASE_URL = 'http://localhost:3000/api';
 
-        // ============ AUTH HEADERS ============
         function authHeaders() {
-            return token 
-                ? { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token } 
-                : { 'Content-Type': 'application/json' };
+            const token = localStorage.getItem('authToken');
+            return {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
         }
 
-        // ============ API CALLS ============
-        async function fetchTeacherProfile() {
+        async function initSystemNode() {
             try {
-                const res = await fetch(`${API_BASE_URL}/api/teachers/me`, { headers: authHeaders() });
-                if (!res.ok) return null;
-                return await res.json();
-            } catch (e) {
-                console.error('Error fetching teacher profile:', e);
-                return null;
+                // Fetch teacher data
+                const res = await fetch(`${API_BASE_URL}/teachers/me`, { headers: authHeaders() });
+                if (!res.ok) throw new Error('Failed to fetch teacher data');
+                
+                teacher = await res.json();
+                
+                document.getElementById('headerTeacherName').textContent = teacher.name || 'Teacher';
+                document.getElementById('headerTeacherTitle').textContent = teacher.designation || '';
+                document.getElementById('sidebarDept').textContent = teacher.department || 'Department';
+
+                // Fetch all question banks (BOTH CBT and Collections) - UNIFIED ENDPOINT
+                await loadQuestionBanks();
+                
+            } catch (err) {
+                console.error('Error initializing:', err);
             }
         }
 
-        async function fetchTeacherClasses() {
+        async function loadQuestionBanks() {
             try {
-                const res = await fetch(`${API_BASE_URL}/api/teachers/classes`, { headers: authHeaders() });
-                if (!res.ok) return [];
+                const res = await fetch(
+                    `${API_BASE_URL}/teachers/${encodeURIComponent(teacher.id)}/question-bank`,
+                    { headers: authHeaders() }
+                );
+                
+                if (!res.ok) throw new Error('Failed to fetch question banks');
+                
                 const data = await res.json();
-                return Array.isArray(data) ? data : [];
-            } catch (e) {
-                console.error('Error fetching classes:', e);
-                return [];
+                assessmentDatabase = data.questionBanks || [];
+                
+                // Update count
+                document.getElementById('overviewCollectionCount').textContent = `${assessmentDatabase.length} Saved Collections`;
+                
+                // Render collections
+                renderCollections();
+                
+            } catch (err) {
+                console.error('Error loading question banks:', err);
+                assessmentDatabase = [];
             }
-        }
-
-        async function fetchStudentsByClass(classId) {
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/teachers/students?classId=${encodeURIComponent(classId)}`, { headers: authHeaders() });
-                if (!res.ok) return [];
-                const data = await res.json();
-                return Array.isArray(data) ? data : [];
-            } catch (e) {
-                console.error('Error fetching students:', e);
-                return [];
-            }
-        }
-
-        async function fetchSubjectsByClass(classId) {
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/teachers/subjects?classId=${encodeURIComponent(classId)}`, { headers: authHeaders() });
-                if (!res.ok) return [];
-                const data = await res.json();
-                return Array.isArray(data) ? data : [];
-            } catch (e) {
-                console.error('Error fetching subjects:', e);
-                return [];
-            }
-        }
-
-        async function fetchTeacherAssignments() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/assignments`, { headers: authHeaders() });
-                if (!res.ok) return [];
-                const data = await res.json();
-                return Array.isArray(data.assignments) ? data.assignments : [];
-            } catch (e) {
-                console.error('Error fetching assignments:', e);
-                return [];
-            }
-        }
-
-        async function fetchTeacherCBTs() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/cbt`, { headers: authHeaders() });
-                if (!res.ok) return [];
-                const data = await res.json();
-                return Array.isArray(data) ? data : (data.cbts || []);
-            } catch (e) {
-                console.error('Error fetching CBTs:', e);
-                return [];
-            }
-        }
-// ✅ NEW: Fetch collections from backend
-async function fetchTeacherCollections() {
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections`, { 
-            headers: authHeaders() 
-        });
-        if (!res.ok) return [];
-        const data = await res.json();
-        return Array.isArray(data.collections) ? data.collections : [];
-    } catch (e) {
-        console.error('Error fetching collections:', e);
-        return [];
-    }
-}
-
-// ✅ NEW: Create collection on backend
-async function createCollectionAPI(name) {
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections`, {
-            method: 'POST',
-            headers: authHeaders(),
-            body: JSON.stringify({ name: name })
-        });
-        if (!res.ok) throw new Error('Failed to create collection');
-        const data = await res.json();
-        return data.collection;
-    } catch (e) {
-        console.error('Error creating collection:', e);
-        return null;
-    }
-}
-
-// ✅ NEW: Add question to collection on backend
-async function addQuestionToCollectionAPI(collectionId, questionData) {
-    try {
-        const res = await fetch(
-            `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}/questions`,
-            {
-                method: 'POST',
-                headers: authHeaders(),
-                body: JSON.stringify(questionData)
-            }
-        );
-        if (!res.ok) throw new Error('Failed to save question');
-        return await res.json();
-    } catch (e) {
-        console.error('Error saving question:', e);
-        return null;
-    }
-}
-
-// ✅ NEW: Update question on backend
-async function updateQuestionAPI(collectionId, questionId, questionData) {
-    try {
-        const res = await fetch(
-            `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}/questions/${questionId}`,
-            {
-                method: 'PATCH',
-                headers: authHeaders(),
-                body: JSON.stringify(questionData)
-            }
-        );
-        if (!res.ok) throw new Error('Failed to update question');
-        return await res.json();
-    } catch (e) {
-        console.error('Error updating question:', e);
-        return null;
-    }
-}
-
-// ✅ NEW: Delete question on backend
-async function deleteQuestionAPI(collectionId, questionId) {
-    try {
-        const res = await fetch(
-            `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}/questions/${questionId}`,
-            {
-                method: 'DELETE',
-                headers: authHeaders()
-            }
-        );
-        if (!res.ok) throw new Error('Failed to delete question');
-        return true;
-    } catch (e) {
-        console.error('Error deleting question:', e);
-        return false;
-    }
-}
-
-// ✅ NEW: Delete collection on backend
-async function deleteCollectionAPI(collectionId) {
-    try {
-        const res = await fetch(
-            `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}`,
-            {
-                method: 'DELETE',
-                headers: authHeaders()
-            }
-        );
-        if (!res.ok) throw new Error('Failed to delete collection');
-        return true;
-    } catch (e) {
-        console.error('Error deleting collection:', e);
-        return false;
-    }
-}
-        // ============ MAIN INITIALIZATION ============
-async function initSystemNode() {
-    try {
-        teacher = await fetchTeacherProfile();
-        if (!teacher) {
-            alert("Failed to load teacher profile. Please check your authentication.");
-            return;
-        }
-
-        // Update header with teacher info
-        document.getElementById('headerTeacherName').textContent = teacher.name || 'Teacher';
-        document.getElementById('headerTeacherTitle').textContent = teacher.designation || 'Faculty Member';
-        document.getElementById('sidebarDept').textContent = teacher.department || 'Department';
-        document.getElementById('profileName').value = teacher.name || '';
-        document.getElementById('profileTitle').value = teacher.designation || '';
-        document.getElementById('profileDept').value = teacher.department || '';
-
-        // Fetch classes and students
-        teacher.classes = await fetchTeacherClasses();
-        
-        for (const cls of teacher.classes) {
-            studentsByClass[cls.id] = await fetchStudentsByClass(cls.id);
-            subjectsByClass[cls.id] = await fetchSubjectsByClass(cls.id);
-        }
-
-        // Fetch assignments
-        allAssignments = await fetchTeacherAssignments() || [];
-
-        // ✅ NEW: Fetch collections from backend
-        assessmentDatabase = await fetchTeacherCollections() || [];
-
-        // Populate class selectors
-        const asmModalClass = document.getElementById('asmModalClass');
-        const gradebookClassFilter = document.getElementById('gradebookClassFilter');
-        const studentClassFilter = document.getElementById('studentClassFilter');
-
-        teacher.classes.forEach(cls => {
-            // Assignment modal class selector
-            const opt1 = document.createElement('option');
-            opt1.value = cls.id;
-            opt1.textContent = cls.name;
-            asmModalClass.appendChild(opt1);
-
-            // Gradebook class filter
-            const opt2 = document.createElement('option');
-            opt2.value = cls.id;
-            opt2.textContent = cls.name;
-            gradebookClassFilter.appendChild(opt2);
-
-            // Student class filter
-            const opt3 = document.createElement('option');
-            opt3.value = cls.name;
-            opt3.textContent = cls.name;
-            studentClassFilter.appendChild(opt3);
-        });
-
-        // Render initial overview
-        renderOverview();
-        renderCollections();
-        renderAssignments();
-        renderStudents();
-        renderGradebook();
-
-    } catch (err) {
-        console.error('Initialization error:', err);
-        alert('Dashboard initialization failed: ' + err.message);
-    }
-}
-        // ============ RENDER FUNCTIONS ============
-        function renderOverview() {
-            const totalStudents = (teacher.classes || []).reduce((s, c) => s + (studentsByClass[c.id] ? studentsByClass[c.id].length : 0), 0);
-            document.getElementById('statTotalStudents').textContent = totalStudents;
-            
-            // Render class cohorts
-            const tbody = document.getElementById('classCohortsBody');
-            tbody.innerHTML = '';
-
-            (teacher.classes || []).forEach(cls => {
-                const students = studentsByClass[cls.id] || [];
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="p-3 pl-4 font-bold text-brand-900">${cls.name}</td>
-                    <td class="p-3">General Subjects</td>
-                    <td class="p-3 text-center">1 Active Batch</td>
-                    <td class="p-3 text-center font-bold text-slate-900 font-mono">73.8%</td>
-                `;
-                tbody.appendChild(tr);
-            });
         }
 
         function renderCollections() {
             const container = document.getElementById('collectionsContainer');
-            container.innerHTML = '';
-            document.getElementById('overviewCollectionCount').innerText = `${assessmentDatabase.length} Saved Collections`;
-
-            if (assessmentDatabase.length === 0) {
-                container.innerHTML = `<div class="text-center p-8 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-xs font-bold">No active evaluation collections registered.</div>`;
+            
+            if (!assessmentDatabase || assessmentDatabase.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <svg class="w-16 h-16 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        <p class="text-slate-500 font-medium">No question collections yet</p>
+                        <button onclick="switchPanel('assessments'); openCreateCollectionModal();" class="mt-4 px-4 py-2 bg-brand-800 text-white rounded-lg hover:bg-brand-900 transition text-sm font-semibold">
+                            Create Your First Collection
+                        </button>
+                    </div>
+                `;
                 return;
             }
 
-            assessmentDatabase.forEach((collection) => {
-                const isSomeActive = activeIsolatedCollectionId !== null;
-                const isThisActive = activeIsolatedCollectionId === collection.id;
+            container.innerHTML = assessmentDatabase.map(collection => `
+                <div class="collection-card bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md">
+                    <div class="flex items-start justify-between mb-3">
+                        <h3 class="font-bold text-slate-900 flex-1">${collection.name}</h3>
+                        <span class="badge-${collection.isMigrated ? 'new' : 'legacy'} text-[10px] font-bold px-2 py-1 rounded-full whitespace-nowrap ml-2">
+                            ${collection.isMigrated ? 'New' : 'Legacy CBT'}
+                        </span>
+                    </div>
+                    
+                    ${collection.description ? `<p class="text-sm text-slate-600 mb-3">${collection.description}</p>` : ''}
+                    
+                    <div class="bg-slate-50 rounded-lg p-3 mb-4 text-center">
+                        <p class="text-2xl font-black text-brand-900">${collection.questions?.length || 0}</p>
+                        <p class="text-[10px] text-slate-500 uppercase font-semibold">Questions</p>
+                    </div>
 
-                if (isSomeActive && !isThisActive) return;
+                    <div class="space-y-2 text-[11px] text-slate-600">
+                        ${collection.source ? `<p><strong>Source:</strong> ${collection.source}</p>` : ''}
+                        <p><strong>Created:</strong> ${new Date(collection.createdAt).toLocaleDateString()}</p>
+                    </div>
 
-                let questionsHtml = '';
-                if (isThisActive) {
-                    if (collection.questions.length === 0) {
-                        questionsHtml = `<div class="text-center p-6 bg-white border border-slate-150 rounded-xl text-slate-400 text-[11px] font-bold">No active objective questions inside this category array.</div>`;
-                    } else {
-                        collection.questions.forEach((q, index) => {
-                            let choicesMarkup = '';
-                            q.options.forEach((opt, oIdx) => {
-                                const letter = String.fromCharCode(65 + oIdx);
-                                choicesMarkup += `
-                                    <div class="p-2.5 rounded-lg border ${opt.isCorrect ? 'bg-emerald-50/70 border-emerald-300 text-emerald-900 font-bold' : 'bg-slate-50 border-slate-100'} text-xs">
-                                        <div class="flex items-start"><span class="font-bold mr-1.5">${letter}.</span> <div class="w-full">${opt.text}</div></div>
-                                    </div>`;
-                            });
-
-                            questionsHtml += `
-                                <div class="p-5 bg-white border border-slate-200 rounded-xl space-y-3 relative shadow-inner">
-                                    <div class="flex justify-between items-center text-[11px]">
-                                        <span class="font-extrabold text-brand-500 font-mono">OBJECTIVE QUESTION ${index + 1}</span>
-                                        <div class="flex space-x-1.5">
-                                            <button onclick="openEditQuestionModal('${collection.id}', '${q.id}')" class="text-brand-800 hover:text-white hover:bg-brand-800 font-bold uppercase text-[10px] bg-brand-50 px-2.5 py-1 rounded-lg transition border border-brand-200">Edit</button>
-                                            <button onclick="deleteQuestion('${collection.id}', '${q.id}')" class="text-rose-600 hover:text-white hover:bg-rose-600 font-bold uppercase text-[10px] bg-rose-50 px-2.5 py-1 rounded-lg transition border border-rose-100">Delete</button>
-                                        </div>
-                                    </div>
-                                    <div class="text-xs font-bold text-slate-900 leading-relaxed">${q.text}</div>
-                                    ${q.imageUrl ? `<img src="${q.imageUrl}" class="max-h-36 w-auto object-contain rounded border border-slate-200 bg-slate-50 p-1">` : ''}
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">${choicesMarkup}</div>
-                                    ${q.explanation ? `<div class="p-2.5 bg-amber-50/60 border border-amber-200 text-amber-900 rounded-lg text-[11px] font-medium"><strong class="font-bold">Rationale:</strong> ${q.explanation}</div>` : ''}
-                                </div>`;
-                        });
-                    }
-                }
-
-                const actionButtonHtml = isThisActive 
-                    ? `<button onclick="toggleCollectionFocus(null)" class="bg-slate-700 hover:bg-slate-800 text-white font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">&larr; Collapse View</button>`
-                    : `<button onclick="toggleCollectionFocus('${collection.id}')" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">View Items (${collection.questions.length}) &rarr;</button>`;
-
-                container.innerHTML += `
-                    <div class="p-5 border border-slate-200 rounded-2xl bg-slate-50/60 space-y-4 shadow-sm relative">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-3">
-                            <div>
-                                <span class="inline-block text-[9px] font-black tracking-widest bg-brand-900 text-white px-2 py-0.5 rounded uppercase font-mono">Category Track</span>
-                                <h3 class="text-sm font-black text-slate-900 mt-1 uppercase tracking-wide font-serif">${collection.name}</h3>
-                            </div>
-                            <div class="flex items-center space-x-1.5 self-end sm:self-auto">
-                                ${isThisActive ? `
-                                <button onclick="openCreateQuestionModal('${collection.id}')" class="bg-brand-50 border border-brand-200 hover:bg-brand-100 text-brand-900 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">
-                                    + Insert Question
-                                </button>` : ''}
-                                ${actionButtonHtml}
-                                <button onclick="deleteCollection('${collection.id}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">Drop Category</button>
-                            </div>
-                        </div>
-                        ${isThisActive ? `<div class="space-y-3 pt-2 animate-[fadeIn_0.25s_ease-out]">${questionsHtml}</div>` : ''}
-                    </div>`;
-            });
-        }
-
-        function renderAssignments() {
-            const container = document.getElementById('assignmentsContainer');
-            container.innerHTML = '';
-
-            if (allAssignments.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center p-6 border rounded-xl text-slate-400 font-bold">No assignments distributed.</div>`;
-                return;
-            }
-
-            allAssignments.forEach(a => {
-                const typeLabel = a.type === 'QUESTION_BANK' 
-                    ? `<span class="bg-indigo-100 text-indigo-800 border border-indigo-200 text-[10px] px-2 py-0.5 rounded font-bold uppercase">MCQ Question Bank Assessment</span>`
-                    : `<span class="bg-slate-100 text-slate-700 border border-slate-200 text-[10px] px-2 py-0.5 rounded font-bold uppercase">Standard Task Instructions</span>`;
-
-                let innerMetaHtml = '';
-                if (a.type === 'QUESTION_BANK') {
-                    innerMetaHtml = `<p class="text-[11px] text-brand-800 font-bold bg-brand-50 p-2 rounded-lg border border-brand-100">&bull; Allocated Evaluation Total: ${a.questionsAllocated ? a.questionsAllocated.length : 0} Objective Items Linked</p>`;
-                } else if (a.description) {
-                    innerMetaHtml = `<div class="text-[11px] text-slate-500 line-clamp-2 bg-slate-50 p-2 rounded border border-slate-150">${a.description.replace(/<[^>]*>/g, '')}</div>`;
-                }
-
-                const dueDate = new Date(a.dueDate || a.due);
-                const dueDateStr = dueDate.toLocaleDateString();
-
-                container.innerHTML += `
-                    <div class="p-5 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-sm relative">
-                        <div class="flex justify-between items-start">
-                            <span class="text-[9px] font-black bg-brand-900 text-white px-2 py-0.5 rounded tracking-widest uppercase font-mono">${a.class || a.classId}</span>
-                            <span class="text-[10px] text-slate-400 font-bold">Due: ${dueDateStr}</span>
-                        </div>
-                        <h4 class="text-xs font-black text-slate-900 uppercase font-serif tracking-wide leading-snug">${a.title || 'Untitled'}</h4>
-                        <div class="py-0.5">${typeLabel}</div>
-                        ${innerMetaHtml}
-                        <div class="flex justify-between items-center pt-2.5 text-[11px] border-t border-slate-100">
-                            <span class="text-emerald-600 font-extrabold">&bull; Status: ${a.status || 'Open'}</span>
-                        </div>
-                    </div>`;
-            });
-        }
-
-        function renderStudents() {
-            const filter = document.getElementById('studentClassFilter').value;
-            const tbody = document.getElementById('studentTableBody');
-            tbody.innerHTML = '';
-
-            const allStudents = [];
-            for (const cls of teacher.classes || []) {
-                const clsStudents = studentsByClass[cls.id] || [];
-                clsStudents.forEach(s => {
-                    s.classGroup = cls.name;
-                });
-                allStudents.push(...clsStudents);
-            }
-
-            const data = filter === 'ALL' ? allStudents : allStudents.filter(s => s.classGroup === filter);
-
-            if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400 font-bold">No students registered to this track class code loop.</td></tr>`;
-                return;
-            }
-
-            data.forEach(s => {
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50/50 transition">
-                        <td class="p-3 pl-4 font-mono font-bold text-brand-900">${s.regNo || s.id}</td>
-                        <td class="p-3 text-slate-900 font-bold">${s.name}</td>
-                        <td class="p-3 text-slate-500 font-medium">${s.classGroup}</td>
-                        <td class="p-3 text-center"><span class="bg-emerald-50 text-emerald-700 border border-emerald-100 text-[10px] px-2 py-0.5 rounded-full font-bold">Active</span></td>
-                    </tr>`;
-            });
-        }
-
-        function renderGradebook() {
-            const classId = document.getElementById('gradebookClassFilter').value;
-            const tbody = document.getElementById('gradebookTableBody');
-            tbody.innerHTML = '';
-
-            if (!classId) {
-                document.getElementById('gradebookTableBody').innerHTML = '';
-                return;
-            }
-
-            const students = studentsByClass[classId] || [];
-            const subjects = subjectsByClass[classId] || [];
-
-            if (students.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400 font-bold">No students found for this class.</td></tr>`;
-                return;
-            }
-
-            students.forEach((s) => {
-                const total = 0;
-                const badge = getStandingBadge(total);
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50/50 transition" data-student-code="${s.id}">
-                        <td class="p-3 pl-4 font-mono font-bold text-brand-900">${s.regNo}</td>
-                        <td class="p-3 font-bold text-slate-800">${s.name}</td>
-                        <td class="p-3 text-center">
-                            <input type="number" min="0" max="20" value="" oninput="calculateRowTotal(this)" class="ca1-input w-14 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono font-bold p-1 text-xs focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
-                        </td>
-                        <td class="p-3 text-center">
-                            <input type="number" min="0" max="20" value="" oninput="calculateRowTotal(this)" class="ca2-input w-14 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono font-bold p-1 text-xs focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
-                        </td>
-                        <td class="p-3 text-center">
-                            <input type="number" min="0" max="60" value="" oninput="calculateRowTotal(this)" class="exam-input w-14 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono font-bold p-1 text-xs focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
-                        </td>
-                        <td class="p-3 text-center font-mono font-black text-slate-900 tracking-wide">
-                            <span class="total-span">0</span>/100
-                        </td>
-                        <td class="p-3 text-center">
-                            <span class="standing-badge inline-block text-[10px] font-bold px-2 py-0.5 rounded border text-center whitespace-nowrap min-w-[76px] ${badge.class}">${badge.text}</span>
-                        </td>
-                        <td class="p-3 text-center space-x-1 whitespace-nowrap">
-                            <button onclick="saveSingleRow(this)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[10px] px-2.5 py-1 rounded-md uppercase tracking-wider transition">Save</button>
-                            <button onclick="clearSingleRow(this)" class="bg-white border border-slate-200 text-slate-500 hover:bg-slate-100 font-extrabold text-[10px] px-2.5 py-1 rounded-md uppercase tracking-wider transition">Clear</button>
-                        </td>
-                    </tr>`;
-            });
-
-            updateProgressMetrics();
-        }
-
-        function getStandingBadge(score) {
-            if (score >= 75) return { text: "A1 Excellent", class: "bg-emerald-100 text-emerald-800 border-emerald-200" };
-            if (score >= 70) return { text: "B2 Very Good", class: "bg-emerald-50 text-emerald-700 border-emerald-100" };
-            if (score >= 65) return { text: "B3 Good", class: "bg-teal-50 text-teal-700 border-teal-100" };
-            if (score >= 60) return { text: "C4 Credit", class: "bg-blue-50 text-blue-700 border-blue-100" };
-            return { text: "F9 Fail", class: "bg-rose-100 text-rose-800 border-rose-200" };
-        }
-
-        function calculateRowTotal(inputElement) {
-            const row = inputElement.closest('tr');
-            const ca1 = parseInt(row.querySelector('.ca1-input').value) || 0;
-            const ca2 = parseInt(row.querySelector('.ca2-input').value) || 0;
-            const exam = parseInt(row.querySelector('.exam-input').value) || 0;
-            const cumulativeTotal = ca1 + ca2 + exam;
-            
-            row.querySelector('.total-span').innerText = cumulativeTotal;
-            
-            const badgeElement = row.querySelector('.standing-badge');
-            const state = getStandingBadge(cumulativeTotal);
-            badgeElement.className = `standing-badge inline-block text-[10px] font-bold px-2 py-0.5 rounded border text-center whitespace-nowrap min-w-[76px] ${state.class}`;
-            badgeElement.innerText = state.text;
-            
-            updateProgressMetrics();
-        }
-
-        function updateProgressMetrics() {
-            const rows = document.getElementById('gradebookTableBody').children;
-            const totalStudents = rows.length;
-            const totalExpectedCells = totalStudents * 3;
-            let completedCells = 0;
-
-            for (let row of rows) {
-                const ca1Val = row.querySelector('.ca1-input').value;
-                const ca2Val = row.querySelector('.ca2-input').value;
-                const examVal = row.querySelector('.exam-input').value;
-
-                if (ca1Val !== "" && !isNaN(ca1Val)) completedCells++;
-                if (ca2Val !== "" && !isNaN(ca2Val)) completedCells++;
-                if (examVal !== "" && !isNaN(examVal)) completedCells++;
-            }
-
-            const cellsLeft = totalExpectedCells - completedCells;
-            document.getElementById('progressStatsCount').innerText = `${completedCells} / ${totalExpectedCells}`;
-            document.getElementById('progressStatsLeft').innerText = `${cellsLeft} Input Cells Left`;
-
-            const percentage = totalExpectedCells > 0 ? (completedCells / totalExpectedCells) * 100 : 0;
-            document.getElementById('progressBarFill').style.width = `${percentage}%`;
-        }
-
-// ============ COLLECTION MANAGEMENT ============
-function toggleCollectionFocus(collectionId) {
-    activeIsolatedCollectionId = collectionId;
-    document.getElementById('collectionControlHeader').classList.toggle('hidden', collectionId !== null);
-    renderCollections();
-}
-
-async function createCollection() {
-    const input = document.getElementById('newCollectionName');
-    const nameValue = input.value.trim().toUpperCase();
-    if (!nameValue) {
-        alert("Please declare a legal collection title.");
-        return;
-    }
-    
-    // ✅ Save to backend
-    const newCollection = await createCollectionAPI(nameValue);
-    if (newCollection) {
-        assessmentDatabase.push(newCollection);
-        input.value = '';
-        renderCollections();
-        alert('Collection created successfully!');
-    } else {
-        alert('Failed to create collection. Please try again.');
-    }
-}
-
-async function deleteCollection(collectionId) {
-    if (confirm("Are you certain you want to purge this full testing category?")) {
-        // ✅ Delete from backend
-        const success = await deleteCollectionAPI(collectionId);
-        if (success) {
-            assessmentDatabase = assessmentDatabase.filter(c => c._id !== collectionId);
-            if (activeIsolatedCollectionId === collectionId) toggleCollectionFocus(null);
-            renderCollections();
-            alert('Collection deleted!');
-        } else {
-            alert('Failed to delete collection.');
-        }
-    }
-}
-
-async function deleteQuestion(collectionId, questionId) {
-    if (confirm("Delete this question?")) {
-        // ✅ Delete from backend
-        const success = await deleteQuestionAPI(collectionId, questionId);
-        if (success) {
-            const col = assessmentDatabase.find(c => c._id === collectionId);
-            if (col) {
-                col.questions = col.questions.filter(q => q.id !== questionId);
-                renderCollections();
-                alert('Question deleted!');
-            }
-        }
-    }
-}
-
-        // ============ QUESTION MODAL FUNCTIONS ============
-        function initModalStemsIfRequired() {
-            if (!stemQuillInstance) {
-                stemQuillInstance = new Quill('#quillQuestionStem', {
-                    theme: 'snow',
-                    placeholder: 'Enter rich-text biology assessment item stem...',
-                    modules: { toolbar: [['bold', 'italic', 'underline'], ['image'], ['clean']] }
-                });
-            }
-            if (!explanationQuillInstance) {
-                explanationQuillInstance = new Quill('#quillExplanation', {
-                    theme: 'snow',
-                    placeholder: 'Provide step-by-step resolution rationale...',
-                    modules: { toolbar: [['bold', 'italic', 'underline'], ['image'], ['clean']] }
-                });
-            }
-        }
-
-        function appendBlankOptionField(initialHtml = '', checkedState = false) {
-            const wrapper = document.getElementById('modalOptionsWrapper');
-            const fieldIndex = `opt_row_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
-            
-            const rowDiv = document.createElement('div');
-            rowDiv.id = fieldIndex;
-            rowDiv.className = "p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2 relative";
-            
-            rowDiv.innerHTML = `
-                <div class="flex items-center justify-between border-b border-slate-200/60 pb-1.5">
-                    <label class="flex items-center space-x-2 text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
-                        <input type="radio" name="correctAnswerRadio" class="w-3.5 h-3.5 text-brand-500 bg-white border-slate-300 focus:ring-1 focus:ring-brand-500" ${checkedState ? 'checked' : ''}>
-                        <span>Correct Evaluation Key Option</span>
-                    </label>
-                    <button onclick="removeOptionField('${fieldIndex}')" class="text-rose-500 hover:text-rose-700 font-bold uppercase text-[10px] bg-white border border-rose-100 px-2 py-0.5 rounded shadow-sm">Remove Field</button>
+                    <button onclick="viewCollection('${collection._id}')" class="w-full mt-4 bg-brand-800 hover:bg-brand-900 text-white font-semibold py-2 rounded-lg transition text-sm">
+                        View Collection
+                    </button>
                 </div>
-                <div class="option-editor-container">
-                    <div id="editor_${fieldIndex}" class="bg-white rounded-lg"></div>
-                </div>`;
+            `).join('');
+        }
+
+        function filterCollections() {
+            const search = document.getElementById('collectionSearch').value.toLowerCase();
+            const filtered = assessmentDatabase.filter(c => 
+                c.name.toLowerCase().includes(search) || 
+                c.description?.toLowerCase().includes(search)
+            );
             
-            wrapper.appendChild(rowDiv);
-
-            const optQuill = new Quill(`#editor_${fieldIndex}`, {
-                theme: 'snow',
-                placeholder: 'Write response option choices...',
-                modules: { toolbar: [['bold', 'italic', 'underline'], ['image'], ['clean']] }
-            });
-            
-            if (initialHtml) optQuill.root.innerHTML = initialHtml;
-            optionQuillRegistry[fieldIndex] = optQuill;
-        }
-
-        function removeOptionField(id) {
-            const row = document.getElementById(id);
-            if (row) { 
-                row.remove(); 
-                delete optionQuillRegistry[id]; 
-            }
-        }
-
-        function previewModalImage() {
-            const url = document.getElementById('modalImageUrl').value.trim();
-            const preview = document.getElementById('modalImagePreview');
-            if (url) { 
-                preview.src = url; 
-                preview.classList.remove('hidden'); 
-            } else { 
-                preview.classList.add('hidden'); 
-            }
-        }
-
-        function openCreateQuestionModal(collectionId) {
-            activeTargetModalMode = 'CREATE';
-            activeIsolatedCollectionId = collectionId;
-            document.getElementById('modalTitle').innerText = "Deploy New Objective Item Structure";
-            
-            initModalStemsIfRequired();
-            stemQuillInstance.setText('');
-            explanationQuillInstance.setText('');
-            document.getElementById('modalImageUrl').value = '';
-            document.getElementById('modalImagePreview').classList.add('hidden');
-            document.getElementById('modalOptionsWrapper').innerHTML = '';
-            optionQuillRegistry = {};
-
-            appendBlankOptionField('', false);
-            appendBlankOptionField('', false);
-            appendBlankOptionField('', false);
-            appendBlankOptionField('', false);
-
-            document.getElementById('questionModal').style.display = 'flex';
-        }
-
-        function openEditQuestionModal(collectionId, questionId) {
-            activeTargetModalMode = 'EDIT';
-            activeIsolatedCollectionId = collectionId;
-            contextualTargetQuestionId = questionId;
-            document.getElementById('modalTitle').innerText = "Refine Saved Objective Item Parameters";
-
-            initModalStemsIfRequired();
-            const col = assessmentDatabase.find(c => c.id === collectionId);
-            const q = col.questions.find(item => item.id === questionId);
-
-            if (q) {
-                stemQuillInstance.root.innerHTML = q.text;
-                document.getElementById('modalImageUrl').value = q.imageUrl || '';
-                previewModalImage();
-                explanationQuillInstance.root.innerHTML = q.explanation || '';
-                document.getElementById('modalOptionsWrapper').innerHTML = '';
-                optionQuillRegistry = {};
-
-                q.options.forEach(opt => {
-                    appendBlankOptionField(opt.text, opt.isCorrect);
-                });
-
-                document.getElementById('questionModal').style.display = 'flex';
-            }
-        }
-
-        function closeQuestionModal() {
-            document.getElementById('questionModal').style.display = 'none';
-        }
-
-        async function saveModalQuestionData() {
-    const stemHtml = stemQuillInstance.root.innerHTML.trim();
-    const plainStem = stemQuillInstance.getText().trim();
-    const imgUrl = document.getElementById('modalImageUrl').value.trim();
-    const expHtml = explanationQuillInstance.root.innerHTML.trim();
-
-    if (!plainStem) {
-        alert("Question stem body value is required.");
-        return;
-    }
-
-    const optionRows = document.getElementById('modalOptionsWrapper').children;
-    if (optionRows.length < 2) {
-        alert("Declare at least two option rows.");
-        return;
-    }
-
-    let compileOptions = [];
-    let chosenCorrectKey = false;
-
-    for (let row of optionRows) {
-        const id = row.id;
-        const inst = optionQuillRegistry[id];
-        const optHtml = inst.root.innerHTML.trim();
-        const optPlain = inst.getText().trim();
-        const radioCheck = row.querySelector('input[name="correctAnswerRadio"]').checked;
-
-        if (!optPlain) {
-            alert("Empty option rows values are rejected.");
-            return;
-        }
-        if (radioCheck) chosenCorrectKey = true;
-
-        compileOptions.push({ text: optHtml, isCorrect: radioCheck });
-    }
-
-    if (!chosenCorrectKey) {
-        alert("Flag one valid target response correct key selection.");
-        return;
-    }
-
-    const col = assessmentDatabase.find(c => c._id === activeIsolatedCollectionId);
-    if (!col) return;
-
-    const questionData = {
-        text: stemHtml,
-        imageUrl: imgUrl || null,
-        options: compileOptions,
-        explanation: expHtml || null
-    };
-
-    if (activeTargetModalMode === 'CREATE') {
-        // ✅ Save new question to backend
-        const result = await addQuestionToCollectionAPI(activeIsolatedCollectionId, questionData);
-        if (result && result.question) {
-            col.questions.push(result.question);
-            renderCollections();
-            closeQuestionModal();
-            alert('Question saved successfully!');
-        }
-    } else {
-        // ✅ Update existing question on backend
-        const result = await updateQuestionAPI(activeIsolatedCollectionId, contextualTargetQuestionId, questionData);
-        if (result && result.question) {
-            const qIdx = col.questions.findIndex(q => q.id === contextualTargetQuestionId);
-            if (qIdx !== -1) {
-                col.questions[qIdx] = result.question;
-            }
-            renderCollections();
-            closeQuestionModal();
-            alert('Question updated successfully!');
-        }
-    }
-}
-
-        function deleteQuestion(collectionId, questionId) {
-            const targetCollection = assessmentDatabase.find(c => c.id === collectionId);
-            if (targetCollection && confirm("Drop this isolated test question?")) {
-                targetCollection.questions = targetCollection.questions.filter(q => q.id !== questionId);
-                renderCollections();
-            }
-        }
-
-        // ============ ASSIGNMENT FUNCTIONS ============
-        function openAssignmentModal() {
-            if (!assignmentQuillInstance) {
-                assignmentQuillInstance = new Quill('#quillAssignmentBody', {
-                    theme: 'snow',
-                    placeholder: 'Define tasks, instructions, objectives or research specifications...',
-                    modules: { toolbar: [['bold', 'italic', 'underline'], ['image'], ['clean']] }
-                });
-            }
-
-            document.getElementById('asmModalTitle').value = '';
-            document.getElementById('asmModalDue').value = '';
-            document.getElementById('asmModalType').value = 'STANDARD';
-            assignmentQuillInstance.setText('');
-            
-            toggleAssignmentTypeSection();
-            populateAssignmentBankCategories();
-
-            document.getElementById('assignmentModal').style.display = 'flex';
-        }
-
-        function closeAssignmentModal() {
-            document.getElementById('assignmentModal').style.display = 'none';
-        }
-
-        function toggleAssignmentTypeSection() {
-            const type = document.getElementById('asmModalType').value;
-            const standardWrapper = document.getElementById('asmTypeStandardWrapper');
-            const bankWrapper = document.getElementById('asmTypeQuestionBankWrapper');
-
-            if (type === 'STANDARD') {
-                standardWrapper.classList.remove('hidden');
-                bankWrapper.classList.add('hidden');
-            } else {
-                standardWrapper.classList.add('hidden');
-                bankWrapper.classList.remove('hidden');
-                loadQuestionsForAllocation();
-            }
-        }
-
-        function populateAssignmentBankCategories() {
-            const selector = document.getElementById('asmBankCategorySelector');
-            selector.innerHTML = '';
-            assessmentDatabase.forEach(c => {
-                selector.innerHTML += `<option value="${c.id}">${c.name} (${c.questions.length} Items)</option>`;
-            });
-        }
-
-        function loadQuestionsForAllocation() {
-            const catId = document.getElementById('asmBankCategorySelector').value;
-            const container = document.getElementById('asmAllocationQuestionsContainer');
-            container.innerHTML = '';
-
-            if (!catId) {
-                container.innerHTML = `<p class="text-slate-400 font-bold text-[11px] py-2">Create a Question Bank Category first.</p>`;
+            const container = document.getElementById('collectionsContainer');
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="col-span-full text-center py-8 text-slate-500">No collections found</div>';
                 return;
             }
 
-            const col = assessmentDatabase.find(c => c.id === catId);
-            if (!col || col.questions.length === 0) {
-                container.innerHTML = `<p class="text-slate-400 font-bold text-[11px] py-2">No question tracks found in this category portfolio loop.</p>`;
+            container.innerHTML = filtered.map(collection => `
+                <div class="collection-card bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md">
+                    <div class="flex items-start justify-between mb-3">
+                        <h3 class="font-bold text-slate-900 flex-1">${collection.name}</h3>
+                        <span class="badge-${collection.isMigrated ? 'new' : 'legacy'} text-[10px] font-bold px-2 py-1 rounded-full whitespace-nowrap ml-2">
+                            ${collection.isMigrated ? 'New' : 'Legacy CBT'}
+                        </span>
+                    </div>
+                    
+                    ${collection.description ? `<p class="text-sm text-slate-600 mb-3">${collection.description}</p>` : ''}
+                    
+                    <div class="bg-slate-50 rounded-lg p-3 mb-4 text-center">
+                        <p class="text-2xl font-black text-brand-900">${collection.questions?.length || 0}</p>
+                        <p class="text-[10px] text-slate-500 uppercase font-semibold">Questions</p>
+                    </div>
+
+                    <button onclick="viewCollection('${collection._id}')" class="w-full mt-4 bg-brand-800 hover:bg-brand-900 text-white font-semibold py-2 rounded-lg transition text-sm">
+                        View Collection
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function viewCollection(collectionId) {
+            const collection = assessmentDatabase.find(c => c._id === collectionId);
+            if (!collection) return;
+
+            alert(`Collection: ${collection.name}\nQuestions: ${collection.questions?.length || 0}\nSource: ${collection.source}`);
+            // TODO: Open detailed collection view
+        }
+
+        function openCreateCollectionModal() {
+            document.getElementById('createCollectionModal').classList.remove('hidden');
+        }
+
+        function closeCreateCollectionModal() {
+            document.getElementById('createCollectionModal').classList.add('hidden');
+            document.getElementById('newCollectionName').value = '';
+            document.getElementById('newCollectionDesc').value = '';
+        }
+
+        async function createNewCollection() {
+            const name = document.getElementById('newCollectionName').value.trim();
+            const description = document.getElementById('newCollectionDesc').value.trim();
+
+            if (!name) {
+                alert('Please enter a collection name');
                 return;
             }
 
-            col.questions.forEach((q, index) => {
-                const cleanTextPreview = q.text.replace(/<[^>]*>/g, '');
-                container.innerHTML += `
-                    <label class="flex items-start space-x-3 p-2.5 bg-white border border-slate-200 rounded-xl hover:border-brand-300 transition cursor-pointer select-none">
-                        <input type="checkbox" value="${q.id}" class="asm-allocated-checkbox mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
-                        <div class="text-[11px] font-medium text-slate-800">
-                            <span class="font-extrabold text-brand-600 block mb-0.5">ITEM ROW #${index + 1}</span>
-                            <span class="line-clamp-2 text-slate-600 font-semibold">${cleanTextPreview}</span>
-                        </div>
-                    </label>`;
-            });
-        }
+            try {
+                const res = await fetch(
+                    `${API_BASE_URL}/teachers/${encodeURIComponent(teacher.id)}/collections`,
+                    {
+                        method: 'POST',
+                        headers: authHeaders(),
+                        body: JSON.stringify({ name, description })
+                    }
+                );
 
-        function commitAssignmentDeployment() {
-            const titleValue = document.getElementById('asmModalTitle').value.trim();
-            const classValue = document.getElementById('asmModalClass').value;
-            const dueValue = document.getElementById('asmModalDue').value;
-            const typeValue = document.getElementById('asmModalType').value;
-
-            if (!titleValue || !dueValue) {
-                alert("Please write a valid assignment title and select a clear deadline date point.");
-                return;
-            }
-
-            let allocatedArray = [];
-            let instructionsHtml = '';
-
-            if (typeValue === 'STANDARD') {
-                instructionsHtml = assignmentQuillInstance.root.innerHTML.trim();
-            } else {
-                const checkedBoxes = document.querySelectorAll('.asm-allocated-checkbox:checked');
-                checkedBoxes.forEach(cb => {
-                    allocatedArray.push(cb.value);
-                });
-
-                if (allocatedArray.length === 0) {
-                    alert("Please select at least one checkable MCQ box block to allocate to this assessment portfolio.");
-                    return;
-                }
-            }
-
-            assignmentsDatabase.push({
-                id: `asm_${Date.now()}`,
-                title: titleValue.toUpperCase(),
-                class: classValue,
-                due: dueValue,
-                status: "Open",
-                type: typeValue,
-                description: instructionsHtml,
-                questionsAllocated: allocatedArray
-            });
-
-            allAssignments = assignmentsDatabase;
-            closeAssignmentModal();
-            renderAssignments();
-            alert(`Task data structure deployed cleanly for target group ${classValue}.`);
-        }
-
-        // ============ GRADEBOOK FUNCTIONS ============
-        function saveSingleRow(buttonElement) {
-            const row = buttonElement.closest('tr');
-            const code = row.getAttribute('data-student-code');
-            const ca1Val = row.querySelector('.ca1-input').value === "" ? 0 : parseInt(row.querySelector('.ca1-input').value);
-            const ca2Val = row.querySelector('.ca2-input').value === "" ? 0 : parseInt(row.querySelector('.ca2-input').value);
-            const examVal = row.querySelector('.exam-input').value === "" ? 0 : parseInt(row.querySelector('.exam-input').value);
-
-            if (ca1Val > 20 || ca2Val > 20 || examVal > 60) {
-                alert("Validation error: Marks exceed limits! Max caps are CA1: 20, CA2: 20, Exam: 60.");
-                return;
-            }
-
-            alert(`Scores for student saved successfully!`);
-            updateProgressMetrics();
-        }
-
-        function clearSingleRow(buttonElement) {
-            const row = buttonElement.closest('tr');
-            row.querySelector('.ca1-input').value = '';
-            row.querySelector('.ca2-input').value = '';
-            row.querySelector('.exam-input').value = '';
-            row.querySelector('.total-span').innerText = '0';
-            
-            const badgeElement = row.querySelector('.standing-badge');
-            const state = getStandingBadge(0);
-            badgeElement.className = `standing-badge inline-block text-[10px] font-bold px-2 py-0.5 rounded border text-center whitespace-nowrap min-w-[76px] ${state.class}`;
-            badgeElement.innerText = state.text;
-            
-            updateProgressMetrics();
-        }
-
-        function saveGradebookChanges() {
-            const rows = document.getElementById('gradebookTableBody').children;
-            let boundsError = false;
-
-            for (let row of rows) {
-                const ca1Val = row.querySelector('.ca1-input').value === "" ? 0 : parseInt(row.querySelector('.ca1-input').value);
-                const ca2Val = row.querySelector('.ca2-input').value === "" ? 0 : parseInt(row.querySelector('.ca2-input').value);
-                const examVal = row.querySelector('.exam-input').value === "" ? 0 : parseInt(row.querySelector('.exam-input').value);
-
-                if (ca1Val > 20 || ca2Val > 20 || examVal > 60) {
-                    boundsError = true;
-                    continue;
-                }
-            }
-
-            if (boundsError) {
-                alert("Some grades exceeded limits (CA1: 20, CA2: 20, Exam: 60) and could not be bulk saved.");
-            } else {
-                alert("Gradebook updates synced completely across all active database files.");
-            }
-            renderGradebook();
-        }
-
-        // ============ PROFILE FUNCTIONS ============
-        function updateTeacherProfile(event) {
-            event.preventDefault();
-            document.getElementById('headerTeacherName').innerText = document.getElementById('profileName').value;
-            document.getElementById('headerTeacherTitle').innerText = document.getElementById('profileTitle').value;
-            document.getElementById('sidebarDept').innerText = document.getElementById('profileDept').value;
-            document.getElementById('sidebarLevels').innerText = document.getElementById('profileLevels').value;
-            alert("Faculty identity profile parameters modified successfully.");
-        }
-
-        // ============ PANEL SWITCHING ============
-        function switchPanel(panelId) {
-            const panels = ['overview', 'assessments', 'assignments', 'students', 'grading', 'profile'];
-            
-            panels.forEach(p => {
-                const targetPanel = document.getElementById(`panel-${p}`);
-                const targetButton = document.getElementById(`btn-${p}`);
+                if (!res.ok) throw new Error('Failed to create collection');
                 
-                if (p === panelId) {
-                    if (targetPanel) targetPanel.classList.remove('hidden');
-                    if (targetButton) {
-                        targetButton.classList.remove('sidebar-btn-inactive');
-                        targetButton.classList.add('sidebar-btn-active');
-                    }
-                } else {
-                    if (targetPanel) targetPanel.classList.add('hidden');
-                    if (targetButton) {
-                        targetButton.classList.remove('sidebar-btn-active');
-                        targetButton.classList.add('sidebar-btn-inactive');
-                    }
-                }
-            });
-            
-            closeBottomNav(null);
+                closeCreateCollectionModal();
+                await loadQuestionBanks();
+                alert('Collection created successfully!');
+                
+            } catch (err) {
+                console.error('Error creating collection:', err);
+                alert('Error creating collection: ' + err.message);
+            }
         }
 
-        // ============ MOBILE DRAWER LOGIC ============
+        function switchPanel(panelName) {
+            // Hide all panels
+            document.querySelectorAll('[id^="panel-"]').forEach(panel => {
+                panel.classList.add('hidden');
+            });
+
+            // Show selected panel
+            const panel = document.getElementById(`panel-${panelName}`);
+            if (panel) panel.classList.remove('hidden');
+
+            // Update button styles
+            document.querySelectorAll('[id^="btn-"]').forEach(btn => {
+                btn.classList.remove('sidebar-btn-active');
+                btn.classList.add('sidebar-btn-inactive');
+            });
+            const activeBtn = document.getElementById(`btn-${panelName}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('sidebar-btn-inactive');
+                activeBtn.classList.add('sidebar-btn-active');
+            }
+        }
+
         function openBottomNav() {
             const overlay = document.getElementById('bottomDrawerOverlay');
             const card = document.getElementById('bottomDrawerCard');
             overlay.classList.remove('hidden');
-            setTimeout(() => { overlay.classList.remove('opacity-0'); card.classList.remove('translate-y-full'); }, 20);
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+                card.classList.remove('translate-y-full');
+            }, 10);
         }
 
         function closeBottomNav(event) {
-            if (!event || event.target === document.getElementById('bottomDrawerOverlay')) {
-                const overlay = document.getElementById('bottomDrawerOverlay');
-                const card = document.getElementById('bottomDrawerCard');
-                overlay.classList.add('opacity-0');
-                card.classList.add('translate-y-full');
-                setTimeout(() => { overlay.classList.add('hidden'); }, 300);
-            }
+            if (event && event.target !== document.getElementById('bottomDrawerOverlay')) return;
+            const overlay = document.getElementById('bottomDrawerOverlay');
+            const card = document.getElementById('bottomDrawerCard');
+            overlay.classList.add('opacity-0');
+            card.classList.add('translate-y-full');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
         }
     </script>
 </body>
