@@ -668,7 +668,51 @@ function redirectToAttendance() {
             throw err;
         }
     }
+function updateGradebookProgress() {
+    const inputs = document.querySelectorAll(
+        '#gradebookTableBody input[type="number"]'
+    );
 
+    const totalCells = inputs.length;
+
+    let completedCells = 0;
+
+    inputs.forEach(input => {
+        if (input.value.trim() !== '') {
+            completedCells++;
+        }
+    });
+
+    const remainingCells = totalCells - completedCells;
+
+    const percentage =
+        totalCells === 0
+            ? 0
+            : Math.round((completedCells / totalCells) * 100);
+
+    const countElement =
+        document.getElementById('progressStatsCount');
+
+    const leftElement =
+        document.getElementById('progressStatsLeft');
+
+    const progressBar =
+        document.getElementById('progressBarFill');
+
+    if (countElement) {
+        countElement.textContent =
+            `${completedCells} / ${totalCells}`;
+    }
+
+    if (leftElement) {
+        leftElement.textContent =
+            `${remainingCells} Cells Left`;
+    }
+
+    if (progressBar) {
+        progressBar.style.width = `${percentage}%`;
+    }
+}
     // ==========================================
     // NOTIFICATION MODAL INJECTION & ENGINE
     // ==========================================
