@@ -1,1365 +1,1762 @@
+name=public/rt.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gold and Linc Schools | Faculty LMS & Multi-Editor Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7', 
+                            800: '#075985', 
+                            900: '#0c4a6e', 
+                        },
+                        gold: {
+                            400: '#fbbf24',
+                            500: '#d97706',
+                            600: '#b45309',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .parabolic-top {
+            border-top-left-radius: 50% 40px;
+            border-top-right-radius: 50% 40px;
+        }
+        .sidebar-btn-active {
+            background: linear-gradient(to right, #075985, #0284c7) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+        .sidebar-btn-inactive:hover {
+            background-color: rgba(15, 23, 42, 0.2);
+            color: #ffffff;
+        }
+        .ql-container {
+            height: 100px;
+            font-size: 13px;
+            border-bottom-left-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+        }
+        .option-editor-container .ql-container {
+            height: 60px;
+        }
+        .explanation-editor-container .ql-container {
+            height: 80px;
+        }
+        .assignment-editor-container .ql-container {
+            height: 120px;
+        }
+        .ql-toolbar {
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+            background-color: #f8fafc;
+            padding: 4px 8px !important;
+        }
+        .ql-snow .ql-picker.ql-image::before {
+            content: '🖼️';
+        }
+        .image-upload-input {
+            display: none;
+        }
+        .ql-custom-image-btn {
+            position: relative;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-[#f8fafc] text-slate-800 font-sans antialiased min-h-screen flex flex-col md:flex-row overflow-x-hidden" onload="initSystemNode();">
 
+    <aside class="hidden md:flex flex-col w-72 bg-brand-900 text-white shrink-0 shadow-2xl relative z-30 border-r border-brand-800">
+        <div class="p-6 border-b border-brand-800/60 bg-brand-950/20 flex items-center space-x-3">
+            <div class="bg-white p-1 rounded-xl shadow-inner flex items-center justify-center shrink-0">
+                <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779961202/editor-uploads/frngf21mg4fcrnmccobm.png" class="h-9 w-auto object-contain" alt="Gold and Linc Logo">
+            </div>
+            <div>
+                <span class="block text-base font-extrabold tracking-tight uppercase font-serif">Gold & Linc</span>
+                <span class="block text-[10px] text-brand-500 uppercase tracking-widest font-extrabold -mt-0.5">Faculty Terminal</span>
+            </div>
+        </div>
+
+        <div class="p-4 mx-4 my-4 bg-brand-800/50 rounded-2xl border border-brand-500/30 backdrop-blur-sm text-xs">
+            <p class="text-[10px] font-bold text-brand-500 uppercase tracking-wider mb-1 px-1">Department</p>
+            <p id="sidebarDept" class="text-sm font-bold text-white px-1">Senior Biological Sciences</p>
+            <p id="sidebarLevels" class="text-[10px] text-brand-100/70 px-1 mt-0.5">Assigned: SS1, SS2, SS3 Track</p>
+        </div>
+
+        <nav class="flex-grow px-4 space-y-1 overflow-y-auto pb-4" id="lmsMenu">
+            <p class="text-[10px] font-bold text-brand-500 uppercase tracking-widest px-3 mb-2">LMS Components</p>
+            
+            <button id="btn-overview" onclick="switchPanel('overview')" type="button" class="sidebar-btn-active w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm0 10a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm11-5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2zm0 10a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                Course Performance Desk
+            </button>
+
+            <button id="btn-assessments" onclick="switchPanel('assessments')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9m0 0a2 2 0 00-2-2m2 2v2m0-6V5a2 2 0 012-2h6a2 2 0 012 2v2m0 0V7a2 2 0 012-2h-.5a3.5 3.5 0 00-3.5 3.5V9"></path></svg>
+                Question Bank Categories
+            </button>
+
+            <button id="btn-assignments" onclick="switchPanel('assignments')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Assignments Hub
+            </button>
+
+            <button id="btn-students" onclick="switchPanel('students')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-2a6 6 0 0112 0v2zm0 0h6v-2a6 6 0 00-9-5.656v2a4 4 0 013 3.656z"></path></svg>
+                Student Rosters
+            </button>
+            
+            <button id="btn-grading" onclick="switchPanel('grading')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                Gradebook & Mark Sheet
+            </button>
+            
+            <button id="btn-profile" onclick="switchPanel('profile')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                Faculty Profile Desk
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-brand-800/60 bg-brand-950/20 text-[11px] text-center text-brand-100/60">
+            System Node: <strong class="text-white font-semibold" id="systemNode">Faculty_LMS_2026</strong>
+        </div>
+    </aside>
+
+    <header class="md:hidden w-full bg-brand-900 text-white h-16 px-4 flex items-center justify-between shadow-md sticky top-0 z-40">
+        <div class="flex items-center space-x-2.5">
+            <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779961202/editor-uploads/frngf21mg4fcrnmccobm.png" class="h-7 w-auto bg-white p-0.5 rounded-lg" alt="Logo">
+            <span class="font-serif font-bold text-sm tracking-wide">Gold & Linc LMS</span>
+        </div>
+        <button type="button" onclick="openBottomNav()" class="bg-brand-800 border border-brand-500/40 px-3 py-1.5 rounded-xl text-xs font-bold text-white transition active:scale-95 flex items-center">
+            <span>LMS Menu</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+    </header>
+
+    <div id="bottomDrawerOverlay" onclick="closeBottomNav(event)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden transition-opacity duration-300 opacity-0">
+        <div id="bottomDrawerCard" class="absolute bottom-0 inset-x-0 bg-brand-900 text-white parabolic-top transform translate-y-full transition-transform duration-300 border-t-2 border-gold-400 p-6">
+            <div class="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-brand-800 rounded-full"></div>
+            <div class="grid grid-cols-1 gap-2 text-sm font-bold">
+                <button onclick="switchPanel('overview')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Course Performance Desk</span> &rarr;</button>
+                <button onclick="switchPanel('assessments')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Question Bank Categories</span> &rarr;</button>
+                <button onclick="switchPanel('assignments')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Assignments Hub</span> &rarr;</button>
+                <button onclick="switchPanel('students')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Student Rosters</span> &rarr;</button>
+                <button onclick="switchPanel('grading')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Gradebook & Mark Sheet</span> &rarr;</button>
+                <button onclick="switchPanel('profile')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Faculty Profile Desk</span> &rarr;</button>
+            </div>
+        </div>
+    </div>
+
+    <main class="flex-grow p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto w-full overflow-hidden" id="lmsPanels">
+        
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                <div class="p-2.5 bg-brand-50 rounded-lg text-brand-800 shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div class="text-xs">
+                    <p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Active Faculty Staff</p>
+                    <p id="headerTeacherName" class="text-sm font-black text-slate-900">Loading...</p>
+                    <p id="headerTeacherTitle" class="text-slate-500 text-[11px]">—</p>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                <div class="p-2.5 bg-amber-50 rounded-lg text-gold-600 shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                </div>
+                <div class="text-xs">
+                    <p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Academic Term Node</p>
+                    <p class="text-sm font-black text-slate-900">2025/2026 Session &bull; First Term</p>
+                    <span class="inline-flex bg-brand-50 text-brand-800 font-bold px-1.5 py-0.5 rounded text-[10px] mt-0.5">Continuous Assessment Cycle</span>
+                </div>
+            </div>
+        </section>
+
+        <div id="panel-overview" class="space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Assigned Total Class Roll</p>
+                    <p class="text-xl font-black text-brand-900 mt-1" id="statTotalStudents">--</p>
+                    <p class="text-[10px] text-slate-400 font-medium mt-1">Across all assigned classes</p>
+                </div>
+                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Overall Test Average</p>
+                    <p class="text-xl font-black text-emerald-600 mt-1">71.5%</p>
+                    <span class="inline-flex bg-emerald-50 text-emerald-700 text-[9px] font-bold px-1.5 py-0.5 rounded-full mt-1">Class Standing: Good</span>
+                </div>
+                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Active Categories</p>
+                    <p id="overviewCollectionCount" class="text-xl font-black text-amber-600 mt-1">0 Saved Collections</p>
+                </div>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                <div class="p-4 border-b border-slate-100 bg-slate-50/60">
+                    <h3 class="text-xs font-bold text-brand-900 uppercase tracking-wider">Assigned Form Class Cohort Summaries</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
+                                <th class="p-3 pl-4">Target Form Level Class</th>
+                                <th class="p-3">Subject Focus</th>
+                                <th class="p-3 text-center">Active Tests Tracked</th>
+                                <th class="p-3 text-center">Current Class Mean</th>
+                            </tr>
+                        </thead>
+                        <tbody id="classCohortsBody" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="panel-assessments" class="space-y-6 hidden">
+            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                
+                <div id="collectionControlHeader" class="flex flex-col sm:flex-row justify-between sm:items-start gap-4 border-b border-slate-100 pb-4">
+                    <div>
+                        <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Question Bank Categorization Deck</h2>
+                        <p class="text-xs text-slate-500">Isolate focus tracks to run standard objective items evaluation updates safely.</p>
+                    </div>
+                    <div class="flex gap-2 items-center w-full sm:w-auto">
+                        <input type="text" id="newCollectionName" placeholder="e.g., SS2 BIOLOGY TEST 1" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold p-2 focus:bg-white focus:ring-1 focus:ring-brand-500">
+                        <button onclick="createCollection()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider transition whitespace-nowrap">
+                            Create Collection
+                        </button>
+                    </div>
+                </div>
+
+                <div id="collectionsContainer" class="space-y-4"></div>
+            </div>
+        </div>
+
+        <div id="panel-assignments" class="space-y-6 hidden">
+            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                    <div>
+                        <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Term Project & Assignments Deployment</h2>
+                        <p class="text-xs text-slate-500">Track current terminal task pushes and target submission close points.</p>
+                    </div>
+                    <button onclick="openAssignmentModal()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider shadow-sm transition">
+                        + Open Deployment Modal
+                    </button>
+                </div>
+                <div id="assignmentsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+        </div>
+
+        <div id="panel-students" class="space-y-6 hidden">
+            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-100 pb-3">
+                    <div>
+                        <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Secondary Form Cohort Registry</h2>
+                        <p class="text-xs text-slate-500">Review assigned class lines and student system codes cleanly.</p>
+                    </div>
+                    <select id="studentClassFilter" onchange="renderStudents()" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
+                        <option value="ALL">Display All Assigned Classes</option>
+                    </select>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-slate-100">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
+                                <th class="p-3 pl-4">Admission Code</th>
+                                <th class="p-3">Student Fullname</th>
+                                <th class="p-3">Assigned Class Tier</th>
+                                <th class="p-3 text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="panel-grading" class="space-y-6 hidden">
+            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h3 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Result Upload Analytics</h3>
+                        <p class="text-base font-black text-brand-900 mt-0.5">Roster Capture Progress</p>
+                    </div>
+                    <div class="text-right text-xs">
+                        <span class="font-bold text-slate-500">Completed Data Cells: </span>
+                        <span id="progressStatsCount" class="font-mono font-black text-brand-900 bg-slate-100 px-2 py-0.5 rounded-md">0 / 0</span>
+                        <span id="progressStatsLeft" class="ml-2 font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">0 Cells Left</span>
+                    </div>
+                </div>
+                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden shadow-inner">
+                    <div id="progressBarFill" class="bg-gradient-to-r from-brand-500 to-emerald-500 h-full w-0 transition-all duration-300"></div>
+                </div>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-slate-100 pb-4">
+                    <div>
+                        <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Secondary Gradebook Mark Sheet Matrix</h2>
+                        <p class="text-xs text-slate-500">Pushes score modifications straight to parent profile views. Weights: CA1 (20%), CA2 (20%), Exam (60%).</p>
+                    </div>
+                    <div class="flex space-x-2 shrink-0">
+                        <select id="gradebookClassFilter" onchange="renderGradebook()" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
+                        </select>
+                        <button onclick="saveGradebookChanges()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider shadow transition">
+                            Bulk Save Class
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-slate-100">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
+                                <th class="p-3 pl-4">Admission Code</th>
+                                <th class="p-3">Student Name</th>
+                                <th class="p-3 text-center w-20">CA1 (20)</th>
+                                <th class="p-3 text-center w-20">CA2 (20)</th>
+                                <th class="p-3 text-center w-20">Exam (60)</th>
+                                <th class="p-3 text-center w-24">Total Outcome</th>
+                                <th class="p-3 text-center w-28">Standing Term</th>
+                                <th class="p-3 text-center w-36">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gradebookTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="panel-profile" class="space-y-6 hidden">
+            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                <div class="border-b border-slate-100 pb-3">
+                    <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Faculty Profile Management Desk</h2>
+                </div>
+                <form id="profileForm" onsubmit="updateTeacherProfile(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Full Instructor Name</label>
+                        <input type="text" id="profileName" value="" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Faculty Rank Title</label>
+                        <input type="text" id="profileTitle" value="" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Assigned Subject Department</label>
+                        <input type="text" id="profileDept" value="" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Assigned Form Class Tracks</label>
+                        <input type="text" id="profileLevels" value="" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                    </div>
+                    <div class="sm:col-span-2 flex justify-end">
+                        <button type="submit" class="bg-brand-900 text-white font-bold px-5 py-2 rounded-xl uppercase transition hover:bg-brand-800">Update Profile</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODALS -->
+    <div id="questionModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl border border-slate-200 w-full max-w-3xl shadow-2xl flex flex-col overflow-hidden max-h-[92vh]">
+            <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+                <div>
+                    <h3 id="modalTitle" class="text-xs font-extrabold text-brand-900 uppercase tracking-wider">Configure Assessment Item</h3>
+                    <p class="text-[11px] text-slate-500">Edit stems, diagrams, multi-editor response spaces, and answer keys.</p>
+                </div>
+                <button onclick="closeQuestionModal()" class="text-slate-400 hover:text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md font-bold">&times;</button>
+            </div>
+            <div class="p-5 space-y-4 overflow-y-auto text-xs">
+                <div>
+                    <label class="block font-extrabold text-slate-400 uppercase tracking-wider mb-1.5">Question Stem Body (Rich Text with Images)</label>
+                    <div class="mb-2 flex gap-1">
+                        <input type="file" id="stemImageUpload" accept="image/*" class="hidden" onchange="insertImageFromFile(this, 'stem')">
+                        <button type="button" onclick="document.getElementById('stemImageUpload').click()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-[11px] uppercase transition">📁 Upload</button>
+                        <input type="text" id="stemImageUrl" placeholder="Paste image URL..." class="flex-grow bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-[11px] outline-none focus:ring-1 focus:ring-brand-500">
+                        <button type="button" onclick="insertImageFromUrl('stem')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-[11px] uppercase transition">Insert</button>
+                    </div>
+                    <div id="quillQuestionStem" class="bg-white rounded-xl"></div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <label class="block font-extrabold text-slate-400 uppercase tracking-wider">Dynamic Response Option Fields</label>
+                        <button onclick="appendBlankOptionField()" class="text-brand-800 hover:text-brand-900 font-bold text-[11px] bg-brand-50 px-2.5 py-1 rounded-lg border border-brand-200 transition">+ Add Option</button>
+                    </div>
+                    <div id="modalOptionsWrapper" class="space-y-4"></div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="block font-extrabold text-slate-400 uppercase tracking-wider">Optional Grading Explanation & Marking Rationale</label>
+                    <div class="mb-2 flex gap-1">
+                        <input type="file" id="explanationImageUpload" accept="image/*" class="hidden" onchange="insertImageFromFile(this, 'explanation')">
+                        <button type="button" onclick="document.getElementById('explanationImageUpload').click()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-[11px] uppercase transition">📁 Upload</button>
+                        <input type="text" id="explanationImageUrl" placeholder="Paste image URL..." class="flex-grow bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-[11px] outline-none focus:ring-1 focus:ring-brand-500">
+                        <button type="button" onclick="insertImageFromUrl('explanation')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-[11px] uppercase transition">Insert</button>
+                    </div>
+                    <div class="explanation-editor-container">
+                        <div id="quillExplanation" class="bg-white rounded-xl"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-3.5 border-t border-slate-100 bg-slate-50 flex justify-end space-x-2">
+                <button onclick="closeQuestionModal()" class="bg-white border border-slate-200 text-slate-600 font-bold px-4 py-1.5 rounded-xl text-[11px] uppercase">Cancel</button>
+                <button onclick="saveModalQuestionData()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold px-5 py-1.5 rounded-xl text-[11px] uppercase">Commit Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="assignmentModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl border border-slate-200 w-full max-w-3xl shadow-2xl flex flex-col overflow-hidden max-h-[92vh]">
+            <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+                <div>
+                    <h3 class="text-xs font-extrabold text-brand-900 uppercase tracking-wider">Deploy New Assignment Portfolio</h3>
+                    <p class="text-[11px] text-slate-500">Configure parameters, distribute tasks, or select MCQ rows from core categories.</p>
+                </div>
+                <button onclick="closeAssignmentModal()" class="text-slate-400 hover:text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md font-bold">&times;</button>
+            </div>
+            <div class="p-5 space-y-4 overflow-y-auto text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Assignment Title</label>
+                        <input type="text" id="asmModalTitle" placeholder="e.g., Photosynthesis Pathways" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Target Class Cohort</label>
+                        <select id="asmModalClass" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Submission Deadline</label>
+                        <input type="date" id="asmModalDue" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-400 mb-1">Task Deployment Routing Type</label>
+                    <select id="asmModalType" onchange="toggleAssignmentTypeSection()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                        <option value="STANDARD">Standard Task Portfolio (Rich Text & Instructions)</option>
+                        <option value="QUESTION_BANK">Question Bank Evaluation (Allocate Dynamic MCQs)</option>
+                    </select>
+                </div>
+                <div id="asmTypeStandardWrapper" class="space-y-1.5">
+                    <label class="block font-extrabold text-slate-400 uppercase tracking-wider">Task Guidelines & Instructions (Rich Text)</label>
+                    <div class="assignment-editor-container">
+                        <div id="quillAssignmentBody" class="bg-white rounded-xl"></div>
+                    </div>
+                </div>
+                <div id="asmTypeQuestionBankWrapper" class="space-y-3 hidden p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-200 pb-2">
+                        <div>
+                            <h4 class="font-extrabold text-brand-900 text-xs uppercase tracking-wide">Question Bank Matrix Mapper</h4>
+                            <p class="text-[11px] text-slate-500">Select which objective questions to link with this task assignment.</p>
+                        </div>
+                        <select id="asmBankCategorySelector" onchange="loadQuestionsForAllocation()" class="bg-white border border-slate-200 rounded-xl text-[11px] font-bold text-slate-700 p-1.5 outline-none focus:ring-1 focus:ring-brand-500">
+                        </select>
+                    </div>
+                    <div id="asmAllocationQuestionsContainer" class="space-y-3 max-h-60 overflow-y-auto pt-1">
+                    </div>
+                </div>
+            </div>
+            <div class="p-3.5 border-t border-slate-100 bg-slate-50 flex justify-end space-x-2">
+                <button onclick="closeAssignmentModal()" class="bg-white border border-slate-200 text-slate-600 font-bold px-4 py-1.5 rounded-xl text-[11px] uppercase">Cancel</button>
+                <button onclick="commitAssignmentDeployment()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold px-5 py-1.5 rounded-xl text-[11px] uppercase tracking-wider transition">Deploy</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // ============ API CONFIGURATION ============
-        const API_BASE_URL = "https://goldlincschools.onrender.com";
-        const token = localStorage.getItem('teacherToken') || localStorage.getItem('token') || "";
+    // ============ API CONFIGURATION ============
+    const API_BASE_URL = "https://goldlincschools.onrender.com";
+    const token = localStorage.getItem('teacherToken') || localStorage.getItem('token') || "";
 
-        // ============ DATA CONTAINERS ============
-        let teacher = null;
-        let studentsByClass = {};
-        let subjectsByClass = {};
-        let allAssignments = [];
-        let assignmentSubmissions = {};
+    // ============ DATA CONTAINERS ============
+    let teacher = null;
+    let studentsByClass = {};
+    let subjectsByClass = {};
+    let allAssignments = [];
+    let assignmentSubmissions = {};
+    
+    let activeIsolatedCollectionId = null;
+    let activeTargetModalMode = 'CREATE';
+    let contextualTargetQuestionId = null;
+
+    let stemQuillInstance = null;
+    let explanationQuillInstance = null;
+    let assignmentQuillInstance = null;
+    let optionQuillRegistry = {};
+    let activeMediaTargetQuillInstance = null;
+
+    // STATE DATABASES
+    let assessmentDatabase = [];
+    let studentRegistry = [];
+    let assignmentsDatabase = [];
+
+    // ============ AUTH HEADERS ============
+    function authHeaders() {
+        return token 
+            ? { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token } 
+            : { 'Content-Type': 'application/json' };
+    }
+
+    // ==========================================
+    // NOTIFICATION MODAL INJECTION & ENGINE
+    // ==========================================
+    (function injectCustomModal() {
+        if (document.getElementById('notificationModal')) return;
         
-        let activeIsolatedCollectionId = null;
-        let activeTargetModalMode = 'CREATE';
-        let contextualTargetQuestionId = null;
+        const style = document.createElement('style');
+        style.textContent = `
+            .notification-overlay {
+                position: fixed;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(15, 23, 42, 0.6);
+                backdrop-filter: blur(4px);
+                display: flex; justify-content: center; align-items: center;
+                z-index: 99999; opacity: 1; transition: opacity 0.2s ease;
+                font-family: system-ui, -apple-system, sans-serif;
+            }
+            .notification-overlay.hidden { opacity: 0; pointer-events: none; display: none; }
+            .notification-card {
+                background: #ffffff; padding: 24px; border-radius: 12px;
+                width: 90%; max-width: 400px; text-align: center;
+                box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+                transform: scale(1); transition: transform 0.2s ease;
+            }
+            .notification-overlay.hidden .notification-card { transform: scale(0.95); }
+            .notification-icon { font-size: 3rem; margin-bottom: 12px; display: block; }
+            .notification-card h3 { margin: 0 0 8px 0; font-size: 1.25rem; color: #1e293b; font-weight: 600; }
+            .notification-card p { margin: 0 0 24px 0; color: #64748b; font-size: 0.95rem; line-height: 1.5; white-space: pre-line; }
+            .notification-actions { display: flex; gap: 12px; justify-content: center; }
+            .notification-btn {
+                padding: 10px 20px; border-radius: 6px; border: none;
+                font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: background 0.15s;
+            }
+            .notification-btn-secondary { background: #f1f5f9; color: #475569; }
+            .notification-btn-secondary:hover { background: #e2e8f0; }
+            .notification-btn-primary { background: #2563eb; color: #ffffff; }
+            .notification-btn-primary:hover { background: #1d4ed8; }
+        `;
+        document.head.appendChild(style);
 
-        let stemQuillInstance = null;
-        let explanationQuillInstance = null;
-        let assignmentQuillInstance = null;
-        let optionQuillRegistry = {};
-        let activeMediaTargetQuillInstance = null;
+        const modalHtml = `
+            <div id="notificationModal" class="notification-overlay hidden">
+                <div class="notification-card">
+                    <span id="notificationIcon" class="notification-icon">❓</span>
+                    <h3 id="notificationTitle">Confirm Action</h3>
+                    <p id="notificationMessage">Are you sure you want to proceed?</p>
+                    <div class="notification-actions">
+                        <button id="notificationCancelBtn" class="notification-btn notification-btn-secondary">Cancel</button>
+                        <button id="notificationConfirmBtn" class="notification-btn notification-btn-primary">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    })();
 
-        // STATE DATABASES
-        let assessmentDatabase = [];
-        let studentRegistry = [];
-        let assignmentsDatabase = [];
+    function showCustomModal({ title, message, type = 'confirm', icon = '❓' }) {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('notificationModal');
+            const titleEl = document.getElementById('notificationTitle');
+            const msgEl = document.getElementById('notificationMessage');
+            const iconEl = document.getElementById('notificationIcon');
+            const confirmBtn = document.getElementById('notificationConfirmBtn');
+            const cancelBtn = document.getElementById('notificationCancelBtn');
 
-        // ============ AUTH HEADERS ============
-        function authHeaders() {
-            return token 
-                ? { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token } 
-                : { 'Content-Type': 'application/json' };
+            titleEl.textContent = title;
+            msgEl.textContent = message;
+            iconEl.textContent = icon;
+
+            if (type === 'alert') {
+                cancelBtn.style.display = 'none';
+                confirmBtn.textContent = 'OK';
+            } else {
+                cancelBtn.style.display = 'inline-block';
+                confirmBtn.textContent = 'Confirm';
+            }
+
+            modal.classList.remove('hidden');
+
+            function close(result) {
+                modal.classList.add('hidden');
+                confirmBtn.removeEventListener('click', onConfirm);
+                cancelBtn.removeEventListener('click', onCancel);
+                resolve(result);
+            }
+
+            function onConfirm() { close(true); }
+            function onCancel() { close(false); }
+
+            confirmBtn.addEventListener('click', onConfirm);
+            cancelBtn.addEventListener('click', onCancel);
+        });
+    }
+
+    // ============ IMAGE UPLOAD HANDLERS ============
+    function insertImageFromFile(fileInput, target) {
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const imageUrl = e.target.result;
+            insertImageToQuill(target, imageUrl);
+            fileInput.value = '';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function insertImageFromUrl(target) {
+        const urlInput = document.getElementById(`${target}ImageUrl`);
+        const imageUrl = urlInput.value.trim();
+        if (!imageUrl) {
+            await showCustomModal({ title: 'Validation Warning', message: 'Please enter an image URL', type: 'alert', icon: '⚠️' });
+            return;
+        }
+        insertImageToQuill(target, imageUrl);
+        urlInput.value = '';
+    }
+
+    function insertImageToQuill(target, imageUrl) {
+        let quillInstance;
+        if (target === 'stem') {
+            quillInstance = stemQuillInstance;
+        } else if (target === 'explanation') {
+            quillInstance = explanationQuillInstance;
+        } else if (target === 'option') {
+            const optionDivs = document.querySelectorAll('#modalOptionsWrapper .option-editor-container');
+            if (optionDivs.length > 0) {
+                const lastOptionDiv = optionDivs[optionDivs.length - 1];
+                const quillDiv = lastOptionDiv.querySelector('.quill-option-editor');
+                Object.values(optionQuillRegistry).forEach(item => {
+                    if (item.quill && item.quill.root === quillDiv) {
+                        quillInstance = item.quill;
+                    }
+                });
+            }
         }
 
-        // ============ IMAGE UPLOAD HANDLERS ============
-        function insertImageFromFile(fileInput, target) {
-            const file = fileInput.files[0];
-            if (!file) return;
-
-            // Simple base64 conversion for demo - in production use proper file upload
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const imageUrl = e.target.result;
-                insertImageToQuill(target, imageUrl);
-                fileInput.value = ''; // Reset input
-            };
-            reader.readAsDataURL(file);
+        if (quillInstance) {
+            const range = quillInstance.getSelection(true);
+            quillInstance.insertEmbed(range.index, 'image', imageUrl);
+            quillInstance.setSelection(range.index + 1);
         }
+    }
 
-        function insertImageFromUrl(target) {
-            const urlInput = document.getElementById(`${target}ImageUrl`);
-            const imageUrl = urlInput.value.trim();
-            if (!imageUrl) {
-                alert('Please enter an image URL');
+    // ============ API CALLS ============
+    async function fetchTeacherProfile() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/teachers/me`, { headers: authHeaders() });
+            if (!res.ok) return null;
+            return await res.json();
+        } catch (e) {
+            console.error('Error fetching teacher profile:', e);
+            return null;
+        }
+    }
+
+    async function fetchTeacherClasses() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/teachers/classes`, { headers: authHeaders() });
+            if (!res.ok) return [];
+            const data = await res.json();
+            return Array.isArray(data) ? data : [];
+        } catch (e) {
+            console.error('Error fetching classes:', e);
+            return [];
+        }
+    }
+
+    async function fetchStudentsByClass(classId) {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/teachers/students?classId=${encodeURIComponent(classId)}`, { headers: authHeaders() });
+            if (!res.ok) return [];
+            const data = await res.json();
+            return Array.isArray(data) ? data : [];
+        } catch (e) {
+            console.error('Error fetching students:', e);
+            return [];
+        }
+    }
+
+    async function fetchSubjectsByClass(classId) {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/teachers/subjects?classId=${encodeURIComponent(classId)}`, { headers: authHeaders() });
+            if (!res.ok) return [];
+            const data = await res.json();
+            return Array.isArray(data) ? data : [];
+        } catch (e) {
+            console.error('Error fetching subjects:', e);
+            return [];
+        }
+    }
+
+    async function fetchTeacherAssignments() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/assignments`, { headers: authHeaders() });
+            if (!res.ok) return [];
+            const data = await res.json();
+            return Array.isArray(data.assignments) ? data.assignments : [];
+        } catch (e) {
+            console.error('Error fetching assignments:', e);
+            return [];
+        }
+    }
+
+    async function fetchUnifiedQuestionBank() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/question-bank`, { 
+                headers: authHeaders() 
+            });
+            if (!res.ok) return [];
+            const data = await res.json();
+            return Array.isArray(data.questionBanks) ? data.questionBanks : [];
+        } catch (e) {
+            console.error('Error fetching unified question bank:', e);
+            return [];
+        }
+    }
+
+    async function createCollectionAPI(name) {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections`, {
+                method: 'POST',
+                headers: authHeaders(),
+                body: JSON.stringify({ name: name })
+            });
+            if (!res.ok) throw new Error('Failed to create collection');
+            const data = await res.json();
+            return data.collection;
+        } catch (e) {
+            console.error('Error creating collection:', e);
+            return null;
+        }
+    }
+
+    async function addQuestionToCollectionAPI(collectionId, questionData) {
+        try {
+            const res = await fetch(
+                `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}/questions`,
+                {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify(questionData)
+                }
+            );
+            if (!res.ok) throw new Error('Failed to save question');
+            return await res.json();
+        } catch (e) {
+            console.error('Error saving question:', e);
+            return null;
+        }
+    }
+
+    async function updateQuestionAPI(collectionId, questionId, questionData) {
+        try {
+            const res = await fetch(
+                `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}/questions/${questionId}`,
+                {
+                    method: 'PATCH',
+                    headers: authHeaders(),
+                    body: JSON.stringify(questionData)
+                }
+            );
+            if (!res.ok) throw new Error('Failed to update question');
+            return await res.json();
+        } catch (e) {
+            console.error('Error updating question:', e);
+            return null;
+        }
+    }
+
+    async function deleteQuestionAPI(collectionId, questionId) {
+        try {
+            const res = await fetch(
+                `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}/questions/${questionId}`,
+                {
+                    method: 'DELETE',
+                    headers: authHeaders()
+                }
+            );
+            if (!res.ok) throw new Error('Failed to delete question');
+            return true;
+        } catch (e) {
+            console.error('Error deleting question:', e);
+            return false;
+        }
+    }
+
+    async function deleteCollectionAPI(collectionId) {
+        try {
+            const res = await fetch(
+                `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}`,
+                {
+                    method: 'DELETE',
+                    headers: authHeaders()
+                }
+            );
+            if (!res.ok) throw new Error('Failed to delete collection');
+            return true;
+        } catch (e) {
+            console.error('Error deleting collection:', e);
+            return false;
+        }
+    }
+
+    // ============ MAIN INITIALIZATION ============
+    async function initSystemNode() {
+        try {
+            teacher = await fetchTeacherProfile();
+            if (!teacher) {
+                await showCustomModal({ title: 'Authentication Failed', message: 'Failed to load teacher profile. Please check your login credentials.', type: 'alert', icon: '🔒' });
                 return;
             }
-            insertImageToQuill(target, imageUrl);
-            urlInput.value = '';
+
+            document.getElementById('headerTeacherName').textContent = teacher.name || 'Teacher';
+            document.getElementById('headerTeacherTitle').textContent = teacher.designation || 'Faculty Member';
+            document.getElementById('sidebarDept').textContent = teacher.department || 'Department';
+            document.getElementById('profileName').value = teacher.name || '';
+            document.getElementById('profileTitle').value = teacher.designation || '';
+            document.getElementById('profileDept').value = teacher.department || '';
+
+            teacher.classes = await fetchTeacherClasses();
+            
+            for (const cls of teacher.classes) {
+                studentsByClass[cls.id] = await fetchStudentsByClass(cls.id);
+                subjectsByClass[cls.id] = await fetchSubjectsByClass(cls.id);
+            }
+
+            allAssignments = await fetchTeacherAssignments() || [];
+            assessmentDatabase = await fetchUnifiedQuestionBank() || [];
+
+            const asmModalClass = document.getElementById('asmModalClass');
+            const gradebookClassFilter = document.getElementById('gradebookClassFilter');
+            const studentClassFilter = document.getElementById('studentClassFilter');
+            const asmBankCategorySelector = document.getElementById('asmBankCategorySelector');
+
+            teacher.classes.forEach(cls => {
+                const opt1 = document.createElement('option');
+                opt1.value = cls.id;
+                opt1.textContent = cls.name;
+                asmModalClass.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = cls.id;
+                opt2.textContent = cls.name;
+                gradebookClassFilter.appendChild(opt2);
+
+                const opt3 = document.createElement('option');
+                opt3.value = cls.name;
+                opt3.textContent = cls.name;
+                studentClassFilter.appendChild(opt3);
+            });
+
+            asmBankCategorySelector.innerHTML = '<option value="">-- Select Category --</option>';
+            assessmentDatabase.forEach(bank => {
+                const opt = document.createElement('option');
+                opt.value = bank._id;
+                opt.textContent = bank.name + (bank.isMigrated ? '' : ' [Legacy]');
+                asmBankCategorySelector.appendChild(opt);
+            });
+
+            renderOverview();
+            renderCollections();
+            renderAssignments();
+            renderStudents();
+            renderGradebook();
+
+        } catch (err) {
+            console.error('Initialization error:', err);
+            await showCustomModal({ title: 'System Error', message: 'Dashboard initialization failed: ' + err.message, type: 'alert', icon: '❌' });
+        }
+    }
+
+    // ============ RENDER FUNCTIONS ============
+    function renderOverview() {
+        const totalStudents = (teacher.classes || []).reduce((s, c) => s + (studentsByClass[c.id] ? studentsByClass[c.id].length : 0), 0);
+        document.getElementById('statTotalStudents').textContent = totalStudents;
+        
+        const tbody = document.getElementById('classCohortsBody');
+        tbody.innerHTML = '';
+
+        (teacher.classes || []).forEach(cls => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="p-3 pl-4 font-bold text-brand-900">${cls.name}</td>
+                <td class="p-3">General Subjects</td>
+                <td class="p-3 text-center">1 Active Batch</td>
+                <td class="p-3 text-center font-bold text-slate-900 font-mono">73.8%</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function renderCollections() {
+        const container = document.getElementById('collectionsContainer');
+        container.innerHTML = '';
+        document.getElementById('overviewCollectionCount').innerText = `${assessmentDatabase.length} Saved Collections`;
+
+        if (assessmentDatabase.length === 0) {
+            container.innerHTML = `<div class="text-center p-8 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-xs font-bold">No active evaluation collections registered.</div>`;
+            return;
         }
 
-        function insertImageToQuill(target, imageUrl) {
-            let quillInstance;
-            if (target === 'stem') {
-                quillInstance = stemQuillInstance;
-            } else if (target === 'explanation') {
-                quillInstance = explanationQuillInstance;
-            } else if (target === 'option') {
-                // For options, get the currently focused quill
-                const optionDivs = document.querySelectorAll('#modalOptionsWrapper .option-editor-container');
-                if (optionDivs.length > 0) {
-                    const lastOptionDiv = optionDivs[optionDivs.length - 1];
-                    const quillDiv = lastOptionDiv.querySelector('.quill-option-editor');
-                    // Find corresponding quill instance
-                    Object.values(optionQuillRegistry).forEach(item => {
-                        if (item.quill && item.quill.root === quillDiv) {
-                            quillInstance = item.quill;
+        assessmentDatabase.forEach((collection) => {
+            const isSomeActive = activeIsolatedCollectionId !== null;
+            const isThisActive = activeIsolatedCollectionId === collection._id;
+
+            if (isSomeActive && !isThisActive) return;
+
+            const questionCount = collection.questions ? collection.questions.length : 0;
+
+            let questionsHtml = '';
+            if (isThisActive) {
+                if (!collection.questions || collection.questions.length === 0) {
+                    questionsHtml = `<div class="text-center p-6 bg-white border border-slate-150 rounded-xl text-slate-400 text-[11px] font-bold">No active objective questions inside this category.</div>`;
+                } else {
+                    collection.questions.forEach((q, index) => {
+                        let choicesMarkup = '';
+                        if (q.options && q.options.length > 0) {
+                            q.options.forEach((opt, oIdx) => {
+                                const letter = String.fromCharCode(65 + oIdx);
+                                const isCorrect = opt.isCorrect === true;
+                                choicesMarkup += `
+                                    <div class="p-2.5 rounded-lg border ${isCorrect ? 'bg-emerald-50/70 border-emerald-300 text-emerald-900 font-bold' : 'bg-slate-50 border-slate-100'} text-xs">
+                                        <div class="flex items-start"><span class="font-bold mr-1.5">${letter}.</span> <div class="w-full">${opt.text || ''}</div></div>
+                                    </div>`;
+                            });
                         }
+
+                        questionsHtml += `
+                            <div class="p-5 bg-white border border-slate-200 rounded-xl space-y-3 relative shadow-inner">
+                                <div class="flex justify-between items-center text-[11px]">
+                                    <span class="font-extrabold text-brand-500 font-mono">OBJECTIVE QUESTION ${index + 1}</span>
+                                    <div class="flex space-x-1.5">
+                                        <button onclick="openEditQuestionModal('${collection._id}', '${q.id}')" class="text-brand-800 hover:text-white hover:bg-brand-800 font-bold uppercase text-[10px] bg-brand-50 px-2.5 py-1 rounded-lg border border-brand-200 transition">Edit</button>
+                                        <button onclick="deleteQuestion('${collection._id}', '${q.id}')" class="text-rose-600 hover:text-white hover:bg-rose-600 font-bold uppercase text-[10px] bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 transition">Delete</button>
+                                    </div>
+                                </div>
+                                <div class="text-xs font-bold text-slate-900 leading-relaxed">${q.text || ''}</div>
+                                ${q.imageUrl ? `<img src="${q.imageUrl}" class="max-h-36 w-auto object-contain rounded border border-slate-200 bg-slate-50 p-1">` : ''}
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">${choicesMarkup}</div>
+                                ${q.explanation ? `<div class="p-2.5 bg-amber-50/60 border border-amber-200 text-amber-900 rounded-lg text-[11px] font-medium"><strong class="font-bold">Rationale:</strong> ${q.explanation}</div>` : ''}
+                            </div>`;
                     });
                 }
             }
 
-            if (quillInstance) {
-                const range = quillInstance.getSelection(true);
-                quillInstance.insertEmbed(range.index, 'image', imageUrl);
-                quillInstance.setSelection(range.index + 1);
-            }
-        }
+            const sourceLabel = collection.source === 'CBT' 
+                ? '<span class="inline-block text-[9px] font-black tracking-widest bg-amber-600 text-white px-2 py-0.5 rounded uppercase font-mono ml-2">LEGACY CBT</span>'
+                : '';
 
-        // ============ API CALLS ============
-        async function fetchTeacherProfile() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/teachers/me`, { headers: authHeaders() });
-                if (!res.ok) return null;
-                return await res.json();
-            } catch (e) {
-                console.error('Error fetching teacher profile:', e);
-                return null;
-            }
-        }
+            const actionButtonHtml = isThisActive 
+                ? `<button onclick="toggleCollectionFocus(null)" class="bg-slate-700 hover:bg-slate-800 text-white font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">Collapse</button>`
+                : `<button onclick="toggleCollectionFocus('${collection._id}')" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">Expand</button>`;
 
-        async function fetchTeacherClasses() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/teachers/classes`, { headers: authHeaders() });
-                if (!res.ok) return [];
-                const data = await res.json();
-                return Array.isArray(data) ? data : [];
-            } catch (e) {
-                console.error('Error fetching classes:', e);
-                return [];
-            }
-        }
-
-        async function fetchStudentsByClass(classId) {
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/teachers/students?classId=${encodeURIComponent(classId)}`, { headers: authHeaders() });
-                if (!res.ok) return [];
-                const data = await res.json();
-                return Array.isArray(data) ? data : [];
-            } catch (e) {
-                console.error('Error fetching students:', e);
-                return [];
-            }
-        }
-
-        async function fetchSubjectsByClass(classId) {
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/teachers/subjects?classId=${encodeURIComponent(classId)}`, { headers: authHeaders() });
-                if (!res.ok) return [];
-                const data = await res.json();
-                return Array.isArray(data) ? data : [];
-            } catch (e) {
-                console.error('Error fetching subjects:', e);
-                return [];
-            }
-        }
-
-        async function fetchTeacherAssignments() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/assignments`, { headers: authHeaders() });
-                if (!res.ok) return [];
-                const data = await res.json();
-                return Array.isArray(data.assignments) ? data.assignments : [];
-            } catch (e) {
-                console.error('Error fetching assignments:', e);
-                return [];
-            }
-        }
-
-        // ✅ UNIFIED: Fetch all question banks (Collections + Legacy CBT) from backend
-        async function fetchUnifiedQuestionBank() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/question-bank`, { 
-                    headers: authHeaders() 
-                });
-                if (!res.ok) return [];
-                const data = await res.json();
-                return Array.isArray(data.questionBanks) ? data.questionBanks : [];
-            } catch (e) {
-                console.error('Error fetching unified question bank:', e);
-                return [];
-            }
-        }
-
-        // ✅ NEW: Create collection on backend
-        async function createCollectionAPI(name) {
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections`, {
-                    method: 'POST',
-                    headers: authHeaders(),
-                    body: JSON.stringify({ name: name })
-                });
-                if (!res.ok) throw new Error('Failed to create collection');
-                const data = await res.json();
-                return data.collection;
-            } catch (e) {
-                console.error('Error creating collection:', e);
-                return null;
-            }
-        }
-
-        // ✅ NEW: Add question to collection on backend
-        async function addQuestionToCollectionAPI(collectionId, questionData) {
-            try {
-                const res = await fetch(
-                    `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}/questions`,
-                    {
-                        method: 'POST',
-                        headers: authHeaders(),
-                        body: JSON.stringify(questionData)
-                    }
-                );
-                if (!res.ok) throw new Error('Failed to save question');
-                return await res.json();
-            } catch (e) {
-                console.error('Error saving question:', e);
-                return null;
-            }
-        }
-
-        // ✅ NEW: Update question on backend
-        async function updateQuestionAPI(collectionId, questionId, questionData) {
-            try {
-                const res = await fetch(
-                    `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}/questions/${questionId}`,
-                    {
-                        method: 'PATCH',
-                        headers: authHeaders(),
-                        body: JSON.stringify(questionData)
-                    }
-                );
-                if (!res.ok) throw new Error('Failed to update question');
-                return await res.json();
-            } catch (e) {
-                console.error('Error updating question:', e);
-                return null;
-            }
-        }
-
-        // ✅ NEW: Delete question on backend
-        async function deleteQuestionAPI(collectionId, questionId) {
-            try {
-                const res = await fetch(
-                    `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}/questions/${questionId}`,
-                    {
-                        method: 'DELETE',
-                        headers: authHeaders()
-                    }
-                );
-                if (!res.ok) throw new Error('Failed to delete question');
-                return true;
-            } catch (e) {
-                console.error('Error deleting question:', e);
-                return false;
-            }
-        }
-
-        // ✅ NEW: Delete collection on backend
-        async function deleteCollectionAPI(collectionId) {
-            try {
-                const res = await fetch(
-                    `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}`,
-                    {
-                        method: 'DELETE',
-                        headers: authHeaders()
-                    }
-                );
-                if (!res.ok) throw new Error('Failed to delete collection');
-                return true;
-            } catch (e) {
-                console.error('Error deleting collection:', e);
-                return false;
-            }
-        }
-
-        // ============ MAIN INITIALIZATION ============
-        async function initSystemNode() {
-            try {
-                teacher = await fetchTeacherProfile();
-                if (!teacher) {
-                    alert("Failed to load teacher profile. Please check your authentication.");
-                    return;
-                }
-
-                // Update header with teacher info
-                document.getElementById('headerTeacherName').textContent = teacher.name || 'Teacher';
-                document.getElementById('headerTeacherTitle').textContent = teacher.designation || 'Faculty Member';
-                document.getElementById('sidebarDept').textContent = teacher.department || 'Department';
-                document.getElementById('profileName').value = teacher.name || '';
-                document.getElementById('profileTitle').value = teacher.designation || '';
-                document.getElementById('profileDept').value = teacher.department || '';
-
-                // Fetch classes and students
-                teacher.classes = await fetchTeacherClasses();
-                
-                for (const cls of teacher.classes) {
-                    studentsByClass[cls.id] = await fetchStudentsByClass(cls.id);
-                    subjectsByClass[cls.id] = await fetchSubjectsByClass(cls.id);
-                }
-
-                // Fetch assignments
-                allAssignments = await fetchTeacherAssignments() || [];
-
-                // ✅ UPDATED: Fetch unified question bank (Collections + Legacy CBT) from backend
-                assessmentDatabase = await fetchUnifiedQuestionBank() || [];
-
-                // Populate class selectors
-                const asmModalClass = document.getElementById('asmModalClass');
-                const gradebookClassFilter = document.getElementById('gradebookClassFilter');
-                const studentClassFilter = document.getElementById('studentClassFilter');
-                const asmBankCategorySelector = document.getElementById('asmBankCategorySelector');
-
-                teacher.classes.forEach(cls => {
-                    // Assignment modal class selector
-                    const opt1 = document.createElement('option');
-                    opt1.value = cls.id;
-                    opt1.textContent = cls.name;
-                    asmModalClass.appendChild(opt1);
-
-                    // Gradebook class filter
-                    const opt2 = document.createElement('option');
-                    opt2.value = cls.id;
-                    opt2.textContent = cls.name;
-                    gradebookClassFilter.appendChild(opt2);
-
-                    // Student class filter
-                    const opt3 = document.createElement('option');
-                    opt3.value = cls.name;
-                    opt3.textContent = cls.name;
-                    studentClassFilter.appendChild(opt3);
-                });
-
-                // Populate bank category selector with all question banks (Collections + Legacy)
-                assessmentDatabase.forEach(bank => {
-                    const opt = document.createElement('option');
-                    opt.value = bank._id;
-                    opt.textContent = bank.name + (bank.isMigrated ? '' : ' [Legacy]');
-                    asmBankCategorySelector.appendChild(opt);
-                });
-
-                // Render initial overview
-                renderOverview();
-                renderCollections();
-                renderAssignments();
-                renderStudents();
-                renderGradebook();
-
-            } catch (err) {
-                console.error('Initialization error:', err);
-                alert('Dashboard initialization failed: ' + err.message);
-            }
-        }
-
-        // ============ RENDER FUNCTIONS ============
-        function renderOverview() {
-            const totalStudents = (teacher.classes || []).reduce((s, c) => s + (studentsByClass[c.id] ? studentsByClass[c.id].length : 0), 0);
-            document.getElementById('statTotalStudents').textContent = totalStudents;
-            
-            // Render class cohorts
-            const tbody = document.getElementById('classCohortsBody');
-            tbody.innerHTML = '';
-
-            (teacher.classes || []).forEach(cls => {
-                const students = studentsByClass[cls.id] || [];
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="p-3 pl-4 font-bold text-brand-900">${cls.name}</td>
-                    <td class="p-3">General Subjects</td>
-                    <td class="p-3 text-center">1 Active Batch</td>
-                    <td class="p-3 text-center font-bold text-slate-900 font-mono">73.8%</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function renderCollections() {
-            const container = document.getElementById('collectionsContainer');
-            container.innerHTML = '';
-            document.getElementById('overviewCollectionCount').innerText = `${assessmentDatabase.length} Saved Collections`;
-
-            if (assessmentDatabase.length === 0) {
-                container.innerHTML = `<div class="text-center p-8 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-xs font-bold">No active evaluation collections registered.</div>`;
-                return;
-            }
-
-            assessmentDatabase.forEach((collection) => {
-                const isSomeActive = activeIsolatedCollectionId !== null;
-                const isThisActive = activeIsolatedCollectionId === collection._id;
-
-                if (isSomeActive && !isThisActive) return;
-
-                const questionCount = collection.questions ? collection.questions.length : 0;
-
-                let questionsHtml = '';
-                if (isThisActive) {
-                    if (!collection.questions || collection.questions.length === 0) {
-                        questionsHtml = `<div class="text-center p-6 bg-white border border-slate-150 rounded-xl text-slate-400 text-[11px] font-bold">No active objective questions inside this category.</div>`;
-                    } else {
-                        collection.questions.forEach((q, index) => {
-                            let choicesMarkup = '';
-                            if (q.options && q.options.length > 0) {
-                                q.options.forEach((opt, oIdx) => {
-                                    const letter = String.fromCharCode(65 + oIdx);
-                                    const isCorrect = opt.isCorrect === true;
-                                    choicesMarkup += `
-                                        <div class="p-2.5 rounded-lg border ${isCorrect ? 'bg-emerald-50/70 border-emerald-300 text-emerald-900 font-bold' : 'bg-slate-50 border-slate-100'} text-xs">
-                                            <div class="flex items-start"><span class="font-bold mr-1.5">${letter}.</span> <div class="w-full">${opt.text || ''}</div></div>
-                                        </div>`;
-                                });
-                            }
-
-                            questionsHtml += `
-                                <div class="p-5 bg-white border border-slate-200 rounded-xl space-y-3 relative shadow-inner">
-                                    <div class="flex justify-between items-center text-[11px]">
-                                        <span class="font-extrabold text-brand-500 font-mono">OBJECTIVE QUESTION ${index + 1}</span>
-                                        <div class="flex space-x-1.5">
-                                            <button onclick="openEditQuestionModal('${collection._id}', '${q.id}')" class="text-brand-800 hover:text-white hover:bg-brand-800 font-bold uppercase text-[10px] bg-brand-50 px-2.5 py-1 rounded-lg border border-brand-200 transition">Edit</button>
-                                            <button onclick="deleteQuestion('${collection._id}', '${q.id}')" class="text-rose-600 hover:text-white hover:bg-rose-600 font-bold uppercase text-[10px] bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 transition">Delete</button>
-                                        </div>
-                                    </div>
-                                    <div class="text-xs font-bold text-slate-900 leading-relaxed">${q.text || ''}</div>
-                                    ${q.imageUrl ? `<img src="${q.imageUrl}" class="max-h-36 w-auto object-contain rounded border border-slate-200 bg-slate-50 p-1">` : ''}
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">${choicesMarkup}</div>
-                                    ${q.explanation ? `<div class="p-2.5 bg-amber-50/60 border border-amber-200 text-amber-900 rounded-lg text-[11px] font-medium"><strong class="font-bold">Rationale:</strong> ${q.explanation}</div>` : ''}
-                                </div>`;
-                        });
-                    }
-                }
-
-                const sourceLabel = collection.source === 'CBT' 
-                    ? '<span class="inline-block text-[9px] font-black tracking-widest bg-amber-600 text-white px-2 py-0.5 rounded uppercase font-mono ml-2">LEGACY CBT</span>'
-                    : '';
-
-                const actionButtonHtml = isThisActive 
-    ? `<button onclick="toggleCollectionFocus(null)" class="bg-slate-700 hover:bg-slate-800 text-white font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">Collapse</button>`
-    : `<button onclick="toggleCollectionFocus('${collection._id}')" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">Expand</button>`;
-
-                container.innerHTML += `
-                    <div class="p-5 border border-slate-200 rounded-2xl bg-slate-50/60 space-y-4 shadow-sm relative">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-3">
-                            <div>
-                                <div class="flex items-center">
-                                    <span class="inline-block text-[9px] font-black tracking-widest bg-brand-900 text-white px-2 py-0.5 rounded uppercase font-mono">Category Track</span>
-                                    ${sourceLabel}
-                                </div>
-                                <h3 class="text-sm font-black text-slate-900 mt-1 uppercase tracking-wide font-serif">${collection.name}</h3>
-                                <p class="text-[11px] text-slate-500 mt-0.5 font-semibold">${questionCount} Question${questionCount !== 1 ? 's' : ''}</p>
+            container.innerHTML += `
+                <div class="p-5 border border-slate-200 rounded-2xl bg-slate-50/60 space-y-4 shadow-sm relative">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-3">
+                        <div>
+                            <div class="flex items-center">
+                                <span class="inline-block text-[9px] font-black tracking-widest bg-brand-900 text-white px-2 py-0.5 rounded uppercase font-mono">Category Track</span>
+                                ${sourceLabel}
                             </div>
-                            <div class="flex items-center space-x-1.5 self-end sm:self-auto">
-    ${isThisActive && collection.source !== 'CBT' ? `
-    <button onclick="openCreateQuestionModal('${collection._id}')" class="bg-brand-50 border border-brand-200 hover:bg-brand-100 text-brand-900 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase">
-        + Insert Question
-    </button>` : ''}
-    ${actionButtonHtml}
-    ${collection.source === 'Collection' ? `
-    <button onclick="pushCollectionToCBT('${collection._id}')" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase">📤 Push to Exam</button>
-    ` : ''}
-    ${collection.source !== 'CBT' ? `<button onclick="deleteCollection('${collection._id}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase">Delete</button>` : ''}
-</div>
+                            <h3 class="text-sm font-black text-slate-900 mt-1 uppercase tracking-wide font-serif">${collection.name}</h3>
+                            <p class="text-[11px] text-slate-500 mt-0.5 font-semibold">${questionCount} Question${questionCount !== 1 ? 's' : ''}</p>
                         </div>
-                        ${isThisActive ? `<div class="space-y-3 pt-2 animate-[fadeIn_0.25s_ease-out]">${questionsHtml}</div>` : ''}
-                    </div>`;
-            });
-        }
-// Add this function in the JavaScript section
-// ==========================================
-// 1. MODAL INJECTION (HTML & CSS COMBINED)
-// ==========================================
-(function injectCustomModal() {
-    // Add styles to the document head
-    const style = document.createElement('style');
-    style.textContent = `
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 99999; opacity: 1; transition: opacity 0.2s ease;
-            font-family: system-ui, -apple-system, sans-serif;
-        }
-        .modal-overlay.hidden { opacity: 0; pointer-events: none; display: none; }
-        .modal-card {
-            background: #ffffff; padding: 24px; border-radius: 12px;
-            width: 90%; max-width: 400px; text-align: center;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
-            transform: scale(1); transition: transform 0.2s ease;
-        }
-        .modal-overlay.hidden .modal-card { transform: scale(0.95); }
-        .modal-icon { font-size: 3rem; margin-bottom: 12px; display: block; }
-        .modal-card h3 { margin: 0 0 8px 0; font-size: 1.25rem; color: #1e293b; font-weight: 600; }
-        .modal-card p { margin: 0 0 24px 0; color: #64748b; font-size: 0.95rem; line-height: 1.5; white-space: pre-line; }
-        .modal-actions { display: flex; gap: 12px; justify-content: center; }
-        .modal-btn {
-            padding: 10px 20px; border-radius: 6px; border: none;
-            font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: background 0.15s;
-        }
-        .modal-btn-secondary { background: #f1f5f9; color: #475569; }
-        .modal-btn-secondary:hover { background: #e2e8f0; }
-        .modal-btn-primary { background: #2563eb; color: #ffffff; }
-        .modal-btn-primary:hover { background: #1d4ed8; }
-    `;
-    document.head.appendChild(style);
+                        <div class="flex items-center space-x-1.5 self-end sm:self-auto">
+                            ${isThisActive && collection.source !== 'CBT' ? `
+                            <button onclick="openCreateQuestionModal('${collection._id}')" class="bg-brand-50 border border-brand-200 hover:bg-brand-100 text-brand-900 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase">
+                                + Insert Question
+                            </button>` : ''}
+                            ${actionButtonHtml}
+                            ${collection.source === 'Collection' ? `
+                            <button onclick="pushCollectionToCBT('${collection._id}')" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase">📤 Push to Exam</button>
+                            ` : ''}
+                            ${collection.source !== 'CBT' ? `<button onclick="deleteCollection('${collection._id}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase">Delete</button>` : ''}
+                        </div>
+                    </div>
+                    ${isThisActive ? `<div class="space-y-3 pt-2 animate-[fadeIn_0.25s_ease-out]">${questionsHtml}</div>` : ''}
+                </div>`;
+        });
+    }
 
-    // Append the markup to the body
-    const modalHtml = `
-        <div id="customModal" class="modal-overlay hidden">
-            <div class="modal-card">
-                <span id="modalIcon" class="modal-icon">❓</span>
-                <h3 id="modalTitle">Confirm Action</h3>
-                <p id="modalMessage">Are you sure you want to proceed?</p>
-                <div class="modal-actions">
-                    <button id="modalCancelBtn" class="modal-btn modal-btn-secondary">Cancel</button>
-                    <button id="modalConfirmBtn" class="modal-btn modal-btn-primary">Confirm</button>
-                </div>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-})();
-
-// ==========================================
-// 2. MODAL CONTROLLER ENGINE
-// ==========================================
-function showCustomModal({ title, message, type = 'confirm', icon = '❓' }) {
-    return new Promise((resolve) => {
-        const modal = document.getElementById('customModal');
-        const titleEl = document.getElementById('modalTitle');
-        const msgEl = document.getElementById('modalMessage');
-        const iconEl = document.getElementById('modalIcon');
-        const confirmBtn = document.getElementById('modalConfirmBtn');
-        const cancelBtn = document.getElementById('modalCancelBtn');
-
-        titleEl.textContent = title;
-        msgEl.textContent = message;
-        iconEl.textContent = icon;
-
-        if (type === 'alert') {
-            cancelBtn.style.display = 'none';
-            confirmBtn.textContent = 'OK';
-        } else {
-            cancelBtn.style.display = 'inline-block';
-            confirmBtn.textContent = 'Confirm';
-        }
-
-        modal.classList.remove('hidden');
-
-        function close(result) {
-            modal.classList.add('hidden');
-            confirmBtn.removeEventListener('click', onConfirm);
-            cancelBtn.removeEventListener('click', onCancel);
-            resolve(result);
-        }
-
-        function onConfirm() { close(true); }
-        function onCancel() { close(false); }
-
-        confirmBtn.addEventListener('click', onConfirm);
-        cancelBtn.addEventListener('click', onCancel);
-    });
-}
-
-// ==========================================
-// 3. YOUR UPDATED CORE FUNCTION
-// ==========================================
-
-
-
-    
+    // ============ INTERACTIVE CBT DEPLOYMENT CONVERSION ============
     async function pushCollectionToCBT(collectionId) {
-    // Step 1: Get collection to check if it has class/subject
-    const collection = assessmentDatabase.find(c => c._id === collectionId);
-    if (!collection) {
-        await showCustomModal({
-            title: 'Error',
-            message: 'Collection not found',
-            type: 'alert',
-            icon: '❌'
-        });
-        return;
-    }
+        const collection = assessmentDatabase.find(c => c._id === collectionId);
+        if (!collection) {
+            await showCustomModal({ title: 'Error', message: 'Collection not found', type: 'alert', icon: '❌' });
+            return;
+        }
 
-    // Step 2: If collection doesn't have class/subject, ask user to assign
-    if (!collection.class || !collection.subject) {
-        const classOptions = (teacher.classes || [])
-            .map(cls => `<option value="${cls.id}">${cls.name}</option>`)
-            .join('');
-        
-        const subjectOptions = (teacher.classes.length > 0 && subjectsByClass[teacher.classes[0].id])
-            ? subjectsByClass[teacher.classes[0].id]
-                .map(subj => `<option value="${subj.id}">${subj.name}</option>`)
-                .join('')
-            : '';
+        if (!collection.class || !collection.subject) {
+            const classOptions = (teacher.classes || [])
+                .map(cls => `<option value="${cls.id}">${cls.name}</option>`)
+                .join('');
+            
+            const subjectOptions = (teacher.classes.length > 0 && subjectsByClass[teacher.classes[0].id])
+                ? subjectsByClass[teacher.classes[0].id]
+                    .map(subj => `<option value="${subj.id}">${subj.name}</option>`)
+                    .join('')
+                : '';
 
-        // Create modal to select class and subject
-        const modal = document.createElement('div');
-        modal.id = 'pushCollectionModal';
-        modal.className = 'fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4';
-        
-        modal.innerHTML = `
-            <div class="bg-white rounded-2xl border border-slate-200 w-full max-w-md shadow-2xl flex flex-col overflow-hidden">
-                <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-                    <div>
-                        <h3 class="text-xs font-extrabold text-brand-900 uppercase tracking-wider">📤 Assign Class & Subject</h3>
-                        <p class="text-[11px] text-slate-500">Required before publishing to CBT</p>
-                    </div>
-                    <button onclick="document.getElementById('pushCollectionModal').remove()" class="text-slate-400 hover:text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md font-bold">&times;</button>
-                </div>
-                <div class="p-5 space-y-4 text-xs">
-                    <div>
-                        <label class="block font-bold text-slate-400 mb-1">Collection</label>
-                        <input type="text" value="${collection.name}" disabled class="w-full bg-slate-100 border border-slate-200 rounded-xl p-2.5 font-bold text-slate-600">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-400 mb-1">Target Class *</label>
-                        <select id="pushClassSelector" onchange="window.updatePushSubjects()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                            <option value="">-- Select Class --</option>
-                            ${classOptions}
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-400 mb-1">Subject *</label>
-                        <select id="pushSubjectSelector" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                            <option value="">-- Select Subject --</option>
-                            ${subjectOptions}
-                        </select>
-                    </div>
-                </div>
-                <div class="p-3.5 border-t border-slate-100 bg-slate-50 flex justify-end space-x-2">
-                    <button onclick="document.getElementById('pushCollectionModal').remove()" class="bg-white border border-slate-200 text-slate-600 font-bold px-4 py-1.5 rounded-xl text-[11px] uppercase">Cancel</button>
-                    <button onclick="window.proceedWithPush('${collectionId}')" class="bg-brand-900 hover:bg-brand-800 text-white font-bold px-5 py-1.5 rounded-xl text-[11px] uppercase">Proceed</button>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(modal);
-        return;
-    }
-
-    // Step 3: Collection already has class/subject, proceed with conversion
-    await proceedWithConversion(collectionId);
-}
-
-// Helper function to update subjects when class changes
-window.updatePushSubjects = function() {
-    const classSelector = document.getElementById('pushClassSelector');
-    const subjectSelector = document.getElementById('pushSubjectSelector');
-    const selectedClassId = classSelector.value;
-    
-    subjectSelector.innerHTML = '<option value="">-- Select Subject --</option>';
-    
-    if (!selectedClassId) return;
-    
-    const subjects = subjectsByClass[selectedClassId] || [];
-    subjects.forEach(subj => {
-        const option = document.createElement('option');
-        option.value = subj.id;
-        option.textContent = subj.name;
-        subjectSelector.appendChild(option);
-    });
-};
-
-// Helper function to proceed after class/subject selection
-window.proceedWithPush = async function(collectionId) {
-    const classSelector = document.getElementById('pushClassSelector');
-    const subjectSelector = document.getElementById('pushSubjectSelector');
-    
-    const selectedClassId = classSelector.value;
-    const selectedSubjectId = subjectSelector.value;
-    
-    if (!selectedClassId || !selectedSubjectId) {
-        alert('Please select both class and subject');
-        return;
-    }
-
-    // Update collection with class and subject
-    try {
-        const updateRes = await fetch(
-            `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}`,
-            {
-                method: 'PATCH',
-                headers: authHeaders(),
-                body: JSON.stringify({
-                    class: selectedClassId,
-                    subject: selectedSubjectId
-                })
-            }
-        );
-
-        if (!updateRes.ok) throw new Error('Failed to assign class and subject');
-
-        // Remove modal
-        const modal = document.getElementById('pushCollectionModal');
-        if (modal) modal.remove();
-
-        // Proceed with conversion
-        await proceedWithConversion(collectionId);
-    } catch (err) {
-        console.error('Error updating collection:', err);
-        alert('Failed to assign class/subject: ' + err.message);
-    }
-};
-
-// Main conversion function
-async function proceedWithConversion(collectionId) {
-    // Step 1: Confirm action
-    const confirmed = await showCustomModal({
-        title: 'Push Collection to CBT?',
-        message: 'This will create a new CBT document that can be pushed to students.\n\nThis action cannot be undone.',
-        icon: '📤'
-    });
-
-    if (!confirmed) return;
-
-    try {
-        // Step 2: Convert collection to CBT
-        const convertRes = await fetch(
-            `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}/convert-to-cbt`,
-            {
-                method: 'POST',
-                headers: authHeaders(),
-                body: JSON.stringify({})
-            }
-        );
-
-        if (!convertRes.ok) throw new Error('Failed to convert collection to CBT');
-        const convertData = await convertRes.json();
-        const cbtId = convertData.cbtId;
-
-        // Step 3: Push the CBT
-        const pushRes = await fetch(
-            `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/cbt/push`,
-            {
-                method: 'POST',
-                headers: authHeaders(),
-                body: JSON.stringify({ cbtIds: [cbtId] })
-            }
-        );
-
-        if (!pushRes.ok) throw new Error('Failed to push to exam');
-        const pushData = await pushRes.json();
-        
-        // Success!
-        await showCustomModal({
-            title: 'Success! ✅',
-            message: `Collection successfully converted and pushed to CBT Exam!\n\nPushed: ${pushData.pushed.length} CBT(s)\n\nStudents can now access this exam.`,
-            type: 'alert',
-            icon: '✅'
-        });
-        
-        // Refresh
-        assessmentDatabase = await fetchUnifiedQuestionBank();
-        renderCollections();
-    } catch (err) {
-        console.error('Error during conversion:', err);
-        await showCustomModal({
-            title: 'Conversion Failed ❌',
-            message: err.message,
-            type: 'alert',
-            icon: '❌'
-        });
-    }
-}
-        function renderAssignments() {
-            const container = document.getElementById('assignmentsContainer');
-            container.innerHTML = '';
-
-            if (allAssignments.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center p-6 border rounded-xl text-slate-400 font-bold">No assignments distributed.</div>`;
-                return;
-            }
-
-            allAssignments.forEach(a => {
-                const typeLabel = a.type === 'QUESTION_BANK' 
-                    ? `<span class="bg-indigo-100 text-indigo-800 border border-indigo-200 text-[10px] px-2 py-0.5 rounded font-bold uppercase">MCQ Question Bank Assessment</span>`
-                    : `<span class="bg-slate-100 text-slate-700 border border-slate-200 text-[10px] px-2 py-0.5 rounded font-bold uppercase">Standard Task Instructions</span>`;
-
-                let innerMetaHtml = '';
-                if (a.type === 'QUESTION_BANK') {
-                    innerMetaHtml = `<p class="text-[11px] text-brand-800 font-bold bg-brand-50 p-2 rounded-lg border border-brand-100">&bull; Allocated Evaluation Total: ${a.questionsAllocated ? a.questionsAllocated.length : 0} questions</p>`;
-                } else if (a.description) {
-                    innerMetaHtml = `<div class="text-[11px] text-slate-500 line-clamp-2 bg-slate-50 p-2 rounded border border-slate-150">${a.description.replace(/<[^>]*>/g, '')}</div>`;
-                }
-
-                const dueDate = new Date(a.dueDate || a.due);
-                const dueDateStr = dueDate.toLocaleDateString();
-
-                container.innerHTML += `
-                    <div class="p-5 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-sm relative">
-                        <div class="flex justify-between items-start">
-                            <span class="text-[9px] font-black bg-brand-900 text-white px-2 py-0.5 rounded tracking-widest uppercase font-mono">${a.class || a.classId}</span>
-                            <span class="text-[10px] text-slate-400 font-bold">Due: ${dueDateStr}</span>
+            const modal = document.createElement('div');
+            modal.id = 'pushCollectionModal';
+            modal.className = 'fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4';
+            
+            modal.innerHTML = `
+                <div class="bg-white rounded-2xl border border-slate-200 w-full max-w-md shadow-2xl flex flex-col overflow-hidden">
+                    <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+                        <div>
+                            <h3 class="text-xs font-extrabold text-brand-900 uppercase tracking-wider">📤 Assign Class & Subject</h3>
+                            <p class="text-[11px] text-slate-500">Required before publishing to CBT</p>
                         </div>
-                        <h4 class="text-xs font-black text-slate-900 uppercase font-serif tracking-wide leading-snug">${a.title || 'Untitled'}</h4>
-                        <div class="py-0.5">${typeLabel}</div>
-                        ${innerMetaHtml}
-                        <div class="flex justify-between items-center pt-2.5 text-[11px] border-t border-slate-100">
-                            <span class="text-emerald-600 font-extrabold">&bull; Status: ${a.status || 'Open'}</span>
+                        <button onclick="document.getElementById('pushCollectionModal').remove()" class="text-slate-400 hover:text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md font-bold">&times;</button>
+                    </div>
+                    <div class="p-5 space-y-4 text-xs">
+                        <div>
+                            <label class="block font-bold text-slate-400 mb-1">Collection</label>
+                            <input type="text" value="${collection.name}" disabled class="w-full bg-slate-100 border border-slate-200 rounded-xl p-2.5 font-bold text-slate-600">
                         </div>
-                    </div>`;
-            });
-        }
-
-        function renderStudents() {
-            const filter = document.getElementById('studentClassFilter').value;
-            const tbody = document.getElementById('studentTableBody');
-            tbody.innerHTML = '';
-
-            const allStudents = [];
-            for (const cls of teacher.classes || []) {
-                const clsStudents = studentsByClass[cls.id] || [];
-                clsStudents.forEach(s => {
-                    s.classGroup = cls.name;
-                });
-                allStudents.push(...clsStudents);
-            }
-
-            const data = filter === 'ALL' ? allStudents : allStudents.filter(s => s.classGroup === filter);
-
-            if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400 font-bold">No students registered to this track class code loop.</td></tr>`;
-                return;
-            }
-
-            data.forEach(s => {
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50/50 transition">
-                        <td class="p-3 pl-4 font-mono font-bold text-brand-900">${s.regNo || s.id}</td>
-                        <td class="p-3 text-slate-900 font-bold">${s.name}</td>
-                        <td class="p-3 text-slate-500 font-medium">${s.classGroup}</td>
-                        <td class="p-3 text-center"><span class="bg-emerald-50 text-emerald-700 border border-emerald-100 text-[10px] px-2 py-0.5 rounded-full font-bold">Active</span></td>
-                    </tr>`;
-            });
-        }
-
-        function renderGradebook() {
-            const classId = document.getElementById('gradebookClassFilter').value;
-            const tbody = document.getElementById('gradebookTableBody');
-            tbody.innerHTML = '';
-
-            if (!classId) {
-                document.getElementById('gradebookTableBody').innerHTML = '';
-                return;
-            }
-
-            const students = studentsByClass[classId] || [];
-            const subjects = subjectsByClass[classId] || [];
-
-            if (students.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400 font-bold">No students found for this class.</td></tr>`;
-                return;
-            }
-
-            students.forEach((s) => {
-                const total = 0;
-                const badge = getStandingBadge(total);
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50/50 transition" data-student-code="${s.id}">
-                        <td class="p-3 pl-4 font-mono font-bold text-brand-900">${s.regNo}</td>
-                        <td class="p-3 font-bold text-slate-800">${s.name}</td>
-                        <td class="p-3 text-center">
-                            <input type="number" min="0" max="20" value="" oninput="calculateRowTotal(this)" class="ca1-input w-14 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono text-xs font-bold outline-none focus:ring-1 focus:ring-brand-500">
-                        </td>
-                        <td class="p-3 text-center">
-                            <input type="number" min="0" max="20" value="" oninput="calculateRowTotal(this)" class="ca2-input w-14 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono text-xs font-bold outline-none focus:ring-1 focus:ring-brand-500">
-                        </td>
-                        <td class="p-3 text-center">
-                            <input type="number" min="0" max="60" value="" oninput="calculateRowTotal(this)" class="exam-input w-14 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono text-xs font-bold outline-none focus:ring-1 focus:ring-brand-500">
-                        </td>
-                        <td class="p-3 text-center font-mono font-black text-slate-900 tracking-wide">
-                            <span class="total-span">0</span>/100
-                        </td>
-                        <td class="p-3 text-center">
-                            <span class="standing-badge inline-block text-[10px] font-bold px-2 py-0.5 rounded border text-center whitespace-nowrap min-w-[76px] ${badge.class}">${badge.text}</span>
-                        </td>
-                        <td class="p-3 text-center space-x-1 whitespace-nowrap">
-                            <button onclick="saveSingleRow(this)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[10px] px-2.5 py-1 rounded-md uppercase tracking-wider transition">Save</button>
-                            <button onclick="clearSingleRow(this)" class="bg-white border border-slate-200 text-slate-500 hover:bg-slate-100 font-extrabold text-[10px] px-2.5 py-1 rounded-md uppercase transition">Clear</button>
-                        </td>
-                    </tr>`;
-            });
-
-            updateProgressMetrics();
-        }
-
-        function getStandingBadge(score) {
-            if (score >= 75) return { text: "A1 Excellent", class: "bg-emerald-100 text-emerald-800 border-emerald-200" };
-            if (score >= 70) return { text: "B2 Very Good", class: "bg-emerald-50 text-emerald-700 border-emerald-100" };
-            if (score >= 65) return { text: "B3 Good", class: "bg-teal-50 text-teal-700 border-teal-100" };
-            if (score >= 60) return { text: "C4 Credit", class: "bg-blue-50 text-blue-700 border-blue-100" };
-            return { text: "F9 Fail", class: "bg-rose-100 text-rose-800 border-rose-200" };
-        }
-
-        function calculateRowTotal(inputElement) {
-            const row = inputElement.closest('tr');
-            const ca1 = parseInt(row.querySelector('.ca1-input').value) || 0;
-            const ca2 = parseInt(row.querySelector('.ca2-input').value) || 0;
-            const exam = parseInt(row.querySelector('.exam-input').value) || 0;
-            const cumulativeTotal = ca1 + ca2 + exam;
-            
-            row.querySelector('.total-span').innerText = cumulativeTotal;
-            
-            const badgeElement = row.querySelector('.standing-badge');
-            const state = getStandingBadge(cumulativeTotal);
-            badgeElement.className = `standing-badge inline-block text-[10px] font-bold px-2 py-0.5 rounded border text-center whitespace-nowrap min-w-[76px] ${state.class}`;
-            badgeElement.innerText = state.text;
-            
-            updateProgressMetrics();
-        }
-
-        function updateProgressMetrics() {
-            const rows = document.getElementById('gradebookTableBody').children;
-            const totalStudents = rows.length;
-            const totalExpectedCells = totalStudents * 3;
-            let completedCells = 0;
-
-            for (let row of rows) {
-                const ca1Val = row.querySelector('.ca1-input').value;
-                const ca2Val = row.querySelector('.ca2-input').value;
-                const examVal = row.querySelector('.exam-input').value;
-
-                if (ca1Val) completedCells++;
-                if (ca2Val) completedCells++;
-                if (examVal) completedCells++;
-            }
-
-            const percentComplete = totalExpectedCells > 0 ? Math.round((completedCells / totalExpectedCells) * 100) : 0;
-            document.getElementById('progressBarFill').style.width = percentComplete + '%';
-            document.getElementById('progressStatsCount').textContent = `${completedCells} / ${totalExpectedCells}`;
-            document.getElementById('progressStatsLeft').textContent = `${totalExpectedCells - completedCells} Cells Left`;
-        }
-
-        // ============ COLLECTION MANAGEMENT ============
-        function toggleCollectionFocus(collectionId) {
-            activeIsolatedCollectionId = activeIsolatedCollectionId === collectionId ? null : collectionId;
-            renderCollections();
-        }
-
-        async function createCollection() {
-            const name = document.getElementById('newCollectionName').value.trim();
-            if (!name) {
-                alert('Please enter a collection name');
-                return;
-            }
-            const newCollection = await createCollectionAPI(name);
-            if (newCollection) {
-                assessmentDatabase.push(newCollection);
-                document.getElementById('newCollectionName').value = '';
-                renderCollections();
-                alert('Collection created successfully');
-            } else {
-                alert('Failed to create collection');
-            }
-        }
-
-        function openCreateQuestionModal(collectionId) {
-            activeIsolatedCollectionId = collectionId;
-            activeTargetModalMode = 'CREATE';
-            contextualTargetQuestionId = null;
-            document.getElementById('modalTitle').textContent = 'Create New Assessment Item';
-            
-            // Initialize Quill editors with image support
-            if (!stemQuillInstance) {
-                stemQuillInstance = new Quill('#quillQuestionStem', {
-                    theme: 'snow',
-                    placeholder: 'Enter question text here...',
-                    modules: { 
-                        toolbar: [['bold', 'italic', 'underline'], ['code-block'], ['image']]
-                    }
-                });
-            }
-            if (!explanationQuillInstance) {
-                explanationQuillInstance = new Quill('#quillExplanation', {
-                    theme: 'snow',
-                    placeholder: 'Optional explanation...',
-                    modules: { 
-                        toolbar: [['bold', 'italic'], ['image']]
-                    }
-                });
-            }
-            
-            stemQuillInstance.setContents([]);
-            explanationQuillInstance.setContents([]);
-            document.getElementById('stemImageUrl').value = '';
-            document.getElementById('explanationImageUrl').value = '';
-            document.getElementById('modalOptionsWrapper').innerHTML = '';
-            
-            appendBlankOptionField();
-            
-            document.getElementById('questionModal').classList.remove('hidden');
-            document.getElementById('questionModal').classList.add('flex');
-        }
-
-        function openEditQuestionModal(collectionId, questionId) {
-            activeIsolatedCollectionId = collectionId;
-            activeTargetModalMode = 'EDIT';
-            contextualTargetQuestionId = questionId;
-            
-            const collection = assessmentDatabase.find(c => c._id === collectionId);
-            const question = collection?.questions?.find(q => q.id === questionId);
-            
-            if (!question) {
-                alert('Question not found');
-                return;
-            }
-            
-            document.getElementById('modalTitle').textContent = 'Edit Assessment Item';
-            
-            // Initialize Quill editors with image support
-            if (!stemQuillInstance) {
-                stemQuillInstance = new Quill('#quillQuestionStem', {
-                    theme: 'snow',
-                    placeholder: 'Enter question text here...',
-                    modules: { 
-                        toolbar: [['bold', 'italic', 'underline'], ['code-block'], ['image']]
-                    }
-                });
-            }
-            if (!explanationQuillInstance) {
-                explanationQuillInstance = new Quill('#quillExplanation', {
-                    theme: 'snow',
-                    placeholder: 'Optional explanation...',
-                    modules: { 
-                        toolbar: [['bold', 'italic'], ['image']]
-                    }
-                });
-            }
-            
-            stemQuillInstance.setContents([{ insert: question.text }]);
-            explanationQuillInstance.setContents([{ insert: question.explanation || '' }]);
-            document.getElementById('stemImageUrl').value = '';
-            document.getElementById('explanationImageUrl').value = '';
-            
-            document.getElementById('modalOptionsWrapper').innerHTML = '';
-            question.options.forEach(opt => {
-                addOptionFieldToModal(opt.text, opt.isCorrect);
-            });
-            
-            document.getElementById('questionModal').classList.remove('hidden');
-            document.getElementById('questionModal').classList.add('flex');
-        }
-
-        function appendBlankOptionField() {
-            addOptionFieldToModal('', false);
-        }
-
-        function addOptionFieldToModal(text = '', isCorrect = false) {
-            const wrapper = document.getElementById('modalOptionsWrapper');
-            const optionDiv = document.createElement('div');
-            optionDiv.className = 'p-3 bg-white border border-slate-200 rounded-xl space-y-2';
-            
-            const optionId = `option_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-            
-            optionDiv.innerHTML = `
-                <div class="flex justify-between items-center">
-                    <label class="font-bold text-slate-500 text-[11px] uppercase">Option</label>
-                    <button type="button" onclick="this.closest('div').remove()" class="text-rose-600 hover:text-white hover:bg-rose-600 font-bold text-[10px] px-2 py-1 rounded transition">Remove</button>
+                        <div>
+                            <label class="block font-bold text-slate-400 mb-1">Target Class *</label>
+                            <select id="pushClassSelector" onchange="window.updatePushSubjects()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                                <option value="">-- Select Class --</option>
+                                ${classOptions}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-400 mb-1">Subject *</label>
+                            <select id="pushSubjectSelector" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                                <option value="">-- Select Subject --</option>
+                                ${subjectOptions}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="p-3.5 border-t border-slate-100 bg-slate-50 flex justify-end space-x-2">
+                        <button onclick="document.getElementById('pushCollectionModal').remove()" class="bg-white border border-slate-200 text-slate-600 font-bold px-4 py-1.5 rounded-xl text-[11px] uppercase">Cancel</button>
+                        <button onclick="window.proceedWithPush('${collectionId}')" class="bg-brand-900 hover:bg-brand-800 text-white font-bold px-5 py-1.5 rounded-xl text-[11px] uppercase">Proceed</button>
+                    </div>
                 </div>
-                <div class="mb-1.5 flex gap-1">
-                    <input type="file" id="optionImageUpload_${optionId}" accept="image/*" class="hidden" onchange="insertImageFromFile(this, 'option')">
-                    <button type="button" onclick="document.getElementById('optionImageUpload_${optionId}').click()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2 py-1 rounded text-[10px] uppercase transition">📁</button>
-                    <input type="text" id="optionImageUrl_${optionId}" placeholder="Image URL..." class="flex-grow bg-slate-50 border border-slate-200 rounded p-1 text-[10px] outline-none focus:ring-1 focus:ring-brand-500">
-                    <button type="button" onclick="insertImageFromUrl('option')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2 py-1 rounded text-[10px] uppercase transition">Add</button>
-                </div>
-                <div class="option-editor-container">
-                    <div class="quill-option-editor bg-white rounded-xl" data-option-id="${optionId}"></div>
-                </div>
-                <label class="flex items-center space-x-2 text-xs">
-                    <input type="checkbox" class="option-correct-checkbox" ${isCorrect ? 'checked' : ''}>
-                    <span>Mark as correct answer</span>
-                </label>
             `;
-            wrapper.appendChild(optionDiv);
             
-            const optionEditor = optionDiv.querySelector('.quill-option-editor');
-            const quill = new Quill(optionEditor, {
-                theme: 'snow',
-                placeholder: 'Option text...',
-                modules: { 
-                    toolbar: [['bold', 'italic'], ['image']]
-                }
-            });
-            optionQuillRegistry[optionId] = { quill, checkbox: optionDiv.querySelector('.option-correct-checkbox') };
-            quill.setContents([{ insert: text }]);
+            document.body.appendChild(modal);
+            return;
         }
 
-        async function saveModalQuestionData() {
-            const stemText = stemQuillInstance.getText();
-            if (!stemText.trim()) {
-                alert('Please enter a question');
-                return;
-            }
-            
-            // Rebuild options from current state
-            const freshOptions = [];
-            document.querySelectorAll('#modalOptionsWrapper .p-3').forEach((optDiv, idx) => {
-                const quillDivs = optDiv.querySelectorAll('.quill-option-editor');
-                if (quillDivs.length > 0) {
-                    const quillDiv = quillDivs[0];
-                    const parentContainer = quillDiv.closest('.option-editor-container');
-                    if (parentContainer && parentContainer.querySelector('.ql-editor')) {
-                        const text = parentContainer.querySelector('.ql-editor').innerText;
-                        const isCorrect = optDiv.querySelector('.option-correct-checkbox').checked;
-                        freshOptions.push({ text, isCorrect });
-                    }
-                }
-            });
-            
-            if (freshOptions.length === 0) {
-                alert('Please add at least one option');
-                return;
-            }
-            
-            const questionData = {
-                text: stemQuillInstance.root.innerHTML,
-                options: freshOptions,
-                imageUrl: null,
-                explanation: explanationQuillInstance.root.innerHTML || null
-            };
-            
-            if (activeTargetModalMode === 'CREATE') {
-                const result = await addQuestionToCollectionAPI(activeIsolatedCollectionId, questionData);
-                if (result) {
-                    alert('Question added successfully');
-                    // Re-fetch collections to get latest data
-                    assessmentDatabase = await fetchUnifiedQuestionBank();
-                    renderCollections();
-                    closeQuestionModal();
-                } else {
-                    alert('Failed to save question');
-                }
-            } else {
-                const result = await updateQuestionAPI(activeIsolatedCollectionId, contextualTargetQuestionId, questionData);
-                if (result) {
-                    alert('Question updated successfully');
-                    // Re-fetch collections
-                    assessmentDatabase = await fetchUnifiedQuestionBank();
-                    renderCollections();
-                    closeQuestionModal();
-                } else {
-                    alert('Failed to update question');
-                }
-            }
-            
-            optionQuillRegistry = {};
+        await proceedWithConversion(collectionId);
+    }
+
+    window.updatePushSubjects = function() {
+        const classSelector = document.getElementById('pushClassSelector');
+        const subjectSelector = document.getElementById('pushSubjectSelector');
+        const selectedClassId = classSelector.value;
+        
+        subjectSelector.innerHTML = '<option value="">-- Select Subject --</option>';
+        if (!selectedClassId) return;
+        
+        const subjects = subjectsByClass[selectedClassId] || [];
+        subjects.forEach(subj => {
+            const option = document.createElement('option');
+            option.value = subj.id;
+            option.textContent = subj.name;
+            subjectSelector.appendChild(option);
+        });
+    };
+
+    window.proceedWithPush = async function(collectionId) {
+        const classSelector = document.getElementById('pushClassSelector');
+        const subjectSelector = document.getElementById('pushSubjectSelector');
+        const selectedClassId = classSelector.value;
+        const selectedSubjectId = subjectSelector.value;
+        
+        if (!selectedClassId || !selectedSubjectId) {
+            await showCustomModal({ title: 'Validation Failed', message: 'Please select both a target class and specific subject track.', type: 'alert', icon: '⚠️' });
+            return;
         }
 
-        function closeQuestionModal() {
-            document.getElementById('questionModal').classList.add('hidden');
-            document.getElementById('questionModal').classList.remove('flex');
-            optionQuillRegistry = {};
-        }
-
-        async function deleteQuestion(collectionId, questionId) {
-            if (confirm('Are you sure you want to delete this question?')) {
-                const success = await deleteQuestionAPI(collectionId, questionId);
-                if (success) {
-                    assessmentDatabase = await fetchUnifiedQuestionBank();
-                    renderCollections();
-                    alert('Question deleted');
-                } else {
-                    alert('Failed to delete question');
-                }
-            }
-        }
-
-        async function deleteCollection(collectionId) {
-            if (confirm('Are you sure you want to delete this entire collection?')) {
-                const success = await deleteCollectionAPI(collectionId);
-                if (success) {
-                    assessmentDatabase = await fetchUnifiedQuestionBank();
-                    renderCollections();
-                    alert('Collection deleted');
-                } else {
-                    alert('Failed to delete collection');
-                }
-            }
-        }
-
-        // ============ ASSIGNMENT MANAGEMENT ============
-        function openAssignmentModal() {
-            activeTargetModalMode = 'CREATE';
-            document.getElementById('asmModalTitle').value = '';
-            document.getElementById('asmModalDue').value = '';
-            document.getElementById('asmModalType').value = 'STANDARD';
-            
-            if (!assignmentQuillInstance) {
-                assignmentQuillInstance = new Quill('#quillAssignmentBody', {
-                    theme: 'snow',
-                    placeholder: 'Enter assignment instructions...',
-                    modules: { toolbar: [['bold', 'italic', 'underline', 'link'], ['code-block']] }
-                });
-            }
-            assignmentQuillInstance.setContents([]);
-            
-            toggleAssignmentTypeSection();
-            document.getElementById('assignmentModal').classList.remove('hidden');
-            document.getElementById('assignmentModal').classList.add('flex');
-        }
-
-        function closeAssignmentModal() {
-            document.getElementById('assignmentModal').classList.add('hidden');
-            document.getElementById('assignmentModal').classList.remove('flex');
-        }
-
-        function toggleAssignmentTypeSection() {
-            const type = document.getElementById('asmModalType').value;
-            const standardWrapper = document.getElementById('asmTypeStandardWrapper');
-            const bankWrapper = document.getElementById('asmTypeQuestionBankWrapper');
-            
-            if (type === 'STANDARD') {
-                standardWrapper.classList.remove('hidden');
-                bankWrapper.classList.add('hidden');
-            } else {
-                standardWrapper.classList.add('hidden');
-                bankWrapper.classList.remove('hidden');
-                loadQuestionsForAllocation();
-            }
-        }
-
-        function loadQuestionsForAllocation() {
-            const bankId = document.getElementById('asmBankCategorySelector').value;
-            if (!bankId) return;
-            
-            const bank = assessmentDatabase.find(b => b._id === bankId);
-            if (!bank) return;
-            
-            const container = document.getElementById('asmAllocationQuestionsContainer');
-            container.innerHTML = '';
-            
-            bank.questions.forEach((q, idx) => {
-                const div = document.createElement('div');
-                div.className = 'p-3 bg-white border border-slate-200 rounded-lg flex items-center space-x-3';
-                div.innerHTML = `
-                    <input type="checkbox" class="question-allocation-checkbox" value="${q.id}" data-bank-id="${bankId}">
-                    <div class="flex-grow">
-                        <p class="font-bold text-xs text-slate-900">${q.text}</p>
-                        <p class="text-[11px] text-slate-500">${q.options?.length || 0} options</p>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        async function commitAssignmentDeployment() {
-            const title = document.getElementById('asmModalTitle').value.trim();
-            const classId = document.getElementById('asmModalClass').value;
-            const dueDate = document.getElementById('asmModalDue').value;
-            const type = document.getElementById('asmModalType').value;
-            
-            if (!title || !classId || !dueDate) {
-                alert('Please fill in all required fields');
-                return;
-            }
-            
-            let assignmentPayload = {
-                class: classId,
-                title,
-                dueDate,
-                type
-            };
-            
-            if (type === 'STANDARD') {
-                assignmentPayload.description = assignmentQuillInstance.getContents();
-            } else {
-                const selectedQuestions = Array.from(document.querySelectorAll('.question-allocation-checkbox:checked')).map(cb => cb.value);
-                assignmentPayload.questionsAllocated = selectedQuestions;
-            }
-            
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/assignments`, {
-                    method: 'POST',
-                    headers: authHeaders(),
-                    body: JSON.stringify(assignmentPayload)
-                });
-                
-                if (!res.ok) throw new Error('Failed to create assignment');
-                
-                allAssignments = await fetchTeacherAssignments();
-                renderAssignments();
-                closeAssignmentModal();
-                alert('Assignment deployed successfully');
-            } catch (err) {
-                alert('Error deploying assignment: ' + err.message);
-            }
-        }
-
-        // ============ PANEL SWITCHING ============
-        function switchPanel(panelName) {
-            // Hide all panels
-            document.querySelectorAll('main > div[id^="panel-"]').forEach(p => {
-                p.classList.add('hidden');
-            });
-            
-            // Show selected panel
-            const panel = document.getElementById(`panel-${panelName}`);
-            if (panel) {
-                panel.classList.remove('hidden');
-            }
-            
-            // Update sidebar buttons
-            document.querySelectorAll('#lmsMenu button').forEach(btn => {
-                btn.classList.remove('sidebar-btn-active');
-                btn.classList.add('sidebar-btn-inactive');
-            });
-            
-            const activeBtn = document.getElementById(`btn-${panelName}`);
-            if (activeBtn) {
-                activeBtn.classList.add('sidebar-btn-active');
-                activeBtn.classList.remove('sidebar-btn-inactive');
-            }
-            
-            // Close bottom drawer on mobile
-            closeBottomNav();
-        }
-
-        function openBottomNav() {
-            const overlay = document.getElementById('bottomDrawerOverlay');
-            const card = document.getElementById('bottomDrawerCard');
-            overlay.classList.remove('hidden');
-            setTimeout(() => {
-                overlay.classList.add('opacity-100');
-                card.classList.add('translate-y-0');
-                card.classList.remove('translate-y-full');
-            }, 10);
-        }
-
-        function closeBottomNav(event) {
-            if (event && !event.target.id === 'bottomDrawerOverlay') return;
-            
-            const overlay = document.getElementById('bottomDrawerOverlay');
-            const card = document.getElementById('bottomDrawerCard');
-            overlay.classList.remove('opacity-100');
-            card.classList.add('translate-y-full');
-            card.classList.remove('translate-y-0');
-            
-            setTimeout(() => {
-                overlay.classList.add('hidden');
-            }, 300);
-        }
-
-        // ============ GRADEBOOK ACTIONS ============
-        function saveSingleRow(btn) {
-            alert('Individual row save - implement backend integration');
-        }
-
-        function clearSingleRow(btn) {
-            const row = btn.closest('tr');
-            row.querySelector('.ca1-input').value = '';
-            row.querySelector('.ca2-input').value = '';
-            row.querySelector('.exam-input').value = '';
-            calculateRowTotal(row.querySelector('.ca1-input'));
-        }
-
-        function saveGradebookChanges() {
-            alert('Bulk save - implement backend integration');
-        }
-
-        // ============ PROFILE MANAGEMENT ============
-        async function updateTeacherProfile(event) {
-            event.preventDefault();
-            const updatedData = {
-                name: document.getElementById('profileName').value,
-                designation: document.getElementById('profileTitle').value,
-                department: document.getElementById('profileDept').value
-            };
-            
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/teachers/me`, {
+        try {
+            const updateRes = await fetch(
+                `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}`,
+                {
                     method: 'PATCH',
                     headers: authHeaders(),
-                    body: JSON.stringify(updatedData)
-                });
-                
-                if (!res.ok) throw new Error('Failed to update profile');
-                
-                alert('Profile updated successfully');
-                teacher = await fetchTeacherProfile();
-                initSystemNode();
-            } catch (err) {
-                alert('Error updating profile: ' + err.message);
+                    body: JSON.stringify({
+                        class: selectedClassId,
+                        subject: selectedSubjectId
+                    })
+                }
+            );
+
+            if (!updateRes.ok) throw new Error('Failed to assign class and subject');
+
+            const modal = document.getElementById('pushCollectionModal');
+            if (modal) modal.remove();
+
+            await proceedWithConversion(collectionId);
+        } catch (err) {
+            console.error('Error updating collection:', err);
+            await showCustomModal({ title: 'Update Failed', message: 'Failed to assign class/subject properties: ' + err.message, type: 'alert', icon: '❌' });
+        }
+    };
+
+    async function proceedWithConversion(collectionId) {
+        const confirmed = await showCustomModal({
+            title: 'Push Collection to CBT?',
+            message: 'This will create a new CBT document that can be pushed to students.\n\nThis action cannot be undone.',
+            icon: '📤'
+        });
+
+        if (!confirmed) return;
+
+        try {
+            const convertRes = await fetch(
+                `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}/convert-to-cbt`,
+                {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({})
+                }
+            );
+
+            if (!convertRes.ok) throw new Error('Failed to convert collection to CBT');
+            const convertData = await convertRes.json();
+            const cbtId = convertData.cbtId;
+
+            const pushRes = await fetch(
+                `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/cbt/push`,
+                {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ cbtIds: [cbtId] })
+                }
+            );
+
+            if (!pushRes.ok) throw new Error('Failed to push to exam');
+            const pushData = await pushRes.json();
+            
+            await showCustomModal({
+                title: 'Success!',
+                message: `Collection successfully converted and pushed to CBT Exam!\n\nPushed: ${pushData.pushed.length} CBT(s)\n\nStudents can now access this assessment.`,
+                type: 'alert',
+                icon: '✅'
+            });
+            
+            assessmentDatabase = await fetchUnifiedQuestionBank();
+            renderCollections();
+        } catch (err) {
+            console.error('Error during conversion:', err);
+            await showCustomModal({ title: 'Conversion Failed', message: err.message, type: 'alert', icon: '❌' });
+        }
+    }
+
+    // ============ COLLECTION MANAGEMENT ============
+    function toggleCollectionFocus(collectionId) {
+        activeIsolatedCollectionId = activeIsolatedCollectionId === collectionId ? null : collectionId;
+        renderCollections();
+    }
+
+    async function createCollection() {
+        const name = document.getElementById('newCollectionName').value.trim();
+        if (!name) {
+            await showCustomModal({ title: 'Field Empty', message: 'Please enter a collection title name before saving.', type: 'alert', icon: '📝' });
+            return;
+        }
+        const newCollection = await createCollectionAPI(name);
+        if (newCollection) {
+            assessmentDatabase.push(newCollection);
+            document.getElementById('newCollectionName').value = '';
+            renderCollections();
+            await showCustomModal({ title: 'Created', message: 'Collection tracked and generated successfully.', type: 'alert', icon: '🎉' });
+        } else {
+            await showCustomModal({ title: 'Error', message: 'Failed to create tracking collection container via API.', type: 'alert', icon: '❌' });
+        }
+    }
+
+    function openCreateQuestionModal(collectionId) {
+        activeIsolatedCollectionId = collectionId;
+        activeTargetModalMode = 'CREATE';
+        contextualTargetQuestionId = null;
+        document.getElementById('modalTitle').textContent = 'Create New Assessment Item';
+        
+        if (!stemQuillInstance) {
+            stemQuillInstance = new Quill('#quillQuestionStem', {
+                theme: 'snow',
+                placeholder: 'Enter question text here...',
+                modules: { toolbar: [['bold', 'italic', 'underline'], ['code-block'], ['image']] }
+            });
+        }
+        if (!explanationQuillInstance) {
+            explanationQuillInstance = new Quill('#quillExplanation', {
+                theme: 'snow',
+                placeholder: 'Optional explanation...',
+                modules: { toolbar: [['bold', 'italic'], ['image']] }
+            });
+        }
+        
+        stemQuillInstance.setContents([]);
+        explanationQuillInstance.setContents([]);
+        document.getElementById('stemImageUrl').value = '';
+        document.getElementById('explanationImageUrl').value = '';
+        document.getElementById('modalOptionsWrapper').innerHTML = '';
+        
+        appendBlankOptionField();
+        
+        document.getElementById('questionModal').classList.remove('hidden');
+        document.getElementById('questionModal').classList.add('flex');
+    }
+
+    function openEditQuestionModal(collectionId, questionId) {
+        activeIsolatedCollectionId = collectionId;
+        activeTargetModalMode = 'EDIT';
+        contextualTargetQuestionId = questionId;
+        
+        const collection = assessmentDatabase.find(c => c._id === collectionId);
+        const question = collection?.questions?.find(q => q.id === questionId);
+        
+        if (!question) {
+            showCustomModal({ title: 'Missing Item', message: 'Question payload tracking matrix missing.', type: 'alert', icon: '❌' });
+            return;
+        }
+        
+        document.getElementById('modalTitle').textContent = 'Edit Assessment Item';
+        
+        if (!stemQuillInstance) {
+            stemQuillInstance = new Quill('#quillQuestionStem', {
+                theme: 'snow',
+                placeholder: 'Enter question text here...',
+                modules: { toolbar: [['bold', 'italic', 'underline'], ['code-block'], ['image']] }
+            });
+        }
+        if (!explanationQuillInstance) {
+            explanationQuillInstance = new Quill('#quillExplanation', {
+                theme: 'snow',
+                placeholder: 'Optional explanation...',
+                modules: { toolbar: [['bold', 'italic'], ['image']] }
+            });
+        }
+        
+        stemQuillInstance.setContents([{ insert: question.text }]);
+        explanationQuillInstance.setContents([{ insert: question.explanation || '' }]);
+        document.getElementById('stemImageUrl').value = '';
+        document.getElementById('explanationImageUrl').value = '';
+        
+        document.getElementById('modalOptionsWrapper').innerHTML = '';
+        question.options.forEach(opt => {
+            addOptionFieldToModal(opt.text, opt.isCorrect);
+        });
+        
+        document.getElementById('questionModal').classList.remove('hidden');
+        document.getElementById('questionModal').classList.add('flex');
+    }
+
+    function appendBlankOptionField() {
+        addOptionFieldToModal('', false);
+    }
+
+    function addOptionFieldToModal(text = '', isCorrect = false) {
+        const wrapper = document.getElementById('modalOptionsWrapper');
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'p-3 bg-white border border-slate-200 rounded-xl space-y-2';
+        
+        const optionId = `option_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        
+        optionDiv.innerHTML = `
+            <div class="flex justify-between items-center">
+                <label class="font-bold text-slate-500 text-[11px] uppercase">Option</label>
+                <button type="button" onclick="this.closest('div').remove()" class="text-rose-600 hover:text-white hover:bg-rose-600 font-bold text-[10px] px-2 py-1 rounded transition">Remove</button>
+            </div>
+            <div class="mb-1.5 flex gap-1">
+                <input type="file" id="optionImageUpload_${optionId}" accept="image/*" class="hidden" onchange="insertImageFromFile(this, 'option')">
+                <button type="button" onclick="document.getElementById('optionImageUpload_${optionId}').click()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2 py-1 rounded text-[10px] uppercase transition">📁</button>
+                <input type="text" id="optionImageUrl_${optionId}" placeholder="Image URL..." class="flex-grow bg-slate-50 border border-slate-200 rounded p-1 text-[10px] outline-none focus:ring-1 focus:ring-brand-500">
+                <button type="button" onclick="insertImageFromUrl('option')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2 py-1 rounded text-[10px] uppercase transition">Add</button>
+            </div>
+            <div class="option-editor-container">
+                <div class="quill-option-editor bg-white rounded-xl" data-option-id="${optionId}"></div>
+            </div>
+            <label class="flex items-center space-x-2 text-xs">
+                <input type="checkbox" class="option-correct-checkbox" ${isCorrect ? 'checked' : ''}>
+                <span>Mark as correct answer</span>
+            </label>
+        `;
+        wrapper.appendChild(optionDiv);
+        
+        const optionEditor = optionDiv.querySelector('.quill-option-editor');
+        const quill = new Quill(optionEditor, {
+            theme: 'snow',
+            placeholder: 'Option text...',
+            modules: { toolbar: [['bold', 'italic'], ['image']] }
+        });
+        optionQuillRegistry[optionId] = { quill, checkbox: optionDiv.querySelector('.option-correct-checkbox') };
+        quill.setContents([{ insert: text }]);
+    }
+
+    async function saveModalQuestionData() {
+        const stemText = stemQuillInstance.getText();
+        if (!stemText.trim()) {
+            await showCustomModal({ title: 'Validation Error', message: 'Please enter question payload text structural layout description.', type: 'alert', icon: '⚠️' });
+            return;
+        }
+        
+        const freshOptions = [];
+        document.querySelectorAll('#modalOptionsWrapper .p-3').forEach((optDiv) => {
+            const quillDivs = optDiv.querySelectorAll('.quill-option-editor');
+            if (quillDivs.length > 0) {
+                const quillDiv = quillDivs[0];
+                const parentContainer = quillDiv.closest('.option-editor-container');
+                if (parentContainer && parentContainer.querySelector('.ql-editor')) {
+                    const text = parentContainer.querySelector('.ql-editor').innerText;
+                    const isCorrect = optDiv.querySelector('.option-correct-checkbox').checked;
+                    freshOptions.push({ text, isCorrect });
+                }
+            }
+        });
+        
+        if (freshOptions.length === 0) {
+            await showCustomModal({ title: 'Validation Error', message: 'Please add at least one response evaluation choice track option.', type: 'alert', icon: '⚠️' });
+            return;
+        }
+        
+        const questionData = {
+            text: stemQuillInstance.root.innerHTML,
+            options: freshOptions,
+            imageUrl: null,
+            explanation: explanationQuillInstance.root.innerHTML || null
+        };
+        
+        if (activeTargetModalMode === 'CREATE') {
+            const result = await addQuestionToCollectionAPI(activeIsolatedCollectionId, questionData);
+            if (result) {
+                await showCustomModal({ title: 'Saved', message: 'Question added successfully.', type: 'alert', icon: '✅' });
+                assessmentDatabase = await fetchUnifiedQuestionBank();
+                renderCollections();
+                closeQuestionModal();
+            } else {
+                await showCustomModal({ title: 'Failed', message: 'Failed to write object evaluation question structural configuration node.', type: 'alert', icon: '❌' });
+            }
+        } else {
+            const result = await updateQuestionAPI(activeIsolatedCollectionId, contextualTargetQuestionId, questionData);
+            if (result) {
+                await showCustomModal({ title: 'Updated', message: 'Question tracking configuration updated successfully.', type: 'alert', icon: '✅' });
+                assessmentDatabase = await fetchUnifiedQuestionBank();
+                renderCollections();
+                closeQuestionModal();
+            } else {
+                await showCustomModal({ title: 'Error', message: 'Failed to balance update tracking patch configuration endpoint reference.', type: 'alert', icon: '❌' });
             }
         }
-    </script>
+        optionQuillRegistry = {};
+    }
+
+    function closeQuestionModal() {
+        document.getElementById('questionModal').classList.add('hidden');
+        document.getElementById('questionModal').classList.remove('flex');
+        optionQuillRegistry = {};
+    }
+
+    async function deleteQuestion(collectionId, questionId) {
+        const confirmed = await showCustomModal({ title: 'Delete Question?', message: 'Are you sure you want to permanently delete this objective assessment item tracking node?', icon: '🗑️' });
+        if (confirmed) {
+            const success = await deleteQuestionAPI(collectionId, questionId);
+            if (success) {
+                assessmentDatabase = await fetchUnifiedQuestionBank();
+                renderCollections();
+                await showCustomModal({ title: 'Removed', message: 'Item removed.', type: 'alert', icon: '🗑️' });
+            } else {
+                await showCustomModal({ title: 'Error', message: 'Failed to handle endpoint destruction structural pipeline.', type: 'alert', icon: '❌' });
+            }
+        }
+    }
+
+    async function deleteCollection(collectionId) {
+        const confirmed = await showCustomModal({ title: 'Delete Container?', message: 'Are you sure you want to completely erase this evaluation tracking question bank container stack?', icon: '⚠️' });
+        if (confirmed) {
+            const success = await deleteCollectionAPI(collectionId);
+            if (success) {
+                assessmentDatabase = await fetchUnifiedQuestionBank();
+                renderCollections();
+                await showCustomModal({ title: 'Deleted', message: 'Entire database stack dropped.', type: 'alert', icon: '🗑️' });
+            } else {
+                await showCustomModal({ title: 'Dropped Layer Failure', message: 'Failed to wipe standard tracking context endpoint pipeline matrix.', type: 'alert', icon: '❌' });
+            }
+        }
+    }
+
+    // ============ ASSIGNMENT MANAGEMENT ============
+    function openAssignmentModal() {
+        activeTargetModalMode = 'CREATE';
+        document.getElementById('asmModalTitle').value = '';
+        document.getElementById('asmModalDue').value = '';
+        document.getElementById('asmModalType').value = 'STANDARD';
+        
+        if (!assignmentQuillInstance) {
+            assignmentQuillInstance = new Quill('#quillAssignmentBody', {
+                theme: 'snow',
+                placeholder: 'Enter assignment instructions...',
+                modules: { toolbar: [['bold', 'italic', 'underline', 'link'], ['code-block']] }
+            });
+        }
+        assignmentQuillInstance.setContents([]);
+        
+        toggleAssignmentTypeSection();
+        document.getElementById('assignmentModal').classList.remove('hidden');
+        document.getElementById('assignmentModal').classList.add('flex');
+    }
+
+    function closeAssignmentModal() {
+        document.getElementById('assignmentModal').classList.add('hidden');
+        document.getElementById('assignmentModal').classList.remove('flex');
+    }
+
+    function toggleAssignmentTypeSection() {
+        const type = document.getElementById('asmModalType').value;
+        const standardWrapper = document.getElementById('asmTypeStandardWrapper');
+        const bankWrapper = document.getElementById('asmTypeQuestionBankWrapper');
+        
+        if (type === 'STANDARD') {
+            standardWrapper.classList.remove('hidden');
+            bankWrapper.classList.add('hidden');
+        } else {
+            standardWrapper.classList.add('hidden');
+            bankWrapper.classList.remove('hidden');
+            loadQuestionsForAllocation();
+        }
+    }
+
+    function loadQuestionsForAllocation() {
+        const bankId = document.getElementById('asmBankCategorySelector').value;
+        if (!bankId) return;
+        
+        const bank = assessmentDatabase.find(b => b._id === bankId);
+        if (!bank) return;
+        
+        const container = document.getElementById('asmAllocationQuestionsContainer');
+        container.innerHTML = '';
+        
+        bank.questions.forEach((q) => {
+            const div = document.createElement('div');
+            div.className = 'p-3 bg-white border border-slate-200 rounded-lg flex items-center space-x-3';
+            div.innerHTML = `
+                <input type="checkbox" class="question-allocation-checkbox" value="${q.id}" data-bank-id="${bankId}">
+                <div class="flex-grow">
+                    <p class="font-bold text-xs text-slate-900">${q.text}</p>
+                    <p class="text-[11px] text-slate-500">${q.options?.length || 0} options</p>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    async function commitAssignmentDeployment() {
+        const title = document.getElementById('asmModalTitle').value.trim();
+        const classId = document.getElementById('asmModalClass').value;
+        const dueDate = document.getElementById('asmModalDue').value;
+        const type = document.getElementById('asmModalType').value;
+        
+        if (!title || !classId || !dueDate) {
+            await showCustomModal({ title: 'Form Incomplete', message: 'Please write out all missing validation parameter data points.', type: 'alert', icon: '⚠️' });
+            return;
+        }
+        
+        let assignmentPayload = {
+            class: classId,
+            title,
+            dueDate,
+            type
+        };
+        
+        if (type === 'STANDARD') {
+            assignmentPayload.description = assignmentQuillInstance.getContents();
+        } else {
+            const selectedQuestions = Array.from(document.querySelectorAll('.question-allocation-checkbox:checked')).map(cb => cb.value);
+            assignmentPayload.questionsAllocated = selectedQuestions;
+        }
+        
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/assignments`, {
+                method: 'POST',
+                headers: authHeaders(),
+                body: JSON.stringify(assignmentPayload)
+            });
+            
+            if (!res.ok) throw new Error('Failed to create assignment');
+            
+            allAssignments = await fetchTeacherAssignments();
+            renderAssignments();
+            closeAssignmentModal();
+            await showCustomModal({ title: 'Deployed', message: 'Assignment tasks distributed successfully onto target workspace stream.', type: 'alert', icon: '🚀' });
+        } catch (err) {
+            await showCustomModal({ title: 'Deployment Error', message: 'Error pushing assignment parameters: ' + err.message, type: 'alert', icon: '❌' });
+        }
+    }
+
+    function renderAssignments() {
+        const container = document.getElementById('assignmentsContainer');
+        container.innerHTML = '';
+
+        if (allAssignments.length === 0) {
+            container.innerHTML = `<div class="col-span-full text-center p-6 border rounded-xl text-slate-400 font-bold">No assignments distributed.</div>`;
+            return;
+        }
+
+        allAssignments.forEach(a => {
+            const typeLabel = a.type === 'QUESTION_BANK' 
+                ? `<span class="bg-indigo-100 text-indigo-800 border border-indigo-200 text-[10px] px-2 py-0.5 rounded font-bold uppercase">MCQ Question Bank Assessment</span>`
+                : `<span class="bg-slate-100 text-slate-700 border border-slate-200 text-[10px] px-2 py-0.5 rounded font-bold uppercase">Standard Task Instructions</span>`;
+
+            let innerMetaHtml = '';
+            if (a.type === 'QUESTION_BANK') {
+                innerMetaHtml = `<p class="text-[11px] text-brand-800 font-bold bg-brand-50 p-2 rounded-lg border border-brand-100">&bull; Allocated Evaluation Total: ${a.questionsAllocated ? a.questionsAllocated.length : 0} questions</p>`;
+            } else if (a.description) {
+                innerMetaHtml = `<div class="text-[11px] text-slate-500 line-clamp-2 bg-slate-50 p-2 rounded border border-slate-150">${a.description.replace(/<[^>]*>/g, '')}</div>`;
+            }
+
+            const dueDate = new Date(a.dueDate || a.due);
+            const dueDateStr = dueDate.toLocaleDateString();
+
+            container.innerHTML += `
+                <div class="p-5 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-sm relative">
+                    <div class="flex justify-between items-start">
+                        <span class="text-[9px] font-black bg-brand-900 text-white px-2 py-0.5 rounded tracking-widest uppercase font-mono">${a.class || a.classId}</span>
+                        <span class="text-[10px] text-slate-400 font-bold">Due: ${dueDateStr}</span>
+                    </div>
+                    <h4 class="text-xs font-black text-slate-900 uppercase font-serif tracking-wide leading-snug">${a.title || 'Untitled'}</h4>
+                    <div class="py-0.5">${typeLabel}</div>
+                    ${innerMetaHtml}
+                    <div class="flex justify-between items-center pt-2.5 text-[11px] border-t border-slate-100">
+                        <span class="text-emerald-600 font-extrabold">&bull; Status: ${a.status || 'Open'}</span>
+                    </div>
+                </div>`;
+        });
+    }
+
+    function renderStudents() {
+        const filter = document.getElementById('studentClassFilter').value;
+        const tbody = document.getElementById('studentTableBody');
+        tbody.innerHTML = '';
+
+        const allStudents = [];
+        for (const cls of teacher.classes || []) {
+            const clsStudents = studentsByClass[cls.id] || [];
+            clsStudents.forEach(s => { s.classGroup = cls.name; });
+            allStudents.push(...clsStudents);
+        }
+
+        const data = filter === 'ALL' ? allStudents : allStudents.filter(s => s.classGroup === filter);
+
+        if (data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400 font-bold">No students registered to this track class code loop.</td></tr>`;
+            return;
+        }
+
+        data.forEach(s => {
+            tbody.innerHTML += `
+                <tr class="hover:bg-slate-50/50 transition">
+                    <td class="p-3 pl-4 font-mono font-bold text-brand-900">${s.regNo || s.id}</td>
+                    <td class="p-3 text-slate-900 font-bold">${s.name}</td>
+                    <td class="p-3 text-slate-500 font-medium">${s.classGroup}</td>
+                    <td class="p-3 text-center"><span class="bg-emerald-50 text-emerald-700 border border-emerald-100 text-[10px] px-2 py-0.5 rounded-full font-bold">Active</span></td>
+                </tr>`;
+        });
+    }
+
+    function renderGradebook() {
+        const classId = document.getElementById('gradebookClassFilter').value;
+        const tbody = document.getElementById('gradebookTableBody');
+        tbody.innerHTML = '';
+
+        if (!classId) return;
+
+        const students = studentsByClass[classId] || [];
+        if (students.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400 font-bold">No students found for this class.</td></tr>`;
+            return;
+        }
+
+        students.forEach((s) => {
+            const total = 0;
+            const badge = getStandingBadge(total);
+            tbody.innerHTML += `
+                <tr class="hover:bg-slate-50/50 transition" data-student-code="${s.id}">
+                    <td class="p-3 pl-4 font-mono font-bold text-brand-900">${s.regNo}</td>
+                    <td class="p-3 font-bold text-slate-800">${s.name}</td>
+                    <td class="p-3 text-center">
+                        <input type="number" min="0" max="20" value="" oninput="calculateRowTotal(this)" class="ca1-input w-14 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono text-xs font-bold outline-none focus:ring-1 focus:ring-brand-500">
+                    </td>
+                    <td class="p-3 text-center">
+                        <input type="number" min="0" max="20" value="" oninput="calculateRowTotal(this)" class="ca2-input w-14 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono text-xs font-bold outline-none focus:ring-1 focus:ring-brand-500">
+                    </td>
+                    <td class="p-3 text-center">
+                        <input type="number" min="0" max="60" value="" oninput="calculateRowTotal(this)" class="exam-input w-14 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono text-xs font-bold outline-none focus:ring-1 focus:ring-brand-500">
+                    </td>
+                    <td class="p-3 text-center font-mono font-black text-slate-900 tracking-wide">
+                        <span class="total-span">0</span>/100
+                    </td>
+                    <td class="p-3 text-center">
+                        <span class="standing-badge inline-block text-[10px] font-bold px-2 py-0.5 rounded border text-center whitespace-nowrap min-w-[76px] ${badge.class}">${badge.text}</span>
+                    </td>
+                    <td class="p-3 text-center space-x-1 whitespace-nowrap">
+                        <button onclick="saveSingleRow(this)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[10px] px-2.5 py-1 rounded-md uppercase tracking-wider transition">Save</button>
+                        <button onclick="clearSingleRow(this)" class="bg-white border border-slate-200 text-slate-500 hover:bg-slate-100 font-extrabold text-[10px] px-2.5 py-1 rounded-md uppercase transition">Clear</button>
+                    </td>
+                </tr>`;
+        });
+        updateProgressMetrics();
+    }
+
+    function getStandingBadge(score) {
+        if (score >= 75) return { text: "A1 Excellent", class: "bg-emerald-100 text-emerald-800 border-emerald-200" };
+        if (score >= 70) return { text: "B2 Very Good", class: "bg-emerald-50 text-emerald-700 border-emerald-100" };
+        if (score >= 65) return { text: "B3 Good", class: "bg-teal-50 text-teal-700 border-teal-100" };
+        if (score >= 60) return { text: "C4 Credit", class: "bg-blue-50 text-blue-700 border-blue-100" };
+        return { text: "F9 Fail", class: "bg-rose-100 text-rose-800 border-rose-200" };
+    }
+
+    function calculateRowTotal(inputElement) {
+        const row = inputElement.closest('tr');
+        const ca1 = parseInt(row.querySelector('.ca1-input').value) || 0;
+        const ca2 = parseInt(row.querySelector('.ca2-input').value) || 0;
+        const exam = parseInt(row.querySelector('.exam-input').value) || 0;
+        const cumulativeTotal = ca1 + ca2 + exam;
+        
+        row.querySelector('.total-span').innerText = cumulativeTotal;
+        
+        const badgeElement = row.querySelector('.standing-badge');
+        const state = getStandingBadge(cumulativeTotal);
+        badgeElement.className = `standing-badge inline-block text-[10px] font-bold px-2 py-0.5 rounded border text-center whitespace-nowrap min-w-[76px] ${state.class}`;
+        badgeElement.innerText = state.text;
+        
+        updateProgressMetrics();
+    }
+
+    function updateProgressMetrics() {
+        const rows = document.getElementById('gradebookTableBody').children;
+        const totalStudents = rows.length;
+        const totalExpectedCells = totalStudents * 3;
+        let completedCells = 0;
+
+        for (let row of rows) {
+            const ca1Val = row.querySelector('.ca1-input').value;
+            const ca2Val = row.querySelector('.ca2-input').value;
+            const examVal = row.querySelector('.exam-input').value;
+
+            if (ca1Val) completedCells++;
+            if (ca2Val) completedCells++;
+            if (examVal) completedCells++;
+        }
+
+        const percentComplete = totalExpectedCells > 0 ? Math.round((completedCells / totalExpectedCells) * 100) : 0;
+        document.getElementById('progressBarFill').style.width = percentComplete + '%';
+        document.getElementById('progressStatsCount').textContent = `${completedCells} / ${totalExpectedCells}`;
+        document.getElementById('progressStatsLeft').textContent = `${totalExpectedCells - completedCells} Cells Left`;
+    }
+
+    // ============ PANEL SWITCHING ============
+    function switchPanel(panelName) {
+        document.querySelectorAll('main > div[id^="panel-"]').forEach(p => { p.classList.add('hidden'); });
+        
+        const panel = document.getElementById(`panel-${panelName}`);
+        if (panel) panel.classList.remove('hidden');
+        
+        document.querySelectorAll('#lmsMenu button').forEach(btn => {
+            btn.classList.remove('sidebar-btn-active');
+            btn.classList.add('sidebar-btn-inactive');
+        });
+        
+        const activeBtn = document.getElementById(`btn-${panelName}`);
+        if (activeBtn) {
+            activeBtn.classList.add('sidebar-btn-active');
+            activeBtn.classList.remove('sidebar-btn-inactive');
+        }
+        closeBottomNav();
+    }
+
+    function openBottomNav() {
+        const overlay = document.getElementById('bottomDrawerOverlay');
+        const card = document.getElementById('bottomDrawerCard');
+        overlay.classList.remove('hidden');
+        setTimeout(() => {
+            overlay.classList.add('opacity-100');
+            card.classList.add('translate-y-0');
+            card.classList.remove('translate-y-full');
+        }, 10);
+    }
+
+    function closeBottomNav(event) {
+        if (event && event.target.id !== 'bottomDrawerOverlay') return;
+        
+        const overlay = document.getElementById('bottomDrawerOverlay');
+        const card = document.getElementById('bottomDrawerCard');
+        overlay.classList.remove('opacity-100');
+        card.classList.add('translate-y-full');
+        card.classList.remove('translate-y-0');
+        
+        setTimeout(() => { overlay.classList.add('hidden'); }, 300);
+    }
+
+    // ============ GRADEBOOK ACTIONS ============
+    async function saveSingleRow(btn) {
+        await showCustomModal({ title: 'Feature Sync', message: 'Individual grading grid row sync is operational. Connect endpoint.', type: 'alert', icon: '💾' });
+    }
+
+    function clearSingleRow(btn) {
+        const row = btn.closest('tr');
+        row.querySelector('.ca1-input').value = '';
+        row.querySelector('.ca2-input').value = '';
+        row.querySelector('.exam-input').value = '';
+        calculateRowTotal(row.querySelector('.ca1-input'));
+    }
+
+    async function saveGradebookChanges() {
+        await showCustomModal({ title: 'Bulk Database Sync', message: 'Bulk grade ledger adjustment submission requires backend target array integration layers.', type: 'alert', icon: '🗄️' });
+    }
+
+    // ============ PROFILE MANAGEMENT ============
+    async function updateTeacherProfile(event) {
+        event.preventDefault();
+        const updatedData = {
+            name: document.getElementById('profileName').value,
+            designation: document.getElementById('profileTitle').value,
+            department: document.getElementById('profileDept').value
+        };
+        
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/teachers/me`, {
+                method: 'PATCH',
+                headers: authHeaders(),
+                body: JSON.stringify(updatedData)
+            });
+            
+            if (!res.ok) throw new Error('Failed to update profile');
+            
+            await showCustomModal({ title: 'Profile Updated', message: 'Your identity and institutional parameters sync task succeeded.', type: 'alert', icon: '👤' });
+            teacher = await fetchTeacherProfile();
+            initSystemNode();
+        } catch (err) {
+            await showCustomModal({ title: 'Update Fault', message: 'Error patching demographic dataset: ' + err.message, type: 'alert', icon: '❌' });
+        }
+    }
+</script>
+
+</body>
+</html>
