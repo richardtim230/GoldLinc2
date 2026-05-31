@@ -325,7 +325,7 @@
                     <div class="flex space-x-2 shrink-0">
                         <select id="gradebookClassFilter" onchange="renderGradebook()" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
                         </select>
-                        <button onclick="saveGradebookChanges()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider shadow transition">
+                        <button onclick="saveGradebookChanges(event)" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider shadow transition">
                             Bulk Save Class
                         </button>
                     </div>
@@ -2634,19 +2634,112 @@ function openAssignmentModal() {
         }
     }
 
-    function saveGradebookChanges(event) {
-        const button = event ? event.target : null;
-        if (button) {
-            setButtonLoading(button, true);
-        }
-        
-        setTimeout(() => {
-            if (button) {
-                setButtonLoading(button, false);
-            }
-            showCustomModal({ title: 'Success', message: 'Gradebook changes saved', type: 'alert', icon: '✅' });
-        }, 1500);
+    async function saveGradebookChanges(event) {
+const button = event ? event.target : null;
+
+if (button) {
+    setButtonLoading(button, true);
+}
+
+try {
+    const classId =
+        document.getElementById('gradebookClassFilter')?.value;
+
+    const session =
+        document.getElementById('gb-session-select')?.value;
+
+    const term =
+        document.getElementById('gb-term-select')?.value;
+
+    const resultType =
+        document.getElementById('gb-result-type-select')?.value;
+
+    if (!classId) {
+        throw new Error('Please select a class');
     }
+
+    const subjects = subjectsByClass[classId] || [];
+    const tbody = document.getElementById('gradebookTableBody');
+
+    const rows = tbody.querySelectorAll('tr');
+
+    const resultsBySubject = {};
+
+    subjects.forEach(subject => {
+        const subjectName = subject.name || subject;
+        resultsBySubject[subjectName] = [];
+    });
+
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+
+        const studentId = cells[0]?.textContent.trim();
+        const studentName = cells[1]?.textContent.trim();
+
+        const inputs = row.querySelectorAll('input[type="number"]');
+
+        inputs.forEach((input, index) => {
+            const score = input.value.trim();
+
+            if (score !== '') {
+                const subjectName =
+                    subjects[index].name || subjects[index];
+
+                resultsBySubject[subjectName].push({
+                    student_id: studentId,
+                    student_name: studentName,
+                    score: Number(score),
+                    grade: calculateGrade(Number(score))
+                });
+            }
+        });
+    });
+
+    for (const [subjectName, results] of Object.entries(resultsBySubject)) {
+
+        if (!results.length) continue;
+
+        await fetch(`${API_BASE_URL}/api/results/upload`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                session,
+                term,
+                class: classId,
+                subject: subjectName,
+                resultType,
+                results
+            })
+        });
+    }
+
+    showCustomModal({
+        title: 'Success',
+        message: 'Results uploaded successfully',
+        type: 'alert',
+        icon: '✅'
+    });
+
+} catch (err) {
+
+    showCustomModal({
+        title: 'Upload Failed',
+        message: err.message,
+        type: 'alert',
+        icon: '❌'
+    });
+
+} finally {
+
+    if (button) {
+        setButtonLoading(button, false);
+    }
+
+}
+
+}
 </script>
 </body>
 </html>
