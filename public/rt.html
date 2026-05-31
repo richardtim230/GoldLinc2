@@ -599,7 +599,7 @@
     let subjectsByClass = {};
     let allAssignments = [];
     let assignmentSubmissions = {};
-    
+    let editingAssignmentId = null;
     let activeIsolatedCollectionId = null;
     let activeTargetModalMode = 'CREATE';
     let contextualTargetQuestionId = null;
@@ -1696,8 +1696,11 @@
         renderCollections();
     }
 
-    // ============ ASSIGNMENT MODAL ============
-    function openAssignmentModal() {
+// ============ ASSIGNMENT MODAL ============
+function openAssignmentModal() {
+
+    // Clear edit mode
+    editingAssignmentId = null;
 
     if (!assignmentQuillInstance) {
 
@@ -1736,16 +1739,7 @@
     document.getElementById('asmModalType').value =
         'STANDARD';
 
-    // Reset question bank selections
-    const questionContainer =
-        document.getElementById(
-            'asmAllocationQuestionsContainer'
-        );
-
-    if (questionContainer) {
-        questionContainer.innerHTML = '';
-    }
-
+    // Reset Question Bank selector
     const bankSelector =
         document.getElementById(
             'asmBankCategorySelector'
@@ -1755,17 +1749,44 @@
         bankSelector.selectedIndex = 0;
     }
 
-    // Show correct section
+    // Clear allocated questions
+    const questionContainer =
+        document.getElementById(
+            'asmAllocationQuestionsContainer'
+        );
+
+    if (questionContainer) {
+        questionContainer.innerHTML = '';
+    }
+
+    // Restore button text
+    const submitBtn =
+        document.querySelector(
+            '#assignmentModal button[onclick*="commitAssignmentDeployment"]'
+        );
+
+    if (submitBtn) {
+        submitBtn.textContent = 'Deploy';
+    }
+
+    // Show standard section
     toggleAssignmentTypeSection();
 
     // Open modal
-    document
-        .getElementById('assignmentModal')
-        .classList.remove('hidden');
+    const modal =
+        document.getElementById(
+            'assignmentModal'
+        );
 
-    document
-        .getElementById('assignmentModal')
-        .classList.add('flex');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+
+    // Focus title field
+    setTimeout(() => {
+        document
+            .getElementById('asmModalTitle')
+            ?.focus();
+    }, 100);
 }
 
     function closeAssignmentModal() {
@@ -1814,7 +1835,9 @@
         });
     }
 
-    async function commitAssignmentDeployment(event) {
+    
+        async function commitAssignmentDeployment(event) {
+
     if (event) event.preventDefault();
 
     const button = event
@@ -1825,11 +1848,20 @@
 
     await executeWithLoading(button, async () => {
 
-        const title = document.getElementById('asmModalTitle').value.trim();
-        const classId = document.getElementById('asmModalClass').value;
-        const subjectId = document.getElementById('asmModalSubject').value;
-        const dueDate = document.getElementById('asmModalDue').value;
-        const type = document.getElementById('asmModalType').value;
+        const title =
+            document.getElementById('asmModalTitle').value.trim();
+
+        const classId =
+            document.getElementById('asmModalClass').value;
+
+        const subjectId =
+            document.getElementById('asmModalSubject').value;
+
+        const dueDate =
+            document.getElementById('asmModalDue').value;
+
+        const type =
+            document.getElementById('asmModalType').value;
 
         // Validation
         if (
@@ -1843,7 +1875,7 @@
             );
         }
 
-        let assignmentBody = "";
+        let assignmentBody = '';
         let allocatedQuestions = [];
 
         if (type === 'STANDARD') {
@@ -1860,7 +1892,7 @@
                 );
             }
 
-        } else if (type === 'QUESTION_BANK') {
+        } else {
 
             const selected =
                 document.querySelectorAll(
@@ -1874,28 +1906,45 @@
             }
 
             allocatedQuestions =
-                Array.from(selected).map(cb => cb.value);
+                Array.from(selected).map(
+                    cb => cb.value
+                );
 
-            // Must remain a string because schema expects String
             assignmentBody =
-                `Question Bank Assignment (${allocatedQuestions.length} Questions)`;
+                'Question Bank Assignment';
         }
 
-        const res = await fetch(
-            `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/assignments`,
-            {
-                method: 'POST',
-                headers: authHeaders(),
+        const payload = {
+            class: classId,
+            subject: subjectId,
+            title,
+            description: assignmentBody,
+            dueDate,
+            type,
+            questionsAllocated: allocatedQuestions
+        };
 
-                body: JSON.stringify({
-                    class: classId,
-                    subject: subjectId,
-                    title: title,
-                    description: assignmentBody,
-                    dueDate: dueDate,
-                    type: type,
-                    questionsAllocated: allocatedQuestions
-                })
+        // CREATE vs UPDATE
+        const isEditing =
+            !!editingAssignmentId;
+
+        const endpoint = isEditing
+            ? `${API_BASE_URL}/api/teachers/${encodeURIComponent(
+                  teacher.id
+              )}/assignments/${editingAssignmentId}`
+            : `${API_BASE_URL}/api/teachers/${encodeURIComponent(
+                  teacher.id
+              )}/assignments`;
+
+        const method =
+            isEditing ? 'PATCH' : 'POST';
+
+        const res = await fetch(
+            endpoint,
+            {
+                method,
+                headers: authHeaders(),
+                body: JSON.stringify(payload)
             }
         );
 
@@ -1904,23 +1953,31 @@
         if (!res.ok) {
             throw new Error(
                 data.error ||
-                'Failed to create assignment'
+                data.message ||
+                `Failed to ${isEditing ? 'update' : 'create'} assignment`
             );
         }
 
+        // Refresh assignments
         allAssignments =
             await fetchTeacherAssignments();
 
         renderAssignments();
 
+        // Exit edit mode
+        editingAssignmentId = null;
+
         closeAssignmentModal();
 
         await showCustomModal({
             title: 'Success',
-            message: 'Assignment deployed successfully',
+            message: isEditing
+                ? 'Assignment updated successfully'
+                : 'Assignment deployed successfully',
             type: 'alert',
             icon: '✅'
         });
+
     });
 }
     document
@@ -1964,9 +2021,91 @@
                 '<option value="">Failed to load subjects</option>';
         }
     });
-    function editAssignment(assignmentId) {
-        showCustomModal({ title: 'Info', message: 'Edit functionality coming soon', type: 'alert', icon: 'ℹ️' });
+    
+    async function editAssignment(assignmentId) {
+
+    const assignment = allAssignments.find(
+        a => a._id === assignmentId
+    );
+
+    if (!assignment) {
+        return showCustomModal({
+            title: 'Error',
+            message: 'Assignment not found',
+            type: 'alert',
+            icon: '❌'
+        });
     }
+
+    editingAssignmentId = assignmentId;
+
+    openAssignmentModal();
+
+    document.getElementById('asmModalTitle').value =
+        assignment.title || '';
+
+    document.getElementById('asmModalClass').value =
+        assignment.class?._id || assignment.class || '';
+
+    // Load subjects for selected class
+    await loadAssignmentSubjects();
+
+    document.getElementById('asmModalSubject').value =
+        assignment.subject?._id || assignment.subject || '';
+
+    document.getElementById('asmModalDue').value =
+        assignment.dueDate
+            ? new Date(assignment.dueDate)
+                  .toISOString()
+                  .split('T')[0]
+            : '';
+
+    document.getElementById('asmModalType').value =
+        assignment.type || 'STANDARD';
+
+    toggleAssignmentTypeSection();
+
+    if (
+        (assignment.type || 'STANDARD') ===
+        'STANDARD'
+    ) {
+
+        assignmentQuillInstance.root.innerHTML =
+            assignment.description || '';
+
+    } else {
+
+        const allocated =
+            assignment.questionsAllocated || [];
+
+        await loadQuestionsForAllocation();
+
+        setTimeout(() => {
+
+            allocated.forEach(id => {
+
+                const checkbox =
+                    document.querySelector(
+                        `#asmAllocationQuestionsContainer input[value="${id}"]`
+                    );
+
+                if (checkbox) {
+                    checkbox.checked = true;
+                }
+
+            });
+
+        }, 300);
+    }
+
+    const submitBtn =
+        document.querySelector(
+            '#assignmentModal button[onclick*="commitAssignmentDeployment"]'
+        );
+
+    submitBtn.textContent =
+        'Update Assignment';
+}
 
     async function deleteAssignment(event, assignmentId) {
         if (event) event.stopPropagation();
