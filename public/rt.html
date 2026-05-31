@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -150,20 +149,20 @@
         </div>
         <button type="button" onclick="openBottomNav()" class="bg-brand-800 border border-brand-500/40 px-3 py-1.5 rounded-xl text-xs font-bold text-white transition active:scale-95 flex items-center">
             <span>LMS Menu</span>
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg class="w-3.5 h-3.5 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
     </header>
 
     <div id="bottomDrawerOverlay" onclick="closeBottomNav(event)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden transition-opacity duration-300 opacity-0">
         <div id="bottomDrawerCard" class="absolute bottom-0 inset-x-0 bg-brand-900 text-white parabolic-top transform translate-y-full transition-transform duration-300 border-t-2 border-gold-400 p-6">
             <div class="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-brand-800 rounded-full"></div>
-            <div class="grid grid-cols-1 gap-2 text-sm font-bold">
-                <button onclick="switchPanel('overview')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Course Performance Desk</span> &rarr;</button>
-                <button onclick="switchPanel('assessments')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Question Bank Categories</span> &rarr;</button>
-                <button onclick="switchPanel('assignments')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Assignments Hub</span> &rarr;</button>
-                <button onclick="switchPanel('students')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Student Rosters</span> &rarr;</button>
-                <button onclick="switchPanel('grading')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Gradebook & Mark Sheet</span> &rarr;</button>
-                <button onclick="switchPanel('profile')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Faculty Profile Desk</span> &rarr;</button>
+            <div class="grid grid-cols-1 gap-2 text-sm font-bold pt-4">
+                <button onclick="switchPanel('overview'); closeBottomNav(event);" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Course Performance Desk</span> &rarr;</button>
+                <button onclick="switchPanel('assessments'); closeBottomNav(event);" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Question Bank Categories</span> &rarr;</button>
+                <button onclick="switchPanel('assignments'); closeBottomNav(event);" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Assignments Hub</span> &rarr;</button>
+                <button onclick="switchPanel('students'); closeBottomNav(event);" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Student Rosters</span> &rarr;</button>
+                <button onclick="switchPanel('grading'); closeBottomNav(event);" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Gradebook & Mark Sheet</span> &rarr;</button>
+                <button onclick="switchPanel('profile'); closeBottomNav(event);" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Faculty Profile Desk</span> &rarr;</button>
             </div>
         </div>
     </div>
@@ -375,7 +374,6 @@
         </div>
     </main>
 
-    <!-- MODALS -->
     <div id="questionModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-white rounded-2xl border border-slate-200 w-full max-w-3xl shadow-2xl flex flex-col overflow-hidden max-h-[92vh]">
             <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
@@ -383,7 +381,7 @@
                     <h3 id="modalTitle" class="text-xs font-extrabold text-brand-900 uppercase tracking-wider">Configure Assessment Item</h3>
                     <p class="text-[11px] text-slate-500">Edit stems, diagrams, multi-editor response spaces, and answer keys.</p>
                 </div>
-                <button onclick="closeQuestionModal()" class="text-slate-400 hover:text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md font-bold">&times;</button>
+                <button onclick="closeQuestionModal()" class="text-slate-400 hover:text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md font-bold text-lg">&times;</button>
             </div>
             <div class="p-5 space-y-4 overflow-y-auto text-xs">
                 <div>
@@ -432,7 +430,7 @@
                     <h3 class="text-xs font-extrabold text-brand-900 uppercase tracking-wider">Deploy New Assignment Portfolio</h3>
                     <p class="text-[11px] text-slate-500">Configure parameters, distribute tasks, or select MCQ rows from core categories.</p>
                 </div>
-                <button onclick="closeAssignmentModal()" class="text-slate-400 hover:text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md font-bold">&times;</button>
+                <button onclick="closeAssignmentModal()" class="text-slate-400 hover:text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md font-bold text-lg">&times;</button>
             </div>
             <div class="p-5 space-y-4 overflow-y-auto text-xs">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -482,6 +480,8 @@
             </div>
         </div>
     </div>
+
+
 <script>
     // ============ API CONFIGURATION ============
     const API_BASE_URL = "https://goldlincschools.onrender.com";
