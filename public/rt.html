@@ -1345,11 +1345,12 @@
                 const checkbox = div.querySelector('input[type="checkbox"]');
                 
                 let optionQuillInstance = null;
-                Object.values(optionQuillRegistry).forEach(item => {
-                    if (item.quill && item.quill.root === quillDiv) {
-                        optionQuillInstance = item.quill;
-                    }
-                });
+
+Object.values(optionQuillRegistry).forEach(item => {
+    if (item.element === div) {
+        optionQuillInstance = item.quill;
+    }
+});
 
                 if (optionQuillInstance) {
                     const optionText = optionQuillInstance.root.innerHTML;
