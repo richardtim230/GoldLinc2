@@ -1,4 +1,3 @@
-name=public/rt.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,6 +72,7 @@ name=public/rt.html
             background-color: #f8fafc;
             padding: 4px 8px !important;
         }
+        /* Custom Quill image button styling */
         .ql-snow .ql-picker.ql-image::before {
             content: '🖼️';
         }
@@ -108,12 +108,12 @@ name=public/rt.html
             <p class="text-[10px] font-bold text-brand-500 uppercase tracking-widest px-3 mb-2">LMS Components</p>
             
             <button id="btn-overview" onclick="switchPanel('overview')" type="button" class="sidebar-btn-active w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm0 10a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm11-5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2zm0 10a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"></path></svg>
                 Course Performance Desk
             </button>
 
             <button id="btn-assessments" onclick="switchPanel('assessments')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9m0 0a2 2 0 00-2-2m2 2v2m0-6V5a2 2 0 012-2h6a2 2 0 012 2v2m0 0V7a2 2 0 012-2h-.5a3.5 3.5 0 00-3.5 3.5V9"></path></svg>
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                 Question Bank Categories
             </button>
 
@@ -123,7 +123,7 @@ name=public/rt.html
             </button>
 
             <button id="btn-students" onclick="switchPanel('students')" type="button" class="sidebar-btn-inactive w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl text-left transition">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-2a6 6 0 0112 0v2zm0 0h6v-2a6 6 0 00-9-5.656v2a4 4 0 013 3.656z"></path></svg>
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3a6 6 0 016-6h6a6 6 0 016 6H9z"></path></svg>
                 Student Rosters
             </button>
             
@@ -148,14 +148,14 @@ name=public/rt.html
             <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779961202/editor-uploads/frngf21mg4fcrnmccobm.png" class="h-7 w-auto bg-white p-0.5 rounded-lg" alt="Logo">
             <span class="font-serif font-bold text-sm tracking-wide">Gold & Linc LMS</span>
         </div>
-        <button type="button" onclick="openBottomNav()" class="bg-brand-800 border border-brand-500/40 px-3 py-1.5 rounded-xl text-xs font-bold text-white transition active:scale-95 flex items-center">
+        <button type="button" onclick="openBottomNav()" class="bg-brand-800 border border-brand-500/40 px-3 py-1.5 rounded-xl text-xs font-bold text-white transition active:scale-95 flex items-center space-x-1.5">
             <span>LMS Menu</span>
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
     </header>
 
     <div id="bottomDrawerOverlay" onclick="closeBottomNav(event)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden transition-opacity duration-300 opacity-0">
-        <div id="bottomDrawerCard" class="absolute bottom-0 inset-x-0 bg-brand-900 text-white parabolic-top transform translate-y-full transition-transform duration-300 border-t-2 border-gold-400 p-6">
+        <div id="bottomDrawerCard" class="absolute bottom-0 inset-x-0 bg-brand-900 text-white parabolic-top transform translate-y-full transition-transform duration-300 border-t-2 border-gold-400 p-6 space-y-2 max-h-[80vh] overflow-y-auto">
             <div class="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-brand-800 rounded-full"></div>
             <div class="grid grid-cols-1 gap-2 text-sm font-bold">
                 <button onclick="switchPanel('overview')" class="w-full bg-brand-800 p-3.5 rounded-xl flex items-center justify-between"><span>Course Performance Desk</span> &rarr;</button>
@@ -240,7 +240,7 @@ name=public/rt.html
                         <p class="text-xs text-slate-500">Isolate focus tracks to run standard objective items evaluation updates safely.</p>
                     </div>
                     <div class="flex gap-2 items-center w-full sm:w-auto">
-                        <input type="text" id="newCollectionName" placeholder="e.g., SS2 BIOLOGY TEST 1" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold p-2 focus:bg-white focus:ring-1 focus:ring-brand-500">
+                        <input type="text" id="newCollectionName" placeholder="e.g., SS2 BIOLOGY TEST 1" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold p-2 focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none flex-grow sm:flex-grow-0">
                         <button onclick="createCollection()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider transition whitespace-nowrap">
                             Create Collection
                         </button>
@@ -390,9 +390,9 @@ name=public/rt.html
                     <label class="block font-extrabold text-slate-400 uppercase tracking-wider mb-1.5">Question Stem Body (Rich Text with Images)</label>
                     <div class="mb-2 flex gap-1">
                         <input type="file" id="stemImageUpload" accept="image/*" class="hidden" onchange="insertImageFromFile(this, 'stem')">
-                        <button type="button" onclick="document.getElementById('stemImageUpload').click()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-[11px] uppercase transition">📁 Upload</button>
+                        <button type="button" onclick="document.getElementById('stemImageUpload').click()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-[11px] uppercase transition">📁 Upload Image</button>
                         <input type="text" id="stemImageUrl" placeholder="Paste image URL..." class="flex-grow bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-[11px] outline-none focus:ring-1 focus:ring-brand-500">
-                        <button type="button" onclick="insertImageFromUrl('stem')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-[11px] uppercase transition">Insert</button>
+                        <button type="button" onclick="insertImageFromUrl('stem')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-[11px] uppercase transition">Insert URL</button>
                     </div>
                     <div id="quillQuestionStem" class="bg-white rounded-xl"></div>
                 </div>
@@ -409,9 +409,9 @@ name=public/rt.html
                     <label class="block font-extrabold text-slate-400 uppercase tracking-wider">Optional Grading Explanation & Marking Rationale</label>
                     <div class="mb-2 flex gap-1">
                         <input type="file" id="explanationImageUpload" accept="image/*" class="hidden" onchange="insertImageFromFile(this, 'explanation')">
-                        <button type="button" onclick="document.getElementById('explanationImageUpload').click()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-[11px] uppercase transition">📁 Upload</button>
+                        <button type="button" onclick="document.getElementById('explanationImageUpload').click()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-[11px] uppercase transition">📁 Upload Image</button>
                         <input type="text" id="explanationImageUrl" placeholder="Paste image URL..." class="flex-grow bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-[11px] outline-none focus:ring-1 focus:ring-brand-500">
-                        <button type="button" onclick="insertImageFromUrl('explanation')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-[11px] uppercase transition">Insert</button>
+                        <button type="button" onclick="insertImageFromUrl('explanation')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-[11px] uppercase transition">Insert URL</button>
                     </div>
                     <div class="explanation-editor-container">
                         <div id="quillExplanation" class="bg-white rounded-xl"></div>
@@ -478,7 +478,7 @@ name=public/rt.html
             </div>
             <div class="p-3.5 border-t border-slate-100 bg-slate-50 flex justify-end space-x-2">
                 <button onclick="closeAssignmentModal()" class="bg-white border border-slate-200 text-slate-600 font-bold px-4 py-1.5 rounded-xl text-[11px] uppercase">Cancel</button>
-                <button onclick="commitAssignmentDeployment()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold px-5 py-1.5 rounded-xl text-[11px] uppercase tracking-wider transition">Deploy</button>
+                <button onclick="commitAssignmentDeployment()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold px-5 py-1.5 rounded-xl text-[11px] uppercase tracking-wider transition">Deploy Assignment</button>
             </div>
         </div>
     </div>
@@ -522,11 +522,12 @@ name=public/rt.html
             const file = fileInput.files[0];
             if (!file) return;
 
+            // Simple base64 conversion for demo - in production use proper file upload
             const reader = new FileReader();
             reader.onload = (e) => {
                 const imageUrl = e.target.result;
                 insertImageToQuill(target, imageUrl);
-                fileInput.value = '';
+                fileInput.value = ''; // Reset input
             };
             reader.readAsDataURL(file);
         }
@@ -549,10 +550,12 @@ name=public/rt.html
             } else if (target === 'explanation') {
                 quillInstance = explanationQuillInstance;
             } else if (target === 'option') {
+                // For options, get the currently focused quill
                 const optionDivs = document.querySelectorAll('#modalOptionsWrapper .option-editor-container');
                 if (optionDivs.length > 0) {
                     const lastOptionDiv = optionDivs[optionDivs.length - 1];
                     const quillDiv = lastOptionDiv.querySelector('.quill-option-editor');
+                    // Find corresponding quill instance
                     Object.values(optionQuillRegistry).forEach(item => {
                         if (item.quill && item.quill.root === quillDiv) {
                             quillInstance = item.quill;
@@ -628,6 +631,7 @@ name=public/rt.html
             }
         }
 
+        // ✅ UNIFIED: Fetch all question banks (Collections + Legacy CBT) from backend
         async function fetchUnifiedQuestionBank() {
             try {
                 const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/question-bank`, { 
@@ -642,6 +646,7 @@ name=public/rt.html
             }
         }
 
+        // ✅ NEW: Create collection on backend
         async function createCollectionAPI(name) {
             try {
                 const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections`, {
@@ -658,6 +663,7 @@ name=public/rt.html
             }
         }
 
+        // ✅ NEW: Add question to collection on backend
         async function addQuestionToCollectionAPI(collectionId, questionData) {
             try {
                 const res = await fetch(
@@ -676,6 +682,7 @@ name=public/rt.html
             }
         }
 
+        // ✅ NEW: Update question on backend
         async function updateQuestionAPI(collectionId, questionId, questionData) {
             try {
                 const res = await fetch(
@@ -694,6 +701,7 @@ name=public/rt.html
             }
         }
 
+        // ✅ NEW: Delete question on backend
         async function deleteQuestionAPI(collectionId, questionId) {
             try {
                 const res = await fetch(
@@ -711,6 +719,7 @@ name=public/rt.html
             }
         }
 
+        // ✅ NEW: Delete collection on backend
         async function deleteCollectionAPI(collectionId) {
             try {
                 const res = await fetch(
@@ -737,6 +746,7 @@ name=public/rt.html
                     return;
                 }
 
+                // Update header with teacher info
                 document.getElementById('headerTeacherName').textContent = teacher.name || 'Teacher';
                 document.getElementById('headerTeacherTitle').textContent = teacher.designation || 'Faculty Member';
                 document.getElementById('sidebarDept').textContent = teacher.department || 'Department';
@@ -744,6 +754,7 @@ name=public/rt.html
                 document.getElementById('profileTitle').value = teacher.designation || '';
                 document.getElementById('profileDept').value = teacher.department || '';
 
+                // Fetch classes and students
                 teacher.classes = await fetchTeacherClasses();
                 
                 for (const cls of teacher.classes) {
@@ -751,31 +762,39 @@ name=public/rt.html
                     subjectsByClass[cls.id] = await fetchSubjectsByClass(cls.id);
                 }
 
+                // Fetch assignments
                 allAssignments = await fetchTeacherAssignments() || [];
+
+                // ✅ UPDATED: Fetch unified question bank (Collections + Legacy CBT) from backend
                 assessmentDatabase = await fetchUnifiedQuestionBank() || [];
 
+                // Populate class selectors
                 const asmModalClass = document.getElementById('asmModalClass');
                 const gradebookClassFilter = document.getElementById('gradebookClassFilter');
                 const studentClassFilter = document.getElementById('studentClassFilter');
                 const asmBankCategorySelector = document.getElementById('asmBankCategorySelector');
 
                 teacher.classes.forEach(cls => {
+                    // Assignment modal class selector
                     const opt1 = document.createElement('option');
                     opt1.value = cls.id;
                     opt1.textContent = cls.name;
                     asmModalClass.appendChild(opt1);
 
+                    // Gradebook class filter
                     const opt2 = document.createElement('option');
                     opt2.value = cls.id;
                     opt2.textContent = cls.name;
                     gradebookClassFilter.appendChild(opt2);
 
+                    // Student class filter
                     const opt3 = document.createElement('option');
                     opt3.value = cls.name;
                     opt3.textContent = cls.name;
                     studentClassFilter.appendChild(opt3);
                 });
 
+                // Populate bank category selector with all question banks (Collections + Legacy)
                 assessmentDatabase.forEach(bank => {
                     const opt = document.createElement('option');
                     opt.value = bank._id;
@@ -783,6 +802,7 @@ name=public/rt.html
                     asmBankCategorySelector.appendChild(opt);
                 });
 
+                // Render initial overview
                 renderOverview();
                 renderCollections();
                 renderAssignments();
@@ -800,6 +820,7 @@ name=public/rt.html
             const totalStudents = (teacher.classes || []).reduce((s, c) => s + (studentsByClass[c.id] ? studentsByClass[c.id].length : 0), 0);
             document.getElementById('statTotalStudents').textContent = totalStudents;
             
+            // Render class cohorts
             const tbody = document.getElementById('classCohortsBody');
             tbody.innerHTML = '';
 
@@ -857,8 +878,8 @@ name=public/rt.html
                                     <div class="flex justify-between items-center text-[11px]">
                                         <span class="font-extrabold text-brand-500 font-mono">OBJECTIVE QUESTION ${index + 1}</span>
                                         <div class="flex space-x-1.5">
-                                            <button onclick="openEditQuestionModal('${collection._id}', '${q.id}')" class="text-brand-800 hover:text-white hover:bg-brand-800 font-bold uppercase text-[10px] bg-brand-100 px-2 py-1 rounded transition">Edit</button>
-                                            <button onclick="deleteQuestion('${collection._id}', '${q.id}')" class="text-rose-600 hover:text-white hover:bg-rose-600 font-bold uppercase text-[10px] bg-rose-100 px-2 py-1 rounded transition">Delete</button>
+                                            <button onclick="openEditQuestionModal('${collection._id}', '${q.id}')" class="text-brand-800 hover:text-white hover:bg-brand-800 font-bold uppercase text-[10px] bg-brand-50 px-2.5 py-1 rounded-lg border border-brand-200 transition">Edit</button>
+                                            <button onclick="deleteQuestion('${collection._id}', '${q.id}')" class="text-rose-600 hover:text-white hover:bg-rose-600 font-bold uppercase text-[10px] bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 transition">Delete</button>
                                         </div>
                                     </div>
                                     <div class="text-xs font-bold text-slate-900 leading-relaxed">${q.text || ''}</div>
@@ -875,8 +896,8 @@ name=public/rt.html
                     : '';
 
                 const actionButtonHtml = isThisActive 
-                    ? `<button onclick="toggleCollectionFocus(null)" class="bg-slate-700 hover:bg-slate-800 text-white font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">Collapse</button>`
-                    : `<button onclick="toggleCollectionFocus('${collection._id}')" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">Expand</button>`;
+    ? `<button onclick="toggleCollectionFocus(null)" class="bg-slate-700 hover:bg-slate-800 text-white font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">Collapse</button>`
+    : `<button onclick="toggleCollectionFocus('${collection._id}')" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase tracking-wide">Expand</button>`;
 
                 container.innerHTML += `
                     <div class="p-5 border border-slate-200 rounded-2xl bg-slate-50/60 space-y-4 shadow-sm relative">
@@ -890,104 +911,492 @@ name=public/rt.html
                                 <p class="text-[11px] text-slate-500 mt-0.5 font-semibold">${questionCount} Question${questionCount !== 1 ? 's' : ''}</p>
                             </div>
                             <div class="flex items-center space-x-1.5 self-end sm:self-auto">
-                                ${isThisActive && collection.source !== 'CBT' ? `
-                                <button onclick="openCreateQuestionModal('${collection._id}')" class="bg-brand-50 border border-brand-200 hover:bg-brand-100 text-brand-900 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase">
-                                    + Insert Question
-                                </button>` : ''}
-                                ${actionButtonHtml}
-                                ${collection.source === 'Collection' ? `
-                                <button onclick="pushCollectionToCBT('${collection._id}')" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase">📤 Push to Exam</button>
-                                ` : ''}
-                                ${collection.source !== 'CBT' ? `<button onclick="deleteCollection('${collection._id}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase">Delete</button>` : ''}
-                            </div>
+    ${isThisActive && collection.source !== 'CBT' ? `
+    <button onclick="openCreateQuestionModal('${collection._id}')" class="bg-brand-50 border border-brand-200 hover:bg-brand-100 text-brand-900 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase">
+        + Insert Question
+    </button>` : ''}
+    ${actionButtonHtml}
+    ${collection.source === 'Collection' ? `
+    <button onclick="pushCollectionToCBT('${collection._id}')" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase">📤 Push to Exam</button>
+    ` : ''}
+    ${collection.source !== 'CBT' ? `<button onclick="deleteCollection('${collection._id}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold text-[11px] px-3 py-2 rounded-xl transition uppercase">Delete</button>` : ''}
+</div>
                         </div>
                         ${isThisActive ? `<div class="space-y-3 pt-2 animate-[fadeIn_0.25s_ease-out]">${questionsHtml}</div>` : ''}
                     </div>`;
             });
         }
+// Add this function in the JavaScript section
+// ==========================================
+// 1. MODAL INJECTION (HTML & CSS COMBINED)
+// ==========================================
+(function injectCustomModal() {
+    // Add styles to the document head
+    const style = document.createElement('style');
+    style.textContent = `
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 99999; opacity: 1; transition: opacity 0.2s ease;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .modal-overlay.hidden { opacity: 0; pointer-events: none; display: none; }
+        .modal-card {
+            background: #ffffff; padding: 24px; border-radius: 12px;
+            width: 90%; max-width: 400px; text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            transform: scale(1); transition: transform 0.2s ease;
+        }
+        .modal-overlay.hidden .modal-card { transform: scale(0.95); }
+        .modal-icon { font-size: 3rem; margin-bottom: 12px; display: block; }
+        .modal-card h3 { margin: 0 0 8px 0; font-size: 1.25rem; color: #1e293b; font-weight: 600; }
+        .modal-card p { margin: 0 0 24px 0; color: #64748b; font-size: 0.95rem; line-height: 1.5; white-space: pre-line; }
+        .modal-actions { display: flex; gap: 12px; justify-content: center; }
+        .modal-btn {
+            padding: 10px 20px; border-radius: 6px; border: none;
+            font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: background 0.15s;
+        }
+        .modal-btn-secondary { background: #f1f5f9; color: #475569; }
+        .modal-btn-secondary:hover { background: #e2e8f0; }
+        .modal-btn-primary { background: #2563eb; color: #ffffff; }
+        .modal-btn-primary:hover { background: #1d4ed8; }
+    `;
+    document.head.appendChild(style);
 
+    // Append the markup to the body
+    const modalHtml = `
+        <div id="customModal" class="modal-overlay hidden">
+            <div class="modal-card">
+                <span id="modalIcon" class="modal-icon">❓</span>
+                <h3 id="modalTitle">Confirm Action</h3>
+                <p id="modalMessage">Are you sure you want to proceed?</p>
+                <div class="modal-actions">
+                    <button id="modalCancelBtn" class="modal-btn modal-btn-secondary">Cancel</button>
+                    <button id="modalConfirmBtn" class="modal-btn modal-btn-primary">Confirm</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+})();
+
+// ==========================================
+// 2. MODAL CONTROLLER ENGINE
+// ==========================================
+function showCustomModal({ title, message, type = 'confirm', icon = '❓' }) {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('customModal');
+        const titleEl = document.getElementById('modalTitle');
+        const msgEl = document.getElementById('modalMessage');
+        const iconEl = document.getElementById('modalIcon');
+        const confirmBtn = document.getElementById('modalConfirmBtn');
+        const cancelBtn = document.getElementById('modalCancelBtn');
+
+        titleEl.textContent = title;
+        msgEl.textContent = message;
+        iconEl.textContent = icon;
+
+        if (type === 'alert') {
+            cancelBtn.style.display = 'none';
+            confirmBtn.textContent = 'OK';
+        } else {
+            cancelBtn.style.display = 'inline-block';
+            confirmBtn.textContent = 'Confirm';
+        }
+
+        modal.classList.remove('hidden');
+
+        function close(result) {
+            modal.classList.add('hidden');
+            confirmBtn.removeEventListener('click', onConfirm);
+            cancelBtn.removeEventListener('click', onCancel);
+            resolve(result);
+        }
+
+        function onConfirm() { close(true); }
+        function onCancel() { close(false); }
+
+        confirmBtn.addEventListener('click', onConfirm);
+        cancelBtn.addEventListener('click', onCancel);
+    });
+}
+
+// ==========================================
+// 3. YOUR UPDATED CORE FUNCTION
+// ==========================================
+
+
+
+    
+    async function pushCollectionToCBT(collectionId) {
+    // Step 1: Get collection to check if it has class/subject
+    const collection = assessmentDatabase.find(c => c._id === collectionId);
+    if (!collection) {
+        await showCustomModal({
+            title: 'Error',
+            message: 'Collection not found',
+            type: 'alert',
+            icon: '❌'
+        });
+        return;
+    }
+
+    // Step 2: If collection doesn't have class/subject, ask user to assign
+    if (!collection.class || !collection.subject) {
+        const classOptions = (teacher.classes || [])
+            .map(cls => `<option value="${cls.id}">${cls.name}</option>`)
+            .join('');
+        
+        const subjectOptions = (teacher.classes.length > 0 && subjectsByClass[teacher.classes[0].id])
+            ? subjectsByClass[teacher.classes[0].id]
+                .map(subj => `<option value="${subj.id}">${subj.name}</option>`)
+                .join('')
+            : '';
+
+        // Create modal to select class and subject
+        const modal = document.createElement('div');
+        modal.id = 'pushCollectionModal';
+        modal.className = 'fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4';
+        
+        modal.innerHTML = `
+            <div class="bg-white rounded-2xl border border-slate-200 w-full max-w-md shadow-2xl flex flex-col overflow-hidden">
+                <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-xs font-extrabold text-brand-900 uppercase tracking-wider">📤 Assign Class & Subject</h3>
+                        <p class="text-[11px] text-slate-500">Required before publishing to CBT</p>
+                    </div>
+                    <button onclick="document.getElementById('pushCollectionModal').remove()" class="text-slate-400 hover:text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md font-bold">&times;</button>
+                </div>
+                <div class="p-5 space-y-4 text-xs">
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Collection</label>
+                        <input type="text" value="${collection.name}" disabled class="w-full bg-slate-100 border border-slate-200 rounded-xl p-2.5 font-bold text-slate-600">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Target Class *</label>
+                        <select id="pushClassSelector" onchange="window.updatePushSubjects()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                            <option value="">-- Select Class --</option>
+                            ${classOptions}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Subject *</label>
+                        <select id="pushSubjectSelector" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
+                            <option value="">-- Select Subject --</option>
+                            ${subjectOptions}
+                        </select>
+                    </div>
+                </div>
+                <div class="p-3.5 border-t border-slate-100 bg-slate-50 flex justify-end space-x-2">
+                    <button onclick="document.getElementById('pushCollectionModal').remove()" class="bg-white border border-slate-200 text-slate-600 font-bold px-4 py-1.5 rounded-xl text-[11px] uppercase">Cancel</button>
+                    <button onclick="window.proceedWithPush('${collectionId}')" class="bg-brand-900 hover:bg-brand-800 text-white font-bold px-5 py-1.5 rounded-xl text-[11px] uppercase">Proceed</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        return;
+    }
+
+    // Step 3: Collection already has class/subject, proceed with conversion
+    await proceedWithConversion(collectionId);
+}
+
+// Helper function to update subjects when class changes
+window.updatePushSubjects = function() {
+    const classSelector = document.getElementById('pushClassSelector');
+    const subjectSelector = document.getElementById('pushSubjectSelector');
+    const selectedClassId = classSelector.value;
+    
+    subjectSelector.innerHTML = '<option value="">-- Select Subject --</option>';
+    
+    if (!selectedClassId) return;
+    
+    const subjects = subjectsByClass[selectedClassId] || [];
+    subjects.forEach(subj => {
+        const option = document.createElement('option');
+        option.value = subj.id;
+        option.textContent = subj.name;
+        subjectSelector.appendChild(option);
+    });
+};
+
+// Helper function to proceed after class/subject selection
+window.proceedWithPush = async function(collectionId) {
+    const classSelector = document.getElementById('pushClassSelector');
+    const subjectSelector = document.getElementById('pushSubjectSelector');
+    
+    const selectedClassId = classSelector.value;
+    const selectedSubjectId = subjectSelector.value;
+    
+    if (!selectedClassId || !selectedSubjectId) {
+        alert('Please select both class and subject');
+        return;
+    }
+
+    // Update collection with class and subject
+    try {
+        const updateRes = await fetch(
+            `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}`,
+            {
+                method: 'PATCH',
+                headers: authHeaders(),
+                body: JSON.stringify({
+                    class: selectedClassId,
+                    subject: selectedSubjectId
+                })
+            }
+        );
+
+        if (!updateRes.ok) throw new Error('Failed to assign class and subject');
+
+        // Remove modal
+        const modal = document.getElementById('pushCollectionModal');
+        if (modal) modal.remove();
+
+        // Proceed with conversion
+        await proceedWithConversion(collectionId);
+    } catch (err) {
+        console.error('Error updating collection:', err);
+        alert('Failed to assign class/subject: ' + err.message);
+    }
+};
+
+// Main conversion function
+async function proceedWithConversion(collectionId) {
+    // Step 1: Confirm action
+    const confirmed = await showCustomModal({
+        title: 'Push Collection to CBT?',
+        message: 'This will create a new CBT document that can be pushed to students.\n\nThis action cannot be undone.',
+        icon: '📤'
+    });
+
+    if (!confirmed) return;
+
+    try {
+        // Step 2: Convert collection to CBT
+        const convertRes = await fetch(
+            `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}/convert-to-cbt`,
+            {
+                method: 'POST',
+                headers: authHeaders(),
+                body: JSON.stringify({})
+            }
+        );
+
+        if (!convertRes.ok) throw new Error('Failed to convert collection to CBT');
+        const convertData = await convertRes.json();
+        const cbtId = convertData.cbtId;
+
+        // Step 3: Push the CBT
+        const pushRes = await fetch(
+            `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/cbt/push`,
+            {
+                method: 'POST',
+                headers: authHeaders(),
+                body: JSON.stringify({ cbtIds: [cbtId] })
+            }
+        );
+
+        if (!pushRes.ok) throw new Error('Failed to push to exam');
+        const pushData = await pushRes.json();
+        
+        // Success!
+        await showCustomModal({
+            title: 'Success! ✅',
+            message: `Collection successfully converted and pushed to CBT Exam!\n\nPushed: ${pushData.pushed.length} CBT(s)\n\nStudents can now access this exam.`,
+            type: 'alert',
+            icon: '✅'
+        });
+        
+        // Refresh
+        assessmentDatabase = await fetchUnifiedQuestionBank();
+        renderCollections();
+    } catch (err) {
+        console.error('Error during conversion:', err);
+        await showCustomModal({
+            title: 'Conversion Failed ❌',
+            message: err.message,
+            type: 'alert',
+            icon: '❌'
+        });
+    }
+}
         function renderAssignments() {
             const container = document.getElementById('assignmentsContainer');
             container.innerHTML = '';
-            
-            if (!allAssignments || allAssignments.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center p-8 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-xs font-bold">No assignments created yet.</div>`;
+
+            if (allAssignments.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center p-6 border rounded-xl text-slate-400 font-bold">No assignments distributed.</div>`;
                 return;
             }
 
-            allAssignments.forEach(assignment => {
+            allAssignments.forEach(a => {
+                const typeLabel = a.type === 'QUESTION_BANK' 
+                    ? `<span class="bg-indigo-100 text-indigo-800 border border-indigo-200 text-[10px] px-2 py-0.5 rounded font-bold uppercase">MCQ Question Bank Assessment</span>`
+                    : `<span class="bg-slate-100 text-slate-700 border border-slate-200 text-[10px] px-2 py-0.5 rounded font-bold uppercase">Standard Task Instructions</span>`;
+
+                let innerMetaHtml = '';
+                if (a.type === 'QUESTION_BANK') {
+                    innerMetaHtml = `<p class="text-[11px] text-brand-800 font-bold bg-brand-50 p-2 rounded-lg border border-brand-100">&bull; Allocated Evaluation Total: ${a.questionsAllocated ? a.questionsAllocated.length : 0} questions</p>`;
+                } else if (a.description) {
+                    innerMetaHtml = `<div class="text-[11px] text-slate-500 line-clamp-2 bg-slate-50 p-2 rounded border border-slate-150">${a.description.replace(/<[^>]*>/g, '')}</div>`;
+                }
+
+                const dueDate = new Date(a.dueDate || a.due);
+                const dueDateStr = dueDate.toLocaleDateString();
+
                 container.innerHTML += `
-                    <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
-                        <h4 class="font-bold text-slate-900 mb-1">${assignment.title || 'Untitled'}</h4>
-                        <p class="text-xs text-slate-500 mb-2">${assignment.description || 'No description'}</p>
-                        <div class="flex justify-between items-center text-xs">
-                            <span class="text-slate-600">Due: ${assignment.dueDate ? new Date(assignment.dueDate).toLocaleDateString() : 'No date'}</span>
-                            <button class="text-brand-700 hover:text-brand-900 font-bold">View Details</button>
+                    <div class="p-5 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-sm relative">
+                        <div class="flex justify-between items-start">
+                            <span class="text-[9px] font-black bg-brand-900 text-white px-2 py-0.5 rounded tracking-widest uppercase font-mono">${a.class || a.classId}</span>
+                            <span class="text-[10px] text-slate-400 font-bold">Due: ${dueDateStr}</span>
                         </div>
-                    </div>
-                `;
+                        <h4 class="text-xs font-black text-slate-900 uppercase font-serif tracking-wide leading-snug">${a.title || 'Untitled'}</h4>
+                        <div class="py-0.5">${typeLabel}</div>
+                        ${innerMetaHtml}
+                        <div class="flex justify-between items-center pt-2.5 text-[11px] border-t border-slate-100">
+                            <span class="text-emerald-600 font-extrabold">&bull; Status: ${a.status || 'Open'}</span>
+                        </div>
+                    </div>`;
             });
         }
 
         function renderStudents() {
-            const classFilter = document.getElementById('studentClassFilter').value;
+            const filter = document.getElementById('studentClassFilter').value;
             const tbody = document.getElementById('studentTableBody');
             tbody.innerHTML = '';
 
-            let classesToRender = [];
-            if (classFilter === 'ALL') {
-                classesToRender = teacher.classes || [];
-            } else {
-                classesToRender = (teacher.classes || []).filter(c => c.name === classFilter);
+            const allStudents = [];
+            for (const cls of teacher.classes || []) {
+                const clsStudents = studentsByClass[cls.id] || [];
+                clsStudents.forEach(s => {
+                    s.classGroup = cls.name;
+                });
+                allStudents.push(...clsStudents);
             }
 
-            classesToRender.forEach(cls => {
-                const students = studentsByClass[cls.id] || [];
-                students.forEach(student => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="p-3 pl-4 font-bold text-brand-900">${student.regNo || '-'}</td>
-                        <td class="p-3">${student.name || '-'}</td>
-                        <td class="p-3">${cls.name}</td>
-                        <td class="p-3 text-center"><span class="inline-flex bg-emerald-50 text-emerald-700 font-bold text-[10px] px-2 py-0.5 rounded-full">Active</span></td>
-                    `;
-                    tbody.appendChild(tr);
-                });
+            const data = filter === 'ALL' ? allStudents : allStudents.filter(s => s.classGroup === filter);
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400 font-bold">No students registered to this track class code loop.</td></tr>`;
+                return;
+            }
+
+            data.forEach(s => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50/50 transition">
+                        <td class="p-3 pl-4 font-mono font-bold text-brand-900">${s.regNo || s.id}</td>
+                        <td class="p-3 text-slate-900 font-bold">${s.name}</td>
+                        <td class="p-3 text-slate-500 font-medium">${s.classGroup}</td>
+                        <td class="p-3 text-center"><span class="bg-emerald-50 text-emerald-700 border border-emerald-100 text-[10px] px-2 py-0.5 rounded-full font-bold">Active</span></td>
+                    </tr>`;
             });
         }
 
         function renderGradebook() {
-            const classFilter = document.getElementById('gradebookClassFilter').value;
+            const classId = document.getElementById('gradebookClassFilter').value;
             const tbody = document.getElementById('gradebookTableBody');
             tbody.innerHTML = '';
 
-            let classesToRender = [];
-            if (classFilter) {
-                classesToRender = (teacher.classes || []).filter(c => c.id === classFilter);
+            if (!classId) {
+                document.getElementById('gradebookTableBody').innerHTML = '';
+                return;
             }
 
-            classesToRender.forEach(cls => {
-                const students = studentsByClass[cls.id] || [];
-                students.forEach((student, idx) => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="p-3 pl-4 font-bold text-brand-900">${student.regNo || '-'}</td>
-                        <td class="p-3">${student.name || '-'}</td>
-                        <td class="p-3 text-center"><input type="number" min="0" max="20" value="0" class="w-12 bg-slate-50 border border-slate-200 rounded p-1 text-center"></td>
-                        <td class="p-3 text-center"><input type="number" min="0" max="20" value="0" class="w-12 bg-slate-50 border border-slate-200 rounded p-1 text-center"></td>
-                        <td class="p-3 text-center"><input type="number" min="0" max="60" value="0" class="w-12 bg-slate-50 border border-slate-200 rounded p-1 text-center"></td>
-                        <td class="p-3 text-center font-bold text-slate-900">0</td>
-                        <td class="p-3 text-center text-slate-600 text-[10px]">—</td>
-                        <td class="p-3 text-center"><button class="text-brand-700 hover:text-brand-900 font-bold text-[10px]">View</button></td>
-                    `;
-                    tbody.appendChild(tr);
-                });
+            const students = studentsByClass[classId] || [];
+            const subjects = subjectsByClass[classId] || [];
+
+            if (students.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400 font-bold">No students found for this class.</td></tr>`;
+                return;
+            }
+
+            students.forEach((s) => {
+                const total = 0;
+                const badge = getStandingBadge(total);
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50/50 transition" data-student-code="${s.id}">
+                        <td class="p-3 pl-4 font-mono font-bold text-brand-900">${s.regNo}</td>
+                        <td class="p-3 font-bold text-slate-800">${s.name}</td>
+                        <td class="p-3 text-center">
+                            <input type="number" min="0" max="20" value="" oninput="calculateRowTotal(this)" class="ca1-input w-14 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono text-xs font-bold outline-none focus:ring-1 focus:ring-brand-500">
+                        </td>
+                        <td class="p-3 text-center">
+                            <input type="number" min="0" max="20" value="" oninput="calculateRowTotal(this)" class="ca2-input w-14 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono text-xs font-bold outline-none focus:ring-1 focus:ring-brand-500">
+                        </td>
+                        <td class="p-3 text-center">
+                            <input type="number" min="0" max="60" value="" oninput="calculateRowTotal(this)" class="exam-input w-14 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono text-xs font-bold outline-none focus:ring-1 focus:ring-brand-500">
+                        </td>
+                        <td class="p-3 text-center font-mono font-black text-slate-900 tracking-wide">
+                            <span class="total-span">0</span>/100
+                        </td>
+                        <td class="p-3 text-center">
+                            <span class="standing-badge inline-block text-[10px] font-bold px-2 py-0.5 rounded border text-center whitespace-nowrap min-w-[76px] ${badge.class}">${badge.text}</span>
+                        </td>
+                        <td class="p-3 text-center space-x-1 whitespace-nowrap">
+                            <button onclick="saveSingleRow(this)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[10px] px-2.5 py-1 rounded-md uppercase tracking-wider transition">Save</button>
+                            <button onclick="clearSingleRow(this)" class="bg-white border border-slate-200 text-slate-500 hover:bg-slate-100 font-extrabold text-[10px] px-2.5 py-1 rounded-md uppercase transition">Clear</button>
+                        </td>
+                    </tr>`;
             });
+
+            updateProgressMetrics();
+        }
+
+        function getStandingBadge(score) {
+            if (score >= 75) return { text: "A1 Excellent", class: "bg-emerald-100 text-emerald-800 border-emerald-200" };
+            if (score >= 70) return { text: "B2 Very Good", class: "bg-emerald-50 text-emerald-700 border-emerald-100" };
+            if (score >= 65) return { text: "B3 Good", class: "bg-teal-50 text-teal-700 border-teal-100" };
+            if (score >= 60) return { text: "C4 Credit", class: "bg-blue-50 text-blue-700 border-blue-100" };
+            return { text: "F9 Fail", class: "bg-rose-100 text-rose-800 border-rose-200" };
+        }
+
+        function calculateRowTotal(inputElement) {
+            const row = inputElement.closest('tr');
+            const ca1 = parseInt(row.querySelector('.ca1-input').value) || 0;
+            const ca2 = parseInt(row.querySelector('.ca2-input').value) || 0;
+            const exam = parseInt(row.querySelector('.exam-input').value) || 0;
+            const cumulativeTotal = ca1 + ca2 + exam;
+            
+            row.querySelector('.total-span').innerText = cumulativeTotal;
+            
+            const badgeElement = row.querySelector('.standing-badge');
+            const state = getStandingBadge(cumulativeTotal);
+            badgeElement.className = `standing-badge inline-block text-[10px] font-bold px-2 py-0.5 rounded border text-center whitespace-nowrap min-w-[76px] ${state.class}`;
+            badgeElement.innerText = state.text;
+            
+            updateProgressMetrics();
+        }
+
+        function updateProgressMetrics() {
+            const rows = document.getElementById('gradebookTableBody').children;
+            const totalStudents = rows.length;
+            const totalExpectedCells = totalStudents * 3;
+            let completedCells = 0;
+
+            for (let row of rows) {
+                const ca1Val = row.querySelector('.ca1-input').value;
+                const ca2Val = row.querySelector('.ca2-input').value;
+                const examVal = row.querySelector('.exam-input').value;
+
+                if (ca1Val) completedCells++;
+                if (ca2Val) completedCells++;
+                if (examVal) completedCells++;
+            }
+
+            const percentComplete = totalExpectedCells > 0 ? Math.round((completedCells / totalExpectedCells) * 100) : 0;
+            document.getElementById('progressBarFill').style.width = percentComplete + '%';
+            document.getElementById('progressStatsCount').textContent = `${completedCells} / ${totalExpectedCells}`;
+            document.getElementById('progressStatsLeft').textContent = `${totalExpectedCells - completedCells} Cells Left`;
         }
 
         // ============ COLLECTION MANAGEMENT ============
         function toggleCollectionFocus(collectionId) {
-            activeIsolatedCollectionId = collectionId;
+            activeIsolatedCollectionId = activeIsolatedCollectionId === collectionId ? null : collectionId;
             renderCollections();
         }
 
@@ -997,13 +1406,14 @@ name=public/rt.html
                 alert('Please enter a collection name');
                 return;
             }
-
-            const collection = await createCollectionAPI(name);
-            if (collection) {
+            const newCollection = await createCollectionAPI(name);
+            if (newCollection) {
+                assessmentDatabase.push(newCollection);
                 document.getElementById('newCollectionName').value = '';
-                assessmentDatabase = await fetchUnifiedQuestionBank();
                 renderCollections();
-                alert(`✅ Collection "${name}" created successfully!`);
+                alert('Collection created successfully');
+            } else {
+                alert('Failed to create collection');
             }
         }
 
@@ -1011,333 +1421,225 @@ name=public/rt.html
             activeIsolatedCollectionId = collectionId;
             activeTargetModalMode = 'CREATE';
             contextualTargetQuestionId = null;
-
-            // Initialize Quill editors
+            document.getElementById('modalTitle').textContent = 'Create New Assessment Item';
+            
+            // Initialize Quill editors with image support
             if (!stemQuillInstance) {
-                stemQuillInstance = new Quill('#quillQuestionStem', { theme: 'snow' });
+                stemQuillInstance = new Quill('#quillQuestionStem', {
+                    theme: 'snow',
+                    placeholder: 'Enter question text here...',
+                    modules: { 
+                        toolbar: [['bold', 'italic', 'underline'], ['code-block'], ['image']]
+                    }
+                });
             }
             if (!explanationQuillInstance) {
-                explanationQuillInstance = new Quill('#quillExplanation', { theme: 'snow' });
+                explanationQuillInstance = new Quill('#quillExplanation', {
+                    theme: 'snow',
+                    placeholder: 'Optional explanation...',
+                    modules: { 
+                        toolbar: [['bold', 'italic'], ['image']]
+                    }
+                });
             }
-
-            // Clear editors
+            
             stemQuillInstance.setContents([]);
             explanationQuillInstance.setContents([]);
+            document.getElementById('stemImageUrl').value = '';
+            document.getElementById('explanationImageUrl').value = '';
             document.getElementById('modalOptionsWrapper').innerHTML = '';
-            optionQuillRegistry = {};
-
-            document.getElementById('modalTitle').textContent = 'Create New Assessment Question';
+            
+            appendBlankOptionField();
+            
             document.getElementById('questionModal').classList.remove('hidden');
-
-            appendBlankOptionField();
-            appendBlankOptionField();
+            document.getElementById('questionModal').classList.add('flex');
         }
 
         function openEditQuestionModal(collectionId, questionId) {
             activeIsolatedCollectionId = collectionId;
             activeTargetModalMode = 'EDIT';
             contextualTargetQuestionId = questionId;
-
+            
             const collection = assessmentDatabase.find(c => c._id === collectionId);
             const question = collection?.questions?.find(q => q.id === questionId);
-
-            if (!question) return;
-
+            
+            if (!question) {
+                alert('Question not found');
+                return;
+            }
+            
+            document.getElementById('modalTitle').textContent = 'Edit Assessment Item';
+            
+            // Initialize Quill editors with image support
             if (!stemQuillInstance) {
-                stemQuillInstance = new Quill('#quillQuestionStem', { theme: 'snow' });
-            }
-            if (!explanationQuillInstance) {
-                explanationQuillInstance = new Quill('#quillExplanation', { theme: 'snow' });
-            }
-
-            stemQuillInstance.setContents([{ insert: question.text || '' }]);
-            explanationQuillInstance.setContents([{ insert: question.explanation || '' }]);
-
-            document.getElementById('modalOptionsWrapper').innerHTML = '';
-            optionQuillRegistry = {};
-
-            if (question.options && question.options.length > 0) {
-                question.options.forEach((opt, idx) => {
-                    appendBlankOptionField();
-                    setTimeout(() => {
-                        const optionDivs = document.querySelectorAll('#modalOptionsWrapper .option-editor-container');
-                        if (optionDivs[idx]) {
-                            const quillId = `quill-option-${Date.now()}-${idx}`;
-                            const quillDiv = optionDivs[idx].querySelector('.quill-option-editor');
-                            if (optionQuillRegistry[quillId]) {
-                                optionQuillRegistry[quillId].quill.setContents([{ insert: opt.text || '' }]);
-                                const checkbox = optionDivs[idx].querySelector('input[type="checkbox"]');
-                                if (checkbox) checkbox.checked = opt.isCorrect === true;
-                            }
-                        }
-                    }, 0);
+                stemQuillInstance = new Quill('#quillQuestionStem', {
+                    theme: 'snow',
+                    placeholder: 'Enter question text here...',
+                    modules: { 
+                        toolbar: [['bold', 'italic', 'underline'], ['code-block'], ['image']]
+                    }
                 });
             }
-
-            document.getElementById('modalTitle').textContent = 'Edit Assessment Question';
+            if (!explanationQuillInstance) {
+                explanationQuillInstance = new Quill('#quillExplanation', {
+                    theme: 'snow',
+                    placeholder: 'Optional explanation...',
+                    modules: { 
+                        toolbar: [['bold', 'italic'], ['image']]
+                    }
+                });
+            }
+            
+            stemQuillInstance.setContents([{ insert: question.text }]);
+            explanationQuillInstance.setContents([{ insert: question.explanation || '' }]);
+            document.getElementById('stemImageUrl').value = '';
+            document.getElementById('explanationImageUrl').value = '';
+            
+            document.getElementById('modalOptionsWrapper').innerHTML = '';
+            question.options.forEach(opt => {
+                addOptionFieldToModal(opt.text, opt.isCorrect);
+            });
+            
             document.getElementById('questionModal').classList.remove('hidden');
+            document.getElementById('questionModal').classList.add('flex');
         }
 
         function appendBlankOptionField() {
+            addOptionFieldToModal('', false);
+        }
+
+        function addOptionFieldToModal(text = '', isCorrect = false) {
             const wrapper = document.getElementById('modalOptionsWrapper');
-            const quillId = `quill-option-${Date.now()}-${Math.random()}`;
-            const fieldHtml = `
-                <div class="p-4 bg-white border border-slate-200 rounded-xl space-y-2 option-editor-container">
-                    <div class="flex items-center justify-between">
-                        <label class="block font-bold text-slate-400 text-[11px]">Option</label>
-                        <input type="checkbox" class="w-4 h-4 cursor-pointer" title="Mark as correct answer">
-                    </div>
-                    <div class="quill-option-editor"></div>
+            const optionDiv = document.createElement('div');
+            optionDiv.className = 'p-3 bg-white border border-slate-200 rounded-xl space-y-2';
+            
+            const optionId = `option_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            
+            optionDiv.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <label class="font-bold text-slate-500 text-[11px] uppercase">Option</label>
+                    <button type="button" onclick="this.closest('div').remove()" class="text-rose-600 hover:text-white hover:bg-rose-600 font-bold text-[10px] px-2 py-1 rounded transition">Remove</button>
                 </div>
+                <div class="mb-1.5 flex gap-1">
+                    <input type="file" id="optionImageUpload_${optionId}" accept="image/*" class="hidden" onchange="insertImageFromFile(this, 'option')">
+                    <button type="button" onclick="document.getElementById('optionImageUpload_${optionId}').click()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2 py-1 rounded text-[10px] uppercase transition">📁</button>
+                    <input type="text" id="optionImageUrl_${optionId}" placeholder="Image URL..." class="flex-grow bg-slate-50 border border-slate-200 rounded p-1 text-[10px] outline-none focus:ring-1 focus:ring-brand-500">
+                    <button type="button" onclick="insertImageFromUrl('option')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2 py-1 rounded text-[10px] uppercase transition">Add</button>
+                </div>
+                <div class="option-editor-container">
+                    <div class="quill-option-editor bg-white rounded-xl" data-option-id="${optionId}"></div>
+                </div>
+                <label class="flex items-center space-x-2 text-xs">
+                    <input type="checkbox" class="option-correct-checkbox" ${isCorrect ? 'checked' : ''}>
+                    <span>Mark as correct answer</span>
+                </label>
             `;
-            wrapper.insertAdjacentHTML('beforeend', fieldHtml);
-
-            const optionDivs = document.querySelectorAll('#modalOptionsWrapper .option-editor-container');
-            const lastDiv = optionDivs[optionDivs.length - 1];
-            const quillDiv = lastDiv.querySelector('.quill-option-editor');
-
-            const quill = new Quill(quillDiv, { theme: 'snow' });
-            optionQuillRegistry[quillId] = { quill, checkbox: lastDiv.querySelector('input[type="checkbox"]') };
+            wrapper.appendChild(optionDiv);
+            
+            const optionEditor = optionDiv.querySelector('.quill-option-editor');
+            const quill = new Quill(optionEditor, {
+                theme: 'snow',
+                placeholder: 'Option text...',
+                modules: { 
+                    toolbar: [['bold', 'italic'], ['image']]
+                }
+            });
+            optionQuillRegistry[optionId] = { quill, checkbox: optionDiv.querySelector('.option-correct-checkbox') };
+            quill.setContents([{ insert: text }]);
         }
 
         async function saveModalQuestionData() {
-            const questionText = stemQuillInstance.getContents().ops.map(op => op.insert).join('').trim();
-            const explanationText = explanationQuillInstance.getContents().ops.map(op => op.insert).join('').trim();
-
-            if (!questionText) {
-                alert('Please enter question text');
+            const stemText = stemQuillInstance.getText();
+            if (!stemText.trim()) {
+                alert('Please enter a question');
                 return;
             }
-
-            const options = [];
-            Object.values(optionQuillRegistry).forEach((item, idx) => {
-                const text = item.quill.getContents().ops.map(op => op.insert).join('').trim();
-                if (text) {
-                    options.push({
-                        text: text,
-                        isCorrect: item.checkbox.checked
-                    });
+            
+            // Rebuild options from current state
+            const freshOptions = [];
+            document.querySelectorAll('#modalOptionsWrapper .p-3').forEach((optDiv, idx) => {
+                const quillDivs = optDiv.querySelectorAll('.quill-option-editor');
+                if (quillDivs.length > 0) {
+                    const quillDiv = quillDivs[0];
+                    const parentContainer = quillDiv.closest('.option-editor-container');
+                    if (parentContainer && parentContainer.querySelector('.ql-editor')) {
+                        const text = parentContainer.querySelector('.ql-editor').innerText;
+                        const isCorrect = optDiv.querySelector('.option-correct-checkbox').checked;
+                        freshOptions.push({ text, isCorrect });
+                    }
                 }
             });
-
-            if (options.length < 2) {
-                alert('Please add at least 2 options');
+            
+            if (freshOptions.length === 0) {
+                alert('Please add at least one option');
                 return;
             }
-
-            if (!options.some(o => o.isCorrect)) {
-                alert('Please mark one option as correct');
-                return;
-            }
-
+            
             const questionData = {
-                text: questionText,
-                options: options,
+                text: stemQuillInstance.root.innerHTML,
+                options: freshOptions,
                 imageUrl: null,
-                explanation: explanationText || null
+                explanation: explanationQuillInstance.root.innerHTML || null
             };
-
-            let result;
+            
             if (activeTargetModalMode === 'CREATE') {
-                result = await addQuestionToCollectionAPI(activeIsolatedCollectionId, questionData);
+                const result = await addQuestionToCollectionAPI(activeIsolatedCollectionId, questionData);
+                if (result) {
+                    alert('Question added successfully');
+                    // Re-fetch collections to get latest data
+                    assessmentDatabase = await fetchUnifiedQuestionBank();
+                    renderCollections();
+                    closeQuestionModal();
+                } else {
+                    alert('Failed to save question');
+                }
             } else {
-                result = await updateQuestionAPI(activeIsolatedCollectionId, contextualTargetQuestionId, questionData);
+                const result = await updateQuestionAPI(activeIsolatedCollectionId, contextualTargetQuestionId, questionData);
+                if (result) {
+                    alert('Question updated successfully');
+                    // Re-fetch collections
+                    assessmentDatabase = await fetchUnifiedQuestionBank();
+                    renderCollections();
+                    closeQuestionModal();
+                } else {
+                    alert('Failed to update question');
+                }
             }
-
-            if (result) {
-                alert('✅ Question saved successfully!');
-                closeQuestionModal();
-                assessmentDatabase = await fetchUnifiedQuestionBank();
-                renderCollections();
-            }
+            
+            optionQuillRegistry = {};
         }
 
         function closeQuestionModal() {
             document.getElementById('questionModal').classList.add('hidden');
-            stemQuillInstance?.setContents([]);
-            explanationQuillInstance?.setContents([]);
-            document.getElementById('modalOptionsWrapper').innerHTML = '';
+            document.getElementById('questionModal').classList.remove('flex');
             optionQuillRegistry = {};
         }
 
         async function deleteQuestion(collectionId, questionId) {
-            if (confirm('Delete this question? This action cannot be undone.')) {
+            if (confirm('Are you sure you want to delete this question?')) {
                 const success = await deleteQuestionAPI(collectionId, questionId);
                 if (success) {
-                    alert('✅ Question deleted');
                     assessmentDatabase = await fetchUnifiedQuestionBank();
                     renderCollections();
+                    alert('Question deleted');
+                } else {
+                    alert('Failed to delete question');
                 }
             }
         }
 
         async function deleteCollection(collectionId) {
-            if (confirm('Delete this entire collection? This action cannot be undone.')) {
+            if (confirm('Are you sure you want to delete this entire collection?')) {
                 const success = await deleteCollectionAPI(collectionId);
                 if (success) {
-                    alert('✅ Collection deleted');
-                    activeIsolatedCollectionId = null;
                     assessmentDatabase = await fetchUnifiedQuestionBank();
                     renderCollections();
+                    alert('Collection deleted');
+                } else {
+                    alert('Failed to delete collection');
                 }
             }
         }
-
-        // ============ PUSH TO CBT FUNCTIONS ============
-        async function openPushCollectionModal(collectionId) {
-            const collection = assessmentDatabase.find(c => c._id === collectionId);
-            if (!collection) {
-                alert('Collection not found');
-                return;
-            }
-
-            const modal = document.createElement('div');
-            modal.id = 'pushCollectionModal';
-            modal.className = 'fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4';
-            
-            const classOptions = (teacher.classes || [])
-                .map(cls => `<option value="${cls.id}">${cls.name}</option>`)
-                .join('');
-            
-            const subjectOptions = (teacher.classes.length > 0 && subjectsByClass[teacher.classes[0].id])
-                ? subjectsByClass[teacher.classes[0].id]
-                    .map(subj => `<option value="${subj.id}">${subj.name}</option>`)
-                    .join('')
-                : '';
-
-            modal.innerHTML = `
-                <div class="bg-white rounded-2xl border border-slate-200 w-full max-w-md shadow-2xl flex flex-col overflow-hidden">
-                    <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-                        <div>
-                            <h3 class="text-xs font-extrabold text-brand-900 uppercase tracking-wider">📤 Push to CBT Exam</h3>
-                            <p class="text-[11px] text-slate-500">Assign class and subject before publishing</p>
-                        </div>
-                        <button onclick="document.getElementById('pushCollectionModal').remove()" class="text-slate-400 hover:text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md font-bold">&times;</button>
-                    </div>
-                    <div class="p-5 space-y-4 text-xs">
-                        <div>
-                            <label class="block font-bold text-slate-400 mb-1">Collection Name</label>
-                            <input type="text" value="${collection.name}" disabled class="w-full bg-slate-100 border border-slate-200 rounded-xl p-2.5 font-bold text-slate-600">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-slate-400 mb-1">Target Class *</label>
-                            <select id="pushClassSelector" onchange="updatePushSubjects()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                                <option value="">-- Select Class --</option>
-                                ${classOptions}
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block font-bold text-slate-400 mb-1">Subject *</label>
-                            <select id="pushSubjectSelector" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold outline-none focus:bg-white focus:ring-1 focus:ring-brand-500">
-                                <option value="">-- Select Subject --</option>
-                                ${subjectOptions}
-                            </select>
-                        </div>
-                        <p class="text-[10px] text-slate-500 font-semibold">⚠️ Questions will be converted to CBT format and cannot be edited after publishing</p>
-                    </div>
-                    <div class="p-3.5 border-t border-slate-100 bg-slate-50 flex justify-end space-x-2">
-                        <button onclick="document.getElementById('pushCollectionModal').remove()" class="bg-white border border-slate-200 text-slate-600 font-bold px-4 py-1.5 rounded-xl text-[11px] uppercase">Cancel</button>
-                        <button onclick="confirmPushCollectionToCBT('${collectionId}')" class="bg-brand-900 hover:bg-brand-800 text-white font-bold px-5 py-1.5 rounded-xl text-[11px] uppercase">Publish to CBT</button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-        }
-
-        function updatePushSubjects() {
-            const classSelector = document.getElementById('pushClassSelector');
-            const subjectSelector = document.getElementById('pushSubjectSelector');
-            const selectedClassId = classSelector.value;
-            
-            subjectSelector.innerHTML = '<option value="">-- Select Subject --</option>';
-            
-            if (!selectedClassId) return;
-            
-            const subjects = subjectsByClass[selectedClassId] || [];
-            subjects.forEach(subj => {
-                const option = document.createElement('option');
-                option.value = subj.id;
-                option.textContent = subj.name;
-                subjectSelector.appendChild(option);
-            });
-        }
-
-        async function confirmPushCollectionToCBT(collectionId) {
-            const classSelector = document.getElementById('pushClassSelector');
-            const subjectSelector = document.getElementById('pushSubjectSelector');
-            
-            const selectedClassId = classSelector.value;
-            const selectedSubjectId = subjectSelector.value;
-            
-            if (!selectedClassId) {
-                alert('Please select a class');
-                return;
-            }
-            
-            if (!selectedSubjectId) {
-                alert('Please select a subject');
-                return;
-            }
-            
-            try {
-                const updateRes = await fetch(
-                    `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}`,
-                    {
-                        method: 'PATCH',
-                        headers: authHeaders(),
-                        body: JSON.stringify({
-                            class: selectedClassId,
-                            subject: selectedSubjectId
-                        })
-                    }
-                );
-                
-                if (!updateRes.ok) {
-                    throw new Error('Failed to update collection with class and subject');
-                }
-            } catch (err) {
-                console.error('Error updating collection:', err);
-                alert('Failed to update collection: ' + err.message);
-                return;
-            }
-            
-            try {
-                const pushRes = await fetch(
-                    `${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections/${collectionId}/push`,
-                    {
-                        method: 'POST',
-                        headers: authHeaders(),
-                        body: JSON.stringify({})
-                    }
-                );
-
-                if (!pushRes.ok) {
-                    const errorData = await pushRes.json();
-                    throw new Error(errorData.error || 'Failed to push collection to CBT');
-                }
-                
-                const pushData = await pushRes.json();
-                
-                alert(`✅ Success!\n\nCollection has been published to CBT Exam.`);
-                
-                const modal = document.getElementById('pushCollectionModal');
-                if (modal) modal.remove();
-                
-                assessmentDatabase = await fetchUnifiedQuestionBank();
-                renderCollections();
-            } catch (err) {
-                console.error('Error pushing collection to CBT:', err);
-                alert('❌ Failed to publish: ' + err.message);
-            }
-        }
-
-        async function pushCollectionToCBT(collectionId) {
-            if (confirm('Push this collection to CBT Exam? You will need to assign a class and subject.')) {
-                openPushCollectionModal(collectionId);
-            }
-        }
-
 
         // ============ ASSIGNMENT MANAGEMENT ============
         function openAssignmentModal() {
