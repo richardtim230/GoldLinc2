@@ -1740,12 +1740,27 @@ async function viewAssignment(assignmentId) {
 
 async function syncStudentResults(studentId, studentName) {
     try {
+        // Ensure teacher is loaded
+        if (!teacher || !teacher.id) {
+            console.log('⏳ Reloading teacher profile...');
+            teacher = await fetchTeacherProfile();
+        }
+
+        if (!teacher || !teacher.id) {
+            await showCustomModal({
+                title: 'Error',
+                message: 'Teacher profile not loaded. Please refresh the page and try again.',
+                type: 'alert',
+                icon: '❌'
+            });
+            return;
+        }
+
         const classId = document.getElementById('gradebookClassFilter')?.value;
         const sessionName = document.getElementById('gb-session-select')?.value;
         const termName = document.getElementById('gb-term-select')?.value;
         const resultType = document.getElementById('gb-result-type-select')?.value;
 
-        // Validate selections
         if (!classId || !sessionName || !termName || !resultType) {
             await showCustomModal({
                 title: 'Selection Required',
@@ -1756,33 +1771,23 @@ async function syncStudentResults(studentId, studentName) {
             return;
         }
 
-        if (!teacher || !teacher._id) {
-            await showCustomModal({
-                title: 'Error',
-                message: 'Teacher profile not loaded. Please refresh the page.',
-                type: 'alert',
-                icon: '❌'
-            });
-            return;
-        }
+        console.log('🔄 Syncing results:', { studentId, studentName, classId, teacher: teacher.id });
 
-        console.log('Syncing results:', { studentId, studentName, classId, sessionName, termName, resultType });
-
-        // CRITICAL: Use /api/teacher (not /api/teachers) and MongoDB student _id
-        const resultsUrl = `${API_BASE_URL}/api/teachers/${teacher._id}/results?` +
+        // Use teacher.id (NOT teacher._id)
+        const resultsUrl = `${API_BASE_URL}/api/teachers/${teacher.id}/results?` +
             `class=${encodeURIComponent(classId)}&` +
             `student=${encodeURIComponent(studentId)}`;
 
-        console.log('Fetching from:', resultsUrl);
+        console.log('📡 Fetching from:', resultsUrl);
 
         const res = await fetch(resultsUrl, { headers: authHeaders() });
         
         if (!res.ok) {
             const error = await res.json();
-            console.error('API Error:', error);
+            console.error('❌ API Error:', error);
             await showCustomModal({
                 title: 'No Results Found',
-                message: `No results found for ${studentName}.\n\nMake sure results have been uploaded for this student in this session/term.`,
+                message: `No results found for ${studentName} in ${sessionName} - ${termName}.\n\nEnsure results have been uploaded for this student.`,
                 type: 'alert',
                 icon: 'ℹ️'
             });
@@ -1790,6 +1795,8 @@ async function syncStudentResults(studentId, studentName) {
         }
 
         const resultsData = await res.json();
+        console.log('✅ Results received:', resultsData);
+
         if (!resultsData.results || resultsData.results.length === 0) {
             await showCustomModal({
                 title: 'No Results Found',
@@ -1800,25 +1807,32 @@ async function syncStudentResults(studentId, studentName) {
             return;
         }
 
-        // Populate gradebook inputs
+        // Find student row in gradebook
         const studentRow = document.querySelector(`tr[data-student-id="${studentId}"]`);
         if (!studentRow) {
-            console.error('Student row not found:', studentId);
+            console.error('❌ Student row not found:', studentId);
             return;
         }
 
+        // Populate input fields
         const inputs = studentRow.querySelectorAll('input[type="number"]');
         let populatedCount = 0;
 
         resultsData.results.forEach((result, idx) => {
             if (idx < inputs.length && inputs[idx]) {
                 let score = 0;
-                if (resultType === 'ca1') score = result.ca1_score;
-                else if (resultType === 'ca2') score = result.ca2_score;
-                else if (resultType === 'exam') score = result.exam_score;
+                
+                if (resultType === 'ca1') {
+                    score = result.ca1_score || 0;
+                } else if (resultType === 'ca2') {
+                    score = result.ca2_score || 0;
+                } else if (resultType === 'exam') {
+                    score = result.exam_score || 0;
+                }
                 
                 inputs[idx].value = Number(score) || 0;
                 populatedCount++;
+                console.log(`Populated field ${idx}: ${score}`);
             }
         });
 
@@ -1826,13 +1840,13 @@ async function syncStudentResults(studentId, studentName) {
 
         await showCustomModal({
             title: '✅ Sync Successful',
-            message: `Loaded ${populatedCount} scores for ${studentName}`,
+            message: `Loaded ${populatedCount} scores for ${studentName}\n\nSession: ${sessionName}\nTerm: ${termName}\nType: ${resultType.toUpperCase()}`,
             type: 'alert',
             icon: '✅'
         });
 
     } catch (err) {
-        console.error('Sync error:', err);
+        console.error('❌ Sync error:', err);
         await showCustomModal({
             title: 'Error',
             message: `Failed to sync: ${err.message}`,
