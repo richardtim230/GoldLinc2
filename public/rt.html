@@ -1638,25 +1638,48 @@ async function viewAssignment(assignmentId) {
     }
 
  async function renderGradebook() {
-    const classId = document.getElementById('gradebookClassFilter').value;
-    const session = document.getElementById('gb-session-select').value;
-    const term = document.getElementById('gb-term-select').value;
-    
-    if (!classId) {
-        document.getElementById('gradebookTableBody').innerHTML = '<tr><td colspan="100%" style="padding:20px;text-align:center;color:#999;">Select a class to view gradebook</td></tr>';
-        return;
-    }
+    const classId = document.getElementById('gradebookClassFilter')?.value;
+    const session = document.getElementById('gb-session-select')?.value;
+    const term = document.getElementById('gb-term-select')?.value;
+    const tbody = document.getElementById('gradebookTableBody');
+
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
 
     const students = studentsByClass[classId] || [];
     const subjects = subjectsByClass[classId] || [];
-    
-    if (students.length === 0) {
-        document.getElementById('gradebookTableBody').innerHTML = '<tr><td colspan="100%" style="padding:20px;text-align:center;color:#999;">No students found for this class</td></tr>';
-        return;
+
+    // Update table headers dynamically
+    const theadRow = document.querySelector('#gradebookSubjectsHeader');
+    if (theadRow) {
+        theadRow.innerHTML = `
+            <th class="p-3 pl-4">Admission Code</th>
+            <th class="p-3">Student Name</th>
+        `;
+
+        subjects.forEach(subject => {
+            theadRow.innerHTML += `
+                <th class="p-3 text-center min-w-[120px]">
+                    ${subject.name || subject}
+                </th>
+            `;
+        });
+
+        theadRow.innerHTML += `
+            <th class="p-3 text-center w-36">Actions</th>
+        `;
     }
 
-    if (subjects.length === 0) {
-        document.getElementById('gradebookTableBody').innerHTML = '<tr><td colspan="100%" style="padding:20px;text-align:center;color:#999;">No subjects found for this class</td></tr>';
+    if (!students.length) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="${subjects.length + 3}"
+                    class="p-4 text-center text-slate-400 text-xs">
+                    No students found for this class
+                </td>
+            </tr>
+        `;
         return;
     }
 
@@ -1665,6 +1688,8 @@ async function viewAssignment(assignmentId) {
     if (session && term) {
         try {
             const className = document.querySelector('#gradebookClassFilter option:checked')?.textContent || classId;
+            
+            console.log('Fetching results for:', { className, session, term });
             
             // Fetch results for this class/session/term
             const resultsRes = await fetch(
@@ -1676,18 +1701,20 @@ async function viewAssignment(assignmentId) {
                 const resultsData = await resultsRes.json();
                 const resultsList = Array.isArray(resultsData) ? resultsData : [];
                 
+                console.log('Fetched results:', resultsList);
+                
                 // Organize results by student and subject
                 resultsList.forEach(result => {
                     const studentId = result.student?._id || result.student;
                     const subjectName = result.subject?.name || result.subject;
                     const key = `${studentId}-${subjectName}`;
                     
-                    // Store the total score for this student/subject combination
+                    // Store the total score (use exam_score, then score, then 0)
                     const totalScore = result.exam_score || result.score || 0;
                     existingResults[key] = totalScore;
                 });
                 
-                console.log('Loaded existing results:', existingResults);
+                console.log('Organized existing results:', existingResults);
             }
         } catch (err) {
             console.error('Error fetching existing results:', err);
@@ -1695,47 +1722,62 @@ async function viewAssignment(assignmentId) {
         }
     }
 
-    // Build table with students and subjects
-    let html = ``;
-    
-    students.forEach(stu => {
-        html += `<tr>
-            <td style="padding:12px;text-align:left;border-bottom:1px solid #eef3ff;">${stu.student_id || ''}</td>
-            <td style="padding:12px;text-align:left;border-bottom:1px solid #eef3ff;">${stu.name}</td>`;
-        
-        subjects.forEach((subj, idx) => {
-            const subjectName = subj.name || subj;
-            const key = `${stu._id}-${subjectName}`;
-            const existingScore = existingResults[key] || '';
+    students.forEach(student => {
+        const tr = document.createElement('tr');
+
+        let subjectCells = '';
+
+        subjects.forEach(subject => {
+            const subjectName = subject.name || subject;
+            const key = `${student._id}-${subjectName}`;
+            const existingScore = existingResults[key] !== undefined ? existingResults[key] : '';
             
-            html += `<td style="padding:12px;text-align:center;border-bottom:1px solid #eef3ff;">
-                <input 
-                    type="number" 
-                    min="0" 
-                    max="100" 
-                    placeholder="0-100"
-                    value="${existingScore}"
-                    data-student-id="${stu._id}"
-                    data-subject="${subjectName}"
-                    style="width:70px;padding:6px;border:1px solid #e6e9ef;border-radius:4px;text-align:center;">
-            </td>`;
+            subjectCells += `
+                <td class="p-3 text-center">
+                    <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        placeholder="0"
+                        value="${existingScore}"
+                        data-student-id="${student._id}"
+                        data-subject="${subjectName}"
+                        class="w-16 text-center bg-white border border-slate-200 rounded p-1 text-xs">
+                </td>
+            `;
         });
-        
-        html += `</tr>`;
+
+        tr.innerHTML = `
+            <td class="p-3 pl-4 font-bold text-brand-900">
+                ${student.regNo || student.student_id || '—'}
+            </td>
+
+            <td class="p-3">
+                ${student.name || '—'}
+            </td>
+
+            ${subjectCells}
+
+            <td class="p-3 text-center">
+                <button
+                    class="text-xs font-bold text-brand-800 hover:bg-brand-50 px-2 py-1 rounded">
+                    View
+                </button>
+            </td>
+        `;
+
+        tbody.appendChild(tr);
     });
-    
-    document.getElementById('gradebookTableBody').innerHTML = html;
-    
+
     // Add event listeners to track changes
-    const inputs = document.querySelectorAll('#gradebookTableBody input[type="number"]');
-    inputs.forEach(input => {
-        input.addEventListener('change', function() {
-            updateGradebookProgress();
-        });
-        input.addEventListener('input', function() {
-            updateGradebookProgress();
-        });
+    document.querySelectorAll(
+        '#gradebookTableBody input[type="number"]'
+    ).forEach(input => {
+        input.addEventListener('input', updateGradebookProgress);
+        input.addEventListener('change', updateGradebookProgress);
     });
+
+    updateGradebookProgress();
 }
     // ============ MODAL FUNCTIONS ============
     function openQuestionModal() {
