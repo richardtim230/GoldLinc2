@@ -2732,112 +2732,108 @@ function openAssignmentModal() {
             await actionTask();
         }
     }
-
-    async function saveGradebookChanges(event) {
-const button = event ? event.target : null;
-
-if (button) {
-    setButtonLoading(button, true);
-}
-
-try {
-    const classId =
-        document.getElementById('gradebookClassFilter')?.value;
-
-    const session =
-        document.getElementById('gb-session-select')?.value;
-
-    const term =
-        document.getElementById('gb-term-select')?.value;
-
-    const resultType =
-        document.getElementById('gb-result-type-select')?.value;
-
-    if (!classId) {
-        throw new Error('Please select a class');
-    }
-
-    const subjects = subjectsByClass[classId] || [];
-    const tbody = document.getElementById('gradebookTableBody');
-
-    const rows = tbody.querySelectorAll('tr');
-
-    const resultsBySubject = {};
-
-    subjects.forEach(subject => {
-        const subjectName = subject.name || subject;
-        resultsBySubject[subjectName] = [];
-    });
-
-    rows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-
-        const studentId = cells[0]?.textContent.trim();
-        const studentName = cells[1]?.textContent.trim();
-
-        const inputs = row.querySelectorAll('input[type="number"]');
-
-        inputs.forEach((input, index) => {
-            const score = input.value.trim();
-
-            if (score !== '') {
-                const subjectName =
-                    subjects[index].name || subjects[index];
-
-                resultsBySubject[subjectName].push({
-                    student_id: studentId,
-                    student_name: studentName,
-                    score: Number(score),
-                    grade: calculateGrade(Number(score))
-                });
-            }
-        });
-    });
-
-    for (const [subjectName, results] of Object.entries(resultsBySubject)) {
-
-        if (!results.length) continue;
-
-        await fetch(`${API_BASE_URL}/api/results/upload`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                session,
-                term,
-                class: classId,
-                subject: subjectName,
-                resultType,
-                results
-            })
-        });
-    }
-
-    showCustomModal({
-        title: 'Success',
-        message: 'Results uploaded successfully',
-        type: 'alert',
-        icon: '✅'
-    });
-
-} catch (err) {
-
-    showCustomModal({
-        title: 'Upload Failed',
-        message: err.message,
-        type: 'alert',
-        icon: '❌'
-    });
-
-} finally {
+async function saveGradebookChanges(event) {
+    const button = event ? event.target : null;
 
     if (button) {
-        setButtonLoading(button, false);
+        setButtonLoading(button, true);
     }
 
-}
+    try {
+        const classId = document.getElementById('gradebookClassFilter')?.value;
+        const session = document.getElementById('gb-session-select')?.value;
+        const term = document.getElementById('gb-term-select')?.value;
+        const resultType = document.getElementById('gb-result-type-select')?.value;
 
+        // ✅ VALIDATION: Check all required fields
+        if (!classId || classId.trim() === '') {
+            throw new Error('Please select a class');
+        }
+        if (!session || session.trim() === '') {
+            throw new Error('Please select a session');
+        }
+        if (!term || term.trim() === '') {
+            throw new Error('Please select a term');
+        }
+        if (!resultType || resultType.trim() === '') {
+            throw new Error('Please select a result type');
+        }
+
+        const subjects = subjectsByClass[classId] || [];
+        const tbody = document.getElementById('gradebookTableBody');
+        const rows = tbody.querySelectorAll('tr');
+
+        const resultsBySubject = {};
+
+        subjects.forEach(subject => {
+            const subjectName = subject.name || subject;
+            resultsBySubject[subjectName] = [];
+        });
+
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            const studentId = cells[0]?.textContent.trim();
+            const studentName = cells[1]?.textContent.trim();
+
+            const inputs = row.querySelectorAll('input[type="number"]');
+
+            inputs.forEach((input, index) => {
+                const score = input.value.trim();
+
+                if (score !== '') {
+                    const subjectName = subjects[index].name || subjects[index];
+
+                    resultsBySubject[subjectName].push({
+                        student_id: studentId,
+                        student_name: studentName,
+                        score: Number(score),
+                        grade: calculateGrade(Number(score))
+                    });
+                }
+            });
+        });
+
+        for (const [subjectName, results] of Object.entries(resultsBySubject)) {
+            if (!results.length) continue;
+
+            const response = await fetch(`${API_BASE_URL}/api/results/upload`, {
+                method: 'POST',
+                headers: authHeaders(),
+                body: JSON.stringify({
+                    session,
+                    term,
+                    class: classId,
+                    subject: subjectName,
+                    resultType,
+                    results
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `Failed to upload results for ${subjectName}`);
+            }
+        }
+
+        showCustomModal({
+            title: 'Success',
+            message: 'Results uploaded successfully',
+            type: 'alert',
+            icon: '✅'
+        });
+
+    } catch (err) {
+        showCustomModal({
+            title: 'Upload Failed',
+            message: err.message,
+            type: 'alert',
+            icon: '❌'
+        });
+    } finally {
+        if (button) {
+            setButtonLoading(button, false);
+        }
+    }
 }
 </script>
 </body>
