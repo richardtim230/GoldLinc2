@@ -1680,10 +1680,13 @@ async function viewAssignment(assignmentId) {
         `;
         return;
     }
-
     students.forEach(student => {
         const tr = document.createElement('tr');
-        tr.setAttribute('data-student-id', student._id);
+        
+        // Use student._id for MongoDB ID
+        const studentMongoId = student._id || student.id;  // Try _id first
+        
+        tr.setAttribute('data-student-id', studentMongoId);
 
         let subjectCells = '';
 
@@ -1697,7 +1700,7 @@ async function viewAssignment(assignmentId) {
                         min="0"
                         max="100"
                         placeholder="0"
-                        data-student-id="${student._id}"
+                        data-student-id="${studentMongoId}"
                         data-subject="${subjectName}"
                         class="w-16 text-center bg-white border border-slate-200 rounded p-1 text-xs">
                 </td>
@@ -1717,7 +1720,7 @@ async function viewAssignment(assignmentId) {
 
             <td class="p-3 text-center">
                 <button
-                    onclick="syncStudentResults('${student._id}', '${student.name}')"
+                    onclick="syncStudentResults('${studentMongoId}', '${student.name}')"
                     class="text-xs font-bold text-brand-800 hover:bg-brand-50 px-2 py-1 rounded transition">
                     Sync
                 </button>
@@ -1727,7 +1730,6 @@ async function viewAssignment(assignmentId) {
         tbody.appendChild(tr);
     });
 
-    // Add event listeners to track changes
     document.querySelectorAll(
         '#gradebookTableBody input[type="number"]'
     ).forEach(input => {
