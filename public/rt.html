@@ -1769,7 +1769,7 @@ async function syncStudentResults(studentId, studentName) {
         console.log('Syncing results:', { studentId, studentName, classId, sessionName, termName, resultType });
 
         // CRITICAL: Use /api/teacher (not /api/teachers) and MongoDB student _id
-        const resultsUrl = `${API_BASE_URL}/api/teacher/${teacher._id}/results?` +
+        const resultsUrl = `${API_BASE_URL}/api/teachers/${teacher._id}/results?` +
             `class=${encodeURIComponent(classId)}&` +
             `student=${encodeURIComponent(studentId)}`;
 
