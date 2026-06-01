@@ -1743,10 +1743,10 @@ async function syncStudentResults(studentId, studentName) {
     try {
         const classId = document.getElementById('gradebookClassFilter')?.value;
         const className = document.querySelector('#gradebookClassFilter option:checked')?.textContent || classId;
-        const session = document.getElementById('gb-session-select')?.value;
-        const term = document.getElementById('gb-term-select')?.value;
+        const sessionName = document.getElementById('gb-session-select')?.value;
+        const termName = document.getElementById('gb-term-select')?.value;
 
-        if (!session || !term) {
+        if (!sessionName || !termName) {
             await showCustomModal({
                 title: 'Selection Required',
                 message: 'Please select Session and Term first',
@@ -1756,70 +1756,86 @@ async function syncStudentResults(studentId, studentName) {
             return;
         }
 
-        console.log('Syncing results for student:', { studentId, studentName, className, session, term });
+        console.log('Syncing results for student:', { studentId, studentName, className, sessionName, termName });
 
-        // Fetch results for this specific student using the student dashboard endpoint
+        // Step 1: Convert session and term names to ObjectIds
+        let sessionId = sessionName;
+        let termId = termName;
+
+        // Try to fetch session object if it's a name
+        if (sessionName && sessionName.length > 10) {
+            // It's likely a name, fetch the ID
+            try {
+                const sessionRes = await fetch(
+                    `${API_BASE_URL}/api/sessions?name=${encodeURIComponent(sessionName)}`,
+                    { headers: authHeaders() }
+                );
+                if (sessionRes.ok) {
+                    const sessions = await sessionRes.json();
+                    if (Array.isArray(sessions) && sessions.length > 0) {
+                        sessionId = sessions[0]._id;
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not fetch session ID:', e);
+            }
+        }
+
+        // Try to fetch term object if it's a name
+        if (termName && termName.length > 10) {
+            // It's likely a name, fetch the ID
+            try {
+                const termRes = await fetch(
+                    `${API_BASE_URL}/api/terms?name=${encodeURIComponent(termName)}`,
+                    { headers: authHeaders() }
+                );
+                if (termRes.ok) {
+                    const terms = await termRes.json();
+                    if (Array.isArray(terms) && terms.length > 0) {
+                        termId = terms[0]._id;
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not fetch term ID:', e);
+            }
+        }
+
+        console.log('Converted IDs:', { sessionId, termId });
+
+        // Step 2: Fetch results using the general endpoint with filters
         const resultsRes = await fetch(
-            `${API_BASE_URL}/api/results/dashboard/student/${studentId}?sessionId=${encodeURIComponent(session)}&termId=${encodeURIComponent(term)}`,
+            `${API_BASE_URL}/api/results?class=${encodeURIComponent(className)}&session=${encodeURIComponent(sessionName)}&term=${encodeURIComponent(termName)}`,
             { headers: authHeaders() }
         );
 
         if (!resultsRes.ok) {
-            // Fallback: try the general results endpoint
-            const fallbackRes = await fetch(
-                `${API_BASE_URL}/api/results?class=${encodeURIComponent(className)}&session=${encodeURIComponent(session)}&term=${encodeURIComponent(term)}`,
-                { headers: authHeaders() }
-            );
-
-            if (!fallbackRes.ok) {
-                throw new Error('Failed to fetch results');
-            }
-
-            const allResults = await fallbackRes.json();
-            const studentResults = Array.isArray(allResults) ? allResults : [];
-
-            // Filter for this specific student
-            const studentSpecificResults = studentResults.filter(r => {
-                const rStudentId = r.student?._id || r.student;
-                return rStudentId === studentId;
-            });
-
-            if (studentSpecificResults.length === 0) {
-                await showCustomModal({
-                    title: 'No Results Found',
-                    message: `No results found for ${studentName} in the selected session and term`,
-                    type: 'alert',
-                    icon: 'ℹ️'
-                });
-                return;
-            }
-
-            updateStudentRow(studentId, studentName, studentSpecificResults);
-            return;
+            throw new Error('Failed to fetch results');
         }
 
-        const resultsData = await resultsRes.json();
-        const subjects = resultsData.results || [];
+        const allResults = await resultsRes.json();
+        const studentResults = Array.isArray(allResults) ? allResults : [];
 
-        console.log('Fetched student results:', resultsData);
+        console.log('All fetched results:', studentResults);
 
-        if (subjects.length === 0) {
+        // Filter for this specific student
+        const studentSpecificResults = studentResults.filter(r => {
+            const rStudentId = r.student?._id || r.student;
+            return rStudentId === studentId;
+        });
+
+        console.log('Student specific results:', studentSpecificResults);
+
+        if (studentSpecificResults.length === 0) {
             await showCustomModal({
                 title: 'No Results Found',
-                message: `No results found for ${studentName} in the selected session and term`,
+                message: `No results found for ${studentName} in ${sessionName} - ${termName}`,
                 type: 'alert',
                 icon: 'ℹ️'
             });
             return;
         }
 
-        // Transform to match our expected format
-        const studentSpecificResults = subjects.map(r => ({
-            subject: { name: r.subject, _id: r.subject },
-            exam_score: r.total,
-            score: r.total
-        }));
-
+        // Update the student row with results
         updateStudentRow(studentId, studentName, studentSpecificResults);
 
     } catch (err) {
