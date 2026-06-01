@@ -2755,6 +2755,26 @@ async function saveGradebookChanges(event) {
         if (!term) throw new Error('Please select a term');
         if (!resultType) throw new Error('Please select a result type');
 
+        console.log('Fetching student data for class:', className);
+        
+        // Step 1: Fetch full student data for the class
+        const studentRes = await fetch(`${API_BASE_URL}/api/student?class=${encodeURIComponent(className)}`, {
+            headers: authHeaders()
+        });
+        
+        if (!studentRes.ok) {
+            throw new Error('Failed to fetch student data');
+        }
+        
+        const studentData = await studentRes.json();
+        const fullStudents = Array.isArray(studentData) ? studentData : (studentData.students || []);
+
+        if (!fullStudents || fullStudents.length === 0) {
+            throw new Error('No student data found for this class');
+        }
+
+        console.log('Fetched students:', fullStudents);
+
         const subjects = subjectsByClass[classId] || [];
         if (subjects.length === 0) {
             throw new Error('No subjects found for the selected class');
@@ -2775,30 +2795,51 @@ async function saveGradebookChanges(event) {
             resultsBySubject[subjectName] = [];
         });
 
-        rows.forEach(row => {
+        // Step 2: Collect grades from gradebook table
+        rows.forEach((row, rowIdx) => {
             const cells = row.querySelectorAll('td');
-            const studentId = cells[0]?.textContent.trim();
-            const studentName = cells[1]?.textContent.trim();
+            const studentNameCell = cells[1];
+            
+            if (!studentNameCell) return;
 
+            const studentName = studentNameCell.textContent.trim();
+
+            // Find the full student object from fetched data
+            const fullStudent = fullStudents.find(s => {
+                const fullName = `${s.firstname || ''} ${s.surname || ''}`.trim();
+                return fullName === studentName || s.name === studentName;
+            });
+
+            if (!fullStudent) {
+                console.warn('Full student data not found for:', studentName);
+                return;
+            }
+
+            // Get all input fields in this row (scores for each subject)
             const inputs = row.querySelectorAll('input[type="number"]');
 
-            inputs.forEach((input, index) => {
-                const score = input.value.trim();
+            inputs.forEach((input, inputIdx) => {
+                if (inputIdx < subjects.length) {
+                    const score = input.value.trim();
+                    
+                    // Only add if score is entered
+                    if (score !== '' && score !== null && score !== undefined) {
+                        const subjectName = subjects[inputIdx].name || subjects[inputIdx];
 
-                if (score !== '' && score !== null && score !== undefined) {
-                    const subjectName = subjects[index].name || subjects[index];
-
-                    resultsBySubject[subjectName].push({
-                        student_id: studentId,
-                        student_name: studentName,
-                        score: parseInt(score) || 0,
-                        grade: calculateGrade(parseInt(score) || 0),
-                        remarks: '',
-                        resultType: resultType
-                    });
+                        resultsBySubject[subjectName].push({
+                            student_id: fullStudent.student_id || fullStudent._id,
+                            student_name: studentName,
+                            score: parseInt(score) || 0,
+                            grade: calculateGrade(parseInt(score) || 0),
+                            remarks: '',
+                            resultType: resultType
+                        });
+                    }
                 }
             });
         });
+
+        console.log('Results by subject:', resultsBySubject);
 
         // Check if any results were entered
         const hasAnyResults = Object.values(resultsBySubject).some(arr => arr.length > 0);
@@ -2806,11 +2847,11 @@ async function saveGradebookChanges(event) {
             throw new Error('Please enter at least one score before saving');
         }
 
+        // Step 3: Send results for each subject
         let totalUploaded = 0;
         let totalUpdated = 0;
         const failedSubjects = [];
 
-        // Send results for each subject
         for (const [subjectName, subjectResults] of Object.entries(resultsBySubject)) {
             if (subjectResults.length === 0) continue;
 
@@ -2824,25 +2865,33 @@ async function saveGradebookChanges(event) {
                 upsert: true
             };
 
+            console.log(`Sending results for ${subjectName}:`, payload);
+
             try {
-                let response = await fetch(`${API_BASE_URL}/api/results/upsert`, {
+                // Try the upsert endpoint first
+                let res = await fetch(`${API_BASE_URL}/api/results/upsert`, {
                     method: 'POST',
                     headers: authHeaders(),
                     body: JSON.stringify(payload)
                 });
 
-                // Fallback to upload endpoint if upsert doesn't exist
-                if (response.status === 404) {
-                    response = await fetch(`${API_BASE_URL}/api/results/upload`, {
+                // If upsert endpoint doesn't exist, fall back to regular upload
+                if (res.status === 404) {
+                    console.log('Upsert endpoint not found, trying regular upload...');
+                    res = await fetch(`${API_BASE_URL}/api/results/upload`, {
                         method: 'POST',
                         headers: authHeaders(),
                         body: JSON.stringify(payload)
                     });
                 }
 
-                const data = await response.json();
+                const data = await res.json();
+                console.log(`Response for ${subjectName}:`, data);
 
-                if (data.success || response.ok) {
+                if (data.success) {
+                    totalUploaded += data.inserted || 0;
+                    totalUpdated += data.updated || 0;
+                } else if (res.ok && (data.inserted || data.updated)) {
                     totalUploaded += data.inserted || 0;
                     totalUpdated += data.updated || 0;
                 } else {
@@ -2853,11 +2902,14 @@ async function saveGradebookChanges(event) {
             }
         }
 
-        // Show results
+        // Step 4: Show results
         if (totalUploaded > 0 || totalUpdated > 0) {
             let message = '✅ Success! ';
             if (totalUploaded > 0) message += `Created ${totalUploaded} new result(s). `;
             if (totalUpdated > 0) message += `Updated ${totalUpdated} existing result(s).`;
+            if (failedSubjects.length > 0) {
+                message += `\n⚠️ Failed subjects:\n${failedSubjects.slice(0, 3).join('\n')}`;
+            }
 
             showCustomModal({
                 title: 'Upload Successful',
@@ -2866,10 +2918,11 @@ async function saveGradebookChanges(event) {
                 icon: '✅'
             });
         } else {
-            throw new Error('No results were uploaded. ' + (failedSubjects.length > 0 ? failedSubjects[0] : ''));
+            throw new Error(`All uploads failed:\n${failedSubjects.join('\n')}`);
         }
 
     } catch (err) {
+        console.error('Error uploading results:', err);
         showCustomModal({
             title: 'Upload Failed',
             message: err.message,
@@ -2882,6 +2935,7 @@ async function saveGradebookChanges(event) {
         }
     }
 }
+
 </script>
 </body>
 </html>
