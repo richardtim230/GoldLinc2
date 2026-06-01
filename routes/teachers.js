@@ -199,18 +199,18 @@ router.get('/subjects', teacherAuth, async (req, res) => {
   res.json(subjects);
 });
 
+// In routes/teachers.js - should look like this:
 router.get('/students', teacherAuth, async (req, res) => {
   const { classId } = req.query;
   if (!classId) return res.status(400).json({ error: "classId is required" });
 
-  // Find the class by ObjectId
   const cls = await Class.findById(classId);
   if (!cls) return res.status(404).json({ error: "Class not found" });
 
-  // Find students by class name (string)
   const students = await Student.find({ class: cls.name });
   res.json(students.map(stu => ({
-    id: stu._id,
+    _id: stu._id,              // ← Make sure this is included
+    id: stu._id,               // Also include as 'id' for compatibility
     name: `${stu.firstname} ${stu.surname}`,
     regNo: stu.regNo,
     email: stu.studentEmail
