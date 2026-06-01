@@ -230,7 +230,7 @@ function populateReport() {
       <td style="text-align:left;">${r.subject || '-'}</td>
       <td class="tc">${r.ca1_score || '-'}</td>
       <td class="tc">${r.ca2_score || '-'}</td>
-      <td class="tc">${r.midterm_score || '-'}</td>
+      
       <td class="tc">${r.exam_score || '-'}</td>
       <td class="tc" style="font-weight:700;">${r.total || 0}</td>
       <td class="tc" style="font-weight:700;">${r.grade || '-'}</td>
