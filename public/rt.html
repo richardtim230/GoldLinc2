@@ -1639,8 +1639,6 @@ async function viewAssignment(assignmentId) {
 
  async function renderGradebook() {
     const classId = document.getElementById('gradebookClassFilter')?.value;
-    const session = document.getElementById('gb-session-select')?.value;
-    const term = document.getElementById('gb-term-select')?.value;
     const tbody = document.getElementById('gradebookTableBody');
 
     if (!tbody) return;
@@ -1683,54 +1681,14 @@ async function viewAssignment(assignmentId) {
         return;
     }
 
-    // Fetch existing results if session and term are selected
-    let existingResults = {};
-    if (session && term) {
-        try {
-            const className = document.querySelector('#gradebookClassFilter option:checked')?.textContent || classId;
-            
-            console.log('Fetching results for:', { className, session, term });
-            
-            // Fetch results for this class/session/term
-            const resultsRes = await fetch(
-                `${API_BASE_URL}/api/results?class=${encodeURIComponent(className)}&session=${encodeURIComponent(session)}&term=${encodeURIComponent(term)}`,
-                { headers: authHeaders() }
-            );
-            
-            if (resultsRes.ok) {
-                const resultsData = await resultsRes.json();
-                const resultsList = Array.isArray(resultsData) ? resultsData : [];
-                
-                console.log('Fetched results:', resultsList);
-                
-                // Organize results by student and subject
-                resultsList.forEach(result => {
-                    const studentId = result.student?._id || result.student;
-                    const subjectName = result.subject?.name || result.subject;
-                    const key = `${studentId}-${subjectName}`;
-                    
-                    // Store the total score (use exam_score, then score, then 0)
-                    const totalScore = result.exam_score || result.score || 0;
-                    existingResults[key] = totalScore;
-                });
-                
-                console.log('Organized existing results:', existingResults);
-            }
-        } catch (err) {
-            console.error('Error fetching existing results:', err);
-            // Continue without existing results
-        }
-    }
-
     students.forEach(student => {
         const tr = document.createElement('tr');
+        tr.setAttribute('data-student-id', student._id);
 
         let subjectCells = '';
 
         subjects.forEach(subject => {
             const subjectName = subject.name || subject;
-            const key = `${student._id}-${subjectName}`;
-            const existingScore = existingResults[key] !== undefined ? existingResults[key] : '';
             
             subjectCells += `
                 <td class="p-3 text-center">
@@ -1739,7 +1697,6 @@ async function viewAssignment(assignmentId) {
                         min="0"
                         max="100"
                         placeholder="0"
-                        value="${existingScore}"
                         data-student-id="${student._id}"
                         data-subject="${subjectName}"
                         class="w-16 text-center bg-white border border-slate-200 rounded p-1 text-xs">
@@ -1760,8 +1717,9 @@ async function viewAssignment(assignmentId) {
 
             <td class="p-3 text-center">
                 <button
-                    class="text-xs font-bold text-brand-800 hover:bg-brand-50 px-2 py-1 rounded">
-                    View
+                    onclick="syncStudentResults('${student._id}', '${student.name}')"
+                    class="text-xs font-bold text-brand-800 hover:bg-brand-50 px-2 py-1 rounded transition">
+                    Sync
                 </button>
             </td>
         `;
@@ -1779,6 +1737,105 @@ async function viewAssignment(assignmentId) {
 
     updateGradebookProgress();
 }
+
+// Sync function to retrieve and update student results
+async function syncStudentResults(studentId, studentName) {
+    try {
+        const classId = document.getElementById('gradebookClassFilter')?.value;
+        const className = document.querySelector('#gradebookClassFilter option:checked')?.textContent || classId;
+        const session = document.getElementById('gb-session-select')?.value;
+        const term = document.getElementById('gb-term-select')?.value;
+
+        if (!session || !term) {
+            await showCustomModal({
+                title: 'Selection Required',
+                message: 'Please select Session and Term first',
+                type: 'alert',
+                icon: '⚠️'
+            });
+            return;
+        }
+
+        console.log('Syncing results for student:', { studentId, studentName, className, session, term });
+
+        // Fetch results for this specific student
+        const resultsRes = await fetch(
+            `${API_BASE_URL}/api/results?class=${encodeURIComponent(className)}&session=${encodeURIComponent(session)}&term=${encodeURIComponent(term)}`,
+            { headers: authHeaders() }
+        );
+
+        if (!resultsRes.ok) {
+            throw new Error('Failed to fetch results');
+        }
+
+        const resultsList = await resultsRes.json();
+        const studentResults = Array.isArray(resultsList) ? resultsList : [];
+
+        console.log('Fetched student results:', studentResults);
+
+        // Filter results for this specific student
+        const studentSpecificResults = studentResults.filter(r => {
+            const rStudentId = r.student?._id || r.student;
+            return rStudentId === studentId;
+        });
+
+        if (studentSpecificResults.length === 0) {
+            await showCustomModal({
+                title: 'No Results Found',
+                message: `No results found for ${studentName} in the selected session and term`,
+                type: 'alert',
+                icon: 'ℹ️'
+            });
+            return;
+        }
+
+        // Update input fields for this student
+        const studentRow = document.querySelector(`tr[data-student-id="${studentId}"]`);
+        if (studentRow) {
+            const inputs = studentRow.querySelectorAll('input[type="number"]');
+            
+            inputs.forEach(input => {
+                const subjectName = input.getAttribute('data-subject');
+                
+                // Find result for this subject
+                const result = studentSpecificResults.find(r => {
+                    const rSubjectName = r.subject?.name || r.subject;
+                    return rSubjectName === subjectName;
+                });
+
+                if (result) {
+                    const score = result.exam_score || result.score || 0;
+                    input.value = score;
+                    input.style.backgroundColor = '#e0f2fe';
+                    
+                    // Remove highlight after 2 seconds
+                    setTimeout(() => {
+                        input.style.backgroundColor = '#ffffff';
+                    }, 2000);
+                }
+            });
+
+            updateGradebookProgress();
+
+            await showCustomModal({
+                title: 'Success',
+                message: `✅ Synced ${studentSpecificResults.length} result(s) for ${studentName}`,
+                type: 'alert',
+                icon: '✅'
+            });
+        }
+
+    } catch (err) {
+        console.error('Error syncing results:', err);
+        await showCustomModal({
+            title: 'Sync Failed',
+            message: err.message,
+            type: 'alert',
+            icon: '❌'
+        });
+    }
+}
+    
     // ============ MODAL FUNCTIONS ============
     function openQuestionModal() {
         if (!stemQuillInstance) {
