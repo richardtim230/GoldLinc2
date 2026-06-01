@@ -325,34 +325,37 @@
                     <div class="flex flex-wrap gap-2 shrink-0">
 
     <!-- Session -->
-    <select
-        id="gb-session-select"
-        class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
-        <option value="">Session</option>
-        <option value="2024/2025">2024/2025</option>
-        <option value="2025/2026" selected>2025/2026</option>
-        <option value="2026/2027">2026/2027</option>
-    </select>
+<select
+    id="gb-session-select"
+    required
+    class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
+    <option value="">Session</option>
+    <option value="2024-2025">2024–2025</option>
+    <option value="2025-2026" selected>2025–2026</option>
+    <option value="2026-2027">2026–2027</option>
+</select>
 
     <!-- Term -->
-    <select
-        id="gb-term-select"
-        class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
-        <option value="">Term</option>
-        <option value="First Term">First Term</option>
-        <option value="Second Term">Second Term</option>
-        <option value="Third Term">Third Term</option>
-    </select>
+<select
+    id="gb-term-select"
+    required
+    class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
+    <option value="">Term</option>
+    <option value="FIRST TERM">FIRST TERM</option>
+    <option value="SECOND TERM">SECOND TERM</option>
+    <option value="THIRD TERM">THIRD TERM</option>
+</select>
 
-    <!-- Result Type -->
-    <select
-        id="gb-result-type-select"
-        class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
-        <option value="">Result Type</option>
-        <option value="CA1">CA1</option>
-        <option value="CA2">CA2</option>
-        <option value="Exam" selected>Exam</option>
-    </select>
+<!-- Result Type -->
+<select
+    id="gb-result-type-select"
+    required
+    class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
+    <option value="">Result Type</option>
+    <option value="exam">Examination</option>
+    <option value="ca1">Continuous Assessment 1</option>
+    <option value="ca2">Continuous Assessment 2</option>
+</select>
 
     <!-- Class -->
     <select
