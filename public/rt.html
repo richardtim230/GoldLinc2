@@ -1758,28 +1758,52 @@ async function syncStudentResults(studentId, studentName) {
 
         console.log('Syncing results for student:', { studentId, studentName, className, session, term });
 
-        // Fetch results for this specific student
+        // Fetch results for this specific student using the student dashboard endpoint
         const resultsRes = await fetch(
-            `${API_BASE_URL}/api/results?class=${encodeURIComponent(className)}&session=${encodeURIComponent(session)}&term=${encodeURIComponent(term)}`,
+            `${API_BASE_URL}/api/results/dashboard/student/${studentId}?sessionId=${encodeURIComponent(session)}&termId=${encodeURIComponent(term)}`,
             { headers: authHeaders() }
         );
 
         if (!resultsRes.ok) {
-            throw new Error('Failed to fetch results');
+            // Fallback: try the general results endpoint
+            const fallbackRes = await fetch(
+                `${API_BASE_URL}/api/results?class=${encodeURIComponent(className)}&session=${encodeURIComponent(session)}&term=${encodeURIComponent(term)}`,
+                { headers: authHeaders() }
+            );
+
+            if (!fallbackRes.ok) {
+                throw new Error('Failed to fetch results');
+            }
+
+            const allResults = await fallbackRes.json();
+            const studentResults = Array.isArray(allResults) ? allResults : [];
+
+            // Filter for this specific student
+            const studentSpecificResults = studentResults.filter(r => {
+                const rStudentId = r.student?._id || r.student;
+                return rStudentId === studentId;
+            });
+
+            if (studentSpecificResults.length === 0) {
+                await showCustomModal({
+                    title: 'No Results Found',
+                    message: `No results found for ${studentName} in the selected session and term`,
+                    type: 'alert',
+                    icon: 'ℹ️'
+                });
+                return;
+            }
+
+            updateStudentRow(studentId, studentName, studentSpecificResults);
+            return;
         }
 
-        const resultsList = await resultsRes.json();
-        const studentResults = Array.isArray(resultsList) ? resultsList : [];
+        const resultsData = await resultsRes.json();
+        const subjects = resultsData.results || [];
 
-        console.log('Fetched student results:', studentResults);
+        console.log('Fetched student results:', resultsData);
 
-        // Filter results for this specific student
-        const studentSpecificResults = studentResults.filter(r => {
-            const rStudentId = r.student?._id || r.student;
-            return rStudentId === studentId;
-        });
-
-        if (studentSpecificResults.length === 0) {
+        if (subjects.length === 0) {
             await showCustomModal({
                 title: 'No Results Found',
                 message: `No results found for ${studentName} in the selected session and term`,
@@ -1789,41 +1813,14 @@ async function syncStudentResults(studentId, studentName) {
             return;
         }
 
-        // Update input fields for this student
-        const studentRow = document.querySelector(`tr[data-student-id="${studentId}"]`);
-        if (studentRow) {
-            const inputs = studentRow.querySelectorAll('input[type="number"]');
-            
-            inputs.forEach(input => {
-                const subjectName = input.getAttribute('data-subject');
-                
-                // Find result for this subject
-                const result = studentSpecificResults.find(r => {
-                    const rSubjectName = r.subject?.name || r.subject;
-                    return rSubjectName === subjectName;
-                });
+        // Transform to match our expected format
+        const studentSpecificResults = subjects.map(r => ({
+            subject: { name: r.subject, _id: r.subject },
+            exam_score: r.total,
+            score: r.total
+        }));
 
-                if (result) {
-                    const score = result.exam_score || result.score || 0;
-                    input.value = score;
-                    input.style.backgroundColor = '#e0f2fe';
-                    
-                    // Remove highlight after 2 seconds
-                    setTimeout(() => {
-                        input.style.backgroundColor = '#ffffff';
-                    }, 2000);
-                }
-            });
-
-            updateGradebookProgress();
-
-            await showCustomModal({
-                title: 'Success',
-                message: `✅ Synced ${studentSpecificResults.length} result(s) for ${studentName}`,
-                type: 'alert',
-                icon: '✅'
-            });
-        }
+        updateStudentRow(studentId, studentName, studentSpecificResults);
 
     } catch (err) {
         console.error('Error syncing results:', err);
@@ -1833,6 +1830,55 @@ async function syncStudentResults(studentId, studentName) {
             type: 'alert',
             icon: '❌'
         });
+    }
+}
+
+// Helper function to update student row with results
+function updateStudentRow(studentId, studentName, results) {
+    const studentRow = document.querySelector(`tr[data-student-id="${studentId}"]`);
+    if (studentRow) {
+        const inputs = studentRow.querySelectorAll('input[type="number"]');
+        let updatedCount = 0;
+        
+        inputs.forEach(input => {
+            const subjectName = input.getAttribute('data-subject');
+            
+            // Find result for this subject
+            const result = results.find(r => {
+                const rSubjectName = r.subject?.name || r.subject;
+                return rSubjectName === subjectName;
+            });
+
+            if (result) {
+                const score = result.exam_score || result.score || 0;
+                input.value = score;
+                input.style.backgroundColor = '#e0f2fe';
+                updatedCount++;
+                
+                // Remove highlight after 2 seconds
+                setTimeout(() => {
+                    input.style.backgroundColor = '#ffffff';
+                }, 2000);
+            }
+        });
+
+        updateGradebookProgress();
+
+        if (updatedCount > 0) {
+            showCustomModal({
+                title: 'Success',
+                message: `✅ Synced ${updatedCount} result(s) for ${studentName}`,
+                type: 'alert',
+                icon: '✅'
+            });
+        } else {
+            showCustomModal({
+                title: 'No Scores Found',
+                message: `No scores found for ${studentName} in selected subjects`,
+                type: 'alert',
+                icon: 'ℹ️'
+            });
+        }
     }
 }
     
