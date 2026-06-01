@@ -9,6 +9,7 @@ const DraftResult = require('../models/DraftResult');
 const Class = require('../models/Class');
 const Subject = require('../models/Subject');
 const Student = require('../models/Student');
+const Result = require('../models/Result');
 const teacherAuth = require('../middleware/teacherAuth'); // Should set req.staff
 const ResultCBT = require('../models/ResultCBT');
 const CBT = require('../models/CBTExam'); // If your results reference Exam
@@ -260,7 +261,81 @@ router.get('/:id/notifications', teacherAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+/**
+ * GET: Teacher fetch their uploaded results filtered by class and student
+ * GET /api/teacher/:id/results?class={classId}&student={studentId}
+ * Used by gradebook to sync student results
+ */
+router.get('/:id/results', teacherAuth, async (req, res) => {
+  try {
+    const teacherId = req.params.id;
+    const { class: classId, student: studentId } = req.query;
 
+    if (!classId || !studentId) {
+      return res.status(400).json({ 
+        error: 'Missing required query parameters: class and student',
+        results: [] 
+      });
+    }
+
+    // Query results by teacher (createdBy), class, and student
+    const query = { 
+      createdBy: teacherId,
+      class: classId,
+      student: studentId  // MongoDB _id of student
+    };
+
+    console.log('Teacher results query:', query);
+
+    const results = await Result.find(query)
+      .populate('student', 'name regNo student_id')
+      .populate('subject', 'name')
+      .populate('class', 'name')
+      .populate('session', 'name')
+      .populate('term', 'name')
+      .sort({ createdAt: -1 });
+
+    console.log(`Found ${results.length} results for query:`, query);
+
+    if (!results.length) {
+      return res.status(404).json({ 
+        error: `No results found for this student in class ${classId}`,
+        results: [] 
+      });
+    }
+
+    // Transform results to expose all score fields
+    const transformedResults = results.map(r => ({
+      _id: r._id,
+      student: r.student,
+      subject: r.subject,
+      class: r.class,
+      session: r.session,
+      term: r.term,
+      ca1_score: r.ca1_score || 0,
+      ca2_score: r.ca2_score || 0,
+      midterm_score: r.midterm_score || 0,
+      exam_score: r.exam_score || 0,
+      score: r.score || 0,
+      grade: r.grade || '',
+      remarks: r.remarks || '',
+      status: r.status,
+      createdAt: r.createdAt
+    }));
+
+    res.json({ 
+      results: transformedResults,
+      count: transformedResults.length
+    });
+
+  } catch (err) {
+    console.error('Error fetching teacher results:', err);
+    res.status(500).json({ 
+      error: err.message,
+      results: [] 
+    });
+  }
+});
 // --- DRAFT RESULTS ---
 // GET /api/teachers/:id/draft-results
 router.get('/:id/draft-results', teacherAuth, async (req, res) => {
