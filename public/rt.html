@@ -1738,116 +1738,110 @@ async function viewAssignment(assignmentId) {
     updateGradebookProgress();
 }
 
-// Sync function to retrieve and update student results
 async function syncStudentResults(studentId, studentName) {
     try {
         const classId = document.getElementById('gradebookClassFilter')?.value;
-        const className = document.querySelector('#gradebookClassFilter option:checked')?.textContent || classId;
         const sessionName = document.getElementById('gb-session-select')?.value;
         const termName = document.getElementById('gb-term-select')?.value;
+        const resultType = document.getElementById('gb-result-type-select')?.value;
 
-        if (!sessionName || !termName) {
+        // Validate selections
+        if (!classId || !sessionName || !termName || !resultType) {
             await showCustomModal({
                 title: 'Selection Required',
-                message: 'Please select Session and Term first',
+                message: 'Please select Class, Session, Term, and Result Type',
                 type: 'alert',
                 icon: '⚠️'
             });
             return;
         }
 
-        console.log('Syncing results for student:', { studentId, studentName, className, sessionName, termName });
-
-        // Step 1: Convert session and term names to ObjectIds
-        let sessionId = sessionName;
-        let termId = termName;
-
-        // Try to fetch session object if it's a name
-        if (sessionName && sessionName.length > 10) {
-            // It's likely a name, fetch the ID
-            try {
-                const sessionRes = await fetch(
-                    `${API_BASE_URL}/api/sessions?name=${encodeURIComponent(sessionName)}`,
-                    { headers: authHeaders() }
-                );
-                if (sessionRes.ok) {
-                    const sessions = await sessionRes.json();
-                    if (Array.isArray(sessions) && sessions.length > 0) {
-                        sessionId = sessions[0]._id;
-                    }
-                }
-            } catch (e) {
-                console.warn('Could not fetch session ID:', e);
-            }
+        if (!teacher || !teacher._id) {
+            await showCustomModal({
+                title: 'Error',
+                message: 'Teacher profile not loaded. Please refresh the page.',
+                type: 'alert',
+                icon: '❌'
+            });
+            return;
         }
 
-        // Try to fetch term object if it's a name
-        if (termName && termName.length > 10) {
-            // It's likely a name, fetch the ID
-            try {
-                const termRes = await fetch(
-                    `${API_BASE_URL}/api/terms?name=${encodeURIComponent(termName)}`,
-                    { headers: authHeaders() }
-                );
-                if (termRes.ok) {
-                    const terms = await termRes.json();
-                    if (Array.isArray(terms) && terms.length > 0) {
-                        termId = terms[0]._id;
-                    }
-                }
-            } catch (e) {
-                console.warn('Could not fetch term ID:', e);
-            }
-        }
+        console.log('Syncing results:', { studentId, studentName, classId, sessionName, termName, resultType });
 
-        console.log('Converted IDs:', { sessionId, termId });
+        // CRITICAL: Use /api/teacher (not /api/teachers) and MongoDB student _id
+        const resultsUrl = `${API_BASE_URL}/api/teacher/${teacher._id}/results?` +
+            `class=${encodeURIComponent(classId)}&` +
+            `student=${encodeURIComponent(studentId)}`;
 
-        // Step 2: Fetch results using the general endpoint with filters
-        const resultsRes = await fetch(
-            `${API_BASE_URL}/api/results?class=${encodeURIComponent(className)}&session=${encodeURIComponent(sessionName)}&term=${encodeURIComponent(termName)}`,
-            { headers: authHeaders() }
-        );
+        console.log('Fetching from:', resultsUrl);
 
-        if (!resultsRes.ok) {
-            throw new Error('Failed to fetch results');
-        }
-
-        const allResults = await resultsRes.json();
-        const studentResults = Array.isArray(allResults) ? allResults : [];
-
-        console.log('All fetched results:', studentResults);
-
-        // Filter for this specific student
-        const studentSpecificResults = studentResults.filter(r => {
-            const rStudentId = r.student?._id || r.student;
-            return rStudentId === studentId;
-        });
-
-        console.log('Student specific results:', studentSpecificResults);
-
-        if (studentSpecificResults.length === 0) {
+        const res = await fetch(resultsUrl, { headers: authHeaders() });
+        
+        if (!res.ok) {
+            const error = await res.json();
+            console.error('API Error:', error);
             await showCustomModal({
                 title: 'No Results Found',
-                message: `No results found for ${studentName} in ${sessionName} - ${termName}`,
+                message: `No results found for ${studentName}.\n\nMake sure results have been uploaded for this student in this session/term.`,
                 type: 'alert',
                 icon: 'ℹ️'
             });
             return;
         }
 
-        // Update the student row with results
-        updateStudentRow(studentId, studentName, studentSpecificResults);
+        const resultsData = await res.json();
+        if (!resultsData.results || resultsData.results.length === 0) {
+            await showCustomModal({
+                title: 'No Results Found',
+                message: `No results found for ${studentName} in ${sessionName} - ${termName}.`,
+                type: 'alert',
+                icon: 'ℹ️'
+            });
+            return;
+        }
+
+        // Populate gradebook inputs
+        const studentRow = document.querySelector(`tr[data-student-id="${studentId}"]`);
+        if (!studentRow) {
+            console.error('Student row not found:', studentId);
+            return;
+        }
+
+        const inputs = studentRow.querySelectorAll('input[type="number"]');
+        let populatedCount = 0;
+
+        resultsData.results.forEach((result, idx) => {
+            if (idx < inputs.length && inputs[idx]) {
+                let score = 0;
+                if (resultType === 'ca1') score = result.ca1_score;
+                else if (resultType === 'ca2') score = result.ca2_score;
+                else if (resultType === 'exam') score = result.exam_score;
+                
+                inputs[idx].value = Number(score) || 0;
+                populatedCount++;
+            }
+        });
+
+        updateGradebookProgress();
+
+        await showCustomModal({
+            title: '✅ Sync Successful',
+            message: `Loaded ${populatedCount} scores for ${studentName}`,
+            type: 'alert',
+            icon: '✅'
+        });
 
     } catch (err) {
-        console.error('Error syncing results:', err);
+        console.error('Sync error:', err);
         await showCustomModal({
-            title: 'Sync Failed',
-            message: err.message,
+            title: 'Error',
+            message: `Failed to sync: ${err.message}`,
             type: 'alert',
             icon: '❌'
         });
     }
 }
+
 
 // Helper function to update student row with results
 function updateStudentRow(studentId, studentName, results) {
