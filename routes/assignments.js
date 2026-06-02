@@ -5,12 +5,14 @@ const Assignment = require('../models/Assignment');
 const AssignmentSubmission = require('../models/AssignmentSubmission');
 const Student = require('../models/Student');
 const studentAuth = require('../middleware/studentAuth');
-const adminAuth = require('../middleware/adminAuth'); // if you have
+const adminAuth = require('../middleware/adminAuth');
 
 const upload = multer({ storage: multer.memoryStorage() });
 
 const mongoose = require('mongoose');
-const Class = require('../models/Class'); // Assuming you have Class model
+const Class = require('../models/Class');
+
+// ============ SPECIFIC ROUTES (must come before parameterized routes) ============
 
 // --- Get assignments for logged-in student ---
 router.get('/me', studentAuth, async (req, res) => {
@@ -19,7 +21,6 @@ router.get('/me', studentAuth, async (req, res) => {
     const student = await Student.findById(studentId);
 
     let classValue = student.class;
-    // If not ObjectId, treat as name
     if (!mongoose.Types.ObjectId.isValid(student.class)) {
       const classDoc = await Class.findOne({ name: student.class });
       if (!classDoc) return res.status(404).json({ error: 'Class not found for assignments' });
@@ -27,15 +28,18 @@ router.get('/me', studentAuth, async (req, res) => {
     }
 
     const assignments = await Assignment.find({
-  $or: [
-    { assignedTo: studentId },
-    { class: classValue }
-  ]
-}).populate('subject').populate('cbt'); 
+      $or: [
+        { assignedTo: studentId },
+        { class: classValue }
+      ]
+    }).populate('subject').populate('cbt');
+
     const submissions = await AssignmentSubmission.find({ student: studentId });
+    
     const assignmentData = assignments.map(ass => {
       const submission = submissions.find(sub => sub.assignment.toString() === ass._id.toString());
       let status = "Pending", score, feedback, submissionFile, submitted = false, totalScore;
+      
       if (submission) {
         status = submission.status || (submission.score !== undefined ? "Reviewed" : "Submitted");
         score = submission.score;
@@ -44,100 +48,94 @@ router.get('/me', studentAuth, async (req, res) => {
         submissionFile = submission.submissionFile?.url;
         submitted = true;
       }
-      // Check overdue
+      
       if (!submitted && new Date(ass.dueDate) < new Date()) status = "Overdue";
-      // ... inside the assignmentData map in /me route
-return {
-  _id: ass._id,
-  title: ass.title,
-  description: ass.description,
-  type: ass.type,
-  questionsAllocated: ass.questionsAllocated,
-  subject: ass.subject,
-  dueDate: ass.dueDate,
-  cbt: ass.cbt,
-  status,
-  score,
-  totalScore,
-  feedback,
-  submissionFile,
-  submitted
-};
+      
+      return {
+        _id: ass._id,
+        title: ass.title,
+        description: ass.description,
+        type: ass.type,
+        questionsAllocated: ass.questionsAllocated,
+        subject: ass.subject,
+        dueDate: ass.dueDate,
+        cbt: ass.cbt,
+        status,
+        score,
+        totalScore,
+        feedback,
+        submissionFile,
+        submitted
+      };
     });
+    
     res.json(assignmentData);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-router.post('/:assignmentId/submit', studentAuth, upload.single('file'), async (req, res) => {
-  try {
-    const { assignmentId } = req.params;
-    const studentId = req.student._id;
-
-    // Find the assignment to check if it is CBT
-    const assignment = await Assignment.findById(assignmentId);
-
-    // If not CBT, require a file
-    if (!assignment.cbt && !req.file) {
-      return res.status(400).json({ error: "No file uploaded." });
-    }
-
-    // Save file if present
-    let fileMeta;
-    if (req.file) {
-      const fileUrl = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
-      fileMeta = { url: fileUrl, name: req.file.originalname };
-    }
-
-    // Upsert submission
-    let submission = await AssignmentSubmission.findOne({ assignment: assignmentId, student: studentId });
-    if (submission) {
-      if (fileMeta) submission.submissionFile = fileMeta;
-      submission.status = 'Submitted';
-      submission.submittedAt = new Date();
-      await submission.save();
-    } else {
-      submission = await AssignmentSubmission.create({
-        assignment: assignmentId,
-        student: studentId,
-        ...(fileMeta && { submissionFile: fileMeta }),
-        status: 'Submitted'
-      });
-    }
-
-    res.json({ message: 'Submission successful!' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// --- CRUD for assignments (admin/staff only) ---
-// Create assignment
-router.post('/', adminAuth, async (req, res) => {
-  try {
-    const data = req.body;
-    const assignment = await Assignment.create(data);
-    res.status(201).json(assignment);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+// ============ CRUD for assignments (admin/staff only) ============
 
 // Read all assignments
 router.get('/', adminAuth, async (req, res) => {
   try {
-    const assignments = await Assignment.find().populate('subject');
+    const assignments = await Assignment.find()
+      .populate('subject')
+      .populate('cbt');
     res.json(assignments);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
+// Create assignment
+router.post('/', adminAuth, async (req, res) => {
+  try {
+    const { title, class: classId, subject, type, dueDate, description, cbt, questionsAllocated } = req.body;
+
+    // Validate required fields
+    if (!title || !classId || !subject || !dueDate) {
+      return res.status(400).json({ error: 'Missing required fields: title, class, subject, dueDate' });
+    }
+
+    // If type is QUESTION_BANK, cbt is required
+    if (type === 'QUESTION_BANK' && !cbt) {
+      return res.status(400).json({ error: 'CBT ID is required for QUESTION_BANK type assignments' });
+    }
+
+    const assignment = new Assignment({
+      title,
+      description: description || '',
+      class: classId,
+      subject,
+      type: type || 'STANDARD',
+      dueDate,
+      cbt: cbt || null,
+      questionsAllocated: questionsAllocated || [],
+      teacher: req.admin?._id || req.staff?._id
+    });
+
+    await assignment.save();
+    await assignment.populate(['subject', 'cbt']);
+
+    res.status(201).json({
+      success: true,
+      assignment
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ============ PARAMETERIZED ROUTES (must come AFTER specific routes) ============
+
 // Read one assignment
 router.get('/:id', adminAuth, async (req, res) => {
   try {
-    const assignment = await Assignment.findById(req.params.id).populate('subject');
+    const assignment = await Assignment.findById(req.params.id)
+      .populate('subject')
+      .populate('cbt');
     if (!assignment) return res.status(404).json({ error: 'Assignment not found' });
     res.json(assignment);
   } catch (err) {
@@ -148,9 +146,30 @@ router.get('/:id', adminAuth, async (req, res) => {
 // Update assignment
 router.put('/:id', adminAuth, async (req, res) => {
   try {
-    const assignment = await Assignment.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const { title, description, type, dueDate, cbt, questionsAllocated } = req.body;
+
+    const assignment = await Assignment.findById(req.params.id);
     if (!assignment) return res.status(404).json({ error: 'Assignment not found' });
-    res.json(assignment);
+
+    // If changing to QUESTION_BANK type, cbt is required
+    if (type === 'QUESTION_BANK' && !cbt) {
+      return res.status(400).json({ error: 'CBT ID is required for QUESTION_BANK type assignments' });
+    }
+
+    if (title) assignment.title = title;
+    if (description !== undefined) assignment.description = description;
+    if (type) assignment.type = type;
+    if (dueDate) assignment.dueDate = dueDate;
+    if (type === 'QUESTION_BANK' && cbt) assignment.cbt = cbt;
+    if (questionsAllocated) assignment.questionsAllocated = questionsAllocated;
+
+    await assignment.save();
+    await assignment.populate(['subject', 'cbt']);
+
+    res.json({
+      success: true,
+      assignment
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -165,45 +184,156 @@ router.delete('/:id', adminAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// Get assignment questions (for QUESTION_BANK type)
 router.get('/:assignmentId/questions', studentAuth, async (req, res) => {
   try {
-    const assignment = await Assignment.findById(req.params.assignmentId).populate('cbt');
+    const assignment = await Assignment.findById(req.params.assignmentId)
+      .populate('cbt');
 
     if (!assignment) {
       return res.status(404).json({ error: 'Assignment not found' });
     }
 
-    if (assignment.type !== 'QUESTION_BANK' || !assignment.cbt) {
+    // Only QUESTION_BANK assignments have questions
+    if (assignment.type !== 'QUESTION_BANK') {
+      return res.status(400).json({ error: 'This assignment does not have questions' });
+    }
+
+    // Must have a CBT reference
+    if (!assignment.cbt) {
       return res.status(400).json({ error: 'No CBT associated with this assignment' });
     }
 
-    // Filter questions that match the questionsAllocated IDs
-    const allocatedQuestions = assignment.cbt.questions.filter(q => 
-      assignment.questionsAllocated.includes(q._id?.toString())
-    );
+    // Get all questions from the CBT
+    let questions = assignment.cbt.questions || [];
+
+    // If questionsAllocated is specified, filter to only those questions by index
+    if (assignment.questionsAllocated && assignment.questionsAllocated.length > 0) {
+      const allocatedIndices = assignment.questionsAllocated
+        .map(q => {
+          const match = q.match(/_(\d+)$/);
+          return match ? parseInt(match[1]) : null;
+        })
+        .filter(idx => idx !== null);
+
+      if (allocatedIndices.length > 0) {
+        questions = questions.filter((_, index) => allocatedIndices.includes(index));
+      }
+    }
 
     res.json({
       _id: assignment._id,
       title: assignment.title,
       duration: assignment.cbt.duration || 30,
-      questions: allocatedQuestions
+      totalQuestions: questions.length,
+      questions
     });
 
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
-// --- Teacher/admin review student submission ---
+
+// Submit assignment (file upload or CBT answers)
+router.post('/:assignmentId/submit', studentAuth, upload.single('file'), async (req, res) => {
+  try {
+    const { assignmentId } = req.params;
+    const studentId = req.student._id;
+
+    const assignment = await Assignment.findById(assignmentId);
+    if (!assignment) {
+      return res.status(404).json({ error: 'Assignment not found' });
+    }
+
+    // If QUESTION_BANK, handle CBT answers
+    if (assignment.type === 'QUESTION_BANK') {
+      const { answers } = req.body;
+      if (!answers || !Array.isArray(answers)) {
+        return res.status(400).json({ error: 'Answers are required for CBT submissions' });
+      }
+
+      let submission = await AssignmentSubmission.findOne({ 
+        assignment: assignmentId, 
+        student: studentId 
+      });
+
+      if (submission) {
+        submission.answers = answers;
+        submission.status = 'Submitted';
+        submission.submittedAt = new Date();
+        await submission.save();
+      } else {
+        submission = await AssignmentSubmission.create({
+          assignment: assignmentId,
+          student: studentId,
+          answers,
+          status: 'Submitted'
+        });
+      }
+
+      return res.json({ 
+        message: 'CBT answers submitted successfully!',
+        submissionId: submission._id 
+      });
+    }
+
+    // For STANDARD assignments, require file
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded." });
+    }
+
+    let fileMeta;
+    if (req.file) {
+      const fileUrl = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+      fileMeta = { url: fileUrl, name: req.file.originalname };
+    }
+
+    let submission = await AssignmentSubmission.findOne({ 
+      assignment: assignmentId, 
+      student: studentId 
+    });
+
+    if (submission) {
+      if (fileMeta) submission.submissionFile = fileMeta;
+      submission.status = 'Submitted';
+      submission.submittedAt = new Date();
+      await submission.save();
+    } else {
+      submission = await AssignmentSubmission.create({
+        assignment: assignmentId,
+        student: studentId,
+        submissionFile: fileMeta,
+        status: 'Submitted'
+      });
+    }
+
+    res.json({ message: 'Submission successful!' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Review student submission
 router.post('/:assignmentId/review/:studentId', async (req, res) => {
   try {
     const { assignmentId, studentId } = req.params;
     const { score, feedback, totalScore } = req.body;
-    const submission = await AssignmentSubmission.findOne({ assignment: assignmentId, student: studentId });
-    if (!submission) return res.status(404).json({ error: "Submission not found" });
+
+    const submission = await AssignmentSubmission.findOne({ 
+      assignment: assignmentId, 
+      student: studentId 
+    });
+
+    if (!submission) {
+      return res.status(404).json({ error: "Submission not found" });
+    }
+
     submission.score = score;
     submission.feedback = feedback;
     submission.status = "Reviewed";
     if (totalScore) submission.totalScore = totalScore;
+
     await submission.save();
     res.json({ message: "Review saved" });
   } catch (err) {
