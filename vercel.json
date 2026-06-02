@@ -15,6 +15,7 @@
     { "source": "/campus-news-update", "destination": "/blog-details.html" },
         { "source": "/dashboard", "destination": "/buyer_dash.html" },
             { "source": "/admissions", "destination": "/admissions.html" },
+    { "source": "/teacher-dashboard", "destination": "/rt.html" },
         { "source": "/schedule-visit", "destination": "/schedule.html" }
     
     
