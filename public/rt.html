@@ -299,93 +299,205 @@
 </div>
 
         <div id="panel-grading" class="space-y-6 hidden">
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div>
-                        <h3 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Result Upload Analytics</h3>
-                        <p class="text-base font-black text-brand-900 mt-0.5">Roster Capture Progress</p>
-                    </div>
-                    <div class="text-right text-xs">
-                        <span class="font-bold text-slate-500">Completed Data Cells: </span>
-                        <span id="progressStatsCount" class="font-mono font-black text-brand-900 bg-slate-100 px-2 py-0.5 rounded-md">0 / 0</span>
-                        <span id="progressStatsLeft" class="ml-2 font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">0 Cells Left</span>
-                    </div>
-                </div>
-                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden shadow-inner">
-                    <div id="progressBarFill" class="bg-gradient-to-r from-brand-500 to-emerald-500 h-full w-0 transition-all duration-300"></div>
-                </div>
+
+    <!-- Progress Analytics -->
+    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h3 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">
+                    Result Upload Analytics
+                </h3>
+                <p class="text-base font-black text-brand-900 mt-0.5">
+                    Roster Capture Progress
+                </p>
             </div>
 
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-slate-100 pb-4">
-                    <div>
-                        <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Secondary Gradebook Mark Sheet Matrix</h2>
-                        <p class="text-xs text-slate-500">Pushes score modifications straight to parent profile views. Weights: CA1 (20%), CA2 (20%), Exam (60%).</p>
-                    </div>
-                    <div class="flex flex-wrap gap-2 shrink-0">
+            <div class="text-right text-xs">
+                <span class="font-bold text-slate-500">
+                    Completed Data Cells:
+                </span>
 
-    <!-- Session -->
-<select
-    id="gb-session-select"
-    required
-    class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
-    <option value="">Session</option>
-    <option value="2024-2025">2024–2025</option>
-    <option value="2025-2026" selected>2025–2026</option>
-    <option value="2026-2027">2026–2027</option>
-</select>
+                <span
+                    id="progressStatsCount"
+                    class="font-mono font-black text-brand-900 bg-slate-100 px-2 py-0.5 rounded-md">
+                    0 / 0
+                </span>
 
-    <!-- Term -->
-<select
-    id="gb-term-select"
-    required
-    class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
-    <option value="">Term</option>
-    <option value="FIRST TERM">FIRST TERM</option>
-    <option value="SECOND TERM">SECOND TERM</option>
-    <option value="THIRD TERM">THIRD TERM</option>
-</select>
-
-<!-- Result Type -->
-<select
-    id="gb-result-type-select"
-    required
-    class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
-    <option value="">Result Type</option>
-    <option value="exam">Examination</option>
-    <option value="ca1">Continuous Assessment 1</option>
-    <option value="ca2">Continuous Assessment 2</option>
-</select>
-
-    <!-- Class -->
-    <select
-        id="gradebookClassFilter"
-        onchange="renderGradebook()"
-        class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
-    </select>
-
-    <!-- Save -->
-    <button
-        onclick="saveGradebookChanges(event)"
-        class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider shadow transition">
-        Bulk Save Class
-    </button>
-
-</div>
-                </div>
-                <div class="overflow-x-auto rounded-xl border border-slate-100">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead>
-                            <tr
-    id="gradebookSubjectsHeader"
-    class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
-</tr>
-                        </thead>
-                        <tbody id="gradebookTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
-                    </table>
-                </div>
+                <span
+                    id="progressStatsLeft"
+                    class="ml-2 font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">
+                    0 Cells Left
+                </span>
             </div>
         </div>
+
+        <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden shadow-inner">
+            <div
+                id="progressBarFill"
+                class="bg-gradient-to-r from-brand-500 to-emerald-500 h-full w-0 transition-all duration-300">
+            </div>
+        </div>
+    </div>
+
+    <!-- Gradebook -->
+    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-slate-100 pb-4">
+
+            <div>
+                <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">
+                    Secondary Gradebook Mark Sheet Matrix
+                </h2>
+
+                <p class="text-xs text-slate-500">
+                    Pushes score modifications straight to parent profile views.
+                    Weights: CA1 (20%), CA2 (20%), Exam (60%).
+                </p>
+            </div>
+
+            <div class="flex flex-wrap gap-2 shrink-0">
+
+                <!-- Session -->
+                <select
+                    id="gb-session-select"
+                    required
+                    class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
+
+                    <option value="">Session</option>
+                    <option value="2024-2025">2024–2025</option>
+                    <option value="2025-2026" selected>2025–2026</option>
+                    <option value="2026-2027">2026–2027</option>
+                </select>
+
+                <!-- Term -->
+                <select
+                    id="gb-term-select"
+                    required
+                    class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
+
+                    <option value="">Term</option>
+                    <option value="FIRST TERM">FIRST TERM</option>
+                    <option value="SECOND TERM">SECOND TERM</option>
+                    <option value="THIRD TERM">THIRD TERM</option>
+                </select>
+
+                <!-- Result Type -->
+                <select
+                    id="gb-result-type-select"
+                    required
+                    class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
+
+                    <option value="">Result Type</option>
+                    <option value="exam">Examination</option>
+                    <option value="ca1">Continuous Assessment 1</option>
+                    <option value="ca2">Continuous Assessment 2</option>
+                </select>
+
+                <!-- Class -->
+                <select
+                    id="gradebookClassFilter"
+                    onchange="renderGradebook()"
+                    class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2 outline-none focus:ring-1 focus:ring-brand-500">
+                </select>
+
+                <!-- Save -->
+                <button
+                    onclick="saveGradebookChanges(event)"
+                    class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider shadow transition">
+
+                    Bulk Save Class
+                </button>
+
+            </div>
+        </div>
+
+        <!-- Scrollable Gradebook -->
+        <div
+            class="rounded-xl border border-slate-100"
+            style="
+                overflow:auto;
+                max-height:75vh;
+                position:relative;
+                -webkit-overflow-scrolling:touch;
+            ">
+
+            <table
+                class="text-left text-xs border-collapse"
+                style="
+                    min-width:max-content;
+                    width:100%;
+                ">
+
+                <thead
+                    style="
+                        position:sticky;
+                        top:0;
+                        z-index:60;
+                        background:#f8fafc;
+                    ">
+
+                    <tr
+                        id="gradebookSubjectsHeader"
+                        class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
+
+                        <!-- S/N -->
+                        <th
+                            style="
+                                position:sticky;
+                                left:0;
+                                z-index:100;
+                                background:#f8fafc;
+                                min-width:70px;
+                                padding:14px;
+                                border-right:1px solid #e2e8f0;
+                            ">
+                            S/N
+                        </th>
+
+                        <!-- Admission -->
+                        <th
+                            style="
+                                position:sticky;
+                                left:70px;
+                                z-index:100;
+                                background:#f8fafc;
+                                min-width:140px;
+                                padding:14px;
+                                border-right:1px solid #e2e8f0;
+                            ">
+                            Admission Code
+                        </th>
+
+                        <!-- Student -->
+                        <th
+                            style="
+                                position:sticky;
+                                left:210px;
+                                z-index:100;
+                                background:#f8fafc;
+                                min-width:220px;
+                                padding:14px;
+                                border-right:1px solid #e2e8f0;
+                            ">
+                            Student Name
+                        </th>
+
+                        <!-- Dynamic Subject Headers Render Here -->
+                    </tr>
+
+                </thead>
+
+                <tbody
+                    id="gradebookTableBody"
+                    class="divide-y divide-slate-100 text-slate-700 font-medium">
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+</div>
 
         <div id="panel-profile" class="space-y-6 hidden">
             <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
@@ -1648,53 +1760,101 @@ async function viewAssignment(assignmentId) {
     const students = studentsByClass[classId] || [];
     const subjects = subjectsByClass[classId] || [];
 
-    // Update table headers dynamically
+    // Build Header
     const theadRow = document.querySelector('#gradebookSubjectsHeader');
+
     if (theadRow) {
         theadRow.innerHTML = `
-            <th class="p-3 pl-4">Admission Code</th>
-            <th class="p-3">Student Name</th>
+            <th style="
+                position:sticky;
+                left:0;
+                z-index:100;
+                background:#f8fafc;
+                min-width:70px;
+                padding:12px;
+                border-right:1px solid #e2e8f0;
+            ">
+                S/N
+            </th>
+
+            <th style="
+                position:sticky;
+                left:70px;
+                z-index:100;
+                background:#f8fafc;
+                min-width:140px;
+                padding:12px;
+                border-right:1px solid #e2e8f0;
+            ">
+                Admission Code
+            </th>
+
+            <th style="
+                position:sticky;
+                left:210px;
+                z-index:100;
+                background:#f8fafc;
+                min-width:220px;
+                padding:12px;
+                border-right:1px solid #e2e8f0;
+            ">
+                Student Name
+            </th>
         `;
 
         subjects.forEach(subject => {
             theadRow.innerHTML += `
-                <th class="p-3 text-center min-w-[120px]">
+                <th style="
+                    min-width:130px;
+                    padding:12px;
+                    text-align:center;
+                    background:#f8fafc;
+                ">
                     ${subject.name || subject}
                 </th>
             `;
         });
 
         theadRow.innerHTML += `
-            <th class="p-3 text-center w-36">Actions</th>
+            <th style="
+                min-width:120px;
+                padding:12px;
+                text-align:center;
+                background:#f8fafc;
+            ">
+                Actions
+            </th>
         `;
     }
 
     if (!students.length) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="${subjects.length + 3}"
-                    class="p-4 text-center text-slate-400 text-xs">
+                <td colspan="${subjects.length + 4}"
+                    style="padding:16px;text-align:center;color:#94a3b8;">
                     No students found for this class
                 </td>
             </tr>
         `;
         return;
     }
-    students.forEach(student => {
-        const tr = document.createElement('tr');
-        
-        // Use student._id for MongoDB ID
-        const studentMongoId = student._id || student.id;  // Try _id first
-        
-        tr.setAttribute('data-student-id', studentMongoId);
+
+    students.forEach((student, index) => {
+
+        const studentMongoId = student._id || student.id;
 
         let subjectCells = '';
 
         subjects.forEach(subject => {
+
             const subjectName = subject.name || subject;
-            
+
             subjectCells += `
-                <td class="p-3 text-center">
+                <td style="
+                    padding:10px;
+                    text-align:center;
+                    min-width:130px;
+                ">
                     <input
                         type="number"
                         min="0"
@@ -1702,26 +1862,86 @@ async function viewAssignment(assignmentId) {
                         placeholder="0"
                         data-student-id="${studentMongoId}"
                         data-subject="${subjectName}"
-                        class="w-16 text-center bg-white border border-slate-200 rounded p-1 text-xs">
+                        style="
+                            width:80px;
+                            text-align:center;
+                            border:1px solid #cbd5e1;
+                            border-radius:8px;
+                            padding:6px;
+                            font-size:12px;
+                            background:white;
+                        ">
                 </td>
             `;
         });
 
+        const tr = document.createElement('tr');
+
+        tr.setAttribute('data-student-id', studentMongoId);
+
         tr.innerHTML = `
-            <td class="p-3 pl-4 font-bold text-brand-900">
+
+            <!-- S/N -->
+            <td style="
+                position:sticky;
+                left:0;
+                background:white;
+                z-index:20;
+                min-width:70px;
+                padding:12px;
+                font-weight:700;
+                border-right:1px solid #e2e8f0;
+            ">
+                ${index + 1}
+            </td>
+
+            <!-- Admission -->
+            <td style="
+                position:sticky;
+                left:70px;
+                background:white;
+                z-index:20;
+                min-width:140px;
+                padding:12px;
+                font-weight:700;
+                color:#0f4c75;
+                border-right:1px solid #e2e8f0;
+            ">
                 ${student.regNo || student.student_id || '—'}
             </td>
 
-            <td class="p-3">
+            <!-- Student Name -->
+            <td style="
+                position:sticky;
+                left:210px;
+                background:white;
+                z-index:20;
+                min-width:220px;
+                padding:12px;
+                font-weight:600;
+                border-right:1px solid #e2e8f0;
+            ">
                 ${student.name || '—'}
             </td>
 
             ${subjectCells}
 
-            <td class="p-3 text-center">
+            <!-- Actions -->
+            <td style="
+                min-width:120px;
+                padding:12px;
+                text-align:center;
+            ">
                 <button
-                    onclick="syncStudentResults('${studentMongoId}', '${student.name}')"
-                    class="text-xs font-bold text-brand-800 hover:bg-brand-50 px-2 py-1 rounded transition">
+                    onclick="syncStudentResults('${studentMongoId}', '${(student.name || '').replace(/'/g, "\\'")}')"
+                    style="
+                        font-size:12px;
+                        font-weight:700;
+                        color:#0f4c75;
+                        padding:6px 12px;
+                        border-radius:8px;
+                        transition:.2s;
+                    ">
                     Sync
                 </button>
             </td>
