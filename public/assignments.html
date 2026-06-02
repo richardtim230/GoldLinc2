@@ -1298,10 +1298,10 @@ if (cbtId) {
       // Fetch CBT
       let cbt = null;
       try {
-        const res = await fetch(`${API_BASE}/exam/${cbtId}`, { headers: { 'Authorization': 'Bearer ' + token } });
+        const res = await fetch(`${API_BASE}/assignments/${cbtId}/questions`, { headers: { 'Authorization': 'Bearer ' + token } });
         if (!res.ok) throw new Error();
         const data = await res.json();
-        cbt = data.cbt || data;
+        cbt = data;
       } catch {
         document.getElementById('cbtQuizLoader').innerHTML = `<span style="color: #e74c3c;">Failed to load CBT. Please try again.</span>`;
         return;
