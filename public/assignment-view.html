@@ -391,35 +391,62 @@
         }
 
         async function loadQuestions() {
-            try {
-                if (!currentAssignment) return;
+    try {
+        if (!currentAssignment) {
+            console.log('No assignment');
+            return;
+        }
 
-                // If type is QUESTION_BANK and has cbt reference
-                if (currentAssignment.type === 'QUESTION_BANK' && currentAssignment.cbt) {
-                    const response = await fetch(
-                        `${API_BASE_URL}/api/exams/${currentAssignment.cbt}`,
-                        { headers: authHeaders() }
-                    );
+        console.log('Assignment type:', currentAssignment.type);
+        console.log('CBT ID:', currentAssignment.cbt);
 
-                    if (!response.ok) throw new Error('Failed to load exam');
-                    const examData = await response.json();
-                    
-                    let questions = examData.questions || [];
-                    
-                    // If questionsAllocated is specified, filter to only those questions
-                    if (currentAssignment.questionsAllocated && currentAssignment.questionsAllocated.length > 0) {
-                        questions = questions.filter((_, index) => 
-                            currentAssignment.questionsAllocated.includes(index.toString())
-                        );
-                    }
-                    
-                    renderQuestionsPanel(questions);
-                }
-            } catch (error) {
-                console.error('Error loading questions:', error);
-                document.getElementById('viewAsmMetaBodyContent').innerHTML = '<p class="text-red-600">Failed to load questions</p>';
+        // If type is QUESTION_BANK and has cbt reference
+        if (currentAssignment.type === 'QUESTION_BANK' && currentAssignment.cbt) {
+            console.log('Fetching exam from:', `${API_BASE_URL}/api/exams/${currentAssignment.cbt}`);
+            
+            const response = await fetch(
+                `${API_BASE_URL}/api/exams/${currentAssignment.cbt}`,
+                { headers: authHeaders() }
+            );
+
+            console.log('Exam response status:', response.status);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Exam fetch error:', errorText);
+                throw new Error(`Failed to load exam: ${response.status}`);
+            }
+
+            const examData = await response.json();
+            console.log('Exam data:', examData);
+            
+            let questions = examData.questions || [];
+            console.log('Questions count:', questions.length);
+            
+            // If questionsAllocated is specified, filter to only those questions
+            if (currentAssignment.questionsAllocated && currentAssignment.questionsAllocated.length > 0) {
+                console.log('Questions allocated:', currentAssignment.questionsAllocated);
+                questions = questions.filter((_, index) => 
+                    currentAssignment.questionsAllocated.includes(index.toString())
+                );
+                console.log('Filtered questions count:', questions.length);
+            }
+            
+            renderQuestionsPanel(questions);
+        } else {
+            console.log('Not a QUESTION_BANK or no CBT ID');
+            if (currentAssignment.type !== 'QUESTION_BANK') {
+                console.log('Type is:', currentAssignment.type);
+            }
+            if (!currentAssignment.cbt) {
+                console.log('No CBT ID provided');
             }
         }
+    } catch (error) {
+        console.error('Error loading questions:', error);
+        document.getElementById('viewAsmMetaBodyContent').innerHTML = `<p class="text-red-600">Failed to load questions: ${error.message}</p>`;
+    }
+}
 
         function renderQuestionsPanel(questions) {
             const contentDiv = document.getElementById('viewAsmMetaBodyContent');
