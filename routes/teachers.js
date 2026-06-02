@@ -261,34 +261,31 @@ router.get('/:id/notifications', teacherAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-/**
- * GET: Teacher fetch their uploaded results filtered by class and student
- * GET /api/teacher/:id/results?class={classId}&student={studentId}
- * Used by gradebook to sync student results
- */
 router.get('/:id/results', teacherAuth, async (req, res) => {
   try {
-    const teacherId = req.params.id;
     const {
-  class: classId,
-  student: studentId,
-  session: sessionId,
-  term: termId
-} = req.query;
-    if (!classId || !studentId) {
-      return res.status(400).json({ 
-        error: 'Missing required query parameters: class and student',
-        results: [] 
+      class: classId,
+      student: studentId,
+      session: sessionName,
+      term: termName
+    } = req.query;
+
+    const sessionObj = await Session.findOne({ name: sessionName });
+    const termObj = await Term.findOne({ name: termName });
+
+    if (!sessionObj || !termObj) {
+      return res.status(404).json({
+        error: 'Session or Term not found',
+        results: []
       });
     }
 
-    // Query results by teacher (createdBy), class, and student
-const query = {
-  class: classId,
-  student: studentId,
-  session: sessionId,
-  term: termId
-};
+    const query = {
+      class: classId,
+      student: studentId,
+      session: sessionObj._id,
+      term: termObj._id
+    };
 
     console.log('Teacher results query:', query);
 
@@ -297,47 +294,18 @@ const query = {
       .populate('subject', 'name')
       .populate('class', 'name')
       .populate('session', 'name')
-      .populate('term', 'name')
-      .sort({ createdAt: -1 });
+      .populate('term', 'name');
 
-    console.log(`Found ${results.length} results for query:`, query);
-
-    if (!results.length) {
-      return res.status(404).json({ 
-        error: `No results found for this student in class ${classId}`,
-        results: [] 
-      });
-    }
-
-    // Transform results to expose all score fields
-    const transformedResults = results.map(r => ({
-      _id: r._id,
-      student: r.student,
-      subject: r.subject,
-      class: r.class,
-      session: r.session,
-      term: r.term,
-      ca1_score: r.ca1_score || 0,
-      ca2_score: r.ca2_score || 0,
-      midterm_score: r.midterm_score || 0,
-      exam_score: r.exam_score || 0,
-      score: r.score || 0,
-      grade: r.grade || '',
-      remarks: r.remarks || '',
-      status: r.status,
-      createdAt: r.createdAt
-    }));
-
-    res.json({ 
-      results: transformedResults,
-      count: transformedResults.length
+    res.json({
+      results,
+      count: results.length
     });
 
   } catch (err) {
-    console.error('Error fetching teacher results:', err);
-    res.status(500).json({ 
+    console.error(err);
+    res.status(500).json({
       error: err.message,
-      results: [] 
+      results: []
     });
   }
 });
