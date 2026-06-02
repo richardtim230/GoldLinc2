@@ -213,6 +213,7 @@
         let currentAssignment = null;
         let currentTeacher = null;
         let submissions = [];
+        let classStudents = [];
         let activeConfirmCallback = null;
 
         // ============ AUTH HEADERS ============
@@ -282,63 +283,66 @@
 
         // ============ INITIALIZATION ============
         async function initializeAssignmentView() {
-    try {
-        // Get assignment ID from URL or sessionStorage
-        const urlParams = new URLSearchParams(window.location.search);
-        const assignmentId = urlParams.get('id');
-        const sessionData = sessionStorage.getItem('currentAssignmentData');
+            try {
+                // Get assignment ID from URL or sessionStorage
+                const urlParams = new URLSearchParams(window.location.search);
+                const assignmentId = urlParams.get('id');
+                const sessionData = sessionStorage.getItem('currentAssignmentData');
 
-        if (!assignmentId && !sessionData) {
-            triggerAlertNotification('Error', 'No assignment selected', '❌');
-            setTimeout(() => returnToHub(), 2000);
-            return;
+                if (!assignmentId && !sessionData) {
+                    triggerAlertNotification('Error', 'No assignment selected', '❌');
+                    setTimeout(() => returnToHub(), 2000);
+                    return;
+                }
+
+                // LOAD TEACHER INFO FIRST
+                await loadTeacherInfo();
+
+                if (!currentTeacher || !currentTeacher.id) {
+                    triggerAlertNotification('Error', 'Failed to load teacher information', '❌');
+                    return;
+                }
+
+                // THEN load assignment
+                if (sessionData) {
+                    currentAssignment = JSON.parse(sessionData);
+                    sessionStorage.removeItem('currentAssignmentData');
+                } else if (assignmentId) {
+                    await fetchAssignmentData(assignmentId);
+                }
+
+                if (currentAssignment) {
+                    renderAssignmentDetails();
+                    // Load both submissions AND class students
+                    await loadSubmissions();
+                    await loadClassStudents();
+                    updateStatistics();
+                }
+            } catch (error) {
+                console.error('Initialization error:', error);
+                triggerAlertNotification('Error', 'Failed to load assignment', '❌');
+            }
         }
 
-        // LOAD TEACHER INFO FIRST - before anything else
-        await loadTeacherInfo();
-
-        if (!currentTeacher || !currentTeacher.id) {
-            triggerAlertNotification('Error', 'Failed to load teacher information', '❌');
-            return;
+        async function loadTeacherInfo() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/teachers/me`, {
+                    headers: authHeaders()
+                });
+                if (!response.ok) throw new Error('Failed to fetch teacher info');
+                const data = await response.json();
+                currentTeacher = data;
+                
+                // Update header
+                const initials = `${data.name.split(' ')[0][0]}${data.name.split(' ')[1]?.[0] || ''}`.toUpperCase();
+                document.getElementById('headerTeacherName').textContent = data.name;
+                document.getElementById('headerTeacherDept').textContent = data.department || 'Faculty';
+                document.getElementById('headerTeacherAvatar').textContent = initials;
+            } catch (error) {
+                console.error('Error loading teacher info:', error);
+                throw error;
+            }
         }
-
-        // THEN load assignment
-        if (sessionData) {
-            currentAssignment = JSON.parse(sessionData);
-            sessionStorage.removeItem('currentAssignmentData');
-        } else if (assignmentId) {
-            await fetchAssignmentData(assignmentId);
-        }
-
-        if (currentAssignment) {
-            renderAssignmentDetails();
-            await loadSubmissions();  // Now currentTeacher is guaranteed to be loaded
-        }
-    } catch (error) {
-        console.error('Initialization error:', error);
-        triggerAlertNotification('Error', 'Failed to load assignment', '❌');
-    }
-}
-
-async function loadTeacherInfo() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/teachers/me`, {
-            headers: authHeaders()
-        });
-        if (!response.ok) throw new Error('Failed to fetch teacher info');
-        const data = await response.json();
-        currentTeacher = data;
-        
-        // Update header
-        const initials = `${data.name.split(' ')[0][0]}${data.name.split(' ')[1]?.[0] || ''}`.toUpperCase();
-        document.getElementById('headerTeacherName').textContent = data.name;
-        document.getElementById('headerTeacherDept').textContent = data.department || 'Faculty';
-        document.getElementById('headerTeacherAvatar').textContent = initials;
-    } catch (error) {
-        console.error('Error loading teacher info:', error);
-        throw error;  // Re-throw so initialization catches it
-    }
-}
 
         async function fetchAssignmentData(assignmentId) {
             try {
@@ -374,6 +378,25 @@ async function loadTeacherInfo() {
             document.getElementById('viewAsmRoutingType').textContent = `Type: ${currentAssignment.type || 'STANDARD'}`;
         }
 
+        async function loadClassStudents() {
+            try {
+                if (!currentAssignment || !currentAssignment.class) return;
+                
+                // Get all students in the class
+                const response = await fetch(
+                    `${API_BASE_URL}/api/teachers/students?classId=${currentAssignment.class._id || currentAssignment.class.id}`,
+                    { headers: authHeaders() }
+                );
+                
+                if (!response.ok) throw new Error('Failed to load class students');
+                const data = await response.json();
+                classStudents = data;
+            } catch (error) {
+                console.error('Error loading class students:', error);
+                classStudents = [];
+            }
+        }
+
         async function loadSubmissions() {
             try {
                 if (!currentTeacher || !currentAssignment) return;
@@ -393,6 +416,22 @@ async function loadTeacherInfo() {
             }
         }
 
+        function updateStatistics() {
+            const totalStudents = classStudents.length;
+            const totalSubmitted = submissions.length;
+            const totalGraded = submissions.filter(s => s.score !== null && s.score !== undefined).length;
+            const totalPending = totalSubmitted - totalGraded;
+
+            document.getElementById('viewAsmStatTotal').textContent = totalStudents;
+            document.getElementById('viewAsmStatSubmitted').textContent = totalSubmitted;
+            document.getElementById('viewAsmStatPending').textContent = totalPending;
+            document.getElementById('viewAsmStatGraded').textContent = totalGraded;
+            document.getElementById('viewAsmClassTotalCounter').textContent = `${totalSubmitted} Records Found`;
+
+            const ratioPercentage = totalSubmitted > 0 ? (totalGraded / totalSubmitted) * 100 : 0;
+            document.getElementById('viewAsmTurnedInBar').style.width = `${ratioPercentage}%`;
+        }
+
         function renderSubmissionsTable() {
             const tableBody = document.getElementById('viewAsmSubmissionsTableBody');
             tableBody.innerHTML = '';
@@ -405,22 +444,12 @@ async function loadTeacherInfo() {
                         </td>
                     </tr>
                 `;
+                return;
             }
 
-            let totalSubmitted = 0;
-            let totalPendingGrading = 0;
-            let totalGraded = 0;
-
             submissions.forEach(submission => {
-                totalSubmitted++;
                 const hasScore = submission.score !== null && submission.score !== undefined;
                 
-                if (hasScore) {
-                    totalGraded++;
-                } else {
-                    totalPendingGrading++;
-                }
-
                 const statusBadge = hasScore
                     ? `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center">Graded</span>`
                     : `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center">Pending Review</span>`;
@@ -455,15 +484,6 @@ async function loadTeacherInfo() {
                 `;
                 tableBody.appendChild(tr);
             });
-
-            document.getElementById('viewAsmStatTotal').textContent = submissions.length;
-            document.getElementById('viewAsmStatSubmitted').textContent = totalSubmitted;
-            document.getElementById('viewAsmStatPending').textContent = totalPendingGrading;
-            document.getElementById('viewAsmStatGraded').textContent = totalGraded;
-            document.getElementById('viewAsmClassTotalCounter').textContent = `${submissions.length} Records Found`;
-
-            const ratioPercentage = submissions.length > 0 ? (totalGraded / submissions.length) * 100 : 0;
-            document.getElementById('viewAsmTurnedInBar').style.width = `${ratioPercentage}%`;
         }
 
         async function commitInlineSubmissionScore(buttonElement, submissionId) {
@@ -501,6 +521,7 @@ async function loadTeacherInfo() {
                 buttonElement.textContent = originalText;
 
                 renderSubmissionsTable();
+                updateStatistics();
                 triggerAlertNotification("Grade Documented", "The score has been successfully saved.", "✅");
             } catch (error) {
                 console.error('Error saving score:', error);
