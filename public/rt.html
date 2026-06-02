@@ -2683,149 +2683,161 @@ function openAssignmentModal() {
     }
 
     
-        async function commitAssignmentDeployment(event) {
+async function commitAssignmentDeployment(event) {
+  if (event) event.preventDefault();
 
-    if (event) event.preventDefault();
+  const button = event
+    ? event.target
+    : document.querySelector(
+        '#assignmentModal button[onclick*="commitAssignmentDeployment"]'
+      );
 
-    const button = event
-        ? event.target
-        : document.querySelector(
-            '#assignmentModal button[onclick*="commitAssignmentDeployment"]'
+  await executeWithLoading(button, async () => {
+    const title =
+      document.getElementById('asmModalTitle').value.trim();
+
+    const classId =
+      document.getElementById('asmModalClass').value;
+
+    const subjectId =
+      document.getElementById('asmModalSubject').value;
+
+    const dueDate =
+      document.getElementById('asmModalDue').value;
+
+    const type =
+      document.getElementById('asmModalType').value;
+
+    // Validation
+    if (
+      !title ||
+      !classId ||
+      !subjectId ||
+      !dueDate
+    ) {
+      throw new Error(
+        'Please fill in all required fields'
+      );
+    }
+
+    let assignmentBody = '';
+    let allocatedQuestions = [];
+    let cbtId = null;
+
+    if (type === 'STANDARD') {
+      assignmentBody =
+        assignmentQuillInstance.root.innerHTML;
+
+      if (
+        !assignmentBody.trim() ||
+        assignmentBody === '<p><br></p>'
+      ) {
+        throw new Error(
+          'Please enter assignment instructions'
+        );
+      }
+
+    } else if (type === 'QUESTION_BANK') {
+      // Get selected CBT
+      const cbtSelect = document.getElementById('asmModalCBT');
+      cbtId = cbtSelect ? cbtSelect.value : null;
+
+      if (!cbtId) {
+        throw new Error(
+          'Please select a CBT/Exam for this question bank assignment'
+        );
+      }
+
+      // Get selected questions
+      const selected =
+        document.querySelectorAll(
+          '#asmAllocationQuestionsContainer input[type="checkbox"]:checked'
         );
 
-    await executeWithLoading(button, async () => {
+      if (selected.length === 0) {
+        throw new Error(
+          'Please select at least one question'
+        );
+      }
 
-        const title =
-            document.getElementById('asmModalTitle').value.trim();
-
-        const classId =
-            document.getElementById('asmModalClass').value;
-
-        const subjectId =
-            document.getElementById('asmModalSubject').value;
-
-        const dueDate =
-            document.getElementById('asmModalDue').value;
-
-        const type =
-            document.getElementById('asmModalType').value;
-
-        // Validation
-        if (
-            !title ||
-            !classId ||
-            !subjectId ||
-            !dueDate
-        ) {
-            throw new Error(
-                'Please fill in all required fields'
-            );
-        }
-
-        let assignmentBody = '';
-        let allocatedQuestions = [];
-
-        if (type === 'STANDARD') {
-
-            assignmentBody =
-                assignmentQuillInstance.root.innerHTML;
-
-            if (
-                !assignmentBody.trim() ||
-                assignmentBody === '<p><br></p>'
-            ) {
-                throw new Error(
-                    'Please enter assignment instructions'
-                );
-            }
-
-        } else {
-
-            const selected =
-                document.querySelectorAll(
-                    '#asmAllocationQuestionsContainer input[type="checkbox"]:checked'
-                );
-
-            if (selected.length === 0) {
-                throw new Error(
-                    'Please select at least one question'
-                );
-            }
-
-            allocatedQuestions =
-                Array.from(selected).map(
-                    cb => cb.value
-                );
-
-            assignmentBody =
-                'Question Bank Assignment';
-        }
-
-        const payload = {
-            class: classId,
-            subject: subjectId,
-            title,
-            description: assignmentBody,
-            dueDate,
-            type,
-            questionsAllocated: allocatedQuestions
-        };
-
-        // CREATE vs UPDATE
-        const isEditing =
-            !!editingAssignmentId;
-
-        const endpoint = isEditing
-            ? `${API_BASE_URL}/api/teachers/${encodeURIComponent(
-                  teacher.id
-              )}/assignments/${editingAssignmentId}`
-            : `${API_BASE_URL}/api/teachers/${encodeURIComponent(
-                  teacher.id
-              )}/assignments`;
-
-        const method =
-            isEditing ? 'PATCH' : 'POST';
-
-        const res = await fetch(
-            endpoint,
-            {
-                method,
-                headers: authHeaders(),
-                body: JSON.stringify(payload)
-            }
+      allocatedQuestions =
+        Array.from(selected).map(
+          cb => cb.value
         );
 
-        const data = await res.json();
+      assignmentBody =
+        'Question Bank Assignment';
+    }
 
-        if (!res.ok) {
-            throw new Error(
-                data.error ||
-                data.message ||
-                `Failed to ${isEditing ? 'update' : 'create'} assignment`
-            );
-        }
+    const payload = {
+      class: classId,
+      subject: subjectId,
+      title,
+      description: assignmentBody,
+      dueDate,
+      type,
+      questionsAllocated: allocatedQuestions
+    };
 
-        // Refresh assignments
-        allAssignments =
-            await fetchTeacherAssignments();
+    // Add CBT ID for QUESTION_BANK type
+    if (type === 'QUESTION_BANK') {
+      payload.cbt = cbtId;
+    }
 
-        renderAssignments();
+    // CREATE vs UPDATE
+    const isEditing =
+      !!editingAssignmentId;
 
-        // Exit edit mode
-        editingAssignmentId = null;
+    const endpoint = isEditing
+      ? `${API_BASE_URL}/api/teachers/${encodeURIComponent(
+          teacher.id
+        )}/assignments/${editingAssignmentId}`
+      : `${API_BASE_URL}/api/teachers/${encodeURIComponent(
+          teacher.id
+        )}/assignments`;
 
-        closeAssignmentModal();
+    const method =
+      isEditing ? 'PUT' : 'POST';
 
-        await showCustomModal({
-            title: 'Success',
-            message: isEditing
-                ? 'Assignment updated successfully'
-                : 'Assignment deployed successfully',
-            type: 'alert',
-            icon: '✅'
-        });
+    const res = await fetch(
+      endpoint,
+      {
+        method,
+        headers: authHeaders(),
+        body: JSON.stringify(payload)
+      }
+    );
 
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(
+        data.error ||
+        data.message ||
+        `Failed to ${isEditing ? 'update' : 'create'} assignment`
+      );
+    }
+
+    // Refresh assignments
+    allAssignments =
+      await fetchTeacherAssignments();
+
+    renderAssignments();
+
+    // Exit edit mode
+    editingAssignmentId = null;
+
+    closeAssignmentModal();
+
+    await showCustomModal({
+      title: 'Success',
+      message: isEditing
+        ? 'Assignment updated successfully'
+        : 'Assignment deployed successfully',
+      type: 'alert',
+      icon: '✅'
     });
+  });
 }
     document
     .getElementById('asmModalClass')
