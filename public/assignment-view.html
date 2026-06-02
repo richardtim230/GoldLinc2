@@ -399,13 +399,32 @@
 
         console.log('Assignment type:', currentAssignment.type);
         console.log('CBT ID:', currentAssignment.cbt);
+        console.log('Questions Allocated:', currentAssignment.questionsAllocated);
 
-        // If type is QUESTION_BANK and has cbt reference
-        if (currentAssignment.type === 'QUESTION_BANK' && currentAssignment.cbt) {
-            console.log('Fetching exam from:', `${API_BASE_URL}/api/exams/${currentAssignment.cbt}`);
+        if (currentAssignment.type === 'QUESTION_BANK') {
+            let examId = currentAssignment.cbt;
+
+            // If no direct CBT ID, try to extract from questionsAllocated
+            if (!examId && currentAssignment.questionsAllocated && currentAssignment.questionsAllocated.length > 0) {
+                const allocated = currentAssignment.questionsAllocated[0];
+                // Format: "cbt_69307fd5a9335dea83b94d30_0"
+                const match = allocated.match(/cbt_([a-f0-9]+)_/);
+                if (match) {
+                    examId = match[1];
+                    console.log('Extracted exam ID from questionsAllocated:', examId);
+                }
+            }
+
+            if (!examId) {
+                document.getElementById('viewAsmMetaBodyContent').innerHTML = '<p class="text-red-600">No exam ID found for this question bank</p>';
+                console.log('No exam ID found');
+                return;
+            }
+
+            console.log('Fetching exam from:', `${API_BASE_URL}/api/exams/${examId}`);
             
             const response = await fetch(
-                `${API_BASE_URL}/api/exams/${currentAssignment.cbt}`,
+                `${API_BASE_URL}/api/exams/${examId}`,
                 { headers: authHeaders() }
             );
 
@@ -426,21 +445,21 @@
             // If questionsAllocated is specified, filter to only those questions
             if (currentAssignment.questionsAllocated && currentAssignment.questionsAllocated.length > 0) {
                 console.log('Questions allocated:', currentAssignment.questionsAllocated);
+                const allocatedIndices = currentAssignment.questionsAllocated.map(q => {
+                    const match = q.match(/_(\d+)$/);
+                    return match ? match[1] : null;
+                }).filter(q => q !== null);
+                
+                console.log('Allocated indices:', allocatedIndices);
                 questions = questions.filter((_, index) => 
-                    currentAssignment.questionsAllocated.includes(index.toString())
+                    allocatedIndices.includes(index.toString())
                 );
                 console.log('Filtered questions count:', questions.length);
             }
             
             renderQuestionsPanel(questions);
         } else {
-            console.log('Not a QUESTION_BANK or no CBT ID');
-            if (currentAssignment.type !== 'QUESTION_BANK') {
-                console.log('Type is:', currentAssignment.type);
-            }
-            if (!currentAssignment.cbt) {
-                console.log('No CBT ID provided');
-            }
+            console.log('Not a QUESTION_BANK type');
         }
     } catch (error) {
         console.error('Error loading questions:', error);
