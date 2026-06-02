@@ -1086,10 +1086,17 @@
 
           // Action button: CBT or regular
           let cbtId = (a.cbt && typeof a.cbt === 'object') ? a.cbt._id : a.cbt;
-          let cbtBtn = cbtId
-            ? `<a class="action-link success" onclick="openCbtModal('${cbtId}','${a.subject && a.subject.name ? a.subject.name : a.subject}','${a.title.replace(/'/g,"&#39;")}')"><i class='fa fa-desktop'></i> Take Test</a>`
-            : `<a class="action-link" onclick="openAssignmentModal(${i})"><i class="fa fa-eye"></i> View</a>`;
-
+          let cbtBtn;
+if (cbtId) {
+  // Direct CBT exam
+  cbtBtn = `<a class="action-link success" onclick="openCbtModal('${cbtId}','${a.subject && a.subject.name ? a.subject.name : a.subject}','${a.title.replace(/'/g,"&#39;")}')"><i class='fa fa-desktop'></i> Take Test</a>`;
+} else if (a.type === 'QUESTION_BANK') {
+  // Question Bank Assignment - take the test
+  cbtBtn = `<a class="action-link success" onclick="openCbtModal('${a._id}','${a.subject && a.subject.name ? a.subject.name : a.subject}','${a.title.replace(/'/g,"&#39;")}')"><i class='fa fa-desktop'></i> Take Test</a>`;
+} else {
+  // Regular assignment - upload file
+  cbtBtn = `<a class="action-link" onclick="openAssignmentModal(${i})"><i class="fa fa-eye"></i> View</a>`;
+    }
           return `
             <tr>
               <td><strong>${a.title}</strong></td>
