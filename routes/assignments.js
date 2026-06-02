@@ -163,7 +163,28 @@ router.delete('/:id', adminAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+router.get('/:assignmentId/questions', studentAuth, async (req, res) => {
+  try {
+    const assignment = await Assignment.findById(req.params.assignmentId);
 
+    if (!assignment) {
+      return res.status(404).json({ error: 'Assignment not found' });
+    }
+
+    if (assignment.type !== 'QUESTION_BANK') {
+      return res.status(400).json({ error: 'Not a question bank assignment' });
+    }
+
+    res.json({
+      _id: assignment._id,
+      title: assignment.title,
+      questions: assignment.questionsAllocated || []
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 // --- Teacher/admin review student submission ---
 router.post('/:assignmentId/review/:studentId', async (req, res) => {
   try {
