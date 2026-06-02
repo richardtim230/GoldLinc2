@@ -388,7 +388,20 @@ router.post('/classes/:classId/subjects', teacherAuth, async (req, res) => {
       : null
   });
 });
-
+// PATCH /api/teachers/:id/assignments/:assignmentId/submissions/:submissionId
+router.patch('/:id/assignments/:assignmentId/submissions/:submissionId', teacherAuth, async (req, res) => {
+  try {
+    const { score } = req.body;
+    const submission = await AssignmentSubmission.findByIdAndUpdate(
+      req.params.submissionId,
+      { score, status: 'Graded' },
+      { new: true }
+    );
+    res.json({ success: true, submission });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 // PATCH /api/teachers/:id/assignments/:assignmentId - Update assignment
 router.patch('/:id/assignments/:assignmentId', teacherAuth, async (req, res) => {
   try {
