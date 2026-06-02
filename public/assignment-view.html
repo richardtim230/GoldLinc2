@@ -82,14 +82,14 @@
                             <span id="viewAsmSubjectBadge" class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded">...</span>
                             <span class="text-slate-400">&bull;</span>
                             <span class="flex items-center">
-                                <svg class="w-3.5 h-3.5 mr-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <svg class="w-3.5 h-3.5 mr-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 Deadline: <span id="viewAsmDeadline" class="ml-1 text-rose-600 font-extrabold">...</span>
                             </span>
                         </div>
                     </div>
                 </div>
                 <div class="flex gap-2 w-full sm:w-auto">
-                    <button onclick="requestAssignmentDeletion()" type="button" class="bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider transition">
+                    <button onclick="requestAssignmentDeletion()" type="button" class="bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wide transition shadow-sm">
                         Delete Task
                     </button>
                 </div>
@@ -193,7 +193,7 @@
             <h3 id="confirmTitle" class="text-sm font-black uppercase text-slate-900 tracking-wide">Confirm Action</h3>
             <p id="confirmMessage" class="text-xs text-slate-500 font-medium mt-2 leading-relaxed">Are you completely sure you want to proceed with this destructive operation?</p>
             <div class="grid grid-cols-2 gap-3 mt-5">
-                <button id="confirmCancelBtn" onclick="closeConfirmDialog()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-2.5 px-4 rounded-xl transition uppercase tracking-wider">
+                <button id="confirmCancelBtn" onclick="closeConfirmDialog()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-2.5 px-4 rounded-xl transition uppercase tracking-wide">
                     Cancel
                 </button>
                 <button id="confirmActionBtn" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition uppercase tracking-wider shadow-sm">
@@ -209,6 +209,12 @@
         const API_BASE_URL = "https://goldlincschools.onrender.com";
         const token = localStorage.getItem('teacherToken') || localStorage.getItem('token') || "";
 
+        // ============ DEBUG LOGGING ============
+        console.log('[DEBUG] ========== PAGE LOADED ==========');
+        console.log('[DEBUG] API_BASE_URL:', API_BASE_URL);
+        console.log('[DEBUG] Token exists:', !!token);
+        console.log('[DEBUG] Token value (first 30 chars):', token ? token.substring(0, 30) + '...' : 'NO TOKEN FOUND');
+
         // ============ DATA STATE ============
         let currentAssignment = null;
         let currentTeacher = null;
@@ -217,9 +223,11 @@
 
         // ============ AUTH HEADERS ============
         function authHeaders() {
-            return token 
+            const headers = token 
                 ? { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token } 
                 : { 'Content-Type': 'application/json' };
+            console.log('[DEBUG] authHeaders() called, returning:', headers);
+            return headers;
         }
 
         // ============ MODAL FUNCTIONS ============
@@ -283,24 +291,36 @@
         // ============ INITIALIZATION ============
         async function initializeAssignmentView() {
     try {
+        console.log('[DEBUG] ========== initializeAssignmentView() STARTING ==========');
+        
         // Get assignment ID from URL or sessionStorage
         const urlParams = new URLSearchParams(window.location.search);
         const assignmentId = urlParams.get('id');
         const sessionData = sessionStorage.getItem('currentAssignmentData');
 
+        console.log('[DEBUG] URL params:', { assignmentId });
+        console.log('[DEBUG] Session data exists:', !!sessionData);
+
         if (!assignmentId && !sessionData) {
+            console.log('[DEBUG] No assignment ID or session data found');
             triggerAlertNotification('Error', 'No assignment selected', '❌');
             setTimeout(() => returnToHub(), 2000);
             return;
         }
 
         // LOAD TEACHER INFO FIRST - before anything else
+        console.log('[DEBUG] About to call loadTeacherInfo()');
         await loadTeacherInfo();
 
+        console.log('[DEBUG] After loadTeacherInfo(), currentTeacher:', currentTeacher);
+
         if (!currentTeacher || !currentTeacher._id) {
+            console.error('[DEBUG] currentTeacher is invalid:', currentTeacher);
             triggerAlertNotification('Error', 'Failed to load teacher information', '❌');
             return;
         }
+
+        console.log('[DEBUG] Teacher loaded successfully:', currentTeacher.name);
 
         // THEN load assignment
         if (sessionData) {
@@ -315,27 +335,57 @@
             await loadSubmissions();  // Now currentTeacher is guaranteed to be loaded
         }
     } catch (error) {
-        console.error('Initialization error:', error);
+        console.error('[DEBUG] Initialization error caught:', error);
         triggerAlertNotification('Error', 'Failed to load assignment', '❌');
     }
 }
 
 async function loadTeacherInfo() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/teachers/me`, {
-            headers: authHeaders()
+        const url = `${API_BASE_URL}/api/teachers/me`;
+        const headers = authHeaders();
+        
+        console.log('[DEBUG] ========== loadTeacherInfo() STARTING ==========');
+        console.log('[DEBUG] Fetching from URL:', url);
+        console.log('[DEBUG] Headers being sent:', headers);
+        
+        const response = await fetch(url, {
+            headers: headers
         });
-        if (!response.ok) throw new Error('Failed to fetch teacher info');
+        
+        console.log('[DEBUG] Fetch completed, response status:', response.status);
+        console.log('[DEBUG] Response ok:', response.ok);
+        console.log('[DEBUG] Response statusText:', response.statusText);
+        
+        if (!response.ok) {
+            let errorData = null;
+            try {
+                errorData = await response.json();
+            } catch (e) {
+                errorData = { error: 'Could not parse error response', rawError: response.statusText };
+            }
+            console.error('[DEBUG] API error response:', errorData);
+            throw new Error(`Failed to fetch teacher info: ${response.status} ${response.statusText}`);
+        }
+        
         const data = await response.json();
+        console.log('[DEBUG] Successfully parsed response JSON');
+        console.log('[DEBUG] Teacher data received:', data);
+        
         currentTeacher = data;
+        console.log('[DEBUG] currentTeacher set to:', currentTeacher);
         
         // Update header
         const initials = `${data.name.split(' ')[0][0]}${data.name.split(' ')[1]?.[0] || ''}`.toUpperCase();
         document.getElementById('headerTeacherName').textContent = data.name;
         document.getElementById('headerTeacherDept').textContent = data.department || 'Faculty';
         document.getElementById('headerTeacherAvatar').textContent = initials;
+        
+        console.log('[DEBUG] Teacher header updated with initials:', initials);
+        console.log('[DEBUG] loadTeacherInfo() COMPLETED SUCCESSFULLY');
     } catch (error) {
-        console.error('Error loading teacher info:', error);
+        console.error('[DEBUG] Error in loadTeacherInfo():', error.message);
+        console.error('[DEBUG] Full error object:', error);
         throw error;  // Re-throw so initialization catches it
     }
 }
@@ -554,7 +604,10 @@ async function loadTeacherInfo() {
         }
 
         // Boot initialization on page load
-        document.addEventListener("DOMContentLoaded", initializeAssignmentView);
+        document.addEventListener("DOMContentLoaded", function() {
+            console.log('[DEBUG] DOMContentLoaded event fired, calling initializeAssignmentView()');
+            initializeAssignmentView();
+        });
     </script>
 </body>
 </html>
