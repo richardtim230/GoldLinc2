@@ -167,7 +167,7 @@ router.delete('/:id', adminAuth, async (req, res) => {
 });
 router.get('/:assignmentId/questions', studentAuth, async (req, res) => {
   try {
-    const assignment = await Assignment.findById(req.params.assignmentId);
+    const assignment = await Assignment.findById(req.params.assignmentId).populate('cbt');
 
     if (!assignment) {
       return res.status(404).json({ error: 'Assignment not found' });
@@ -180,7 +180,8 @@ router.get('/:assignmentId/questions', studentAuth, async (req, res) => {
     res.json({
       _id: assignment._id,
       title: assignment.title,
-      questions: assignment.questionsAllocated || []
+      duration: assignment.cbt?.duration || 30,
+      questions: assignment.cbt?.questions || []
     });
 
   } catch (err) {
