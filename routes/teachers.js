@@ -234,21 +234,43 @@ router.get('/:id/assignments', teacherAuth, async (req, res) => {
 // POST /api/teachers/:id/assignments
 router.post('/:id/assignments', teacherAuth, async (req, res) => {
   try {
-    const { class: classId, subject, title, description, dueDate, cbt, type, questionsAllocated } = req.body;
+    const { title, description, class: classId, subject, type, dueDate, cbt, questionsAllocated } = req.body;
+    const teacherId = req.params.id;
+
+    // Validate required fields
+    if (!title || !classId || !subject || !dueDate) {
+      return res.status(400).json({ 
+        error: 'Missing required fields: title, class, subject, dueDate' 
+      });
+    }
+
+    // If type is QUESTION_BANK, cbt is required
+    if (type === 'QUESTION_BANK' && !cbt) {
+      return res.status(400).json({ 
+        error: 'CBT ID is required for QUESTION_BANK type assignments. Please select an exam first.' 
+      });
+    }
+
     const assignment = new Assignment({
-      teacher: req.params.id,
+      title,
+      description: description || '',
       class: classId,
       subject,
-      title,
-      description,
-      dueDate,
-      cbt,
       type: type || 'STANDARD',
-      questionsAllocated: questionsAllocated || []
+      dueDate,
+      cbt: cbt || null,
+      questionsAllocated: questionsAllocated || [],
+      teacher: teacherId
     });
+
     await assignment.save();
-    await assignment.populate({ path: 'class', select: 'name' });
-    res.status(201).json({ assignment });
+    await assignment.populate(['subject', 'class', 'cbt']);
+
+    res.status(201).json({
+      success: true,
+      message: 'Assignment created successfully',
+      assignment
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
