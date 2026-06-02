@@ -313,11 +313,11 @@
 
                 if (currentAssignment) {
                     renderAssignmentDetails();
-                    // Load questions if QUESTION_BANK type
+                    // Load questions FIRST if QUESTION_BANK type
                     if (currentAssignment.type === 'QUESTION_BANK') {
                         await loadQuestions();
                     }
-                    // Load both submissions AND class students
+                    // Then load submissions AND class students
                     await loadSubmissions();
                     await loadClassStudents();
                     updateStatistics();
@@ -378,7 +378,15 @@
             document.getElementById('viewAsmClassBadge').textContent = currentAssignment.class?.name || '—';
             document.getElementById('viewAsmSubjectBadge').textContent = currentAssignment.subject?.name || currentAssignment.subject || '—';
             document.getElementById('viewAsmDeadline').textContent = dueDate;
-            document.getElementById('viewAsmMetaBodyContent').innerHTML = currentAssignment.description || 'No instructions provided';
+            
+            // Only show description if NOT a QUESTION_BANK
+            if (currentAssignment.type !== 'QUESTION_BANK') {
+                document.getElementById('viewAsmMetaBodyContent').innerHTML = currentAssignment.description || 'No instructions provided';
+            } else {
+                // For QUESTION_BANK, show loading message - questions will be loaded separately
+                document.getElementById('viewAsmMetaBodyContent').innerHTML = '<p class="text-slate-600">Loading questions...</p>';
+            }
+            
             document.getElementById('viewAsmRoutingType').textContent = `Type: ${currentAssignment.type || 'STANDARD'}`;
         }
 
@@ -409,6 +417,7 @@
                 }
             } catch (error) {
                 console.error('Error loading questions:', error);
+                document.getElementById('viewAsmMetaBodyContent').innerHTML = '<p class="text-red-600">Failed to load questions</p>';
             }
         }
 
@@ -441,7 +450,7 @@
                         
                         html += `
                             <div class="${badgeClass} border px-3 py-2 rounded text-sm ${fontWeight}">
-                                <span class="font-bold">${String.fromCharCode(65 + optIndex)})</span> ${option.value}${checkmark}
+                                <span class="font-bold">${String.fromCharCode(65 + optIndex)})</span> ${option.value || option}${checkmark}
                             </div>
                         `;
                     });
