@@ -51,9 +51,11 @@ return {
   _id: ass._id,
   title: ass.title,
   description: ass.description,
+  type: ass.type,
+  questionsAllocated: ass.questionsAllocated,
   subject: ass.subject,
   dueDate: ass.dueDate,
-  cbt: ass.cbt, // <-- ADD THIS LINE
+  cbt: ass.cbt,
   status,
   score,
   totalScore,
