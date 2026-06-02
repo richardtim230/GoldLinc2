@@ -269,8 +269,12 @@ router.get('/:id/notifications', teacherAuth, async (req, res) => {
 router.get('/:id/results', teacherAuth, async (req, res) => {
   try {
     const teacherId = req.params.id;
-    const { class: classId, student: studentId } = req.query;
-
+    const {
+  class: classId,
+  student: studentId,
+  session: sessionId,
+  term: termId
+} = req.query;
     if (!classId || !studentId) {
       return res.status(400).json({ 
         error: 'Missing required query parameters: class and student',
