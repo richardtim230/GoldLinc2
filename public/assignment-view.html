@@ -313,6 +313,10 @@
 
                 if (currentAssignment) {
                     renderAssignmentDetails();
+                    // Load questions if QUESTION_BANK type
+                    if (currentAssignment.type === 'QUESTION_BANK') {
+                        await loadQuestions();
+                    }
                     // Load both submissions AND class students
                     await loadSubmissions();
                     await loadClassStudents();
@@ -376,6 +380,85 @@
             document.getElementById('viewAsmDeadline').textContent = dueDate;
             document.getElementById('viewAsmMetaBodyContent').innerHTML = currentAssignment.description || 'No instructions provided';
             document.getElementById('viewAsmRoutingType').textContent = `Type: ${currentAssignment.type || 'STANDARD'}`;
+        }
+
+        async function loadQuestions() {
+            try {
+                if (!currentAssignment) return;
+
+                // If type is QUESTION_BANK and has cbt reference
+                if (currentAssignment.type === 'QUESTION_BANK' && currentAssignment.cbt) {
+                    const response = await fetch(
+                        `${API_BASE_URL}/api/exams/${currentAssignment.cbt}`,
+                        { headers: authHeaders() }
+                    );
+
+                    if (!response.ok) throw new Error('Failed to load exam');
+                    const examData = await response.json();
+                    
+                    let questions = examData.questions || [];
+                    
+                    // If questionsAllocated is specified, filter to only those questions
+                    if (currentAssignment.questionsAllocated && currentAssignment.questionsAllocated.length > 0) {
+                        questions = questions.filter((_, index) => 
+                            currentAssignment.questionsAllocated.includes(index.toString())
+                        );
+                    }
+                    
+                    renderQuestionsPanel(questions);
+                }
+            } catch (error) {
+                console.error('Error loading questions:', error);
+            }
+        }
+
+        function renderQuestionsPanel(questions) {
+            const contentDiv = document.getElementById('viewAsmMetaBodyContent');
+            
+            if (!questions || questions.length === 0) {
+                contentDiv.innerHTML = '<p class="text-slate-600">No questions available</p>';
+                return;
+            }
+
+            let html = '<div class="space-y-4">';
+            
+            questions.forEach((question, qIndex) => {
+                html += `
+                    <div class="border border-slate-300 rounded-lg p-4 bg-slate-50 hover:bg-slate-100 transition">
+                        <p class="font-bold text-slate-900 mb-3">Q${qIndex + 1}: ${question.text || 'Question'}</p>
+                        <div class="space-y-2 ml-2">
+                `;
+
+                // Render options
+                if (question.options && Array.isArray(question.options)) {
+                    question.options.forEach((option, optIndex) => {
+                        const isCorrect = question.answer === optIndex;
+                        const badgeClass = isCorrect 
+                            ? 'bg-green-100 border-green-300 text-green-800' 
+                            : 'bg-slate-100 border-slate-300 text-slate-700';
+                        const checkmark = isCorrect ? ' ✓ CORRECT' : '';
+                        const fontWeight = isCorrect ? 'font-semibold' : 'font-normal';
+                        
+                        html += `
+                            <div class="${badgeClass} border px-3 py-2 rounded text-sm ${fontWeight}">
+                                <span class="font-bold">${String.fromCharCode(65 + optIndex)})</span> ${option.value}${checkmark}
+                            </div>
+                        `;
+                    });
+                }
+
+                if (question.score) {
+                    html += `<p class="text-xs text-slate-500 mt-2 italic">Points: ${question.score}</p>`;
+                }
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            contentDiv.innerHTML = html;
         }
 
         async function loadClassStudents() {
