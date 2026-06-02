@@ -442,46 +442,41 @@
                         class="bg-slate-50 text-slate-400 font-extrabold uppercase border-b border-slate-100">
 
                         <!-- S/N -->
-                        <th
-                            style="
-                                position:sticky;
-                                left:0;
-                                z-index:100;
-                                background:#f8fafc;
-                                min-width:70px;
-                                padding:14px;
-                                border-right:1px solid #e2e8f0;
-                            ">
-                            S/N
-                        </th>
+                        <th style="
+    position:sticky;
+    left:0;
+    z-index:100;
+    background:#f8fafc;
+    width:40px;
+    min-width:40px;
+    padding:8px;
+">
+    #
+</th>
 
-                        <!-- Admission -->
-                        <th
-                            style="
-                                position:sticky;
-                                left:70px;
-                                z-index:100;
-                                background:#f8fafc;
-                                min-width:140px;
-                                padding:14px;
-                                border-right:1px solid #e2e8f0;
-                            ">
-                            Admission Code
-                        </th>
+<th style="
+    position:sticky;
+    left:40px;
+    z-index:100;
+    background:#f8fafc;
+    width:100px;
+    min-width:100px;
+    padding:8px;
+">
+    ADM
+</th>
 
-                        <!-- Student -->
-                        <th
-                            style="
-                                position:sticky;
-                                left:210px;
-                                z-index:100;
-                                background:#f8fafc;
-                                min-width:220px;
-                                padding:14px;
-                                border-right:1px solid #e2e8f0;
-                            ">
-                            Student Name
-                        </th>
+<th style="
+    position:sticky;
+    left:140px;
+    z-index:100;
+    background:#f8fafc;
+    width:140px;
+    min-width:140px;
+    padding:8px;
+">
+    STUDENT
+</th>
 
                         <!-- Dynamic Subject Headers Render Here -->
                     </tr>
@@ -1766,46 +1761,47 @@ async function viewAssignment(assignmentId) {
     if (theadRow) {
         theadRow.innerHTML = `
             <th style="
-                position:sticky;
-                left:0;
-                z-index:100;
-                background:#f8fafc;
-                min-width:70px;
-                padding:12px;
-                border-right:1px solid #e2e8f0;
-            ">
-                S/N
-            </th>
+    position:sticky;
+    left:0;
+    z-index:100;
+    background:#f8fafc;
+    width:40px;
+    min-width:40px;
+    padding:8px;
+">
+    #
+</th>
 
-            <th style="
-                position:sticky;
-                left:70px;
-                z-index:100;
-                background:#f8fafc;
-                min-width:140px;
-                padding:12px;
-                border-right:1px solid #e2e8f0;
-            ">
-                Admission Code
-            </th>
+<th style="
+    position:sticky;
+    left:40px;
+    z-index:100;
+    background:#f8fafc;
+    width:100px;
+    min-width:100px;
+    padding:8px;
+">
+    ADM
+</th>
 
-            <th style="
-                position:sticky;
-                left:210px;
-                z-index:100;
-                background:#f8fafc;
-                min-width:220px;
-                padding:12px;
-                border-right:1px solid #e2e8f0;
-            ">
-                Student Name
-            </th>
+<th style="
+    position:sticky;
+    left:140px;
+    z-index:100;
+    background:#f8fafc;
+    width:140px;
+    min-width:140px;
+    padding:8px;
+">
+    STUDENT
+</th>
         `;
 
         subjects.forEach(subject => {
             theadRow.innerHTML += `
                 <th style="
-                    min-width:130px;
+                    min-width:90px;
+width:90px;
                     padding:12px;
                     text-align:center;
                     background:#f8fafc;
@@ -1883,46 +1879,47 @@ async function viewAssignment(assignmentId) {
 
             <!-- S/N -->
             <td style="
-                position:sticky;
-                left:0;
-                background:white;
-                z-index:20;
-                min-width:70px;
-                padding:12px;
-                font-weight:700;
-                border-right:1px solid #e2e8f0;
-            ">
-                ${index + 1}
-            </td>
+    position:sticky;
+    left:0;
+    background:white;
+    z-index:20;
+    width:40px;
+    min-width:40px;
+    padding:8px;
+    font-weight:700;
+">
+    ${index + 1}
+</td>
 
-            <!-- Admission -->
             <td style="
-                position:sticky;
-                left:70px;
-                background:white;
-                z-index:20;
-                min-width:140px;
-                padding:12px;
-                font-weight:700;
-                color:#0f4c75;
-                border-right:1px solid #e2e8f0;
-            ">
-                ${student.regNo || student.student_id || '—'}
-            </td>
+    position:sticky;
+    left:40px;
+    background:white;
+    z-index:20;
+    width:100px;
+    min-width:100px;
+    padding:8px;
+    font-weight:700;
+    color:#0f4c75;
+">
+    ${student.regNo || student.student_id || '—'}
+</td>
 
-            <!-- Student Name -->
             <td style="
-                position:sticky;
-                left:210px;
-                background:white;
-                z-index:20;
-                min-width:220px;
-                padding:12px;
-                font-weight:600;
-                border-right:1px solid #e2e8f0;
-            ">
-                ${student.name || '—'}
-            </td>
+    position:sticky;
+    left:140px;
+    background:white;
+    z-index:20;
+    width:140px;
+    min-width:140px;
+    max-width:140px;
+    padding:8px;
+    font-weight:600;
+    overflow:hidden;
+    text-overflow:ellipsis;
+">
+    ${student.name || '—'}
+</td>
 
             ${subjectCells}
 
