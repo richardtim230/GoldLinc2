@@ -279,11 +279,10 @@ router.get('/:id/results', teacherAuth, async (req, res) => {
     }
 
     // Query results by teacher (createdBy), class, and student
-    const query = { 
-      createdBy: teacherId,
-      class: classId,
-      student: studentId  // MongoDB _id of student
-    };
+    const query = {
+  class: classId,
+  student: studentId
+};
 
     console.log('Teacher results query:', query);
 
