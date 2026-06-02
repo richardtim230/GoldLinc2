@@ -15,6 +15,8 @@ const ResultCBT = require('../models/ResultCBT');
 const CBT = require('../models/CBTExam'); // If your results reference Exam
 const Collection = require('../models/Collection');
 const AssignmentSubmission = require('../models/AssignmentSubmission');
+const Session = require('../models/Session');
+const Term = require('../models/Term');
 // GET /api/teachers/me - Get own teacher profile + classes + subjects
 router.get('/me', teacherAuth, async (req, res) => {
   const teacher = req.staff;
