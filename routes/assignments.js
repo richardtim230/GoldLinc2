@@ -173,15 +173,20 @@ router.get('/:assignmentId/questions', studentAuth, async (req, res) => {
       return res.status(404).json({ error: 'Assignment not found' });
     }
 
-    if (assignment.type !== 'QUESTION_BANK') {
-      return res.status(400).json({ error: 'Not a question bank assignment' });
+    if (assignment.type !== 'QUESTION_BANK' || !assignment.cbt) {
+      return res.status(400).json({ error: 'No CBT associated with this assignment' });
     }
+
+    // Filter questions that match the questionsAllocated IDs
+    const allocatedQuestions = assignment.cbt.questions.filter(q => 
+      assignment.questionsAllocated.includes(q._id?.toString())
+    );
 
     res.json({
       _id: assignment._id,
       title: assignment.title,
-      duration: assignment.cbt?.duration || 30,
-      questions: assignment.cbt?.questions || []
+      duration: assignment.cbt.duration || 30,
+      questions: allocatedQuestions
     });
 
   } catch (err) {
