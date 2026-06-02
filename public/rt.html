@@ -1744,7 +1744,8 @@ async function viewAssignment(assignmentId) {
         });
     }
 
- async function renderGradebook() {
+async function renderGradebook() {
+
     const classId = document.getElementById('gradebookClassFilter')?.value;
     const tbody = document.getElementById('gradebookTableBody');
 
@@ -1755,56 +1756,72 @@ async function viewAssignment(assignmentId) {
     const students = studentsByClass[classId] || [];
     const subjects = subjectsByClass[classId] || [];
 
-    // Build Header
+    // -------------------------------
+    // TABLE HEADER
+    // -------------------------------
+
     const theadRow = document.querySelector('#gradebookSubjectsHeader');
 
     if (theadRow) {
+
         theadRow.innerHTML = `
+
+            <!-- S/N -->
             <th style="
-    position:sticky;
-    left:0;
-    z-index:100;
-    background:#f8fafc;
-    width:40px;
-    min-width:40px;
-    padding:8px;
-">
-    #
-</th>
+                position:sticky;
+                left:0;
+                z-index:100;
+                background:#f8fafc;
+                width:30px;
+                min-width:30px;
+                padding:6px;
+                border-right:1px solid #e2e8f0;
+            ">
+                #
+            </th>
 
-<th style="
-    position:sticky;
-    left:40px;
-    z-index:100;
-    background:#f8fafc;
-    width:100px;
-    min-width:100px;
-    padding:8px;
-">
-    ADM
-</th>
+            <!-- Admission -->
+            <th style="
+                position:sticky;
+                left:30px;
+                z-index:100;
+                background:#f8fafc;
+                width:80px;
+                min-width:80px;
+                max-width:80px;
+                padding:6px;
+                border-right:1px solid #e2e8f0;
+            ">
+                ADM
+            </th>
 
-<th style="
-    position:sticky;
-    left:140px;
-    z-index:100;
-    background:#f8fafc;
-    width:140px;
-    min-width:140px;
-    padding:8px;
-">
-    STUDENT
-</th>
+            <!-- Student -->
+            <th style="
+                position:sticky;
+                left:110px;
+                z-index:100;
+                background:#f8fafc;
+                width:100px;
+                min-width:100px;
+                max-width:100px;
+                padding:6px;
+                border-right:1px solid #e2e8f0;
+            ">
+                STUDENT
+            </th>
         `;
 
         subjects.forEach(subject => {
+
             theadRow.innerHTML += `
                 <th style="
-                    min-width:90px;
-width:90px;
-                    padding:12px;
+                    min-width:70px;
+                    width:70px;
+                    padding:8px;
                     text-align:center;
                     background:#f8fafc;
+                    font-size:11px;
+                    border-right:1px solid #e2e8f0;
                 ">
                     ${subject.name || subject}
                 </th>
@@ -1813,27 +1830,42 @@ width:90px;
 
         theadRow.innerHTML += `
             <th style="
-                min-width:120px;
-                padding:12px;
+                min-width:80px;
+                width:80px;
+                padding:8px;
                 text-align:center;
                 background:#f8fafc;
             ">
-                Actions
+                Action
             </th>
         `;
     }
 
+    // -------------------------------
+    // EMPTY STATE
+    // -------------------------------
+
     if (!students.length) {
+
         tbody.innerHTML = `
             <tr>
                 <td colspan="${subjects.length + 4}"
-                    style="padding:16px;text-align:center;color:#94a3b8;">
+                    style="
+                        padding:20px;
+                        text-align:center;
+                        color:#94a3b8;
+                    ">
                     No students found for this class
                 </td>
             </tr>
         `;
+
         return;
     }
+
+    // -------------------------------
+    // STUDENT ROWS
+    // -------------------------------
 
     students.forEach((student, index) => {
 
@@ -1847,9 +1879,10 @@ width:90px;
 
             subjectCells += `
                 <td style="
-                    padding:10px;
+                    padding:8px;
                     text-align:center;
-                    min-width:130px;
+                    min-width:70px;
+                    width:70px;
                 ">
                     <input
                         type="number"
@@ -1859,12 +1892,12 @@ width:90px;
                         data-student-id="${studentMongoId}"
                         data-subject="${subjectName}"
                         style="
-                            width:80px;
+                            width:55px;
                             text-align:center;
                             border:1px solid #cbd5e1;
-                            border-radius:8px;
-                            padding:6px;
-                            font-size:12px;
+                            border-radius:6px;
+                            padding:4px;
+                            font-size:11px;
                             background:white;
                         ">
                 </td>
@@ -1879,65 +1912,78 @@ width:90px;
 
             <!-- S/N -->
             <td style="
-    position:sticky;
-    left:0;
-    background:white;
-    z-index:20;
-    width:40px;
-    min-width:40px;
-    padding:8px;
-    font-weight:700;
-">
-    ${index + 1}
-</td>
+                position:sticky;
+                left:0;
+                background:white;
+                z-index:20;
+                width:30px;
+                min-width:30px;
+                padding:6px;
+                font-weight:700;
+                border-right:1px solid #e2e8f0;
+            ">
+                ${index + 1}
+            </td>
 
+            <!-- Admission -->
             <td style="
-    position:sticky;
-    left:40px;
-    background:white;
-    z-index:20;
-    width:100px;
-    min-width:100px;
-    padding:8px;
-    font-weight:700;
-    color:#0f4c75;
-">
-    ${student.regNo || student.student_id || '—'}
-</td>
+                position:sticky;
+                left:30px;
+                background:white;
+                z-index:20;
+                width:80px;
+                min-width:80px;
+                max-width:80px;
+                padding:6px;
+                font-weight:700;
+                color:#0f4c75;
+                white-space:nowrap;
+                overflow:hidden;
+                text-overflow:ellipsis;
+                border-right:1px solid #e2e8f0;
+            ">
+                ${student.regNo || student.student_id || '—'}
+            </td>
 
+            <!-- Student -->
             <td style="
-    position:sticky;
-    left:140px;
-    background:white;
-    z-index:20;
-    width:140px;
-    min-width:140px;
-    max-width:140px;
-    padding:8px;
-    font-weight:600;
-    overflow:hidden;
-    text-overflow:ellipsis;
-">
-    ${student.name || '—'}
-</td>
+                position:sticky;
+                left:110px;
+                background:white;
+                z-index:20;
+                width:100px;
+                min-width:100px;
+                max-width:100px;
+                padding:6px;
+                font-weight:600;
+                white-space:nowrap;
+                overflow:hidden;
+                text-overflow:ellipsis;
+                border-right:1px solid #e2e8f0;
+            ">
+                ${student.name || '—'}
+            </td>
 
             ${subjectCells}
 
-            <!-- Actions -->
+            <!-- Action -->
             <td style="
-                min-width:120px;
-                padding:12px;
+                min-width:80px;
+                width:80px;
+                padding:8px;
                 text-align:center;
             ">
                 <button
                     onclick="syncStudentResults('${studentMongoId}', '${(student.name || '').replace(/'/g, "\\'")}')"
                     style="
-                        font-size:12px;
+                        font-size:11px;
                         font-weight:700;
                         color:#0f4c75;
-                        padding:6px 12px;
-                        border-radius:8px;
-                        transition:.2s;
+                        background:#eff6ff;
+                        border:1px solid #bfdbfe;
+                        padding:5px 10px;
+                        border-radius:6px;
+                        cursor:pointer;
                     ">
                     Sync
                 </button>
@@ -1947,15 +1993,29 @@ width:90px;
         tbody.appendChild(tr);
     });
 
+    // -------------------------------
+    // PROGRESS TRACKING
+    // -------------------------------
+
     document.querySelectorAll(
         '#gradebookTableBody input[type="number"]'
     ).forEach(input => {
-        input.addEventListener('input', updateGradebookProgress);
-        input.addEventListener('change', updateGradebookProgress);
+
+        input.addEventListener(
+            'input',
+            updateGradebookProgress
+        );
+
+        input.addEventListener(
+            'change',
+            updateGradebookProgress
+        );
     });
 
     updateGradebookProgress();
-}
+}    
+
+    
 
 async function syncStudentResults(studentId, studentName) {
     try {
