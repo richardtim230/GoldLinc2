@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>My Assignments | Gold and Linc Schools</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=0.86">
   <!-- Inter Font + FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -1291,72 +1291,51 @@ if (cbtId) {
       document.getElementById('cbtModalBg').classList.add('active');
 
       // Find assignment id
-      const a = (window._assignments || []).find(ass =>
-    ass._id === cbtId ||
-    ass.cbt === cbtId ||
-    ass.cbt?._id === cbtId
-);
+      const a = (window._assignments||[]).find(ass=>ass.cbt && ass.cbt._id ? ass.cbt._id === cbtId : ass.cbt === cbtId);
+      cbtAssignmentId = a?._id || a?.id;
+      cbtExamId = cbtId;
 
-cbtAssignmentId = a?._id || a?.id;
-cbtExamId = cbtId;
-
-// Fetch CBT / Question Bank
-let cbt = null;
-
-try {
-
-    // QUESTION BANK ASSIGNMENT
-    if (a && a.type === 'QUESTION_BANK') {
-
-        const res = await fetch(
-            `${API_BASE}/assignments/${a._id}/questions`,
-            {
-                headers: {
-                    'Authorization': 'Bearer ' + token
-                }
-            }
-        );
-
+      // Fetch CBT
+      let cbt = null;
+      try {
+        const res = await fetch(`${API_BASE}/exam/${cbtId}`, { headers: { 'Authorization': 'Bearer ' + token } });
         if (!res.ok) throw new Error();
-
-        const data = await res.json();
-
-        cbt = {
-            duration: 30,
-            questions: data.questions || []
-        };
-
-    } else {
-
-        // NORMAL CBT EXAM
-        const res = await fetch(
-            `${API_BASE}/exam/${cbtId}`,
-            {
-                headers: {
-                    'Authorization': 'Bearer ' + token
-                }
-            }
-        );
-
-        if (!res.ok) throw new Error();
-
         const data = await res.json();
         cbt = data.cbt || data;
+      } catch {
+        document.getElementById('cbtQuizLoader').innerHTML = `<span style="color: #e74c3c;">Failed to load CBT. Please try again.</span>`;
+        return;
+      }
+
+      cbtDuration = cbt.duration || 30;
+      cbtQuestions = cbt.questions || [];
+      cbtAnswers = Array(cbtQuestions.length).fill(null);
+
+      // Render questions
+      let qHtml = cbtQuestions.map((q, i) => `
+        <div class="cbt-q-block">
+          <h4>Question ${i+1}</h4>
+          <div style="margin-bottom: 12px; color: var(--text-main);">${q.text}</div>
+          <div>
+            ${(q.options||[]).map((opt, oi) => `
+              <div class="cbt-opt-row">
+                <input type="radio" id="cbt-q${i}-opt${oi}" name="cbt-q${i}" value="${oi}" required onchange="cbtAnswers[${i}]=${oi}">
+                <label for="cbt-q${i}-opt${oi}">${opt.value || opt}</label>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+      document.getElementById('cbtQuestionsBlock').innerHTML = qHtml;
+      document.getElementById('cbtQuizLoader').style.display = 'none';
+      document.getElementById('cbtQuizForm').style.display = '';
+
+      // Start timer
+      cbtStartTime = Date.now();
+      updateCbtTimer();
+      clearInterval(cbtTimerInterval);
+      cbtTimerInterval = setInterval(updateCbtTimer, 1000);
     }
-
-} catch (err) {
-
-    console.error(err);
-
-    document.getElementById('cbtQuizLoader').innerHTML =
-        `<span style="color:#e74c3c;">Failed to load CBT. Please try again.</span>`;
-
-    return;
-}
-
-cbtDuration = cbt.duration || 30;
-cbtQuestions = cbt.questions || [];
-cbtAnswers = Array(cbtQuestions.length).fill(null);
 
     function closeCbtModal() {
       document.getElementById('cbtModalBg').classList.remove('active');
