@@ -279,9 +279,11 @@ router.get('/:id/results', teacherAuth, async (req, res) => {
     }
 
     // Query results by teacher (createdBy), class, and student
-    const query = {
+const query = {
   class: classId,
-  student: studentId
+  student: studentId,
+  session: sessionId,
+  term: termId
 };
 
     console.log('Teacher results query:', query);
