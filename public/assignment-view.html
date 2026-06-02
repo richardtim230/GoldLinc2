@@ -209,12 +209,6 @@
         const API_BASE_URL = "https://goldlincschools.onrender.com";
         const token = localStorage.getItem('teacherToken') || localStorage.getItem('token') || "";
 
-        // ============ DEBUG LOGGING ============
-        console.log('[DEBUG] ========== PAGE LOADED ==========');
-        console.log('[DEBUG] API_BASE_URL:', API_BASE_URL);
-        console.log('[DEBUG] Token exists:', !!token);
-        console.log('[DEBUG] Token value (first 30 chars):', token ? token.substring(0, 30) + '...' : 'NO TOKEN FOUND');
-
         // ============ DATA STATE ============
         let currentAssignment = null;
         let currentTeacher = null;
@@ -223,11 +217,9 @@
 
         // ============ AUTH HEADERS ============
         function authHeaders() {
-            const headers = token 
+            return token 
                 ? { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token } 
                 : { 'Content-Type': 'application/json' };
-            console.log('[DEBUG] authHeaders() called, returning:', headers);
-            return headers;
         }
 
         // ============ MODAL FUNCTIONS ============
@@ -291,36 +283,24 @@
         // ============ INITIALIZATION ============
         async function initializeAssignmentView() {
     try {
-        console.log('[DEBUG] ========== initializeAssignmentView() STARTING ==========');
-        
         // Get assignment ID from URL or sessionStorage
         const urlParams = new URLSearchParams(window.location.search);
         const assignmentId = urlParams.get('id');
         const sessionData = sessionStorage.getItem('currentAssignmentData');
 
-        console.log('[DEBUG] URL params:', { assignmentId });
-        console.log('[DEBUG] Session data exists:', !!sessionData);
-
         if (!assignmentId && !sessionData) {
-            console.log('[DEBUG] No assignment ID or session data found');
             triggerAlertNotification('Error', 'No assignment selected', '❌');
             setTimeout(() => returnToHub(), 2000);
             return;
         }
 
         // LOAD TEACHER INFO FIRST - before anything else
-        console.log('[DEBUG] About to call loadTeacherInfo()');
         await loadTeacherInfo();
 
-        console.log('[DEBUG] After loadTeacherInfo(), currentTeacher:', currentTeacher);
-
-        if (!currentTeacher || !currentTeacher._id) {
-            console.error('[DEBUG] currentTeacher is invalid:', currentTeacher);
+        if (!currentTeacher || !currentTeacher.id) {
             triggerAlertNotification('Error', 'Failed to load teacher information', '❌');
             return;
         }
-
-        console.log('[DEBUG] Teacher loaded successfully:', currentTeacher.name);
 
         // THEN load assignment
         if (sessionData) {
@@ -335,64 +315,34 @@
             await loadSubmissions();  // Now currentTeacher is guaranteed to be loaded
         }
     } catch (error) {
-        console.error('[DEBUG] Initialization error caught:', error);
+        console.error('Initialization error:', error);
         triggerAlertNotification('Error', 'Failed to load assignment', '❌');
     }
 }
 
 async function loadTeacherInfo() {
     try {
-        const url = `${API_BASE_URL}/api/teachers/me`;
-        const headers = authHeaders();
-        
-        console.log('[DEBUG] ========== loadTeacherInfo() STARTING ==========');
-        console.log('[DEBUG] Fetching from URL:', url);
-        console.log('[DEBUG] Headers being sent:', headers);
-        
-        const response = await fetch(url, {
-            headers: headers
+        const response = await fetch(`${API_BASE_URL}/api/teachers/me`, {
+            headers: authHeaders()
         });
-        
-        console.log('[DEBUG] Fetch completed, response status:', response.status);
-        console.log('[DEBUG] Response ok:', response.ok);
-        console.log('[DEBUG] Response statusText:', response.statusText);
-        
-        if (!response.ok) {
-            let errorData = null;
-            try {
-                errorData = await response.json();
-            } catch (e) {
-                errorData = { error: 'Could not parse error response', rawError: response.statusText };
-            }
-            console.error('[DEBUG] API error response:', errorData);
-            throw new Error(`Failed to fetch teacher info: ${response.status} ${response.statusText}`);
-        }
-        
+        if (!response.ok) throw new Error('Failed to fetch teacher info');
         const data = await response.json();
-        console.log('[DEBUG] Successfully parsed response JSON');
-        console.log('[DEBUG] Teacher data received:', data);
-        
         currentTeacher = data;
-        console.log('[DEBUG] currentTeacher set to:', currentTeacher);
         
         // Update header
         const initials = `${data.name.split(' ')[0][0]}${data.name.split(' ')[1]?.[0] || ''}`.toUpperCase();
         document.getElementById('headerTeacherName').textContent = data.name;
         document.getElementById('headerTeacherDept').textContent = data.department || 'Faculty';
         document.getElementById('headerTeacherAvatar').textContent = initials;
-        
-        console.log('[DEBUG] Teacher header updated with initials:', initials);
-        console.log('[DEBUG] loadTeacherInfo() COMPLETED SUCCESSFULLY');
     } catch (error) {
-        console.error('[DEBUG] Error in loadTeacherInfo():', error.message);
-        console.error('[DEBUG] Full error object:', error);
+        console.error('Error loading teacher info:', error);
         throw error;  // Re-throw so initialization catches it
     }
 }
 
         async function fetchAssignmentData(assignmentId) {
             try {
-                const response = await fetch(`${API_BASE_URL}/api/teachers/${currentTeacher._id}/assignments`, {
+                const response = await fetch(`${API_BASE_URL}/api/teachers/${currentTeacher.id}/assignments`, {
                     headers: authHeaders()
                 });
                 if (!response.ok) throw new Error('Failed to fetch assignments');
@@ -429,7 +379,7 @@ async function loadTeacherInfo() {
                 if (!currentTeacher || !currentAssignment) return;
 
                 const response = await fetch(
-                    `${API_BASE_URL}/api/teachers/${currentTeacher._id}/assignments/${currentAssignment._id}/submissions`,
+                    `${API_BASE_URL}/api/teachers/${currentTeacher.id}/assignments/${currentAssignment._id}/submissions`,
                     { headers: authHeaders() }
                 );
                 
@@ -532,7 +482,7 @@ async function loadTeacherInfo() {
 
             try {
                 const response = await fetch(
-                    `${API_BASE_URL}/api/teachers/${currentTeacher._id}/assignments/${currentAssignment._id}/submissions/${submissionId}`,
+                    `${API_BASE_URL}/api/teachers/${currentTeacher.id}/assignments/${currentAssignment._id}/submissions/${submissionId}`,
                     {
                         method: 'PATCH',
                         headers: authHeaders(),
@@ -574,7 +524,7 @@ async function loadTeacherInfo() {
 
             try {
                 const response = await fetch(
-                    `${API_BASE_URL}/api/teachers/${currentTeacher._id}/assignments/${currentAssignment._id}`,
+                    `${API_BASE_URL}/api/teachers/${currentTeacher.id}/assignments/${currentAssignment._id}`,
                     {
                         method: 'DELETE',
                         headers: authHeaders()
@@ -604,10 +554,7 @@ async function loadTeacherInfo() {
         }
 
         // Boot initialization on page load
-        document.addEventListener("DOMContentLoaded", function() {
-            console.log('[DEBUG] DOMContentLoaded event fired, calling initializeAssignmentView()');
-            initializeAssignmentView();
-        });
+        document.addEventListener("DOMContentLoaded", initializeAssignmentView);
     </script>
 </body>
 </html>
