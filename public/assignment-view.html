@@ -282,57 +282,63 @@
 
         // ============ INITIALIZATION ============
         async function initializeAssignmentView() {
-            try {
-                // Get assignment ID from URL or sessionStorage
-                const urlParams = new URLSearchParams(window.location.search);
-                const assignmentId = urlParams.get('id');
-                const sessionData = sessionStorage.getItem('currentAssignmentData');
+    try {
+        // Get assignment ID from URL or sessionStorage
+        const urlParams = new URLSearchParams(window.location.search);
+        const assignmentId = urlParams.get('id');
+        const sessionData = sessionStorage.getItem('currentAssignmentData');
 
-                if (!assignmentId && !sessionData) {
-                    triggerAlertNotification('Error', 'No assignment selected', '❌');
-                    setTimeout(() => returnToHub(), 2000);
-                    return;
-                }
-
-                // Load teacher info
-                await loadTeacherInfo();
-
-                // Load assignment
-                if (sessionData) {
-                    currentAssignment = JSON.parse(sessionData);
-                    sessionStorage.removeItem('currentAssignmentData');
-                } else if (assignmentId) {
-                    await fetchAssignmentData(assignmentId);
-                }
-
-                if (currentAssignment) {
-                    renderAssignmentDetails();
-                    await loadSubmissions();
-                }
-            } catch (error) {
-                console.error('Initialization error:', error);
-                triggerAlertNotification('Error', 'Failed to load assignment', '❌');
-            }
+        if (!assignmentId && !sessionData) {
+            triggerAlertNotification('Error', 'No assignment selected', '❌');
+            setTimeout(() => returnToHub(), 2000);
+            return;
         }
 
-        async function loadTeacherInfo() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/teachers/me`, {
-                    headers: authHeaders()
-                });
-                if (!response.ok) throw new Error('Failed to fetch teacher info');
-                const data = await response.json();
-                currentTeacher = data;
-                
-                // Update header
-                const initials = `${data.name.split(' ')[0][0]}${data.name.split(' ')[1]?.[0] || ''}`.toUpperCase();
-                document.getElementById('headerTeacherName').textContent = data.name;
-                document.getElementById('headerTeacherDept').textContent = data.department || 'Faculty';
-                document.getElementById('headerTeacherAvatar').textContent = initials;
-            } catch (error) {
-                console.error('Error loading teacher info:', error);
-            }
+        // LOAD TEACHER INFO FIRST - before anything else
+        await loadTeacherInfo();
+
+        if (!currentTeacher || !currentTeacher._id) {
+            triggerAlertNotification('Error', 'Failed to load teacher information', '❌');
+            return;
         }
+
+        // THEN load assignment
+        if (sessionData) {
+            currentAssignment = JSON.parse(sessionData);
+            sessionStorage.removeItem('currentAssignmentData');
+        } else if (assignmentId) {
+            await fetchAssignmentData(assignmentId);
+        }
+
+        if (currentAssignment) {
+            renderAssignmentDetails();
+            await loadSubmissions();  // Now currentTeacher is guaranteed to be loaded
+        }
+    } catch (error) {
+        console.error('Initialization error:', error);
+        triggerAlertNotification('Error', 'Failed to load assignment', '❌');
+    }
+}
+
+async function loadTeacherInfo() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/teachers/me`, {
+            headers: authHeaders()
+        });
+        if (!response.ok) throw new Error('Failed to fetch teacher info');
+        const data = await response.json();
+        currentTeacher = data;
+        
+        // Update header
+        const initials = `${data.name.split(' ')[0][0]}${data.name.split(' ')[1]?.[0] || ''}`.toUpperCase();
+        document.getElementById('headerTeacherName').textContent = data.name;
+        document.getElementById('headerTeacherDept').textContent = data.department || 'Faculty';
+        document.getElementById('headerTeacherAvatar').textContent = initials;
+    } catch (error) {
+        console.error('Error loading teacher info:', error);
+        throw error;  // Re-throw so initialization catches it
+    }
+}
 
         async function fetchAssignmentData(assignmentId) {
             try {
