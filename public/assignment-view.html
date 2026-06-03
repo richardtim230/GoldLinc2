@@ -818,170 +818,194 @@
             const ratioPercentage = totalSubmitted > 0 ? (totalGraded / totalSubmitted) * 100 : 0;
             document.getElementById('viewAsmTurnedInBar').style.width = `${ratioPercentage}%`;
         }
+function renderSubmissionsTable() {
+    const tableBody = document.getElementById('viewAsmSubmissionsTableBody');
+    tableBody.innerHTML = '';
 
-        function renderSubmissionsTable() {
-            const tableBody = document.getElementById('viewAsmSubmissionsTableBody');
-            tableBody.innerHTML = '';
+    if (submissions.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="5" class="p-8 text-center text-slate-400 text-xs">
+                    No submissions yet
+                </td>
+            </tr>
+        `;
+        return;
+    }
 
-            if (submissions.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="p-8 text-center text-slate-400 text-xs">
-                            No submissions yet
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
+    submissions.forEach(submission => {
+        const hasScore = submission.score !== null && submission.score !== undefined;
+        
+        const statusBadge = hasScore
+            ? `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center">Graded</span>`
+            : `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center">Pending Review</span>`;
 
-            submissions.forEach(submission => {
-                const hasScore = submission.score !== null && submission.score !== undefined;
-                
-                const statusBadge = hasScore
-                    ? `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center">Graded</span>`
-                    : `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center">Pending Review</span>`;
-
-                // Handle deliverable display
-                let deliverableCell = '';
-                
-                if (currentAssignment.type === 'QUESTION_BANK') {
-                    // For CBT assignments, show student's answers
-                    if (submission.answers && typeof submission.answers === 'object') {
-                        const answerCount = Object.keys(submission.answers).length;
-                        const answeredQuestions = Object.values(submission.answers).filter(a => a !== null && a !== undefined).length;
-                        deliverableCell = `<div class="text-[11px] text-slate-600 bg-slate-100 p-1.5 rounded border border-slate-200/60">
-                            <span class="font-mono">✓ ${answeredQuestions}/${answerCount} Answered</span>
-                        </div>`;
-                    } else {
-                        deliverableCell = `<span class="text-slate-400 italic font-normal text-[11px]">No answers submitted</span>`;
-                    }
-                } else {
-                    // For file-based assignments, show the file with preview/download
-                    if (submission.submissionFile) {
-                        const fileName = extractFileName(submission.submissionFile);
-                        const fileIcon = getFileIcon(fileName);
-                        deliverableCell = `<button onclick="openFilePreview('${submission.submissionFile || ''}', '${fileName}')" class="text-[11px] text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 p-1.5 rounded font-mono border border-blue-200 max-w-xs truncate transition cursor-pointer" title="${fileName}">
-                            ${fileIcon} ${fileName}
-                        </button>`;
-                    } else {
-                        deliverableCell = `<span class="text-slate-400 italic font-normal text-[11px]">No file submitted</span>`;
-                    }
-                }
-
-                // Handle score and action display
-                let scoreCell = '';
-                let actionCell = '';
-
-                if (currentAssignment.type === 'QUESTION_BANK') {
-                    // Show automatic score for CBT
-                    if (hasScore) {
-                        scoreCell = `<div class="text-center">
-                            <div class="text-lg font-black text-emerald-600">${submission.score}</div>
-                            <div class="text-[9px] text-slate-400 font-mono">Auto-graded</div>
-                        </div>`;
-                        actionCell = `<button onclick="viewStudentCBTAnswers(this, '${submission._id}')" type="button" 
-                                class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-wide transition shadow-sm">
-                            View Answers
-                        </button>`;
-                    } else {
-                        scoreCell = `<div class="text-center text-slate-400">Pending</div>`;
-                        actionCell = `<button onclick="viewStudentCBTAnswers(this, '${submission._id}')" type="button" 
-                                class="bg-slate-400 hover:bg-slate-500 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-wide transition shadow-sm">
-                            View Answers
-                        </button>`;
-                    }
-                } else {
-                    // Manual scoring for file-based assignments
-                    scoreCell = `<input type="number" min="0" max="100" id="inlineScore-${submission._id}" value="${hasScore ? submission.score : ''}" placeholder="--" 
-                           class="w-16 bg-slate-50 border border-slate-300 rounded-lg p-1 text-center font-bold text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition">`;
-                    actionCell = `<button onclick="commitInlineSubmissionScore(this, '${submission._id}')" type="button" 
-                            class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-wide transition shadow-sm">
-                        Save Mark
-                    </button>`;
-                }
-
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50/80 transition-all text-slate-700";
-                tr.innerHTML = `
-                    <td class="p-3 pl-4 font-bold text-slate-900">
-                        ${submission.studentName} 
-                        <span class="block text-[10px] text-slate-400 font-mono font-normal tracking-tight">${submission.regNo || '—'}</span>
-                    </td>
-                    <td class="p-3">${statusBadge}</td>
-                    <td class="p-3">${deliverableCell}</td>
-                    <td class="p-3 text-center">${scoreCell}</td>
-                    <td class="p-3 text-center">${actionCell}</td>
-                `;
-                tableBody.appendChild(tr);
-            });
-        }
-
-        function viewStudentCBTAnswers(buttonElement, submissionId) {
-            const submission = submissions.find(s => s._id === submissionId);
-            if (!submission) return;
-
-            // Build a detailed view of answers
-            let answerHTML = '<div class="space-y-4">';
+        // Handle deliverable display
+        let deliverableCell = '';
+        
+        if (currentAssignment.type === 'QUESTION_BANK') {
+            // For CBT assignments, check for answers more carefully
+            console.log('Checking submission answers:', submission);
+            console.log('Answers object:', submission.answers);
             
-            if (submission.answers && typeof submission.answers === 'object') {
-                const answerEntries = Object.entries(submission.answers);
-                
-                answerEntries.forEach(([questionIndex, studentAnswer]) => {
-                    const qIndex = parseInt(questionIndex);
-                    answerHTML += `
-                        <div class="border border-slate-300 rounded-lg p-3 bg-white">
-                            <p class="font-bold text-slate-900 text-sm mb-2">Q${qIndex + 1}</p>
-                            <div class="pl-2 space-y-1">
-                                <p class="text-xs text-slate-600">
-                                    <span class="font-bold">Student Answer:</span> 
-                                    <span class="bg-blue-50 border border-blue-200 px-2 py-0.5 rounded text-blue-800 font-mono">
-                                        ${studentAnswer !== null && studentAnswer !== undefined ? String.fromCharCode(65 + studentAnswer) : 'Not Answered'}
-                                    </span>
-                                </p>
-                            </div>
-                        </div>
-                    `;
-                });
+            // Check if answers exist and is not empty
+            const hasAnswers = submission.answers && 
+                               (typeof submission.answers === 'object') && 
+                               Object.keys(submission.answers).length > 0;
+            
+            if (hasAnswers) {
+                const answerCount = Object.keys(submission.answers).length;
+                const answeredQuestions = Object.values(submission.answers).filter(a => a !== null && a !== undefined && a !== '').length;
+                deliverableCell = `<div class="text-[11px] text-slate-600 bg-slate-100 p-1.5 rounded border border-slate-200/60">
+                    <span class="font-mono">✓ ${answeredQuestions}/${answerCount} Answered</span>
+                </div>`;
             } else {
-                answerHTML += '<p class="text-slate-600 text-sm">No answer data available</p>';
+                deliverableCell = `<span class="text-slate-400 italic font-normal text-[11px]">No answers submitted</span>`;
             }
-
-            answerHTML += '</div>';
-
-            // Show in alert modal with the answers
-            document.getElementById('modalTitle').textContent = `${submission.studentName}'s CBT Answers`;
-            document.getElementById('modalMessage').textContent = `Score: ${submission.score || 'Pending'} / 100`;
-            
-            const overlay = document.getElementById('customAlertModal');
-            const box = document.getElementById('customAlertBox');
-            
-            // Replace the modal content temporarily
-            const originalContent = box.innerHTML;
-            box.innerHTML = `
-                <div class="text-left max-h-96 overflow-y-auto mb-4">
-                    <h3 class="text-sm font-black uppercase text-slate-900 tracking-wide mb-2">${submission.studentName}'s CBT Answers</h3>
-                    <p class="text-xs text-slate-500 font-medium mb-4">Score: <span class="font-bold text-emerald-600">${submission.score || 'Pending'}</span> / 100</p>
-                    ${answerHTML}
-                </div>
-                <button onclick="closeAlertNotification()" class="mt-5 w-full bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition uppercase tracking-wider">
-                    Close
-                </button>
-            `;
-            
-            overlay.classList.remove('hidden');
-            setTimeout(() => {
-                box.classList.remove('scale-95', 'opacity-0');
-                box.classList.add('scale-100', 'opacity-100');
-            }, 10);
-
-            // Restore original content when closing
-            const originalCloseAlert = window.closeAlertNotification;
-            window.closeAlertNotification = function() {
-                box.innerHTML = originalContent;
-                originalCloseAlert();
-                window.closeAlertNotification = originalCloseAlert;
-            };
+        } else {
+            // For file-based assignments, show the file with preview/download
+            if (submission.submissionFile) {
+                const fileName = extractFileName(submission.submissionFile);
+                const fileIcon = getFileIcon(fileName);
+                deliverableCell = `<button onclick="openFilePreview('${submission.submissionFile.replace(/'/g, "\\'")}', '${fileName.replace(/'/g, "\\'")}'); return false;" class="text-[11px] text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 p-1.5 rounded font-mono border border-blue-200 max-w-xs truncate transition cursor-pointer" title="${fileName}">
+                    ${fileIcon} ${fileName}
+                </button>`;
+            } else {
+                deliverableCell = `<span class="text-slate-400 italic font-normal text-[11px]">No file submitted</span>`;
+            }
         }
+
+        // Handle score and action display
+        let scoreCell = '';
+        let actionCell = '';
+
+        if (currentAssignment.type === 'QUESTION_BANK') {
+            // Show automatic score for CBT
+            if (hasScore) {
+                scoreCell = `<div class="text-center">
+                    <div class="text-lg font-black text-emerald-600">${submission.score}</div>
+                    <div class="text-[9px] text-slate-400 font-mono">Auto-graded</div>
+                </div>`;
+                actionCell = `<button onclick="viewStudentCBTAnswers('${submission._id}')" type="button" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-wide transition shadow-sm">
+                    View Answers
+                </button>`;
+            } else {
+                scoreCell = `<div class="text-center text-slate-400">Pending</div>`;
+                actionCell = `<button onclick="viewStudentCBTAnswers('${submission._id}')" type="button" 
+                        class="bg-slate-400 hover:bg-slate-500 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-wide transition shadow-sm">
+                    View Answers
+                </button>`;
+            }
+        } else {
+            // Manual scoring for file-based assignments
+            scoreCell = `<input type="number" min="0" max="100" id="inlineScore-${submission._id}" value="${hasScore ? submission.score : ''}" placeholder="--" 
+                   class="w-16 bg-slate-50 border border-slate-300 rounded-lg p-1 text-center font-bold text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition">`;
+            actionCell = `<button onclick="commitInlineSubmissionScore(this, '${submission._id}')" type="button" 
+                    class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-wide transition shadow-sm">
+                Save Mark
+            </button>`;
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50/80 transition-all text-slate-700";
+        tr.innerHTML = `
+            <td class="p-3 pl-4 font-bold text-slate-900">
+                ${submission.studentName} 
+                <span class="block text-[10px] text-slate-400 font-mono font-normal tracking-tight">${submission.regNo || '—'}</span>
+            </td>
+            <td class="p-3">${statusBadge}</td>
+            <td class="p-3">${deliverableCell}</td>
+            <td class="p-3 text-center">${scoreCell}</td>
+            <td class="p-3 text-center">${actionCell}</td>
+        `;
+        tableBody.appendChild(tr);
+    });
+}
+
+        function viewStudentCBTAnswers(submissionId) {
+    const submission = submissions.find(s => s._id === submissionId);
+    if (!submission) {
+        triggerAlertNotification('Error', 'Submission not found', '❌');
+        return;
+    }
+
+    console.log('Viewing answers for submission:', submission);
+
+    // Build a detailed view of answers
+    let answerHTML = '<div class="space-y-4">';
+    
+    if (submission.answers && typeof submission.answers === 'object' && Object.keys(submission.answers).length > 0) {
+        const answerEntries = Object.entries(submission.answers);
+        
+        answerEntries.forEach(([questionIndex, studentAnswer]) => {
+            const qIndex = parseInt(questionIndex);
+            const answerLetter = studentAnswer !== null && studentAnswer !== undefined ? String.fromCharCode(65 + studentAnswer) : 'Not Answered';
+            const answerClass = studentAnswer !== null && studentAnswer !== undefined 
+                ? 'bg-blue-50 border border-blue-200 text-blue-800' 
+                : 'bg-red-50 border border-red-200 text-red-800';
+            
+            answerHTML += `
+                <div class="border border-slate-300 rounded-lg p-3 bg-white">
+                    <p class="font-bold text-slate-900 text-sm mb-2">Q${qIndex + 1}</p>
+                    <div class="pl-2 space-y-1">
+                        <p class="text-xs text-slate-600">
+                            <span class="font-bold">Student Answer:</span> 
+                            <span class="${answerClass} px-2 py-0.5 rounded font-mono">
+                                ${answerLetter}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            `;
+        });
+    } else {
+        answerHTML += '<p class="text-slate-600 text-sm text-center py-4">No answer data available</p>';
+    }
+
+    answerHTML += '</div>';
+
+    // Show in alert modal with the answers
+    document.getElementById('modalTitle').textContent = `${submission.studentName}'s CBT Answers`;
+    document.getElementById('modalMessage').textContent = `Score: ${submission.score || 'Pending'} / 100`;
+    
+    const overlay = document.getElementById('customAlertModal');
+    const box = document.getElementById('customAlertBox');
+    
+    // Replace the modal content temporarily
+    const originalContent = box.innerHTML;
+    box.innerHTML = `
+        <div class="text-left max-h-96 overflow-y-auto mb-4">
+            <h3 class="text-sm font-black uppercase text-slate-900 tracking-wide mb-2">${submission.studentName}'s CBT Answers</h3>
+            <p class="text-xs text-slate-500 font-medium mb-4">Score: <span class="font-bold text-emerald-600">${submission.score || 'Pending'}</span> / 100</p>
+            ${answerHTML}
+        </div>
+        <button onclick="restoreAlertModal()" class="mt-5 w-full bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition uppercase tracking-wider">
+            Close
+        </button>
+    `;
+    
+    overlay.classList.remove('hidden');
+    setTimeout(() => {
+        box.classList.remove('scale-95', 'opacity-0');
+        box.classList.add('scale-100', 'opacity-100');
+    }, 10);
+
+    // Store original content for restoration
+    window.alertOriginalContent = originalContent;
+    window.alertCloseCallback = () => {
+        box.innerHTML = originalContent;
+        window.alertOriginalContent = null;
+    };
+}
+
+// Add this function to restore the alert modal
+function restoreAlertModal() {
+    if (window.alertCloseCallback) {
+        window.alertCloseCallback();
+    }
+    closeAlertNotification();
+}
 
         async function commitInlineSubmissionScore(buttonElement, submissionId) {
             const scoreInput = document.getElementById(`inlineScore-${submissionId}`);
