@@ -82,7 +82,73 @@
             position: relative;
             overflow: hidden;
         }
-    </style>
+
+    /* Loading Spinner */
+    .loading-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.7);
+        backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 0.3s ease;
+    }
+
+    .loading-overlay.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .spinner-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .spinner-ring {
+        width: 60px;
+        height: 60px;
+        border: 4px solid rgba(255, 255, 255, 0.1);
+        border-top: 4px solid #0284c7;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .spinner-text {
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-align: center;
+        line-height: 1.5;
+    }
+
+    .spinner-status {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.85rem;
+        margin-top: 8px;
+    }
+
+    /* Pulse animation for skeleton loading */
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    .skeleton {
+        background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+        background-size: 200% 100%;
+        animation: pulse 2s infinite;
+    }
+</style>
 </head>
 <body class="bg-[#f8fafc] text-slate-800 font-sans antialiased min-h-screen flex flex-col md:flex-row overflow-x-hidden" onload="initSystemNode();">
 
@@ -706,7 +772,16 @@
 
     </div>
 </div>
-
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner-container">
+        <div class="spinner-ring"></div>
+        <div class="spinner-text">
+            <div id="spinnerMainText">Loading Dashboard</div>
+            <div id="spinnerStatus" class="spinner-status">Initializing system...</div>
+        </div>
+    </div>
+</div>
 
 <script>
 
@@ -731,7 +806,29 @@ function redirectToAttendance() {
     // ============ API CONFIGURATION ============
     const API_BASE_URL = "https://goldlincschools.onrender.com";
     const token = localStorage.getItem('teacherToken') || localStorage.getItem('token') || "";
+// ============ LOADING SPINNER SYSTEM ============
+function showLoadingSpinner(message = 'Loading Dashboard', status = 'Initializing system...') {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        document.getElementById('spinnerMainText').textContent = message;
+        document.getElementById('spinnerStatus').textContent = status;
+        overlay.classList.remove('hidden');
+    }
+}
 
+function hideLoadingSpinner() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        setTimeout(() => overlay.classList.add('hidden'), 300);
+    }
+}
+
+function updateLoadingStatus(status) {
+    const statusEl = document.getElementById('spinnerStatus');
+    if (statusEl) {
+        statusEl.textContent = status;
+    }
+}
     // ============ DATA CONTAINERS ============
     let teacher = null;
     let studentsByClass = {};
@@ -1188,52 +1285,93 @@ function updateGradebookProgress() {
 
     // ============ MAIN INITIALIZATION ============
     async function initSystemNode() {
-        try {
-            teacher = await fetchTeacherProfile();
-            if (!teacher) {
-                await showCustomModal({ title: 'Authentication Failed', message: 'Failed to load teacher profile. Please check your login credentials.', type: 'alert', icon: '🔒' });
-                return;
-            }
+    try {
+        showLoadingSpinner('Loading Faculty Dashboard', 'Initializing system...');
 
-            document.getElementById('headerTeacherName').textContent = teacher.name || 'Teacher';
-            document.getElementById('headerTeacherTitle').textContent = teacher.designation || 'Faculty Member';
-            document.getElementById('sidebarDept').textContent = teacher.department || 'Department';
-            document.getElementById('profileName').value = teacher.name || '';
-            document.getElementById('profileTitle').value = teacher.designation || '';
-            document.getElementById('profileDept').value = teacher.department || '';
+        // Step 1: Load teacher profile
+        updateLoadingStatus('Loading teacher information...');
+        teacher = await fetchTeacherProfile();
+        if (!teacher) {
+            hideLoadingSpinner();
+            await showCustomModal({ 
+                title: 'Authentication Failed', 
+                message: 'Failed to load teacher profile. Please check your login credentials.', 
+                type: 'alert', 
+                icon: '🔒' 
+            });
+            return;
+        }
 
-            teacher.classes = await fetchTeacherClasses();
-            
-            for (const cls of teacher.classes) {
-                studentsByClass[cls.id] = await fetchStudentsByClass(cls.id);
-                subjectsByClass[cls.id] = await fetchSubjectsByClass(cls.id);
-            }
+        document.getElementById('headerTeacherName').textContent = teacher.name || 'Teacher';
+        document.getElementById('headerTeacherTitle').textContent = teacher.designation || 'Faculty Member';
+        document.getElementById('sidebarDept').textContent = teacher.department || 'Department';
+        document.getElementById('profileName').value = teacher.name || '';
+        document.getElementById('profileTitle').value = teacher.designation || '';
+        document.getElementById('profileDept').value = teacher.department || '';
 
-            allAssignments = await fetchTeacherAssignments() || [];
-            assessmentDatabase = await fetchUnifiedQuestionBank() || [];
+        // Step 2: Load classes and students
+        updateLoadingStatus('Loading class data...');
+        teacher.classes = await fetchTeacherClasses();
+        
+        for (const cls of teacher.classes) {
+            updateLoadingStatus(`Loading students for ${cls.name}...`);
+            studentsByClass[cls.id] = await fetchStudentsByClass(cls.id);
+            subjectsByClass[cls.id] = await fetchSubjectsByClass(cls.id);
+        }
 
-            const asmModalClass = document.getElementById('asmModalClass');
-            const gradebookClassFilter = document.getElementById('gradebookClassFilter');
-            const studentClassFilter = document.getElementById('studentClassFilter');
-            const asmBankCategorySelector = document.getElementById('asmBankCategorySelector');
+        // Step 3: Load assignments
+        updateLoadingStatus('Loading assignments...');
+        allAssignments = await fetchTeacherAssignments() || [];
 
-            teacher.classes.forEach(cls => {
+        // Step 4: Load assessment collections
+        updateLoadingStatus('Loading assessment collections...');
+        assessmentDatabase = await fetchUnifiedQuestionBank() || [];
+
+        // Step 5: Populate dropdown filters
+        updateLoadingStatus('Populating filters and controls...');
+        
+        const asmModalClass = document.getElementById('asmModalClass');
+        const gradebookClassFilter = document.getElementById('gradebookClassFilter');
+        const studentClassFilter = document.getElementById('studentClassFilter');
+        const asmBankCategorySelector = document.getElementById('asmBankCategorySelector');
+
+        // Clear existing options (keeping the first placeholder)
+        if (asmModalClass) {
+            asmModalClass.innerHTML = '<option value="">Select Class</option>';
+        }
+        if (gradebookClassFilter) {
+            gradebookClassFilter.innerHTML = '<option value="">Select Class</option>';
+        }
+        if (studentClassFilter) {
+            studentClassFilter.innerHTML = '<option value="ALL">Display All Assigned Classes</option>';
+        }
+
+        // Populate class filters
+        teacher.classes.forEach(cls => {
+            if (asmModalClass) {
                 const opt1 = document.createElement('option');
                 opt1.value = cls.id;
                 opt1.textContent = cls.name;
                 asmModalClass.appendChild(opt1);
+            }
 
+            if (gradebookClassFilter) {
                 const opt2 = document.createElement('option');
                 opt2.value = cls.id;
                 opt2.textContent = cls.name;
                 gradebookClassFilter.appendChild(opt2);
+            }
 
+            if (studentClassFilter) {
                 const opt3 = document.createElement('option');
                 opt3.value = cls.name;
                 opt3.textContent = cls.name;
                 studentClassFilter.appendChild(opt3);
-            });
+            }
+        });
 
+        // Populate assessment bank categories
+        if (asmBankCategorySelector) {
             asmBankCategorySelector.innerHTML = '<option value="">-- Select Category --</option>';
             assessmentDatabase.forEach(bank => {
                 const opt = document.createElement('option');
@@ -1241,18 +1379,33 @@ function updateGradebookProgress() {
                 opt.textContent = bank.name + (bank.isMigrated ? '' : ' [Legacy]');
                 asmBankCategorySelector.appendChild(opt);
             });
-
-            renderOverview();
-            renderCollections();
-            renderAssignments();
-            renderStudents();
-            renderGradebook();
-
-        } catch (err) {
-            console.error('Initialization error:', err);
-            await showCustomModal({ title: 'System Error', message: 'Dashboard initialization failed: ' + err.message, type: 'alert', icon: '❌' });
         }
+
+        // Step 6: Render all dashboard sections
+        updateLoadingStatus('Rendering dashboard components...');
+        renderOverview();
+        renderCollections();
+        renderAssignments();
+        renderStudents();
+        renderGradebook();
+
+        // Step 7: Hide spinner and show dashboard
+        hideLoadingSpinner();
+        
+        // Show initial panel
+        switchPanel('overview');
+
+    } catch (err) {
+        console.error('Initialization error:', err);
+        hideLoadingSpinner();
+        await showCustomModal({ 
+            title: 'System Error', 
+            message: 'Dashboard initialization failed: ' + err.message, 
+            type: 'alert', 
+            icon: '❌' 
+        });
     }
+}
 
     // ============ RENDER FUNCTIONS ============
     function renderOverview() {
