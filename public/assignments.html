@@ -1317,6 +1317,43 @@ async function loadCBTQuestions(assignmentId, { autoRender = true } = {}) {
       `<span style="color: #e74c3c;">Failed to load questions: ${error.message}</span>`;
   }
 }
+    async function loadExamQuestions(examId) {
+
+  try {
+
+    const res = await fetch(
+      `${API_BASE}/exam/${examId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to load CBT");
+    }
+
+    const data = await res.json();
+    const cbt = data.cbt || data;
+
+    cbtDuration = cbt.duration || 30;
+    cbtQuestions = cbt.questions || [];
+    cbtAnswers = Array(cbtQuestions.length).fill(null);
+
+    document.getElementById('cbtQuizLoader').style.display = 'none';
+
+    renderCBTQuiz();
+    startCBTTimer();
+
+  } catch (err) {
+
+    console.error(err);
+
+    document.getElementById('cbtQuizLoader').innerHTML =
+      `<span style="color:#e74c3c;">Failed to load CBT.</span>`;
+  }
+        }
     async function openCbtModal(cbtId, subject, title) {
   // RESET STATE
   cbtQuestions = [];
@@ -1339,14 +1376,22 @@ async function loadCBTQuestions(assignmentId, { autoRender = true } = {}) {
 
   // FIND ASSIGNMENT ID
   const a = (window._assignments || []).find(ass =>
-    String(ass.cbt?._id || ass.cbt) === String(cbtId)
-  );
+  String(ass._id) === String(cbtId) ||
+  String(ass.cbt?._id || ass.cbt) === String(cbtId)
+);
 
-  cbtAssignmentId = a?._id || a?.id;
-  cbtExamId = cbtId;
+cbtAssignmentId = a?._id || a?.id;
+cbtExamId = cbtId;
 
-  // LOAD QUESTIONS (NO DUPLICATE FETCH ANYMORE)
-  await loadCBTQuestions(cbtId);
+// QUESTION BANK
+if (a?.type === "QUESTION_BANK") {
+
+  await loadCBTQuestions(cbtAssignmentId);
+
+} else {
+
+  await loadExamQuestions(cbtId);
+
 }
 
     function closeCbtModal() {
