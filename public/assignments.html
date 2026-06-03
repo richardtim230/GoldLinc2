@@ -1279,92 +1279,18 @@ let cbtAnswers = [];
 
 let cbtAssignmentId = null;
 let cbtExamId = null;
-async function loadCBTQuestions(assignmentId, { autoRender = true } = {}) {
-  try {
-    const res = await fetch(`${API_BASE}/assignments/${assignmentId}/questions`, {
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
 
-    if (!res.ok) {
-      throw new Error('Failed to load questions');
-    }
-
-    const data = await res.json();
-    const questions = data.questions || [];
-
-    if (!questions.length) {
-      document.getElementById('cbtQuizLoader').innerHTML =
-        `<span style="color: #e74c3c;">No questions found for this assignment.</span>`;
-      return;
-    }
-
-    // STATE SETUP
-    cbtDuration = data.duration || 30;
-    cbtQuestions = questions;
-    cbtAnswers = Array(cbtQuestions.length).fill(null);
-
-    // UI
-    document.getElementById('cbtQuizLoader').style.display = 'none';
-
-    if (autoRender) {
-      renderCBTQuiz();
-      startCBTTimer();
-    }
-
-  } catch (error) {
-    console.error('Error loading questions:', error);
-    document.getElementById('cbtQuizLoader').innerHTML =
-      `<span style="color: #e74c3c;">Failed to load questions: ${error.message}</span>`;
-  }
-}
-    async function loadExamQuestions(examId) {
-
-  try {
-
-    const res = await fetch(
-      `${API_BASE}/exam/${examId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
-
-    if (!res.ok) {
-      throw new Error("Failed to load CBT");
-    }
-
-    const data = await res.json();
-    const cbt = data.cbt || data;
-
-    cbtDuration = cbt.duration || 30;
-    cbtQuestions = cbt.questions || [];
-    cbtAnswers = Array(cbtQuestions.length).fill(null);
-
-    document.getElementById('cbtQuizLoader').style.display = 'none';
-
-    renderCBTQuiz();
-    startCBTTimer();
-
-  } catch (err) {
-
-    console.error(err);
-
-    document.getElementById('cbtQuizLoader').innerHTML =
-      `<span style="color:#e74c3c;">Failed to load CBT.</span>`;
-  }
-        }
     async function openCbtModal(cbtId, subject, title) {
-  // RESET STATE
+
   cbtQuestions = [];
   cbtAnswers = [];
   cbtAssignmentId = null;
   cbtExamId = null;
 
-  // RESET UI
   document.getElementById('cbtModalHeader').innerHTML =
-    `<i class="fa fa-lightbulb" style="color: #10b981; margin-right: 8px;"></i> ${subject}
-     <span style="font-weight: 400; font-size: 0.9rem;">(${title})</span>`;
+    `<i class="fa fa-lightbulb" style="color:#10b981;margin-right:8px;"></i>
+     ${subject}
+     <span style="font-weight:400;font-size:.9rem;">(${title})</span>`;
 
   document.getElementById('cbtQuestionsBlock').innerHTML = '';
   document.getElementById('cbtFeedback').innerHTML = '';
@@ -1372,26 +1298,102 @@ async function loadCBTQuestions(assignmentId, { autoRender = true } = {}) {
   document.getElementById('cbtQuizLoader').style.display = '';
   document.getElementById('cbtQuizForm').style.display = 'none';
   document.getElementById('cbtTimer').textContent = '--:--';
+
   document.getElementById('cbtModalBg').classList.add('active');
 
-  // FIND ASSIGNMENT ID
-  const a = (window._assignments || []).find(ass =>
-  String(ass._id) === String(cbtId) ||
-  String(ass.cbt?._id || ass.cbt) === String(cbtId)
-);
+  const assignment = (window._assignments || []).find(a =>
+    a._id === cbtId ||
+    a.cbt === cbtId ||
+    a.cbt?._id === cbtId
+  );
 
-cbtAssignmentId = a?._id || a?.id;
-cbtExamId = cbtId;
+  cbtAssignmentId = assignment?._id || assignment?.id;
+  cbtExamId = cbtId;
 
-// QUESTION BANK
-if (a?.type === "QUESTION_BANK") {
+  try {
 
-  await loadCBTQuestions(cbtAssignmentId);
+    let data;
 
-} else {
+    /*
+     * QUESTION BANK
+     */
+    if (assignment && assignment.type === "QUESTION_BANK") {
 
-  await loadExamQuestions(cbtId);
+      const res = await fetch(
+        `${API_BASE}/assignments/${assignment._id}/questions`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
 
+      if (!res.ok) {
+        throw new Error('Failed to load assignment questions');
+      }
+
+      data = await res.json();
+
+      cbtDuration = data.duration || 30;
+      cbtQuestions = data.questions || [];
+    }
+
+    /*
+     * NORMAL CBT EXAM
+     */
+    else {
+
+      const res = await fetch(
+        `${API_BASE}/exam/${cbtId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error('Failed to load CBT');
+      }
+
+      data = await res.json();
+
+      const exam = data.cbt || data;
+
+      cbtDuration = exam.duration || 30;
+      cbtQuestions = exam.questions || [];
+    }
+
+    cbtAnswers = Array(cbtQuestions.length).fill(null);
+
+    if (!cbtQuestions.length) {
+      document.getElementById('cbtQuizLoader').innerHTML =
+        `<span style="color:#e74c3c;">No questions found.</span>`;
+      return;
+    }
+
+    document.getElementById('cbtQuizLoader').style.display = 'none';
+    document.getElementById('cbtQuizForm').style.display = 'block';
+
+    renderCBTQuiz();
+
+    cbtStartTime = Date.now();
+
+    clearInterval(cbtTimerInterval);
+
+    cbtTimerInterval = setInterval(updateCbtTimer, 1000);
+
+    updateCbtTimer();
+
+  } catch (err) {
+
+    console.error(err);
+
+    document.getElementById('cbtQuizLoader').innerHTML =
+      `<span style="color:#e74c3c;">
+        Failed to load CBT questions.
+      </span>`;
+  }
 }
 
     function closeCbtModal() {
