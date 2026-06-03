@@ -34,57 +34,9 @@
     </script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
-        
-        /* Spinner Animation */
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        @keyframes pulse-scale {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.7; }
-        }
-        
-        .spinner {
-            animation: spin 1s linear infinite;
-        }
-        
-        .pulse-dot {
-            animation: pulse-scale 1.5s ease-in-out infinite;
-        }
-        
-        /* Loading skeleton */
-        @keyframes skeleton-loading {
-            0% { background-color: #e2e8f0; }
-            100% { background-color: #cbd5e1; }
-        }
-        
-        .skeleton {
-            animation: skeleton-loading 1s linear infinite alternate;
-        }
     </style>
 </head>
 <body class="antialiased min-h-screen text-slate-800">
-
-    <!-- Full Page Loader -->
-    <div id="pageLoader" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
-        <div class="text-center">
-            <div class="mb-6">
-                <div class="inline-flex items-center justify-center h-16 w-16 rounded-full bg-brand-100">
-                    <svg class="h-8 w-8 text-brand-600 spinner" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                    </svg>
-                </div>
-            </div>
-            <h2 class="text-xl font-bold text-slate-900 mb-2">Loading Assignment</h2>
-            <p class="text-slate-500 text-sm">Fetching all data...</p>
-            <div class="flex gap-1 justify-center mt-4">
-                <span class="h-2 w-2 bg-brand-600 rounded-full pulse-dot" style="animation-delay: 0s;"></span>
-                <span class="h-2 w-2 bg-brand-600 rounded-full pulse-dot" style="animation-delay: 0.2s;"></span>
-                <span class="h-2 w-2 bg-brand-600 rounded-full pulse-dot" style="animation-delay: 0.4s;"></span>
-            </div>
-        </div>
-    </div>
 
     <!-- Top Navigation Bar Header -->
     <header class="bg-brand-900 text-white shadow-md border-b border-brand-800 sticky top-0 z-40">
@@ -130,14 +82,14 @@
                             <span id="viewAsmSubjectBadge" class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded">...</span>
                             <span class="text-slate-400">&bull;</span>
                             <span class="flex items-center">
-                                <svg class="w-3.5 h-3.5 mr-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                <svg class="w-3.5 h-3.5 mr-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 Deadline: <span id="viewAsmDeadline" class="ml-1 text-rose-600 font-extrabold">...</span>
                             </span>
                         </div>
                     </div>
                 </div>
                 <div class="flex gap-2 w-full sm:w-auto">
-                    <button onclick="requestAssignmentDeletion()" type="button" class="bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider transition">
+                    <button onclick="requestAssignmentDeletion()" type="button" class="bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wide transition shadow-sm">
                         Delete Task
                     </button>
                 </div>
@@ -211,16 +163,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="viewAsmSubmissionsTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium">
-                                    <tr>
-                                        <td colspan="5" class="p-8 text-center">
-                                            <div class="flex flex-col items-center gap-3">
-                                                <svg class="h-8 w-8 text-brand-500 spinner" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                                                </svg>
-                                                <p class="text-slate-500 text-sm">Loading submissions...</p>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    <!-- Populated dynamically -->
                                 </tbody>
                             </table>
                         </div>
@@ -236,7 +179,7 @@
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center shadow-xl border border-slate-200/80 mx-4 transform transition-all scale-95 opacity-0 duration-300" id="customAlertBox">
             <div id="modalIcon" class="text-4xl mb-3">✅</div>
             <h3 id="modalTitle" class="text-sm font-black uppercase text-slate-900 tracking-wide">Action Successful</h3>
-            <div id="modalMessage" class="text-xs text-slate-500 font-medium mt-2 leading-relaxed max-h-64 overflow-y-auto"></div>
+            <p id="modalMessage" class="text-xs text-slate-500 font-medium mt-2 leading-relaxed">The data state has loaded correctly.</p>
             <button onclick="closeAlertNotification()" class="mt-5 w-full bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition uppercase tracking-wider shadow-sm">
                 Acknowledge
             </button>
@@ -250,7 +193,7 @@
             <h3 id="confirmTitle" class="text-sm font-black uppercase text-slate-900 tracking-wide">Confirm Action</h3>
             <p id="confirmMessage" class="text-xs text-slate-500 font-medium mt-2 leading-relaxed">Are you completely sure you want to proceed with this destructive operation?</p>
             <div class="grid grid-cols-2 gap-3 mt-5">
-                <button id="confirmCancelBtn" onclick="closeConfirmDialog()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-2.5 px-4 rounded-xl transition uppercase tracking-wider">
+                <button id="confirmCancelBtn" onclick="closeConfirmDialog()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-2.5 px-4 rounded-xl transition uppercase tracking-wide">
                     Cancel
                 </button>
                 <button id="confirmActionBtn" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition uppercase tracking-wider shadow-sm">
@@ -280,18 +223,10 @@
                 : { 'Content-Type': 'application/json' };
         }
 
-        // ============ LOADER FUNCTIONS ============
-        function hidePageLoader() {
-            const loader = document.getElementById('pageLoader');
-            loader.style.opacity = '0';
-            loader.style.pointerEvents = 'none';
-            loader.style.transition = 'opacity 0.3s ease';
-        }
-
         // ============ MODAL FUNCTIONS ============
         function triggerAlertNotification(title, message, icon = "✅") {
             document.getElementById('modalTitle').textContent = title;
-            document.getElementById('modalMessage').innerHTML = message;
+            document.getElementById('modalMessage').textContent = message;
             document.getElementById('modalIcon').textContent = icon;
             
             const overlay = document.getElementById('customAlertModal');
@@ -331,7 +266,6 @@
 
             document.getElementById('confirmActionBtn').onclick = () => {
                 if (typeof activeConfirmCallback === "function") activeConfirmCallback();
-                closeConfirmDialog();
             };
         }
 
@@ -358,16 +292,14 @@
                 if (!assignmentId && !sessionData) {
                     triggerAlertNotification('Error', 'No assignment selected', '❌');
                     setTimeout(() => returnToHub(), 2000);
-                    hidePageLoader();
                     return;
                 }
 
                 // LOAD TEACHER INFO FIRST
                 await loadTeacherInfo();
 
-                if (!currentTeacher || !currentTeacher._id) {
+                if (!currentTeacher || !currentTeacher.id) {
                     triggerAlertNotification('Error', 'Failed to load teacher information', '❌');
-                    hidePageLoader();
                     return;
                 }
 
@@ -381,22 +313,18 @@
 
                 if (currentAssignment) {
                     renderAssignmentDetails();
-                    
-                    // Load data in parallel
-                    await Promise.all([
-                        currentAssignment.type === 'QUESTION_BANK' ? loadQuestions() : Promise.resolve(),
-                        loadSubmissions(),
-                        loadClassStudents()
-                    ]);
-
+                    // Load questions FIRST if QUESTION_BANK type
+                    if (currentAssignment.type === 'QUESTION_BANK') {
+                        await loadQuestions();
+                    }
+                    // Then load submissions AND class students
+                    await loadSubmissions();
+                    await loadClassStudents();
                     updateStatistics();
                 }
-
-                hidePageLoader();
             } catch (error) {
                 console.error('Initialization error:', error);
-                triggerAlertNotification('Error', 'Failed to load assignment: ' + error.message, '❌');
-                hidePageLoader();
+                triggerAlertNotification('Error', 'Failed to load assignment', '❌');
             }
         }
 
@@ -422,16 +350,16 @@
 
         async function fetchAssignmentData(assignmentId) {
             try {
-                const response = await fetch(`${API_BASE_URL}/api/teachers/${currentTeacher._id}/assignments/${assignmentId}`, {
+                const response = await fetch(`${API_BASE_URL}/api/teachers/${currentTeacher.id}/assignments`, {
                     headers: authHeaders()
                 });
-                if (!response.ok) throw new Error('Failed to fetch assignment');
+                if (!response.ok) throw new Error('Failed to fetch assignments');
                 const data = await response.json();
-                currentAssignment = data.assignment || data;
+                currentAssignment = data.assignments.find(a => a._id === assignmentId);
                 if (!currentAssignment) throw new Error('Assignment not found');
             } catch (error) {
                 console.error('Error fetching assignment:', error);
-                throw error;
+                triggerAlertNotification('Error', 'Failed to load assignment data', '❌');
             }
         }
 
@@ -451,9 +379,11 @@
             document.getElementById('viewAsmSubjectBadge').textContent = currentAssignment.subject?.name || currentAssignment.subject || '—';
             document.getElementById('viewAsmDeadline').textContent = dueDate;
             
+            // Only show description if NOT a QUESTION_BANK
             if (currentAssignment.type !== 'QUESTION_BANK') {
                 document.getElementById('viewAsmMetaBodyContent').innerHTML = currentAssignment.description || 'No instructions provided';
             } else {
+                // For QUESTION_BANK, show loading message - questions will be loaded separately
                 document.getElementById('viewAsmMetaBodyContent').innerHTML = '<p class="text-slate-600">Loading questions...</p>';
             }
             
@@ -461,51 +391,81 @@
         }
 
         async function loadQuestions() {
-            try {
-                if (!currentAssignment || currentAssignment.type !== 'QUESTION_BANK') return;
-
-                let examId = currentAssignment.cbt;
-
-                if (!examId && currentAssignment.questionsAllocated && currentAssignment.questionsAllocated.length > 0) {
-                    const allocated = currentAssignment.questionsAllocated[0];
-                    const match = allocated.match(/cbt_([a-f0-9]+)_/);
-                    if (match) {
-                        examId = match[1];
-                    }
-                }
-
-                if (!examId) {
-                    document.getElementById('viewAsmMetaBodyContent').innerHTML = '<p class="text-red-600">No exam ID found for this question bank</p>';
-                    return;
-                }
-
-                const response = await fetch(
-                    `${API_BASE_URL}/api/exam/${examId}`,
-                    { headers: authHeaders() }
-                );
-
-                if (!response.ok) throw new Error(`Failed to load exam: ${response.status}`);
-
-                const examData = await response.json();
-                let questions = examData.questions || [];
-                
-                if (currentAssignment.questionsAllocated && currentAssignment.questionsAllocated.length > 0) {
-                    const allocatedIndices = currentAssignment.questionsAllocated.map(q => {
-                        const match = q.match(/_(\d+)$/);
-                        return match ? match[1] : null;
-                    }).filter(q => q !== null);
-                    
-                    questions = questions.filter((_, index) => 
-                        allocatedIndices.includes(index.toString())
-                    );
-                }
-                
-                renderQuestionsPanel(questions);
-            } catch (error) {
-                console.error('Error loading questions:', error);
-                document.getElementById('viewAsmMetaBodyContent').innerHTML = `<p class="text-red-600">Failed to load questions: ${error.message}</p>`;
-            }
+    try {
+        if (!currentAssignment) {
+            console.log('No assignment');
+            return;
         }
+
+        console.log('Assignment type:', currentAssignment.type);
+        console.log('CBT ID:', currentAssignment.cbt);
+        console.log('Questions Allocated:', currentAssignment.questionsAllocated);
+
+        if (currentAssignment.type === 'QUESTION_BANK') {
+            let examId = currentAssignment.cbt;
+
+            // If no direct CBT ID, try to extract from questionsAllocated
+            if (!examId && currentAssignment.questionsAllocated && currentAssignment.questionsAllocated.length > 0) {
+                const allocated = currentAssignment.questionsAllocated[0];
+                // Format: "cbt_69307fd5a9335dea83b94d30_0"
+                const match = allocated.match(/cbt_([a-f0-9]+)_/);
+                if (match) {
+                    examId = match[1];
+                    console.log('Extracted exam ID from questionsAllocated:', examId);
+                }
+            }
+
+            if (!examId) {
+                document.getElementById('viewAsmMetaBodyContent').innerHTML = '<p class="text-red-600">No exam ID found for this question bank</p>';
+                console.log('No exam ID found');
+                return;
+            }
+
+            console.log('Fetching exam from:', `${API_BASE_URL}/api/exam/${examId}`);
+            
+            const response = await fetch(
+                `${API_BASE_URL}/api/exam/${examId}`,
+                { headers: authHeaders() }
+            );
+
+            console.log('Exam response status:', response.status);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Exam fetch error:', errorText);
+                throw new Error(`Failed to load exam: ${response.status}`);
+            }
+
+            const examData = await response.json();
+            console.log('Exam data:', examData);
+            
+            let questions = examData.questions || [];
+            console.log('Questions count:', questions.length);
+            
+            // If questionsAllocated is specified, filter to only those questions
+            if (currentAssignment.questionsAllocated && currentAssignment.questionsAllocated.length > 0) {
+                console.log('Questions allocated:', currentAssignment.questionsAllocated);
+                const allocatedIndices = currentAssignment.questionsAllocated.map(q => {
+                    const match = q.match(/_(\d+)$/);
+                    return match ? match[1] : null;
+                }).filter(q => q !== null);
+                
+                console.log('Allocated indices:', allocatedIndices);
+                questions = questions.filter((_, index) => 
+                    allocatedIndices.includes(index.toString())
+                );
+                console.log('Filtered questions count:', questions.length);
+            }
+            
+            renderQuestionsPanel(questions);
+        } else {
+            console.log('Not a QUESTION_BANK type');
+        }
+    } catch (error) {
+        console.error('Error loading questions:', error);
+        document.getElementById('viewAsmMetaBodyContent').innerHTML = `<p class="text-red-600">Failed to load questions: ${error.message}</p>`;
+    }
+}
 
         function renderQuestionsPanel(questions) {
             const contentDiv = document.getElementById('viewAsmMetaBodyContent');
@@ -518,16 +478,13 @@
             let html = '<div class="space-y-4">';
             
             questions.forEach((question, qIndex) => {
-                const questionText = typeof question.text === 'string'
-                    ? question.text.replace(/<[^>]*>/g, '').trim()
-                    : question.text || 'Question';
-
                 html += `
                     <div class="border border-slate-300 rounded-lg p-4 bg-slate-50 hover:bg-slate-100 transition">
-                        <p class="font-bold text-slate-900 mb-3">Q${qIndex + 1}: ${questionText}</p>
+                        <p class="font-bold text-slate-900 mb-3">Q${qIndex + 1}: ${question.text || 'Question'}</p>
                         <div class="space-y-2 ml-2">
                 `;
 
+                // Render options
                 if (question.options && Array.isArray(question.options)) {
                     question.options.forEach((option, optIndex) => {
                         const isCorrect = question.answer === optIndex;
@@ -537,13 +494,9 @@
                         const checkmark = isCorrect ? ' ✓ CORRECT' : '';
                         const fontWeight = isCorrect ? 'font-semibold' : 'font-normal';
                         
-                        const optionText = typeof option === 'string'
-                            ? option
-                            : (option.value || option.text || '');
-                        
                         html += `
                             <div class="${badgeClass} border px-3 py-2 rounded text-sm ${fontWeight}">
-                                <span class="font-bold">${String.fromCharCode(65 + optIndex)})</span> ${optionText}${checkmark}
+                                <span class="font-bold">${String.fromCharCode(65 + optIndex)})</span> ${option.value || option}${checkmark}
                             </div>
                         `;
                     });
@@ -567,15 +520,15 @@
             try {
                 if (!currentAssignment || !currentAssignment.class) return;
                 
-                const classId = currentAssignment.class._id || currentAssignment.class;
+                // Get all students in the class
                 const response = await fetch(
-                    `${API_BASE_URL}/api/teachers/${currentTeacher._id}/students?classId=${classId}`,
+                    `${API_BASE_URL}/api/teachers/students?classId=${currentAssignment.class._id || currentAssignment.class.id}`,
                     { headers: authHeaders() }
                 );
                 
                 if (!response.ok) throw new Error('Failed to load class students');
                 const data = await response.json();
-                classStudents = data.students || data || [];
+                classStudents = data;
             } catch (error) {
                 console.error('Error loading class students:', error);
                 classStudents = [];
@@ -587,18 +540,17 @@
                 if (!currentTeacher || !currentAssignment) return;
 
                 const response = await fetch(
-                    `${API_BASE_URL}/api/assignments/${currentAssignment._id}/submissions`,
+                    `${API_BASE_URL}/api/teachers/${currentTeacher.id}/assignments/${currentAssignment._id}/submissions`,
                     { headers: authHeaders() }
                 );
                 
                 if (!response.ok) throw new Error('Failed to load submissions');
                 const data = await response.json();
-                submissions = data.submissions || data || [];
+                submissions = data.submissions || [];
                 renderSubmissionsTable();
             } catch (error) {
                 console.error('Error loading submissions:', error);
-                document.getElementById('viewAsmSubmissionsTableBody').innerHTML = 
-                    `<tr><td colspan="5" class="p-4 text-center text-red-600 text-sm">Failed to load submissions</td></tr>`;
+                triggerAlertNotification('Error', 'Failed to load submissions', '❌');
             }
         }
 
@@ -619,12 +571,13 @@
         }
 
         function renderSubmissionsTable() {
-            const tbody = document.getElementById('viewAsmSubmissionsTableBody');
-            
-            if (!submissions || submissions.length === 0) {
-                tbody.innerHTML = `
+            const tableBody = document.getElementById('viewAsmSubmissionsTableBody');
+            tableBody.innerHTML = '';
+
+            if (submissions.length === 0) {
+                tableBody.innerHTML = `
                     <tr>
-                        <td colspan="5" class="p-8 text-center text-slate-500">
+                        <td colspan="5" class="p-8 text-center text-slate-400 text-xs">
                             No submissions yet
                         </td>
                     </tr>
@@ -632,163 +585,87 @@
                 return;
             }
 
-            tbody.innerHTML = submissions.map(submission => {
-                const student = submission.student || {};
-                const studentName = student.firstname && student.surname 
-                    ? `${student.firstname} ${student.surname}`
-                    : student.name || 'Unknown Student';
-                const regNo = student.admissionCode || submission.regNo || '—';
-
-                // Status badge
-                let statusBadge = '<span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">Pending</span>';
-                if (submission.status === 'Reviewed') {
-                    statusBadge = '<span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">Reviewed</span>';
-                } else if (submission.status === 'Submitted') {
-                    statusBadge = '<span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800">Submitted</span>';
-                }
-
-                // Deliverable display
-                let deliverable = '—';
+            submissions.forEach(submission => {
+                const hasScore = submission.score !== null && submission.score !== undefined;
                 
-                if (currentAssignment.type === 'QUESTION_BANK') {
-                    if (submission.answers && Array.isArray(submission.answers)) {
-                        const answeredCount = submission.answers.filter(a => a !== null).length;
-                        deliverable = `<span class="text-xs bg-brand-100 text-brand-800 px-2 py-1 rounded font-mono">${answeredCount}/${submission.answers.length} Answered</span>`;
-                    }
-                } else {
-                    if (submission.submissionFile) {
-                        const fileName = submission.submissionFile.name || 'Download';
-                        const fileUrl = submission.submissionFile.url;
-                        deliverable = `<a href="${fileUrl}" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium text-xs flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> ${fileName.substring(0, 20)}${fileName.length > 20 ? '...' : ''}</a>`;
-                    }
-                }
+                const statusBadge = hasScore
+                    ? `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center">Graded</span>`
+                    : `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center">Pending Review</span>`;
 
-                // Score display
-                let scoreDisplay = '—';
-                if (submission.score !== undefined && submission.score !== null) {
-                    const totalScore = submission.totalScore || 100;
-                    const percentage = Math.round((submission.score / totalScore) * 100);
-                    scoreDisplay = `<div class="text-center"><p class="font-bold text-slate-900">${submission.score}/${totalScore}</p><p class="text-[10px] text-slate-500">${percentage}%</p></div>`;
-                }
+                const deliverableCell = submission.submissionFile
+                    ? `<div class="text-[11px] text-slate-600 bg-slate-100 p-1.5 rounded font-mono border border-slate-200/60 max-w-xs truncate" title="${submission.submissionFile}">📎 ${submission.submissionFile}</div>`
+                    : `<span class="text-slate-400 italic font-normal text-[11px]">No file submitted</span>`;
 
-                // Actions
-                let actions = `<div class="flex gap-2 justify-center flex-wrap">`;
-                if (currentAssignment.type === 'QUESTION_BANK') {
-                    actions += `<button onclick="viewStudentAnswers('${submission._id}')" class="px-2 py-1 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded transition">View</button>`;
-                }
-                actions += `<button onclick="openGradeModal('${submission._id}', '${studentName}')" class="px-2 py-1 bg-brand-900 hover:bg-brand-800 text-white text-xs font-bold rounded transition">${submission.status === 'Reviewed' ? 'Edit' : 'Grade'}</button></div>`;
-
-                return `
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="p-3 pl-4 font-medium text-slate-900">${studentName}<br><span class="text-[10px] text-slate-400">${regNo}</span></td>
-                        <td class="p-3">${statusBadge}</td>
-                        <td class="p-3 text-xs">${deliverable}</td>
-                        <td class="p-3 text-center text-xs">${scoreDisplay}</td>
-                        <td class="p-3 text-center">${actions}</td>
-                    </tr>
+                const scoreInput = `
+                    <input type="number" min="0" max="100" id="inlineScore-${submission._id}" value="${hasScore ? submission.score : ''}" placeholder="--" 
+                           class="w-16 bg-slate-50 border border-slate-300 rounded-lg p-1 text-center font-bold text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition">
                 `;
-            }).join('');
+
+                const actionBtn = `
+                    <button onclick="commitInlineSubmissionScore(this, '${submission._id}')" type="button" 
+                            class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-wide transition shadow-sm">
+                        Save Mark
+                    </button>
+                `;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/80 transition-all text-slate-700";
+                tr.innerHTML = `
+                    <td class="p-3 pl-4 font-bold text-slate-900">
+                        ${submission.studentName} 
+                        <span class="block text-[10px] text-slate-400 font-mono font-normal tracking-tight">${submission.regNo || '—'}</span>
+                    </td>
+                    <td class="p-3">${statusBadge}</td>
+                    <td class="p-3">${deliverableCell}</td>
+                    <td class="p-3 text-center">${scoreInput}</td>
+                    <td class="p-3 text-center">${actionBtn}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
         }
 
-        function viewStudentAnswers(submissionId) {
-            const submission = submissions.find(s => s._id === submissionId);
-            if (!submission) return;
+        async function commitInlineSubmissionScore(buttonElement, submissionId) {
+            const scoreInput = document.getElementById(`inlineScore-${submissionId}`);
+            if (!scoreInput) return;
 
-            const student = submission.student || {};
-            const studentName = student.firstname && student.surname 
-                ? `${student.firstname} ${student.surname}`
-                : student.name || 'Unknown';
-
-            let html = `<div class="space-y-3">`;
-            
-            if (submission.answers && Array.isArray(submission.answers)) {
-                submission.answers.forEach((answer, idx) => {
-                    const question = cbtQuestions?.[idx] || currentAssignment.cbt?.questions?.[idx];
-                    
-                    if (!question) return;
-
-                    const answerText = answer !== null && question.options?.[answer]
-                        ? question.options[answer]
-                        : (answer !== null ? `Option ${String.fromCharCode(65 + answer)}` : 'Not Answered');
-                    
-                    const isCorrect = answer === question.answer;
-                    const correctAnswer = question.options?.[question.answer] 
-                        ? question.options[question.answer]
-                        : `Option ${String.fromCharCode(65 + question.answer)}`;
-
-                    const questionText = typeof question.text === 'string'
-                        ? question.text.replace(/<[^>]*>/g, '').trim()
-                        : question.text || 'Question';
-
-                    html += `
-                        <div class="border ${isCorrect ? 'border-emerald-300 bg-emerald-50' : 'border-rose-300 bg-rose-50'} rounded-lg p-3">
-                            <p class="font-bold text-slate-900 mb-2 text-sm">Q${idx + 1}: ${questionText}</p>
-                            <div class="space-y-1 ml-3 text-xs">
-                                <p><span class="font-semibold">Student:</span> <span class="${isCorrect ? 'text-emerald-700 font-bold' : 'text-rose-700'}">${answerText}${isCorrect ? ' ✓' : ''}</span></p>
-                                ${!isCorrect ? `<p><span class="font-semibold">Correct:</span> <span class="text-emerald-700 font-bold">${correctAnswer}</span></p>` : ''}
-                            </div>
-                        </div>
-                    `;
-                });
-            } else {
-                html += '<p class="text-slate-600 text-sm">No answers recorded</p>';
-            }
-            
-            html += '</div>';
-
-            triggerAlertNotification(
-                `${studentName}'s CBT Answers`,
-                html,
-                '📝'
-            );
-        }
-
-        function openGradeModal(submissionId, studentName) {
-            const submission = submissions.find(s => s._id === submissionId);
-            if (!submission) return;
-
-            const totalScore = submission.totalScore || 100;
-            const scoreInput = prompt(
-                `Enter score for ${studentName} (out of ${totalScore}):`,
-                submission.score || '0'
-            );
-
-            if (scoreInput === null) return;
-
-            const score = parseFloat(scoreInput);
-            if (isNaN(score) || score < 0) {
-                triggerAlertNotification('Error', 'Please enter a valid score', '❌');
+            const cleanValue = scoreInput.value.trim();
+            if (cleanValue === "" || isNaN(cleanValue) || parseFloat(cleanValue) < 0 || parseFloat(cleanValue) > 100) {
+                triggerAlertNotification("Input Validation Error", "Please assign a score between 0 and 100 points.", "⚠️");
                 return;
             }
 
-            const feedback = prompt(`Enter feedback for ${studentName}:`);
+            const originalText = buttonElement.textContent;
+            buttonElement.disabled = true;
+            buttonElement.textContent = "Saving...";
 
-            saveGrade(submissionId, score, feedback, totalScore);
-        }
-
-        async function saveGrade(submissionId, score, feedback, totalScore) {
             try {
                 const response = await fetch(
-                    `${API_BASE_URL}/api/assignments/${currentAssignment._id}/review/${submissionId}`,
+                    `${API_BASE_URL}/api/teachers/${currentTeacher.id}/assignments/${currentAssignment._id}/submissions/${submissionId}`,
                     {
-                        method: 'POST',
+                        method: 'PATCH',
                         headers: authHeaders(),
-                        body: JSON.stringify({
-                            score,
-                            feedback: feedback || '',
-                            totalScore
-                        })
+                        body: JSON.stringify({ score: parseFloat(cleanValue) })
                     }
                 );
 
-                if (!response.ok) throw new Error('Failed to save grade');
+                if (!response.ok) throw new Error('Failed to save score');
 
-                triggerAlertNotification('Success', 'Grade saved successfully', '✅');
-                await loadSubmissions();
+                const submission = submissions.find(s => s._id === submissionId);
+                if (submission) {
+                    submission.score = parseFloat(cleanValue);
+                }
+
+                buttonElement.disabled = false;
+                buttonElement.textContent = originalText;
+
+                renderSubmissionsTable();
                 updateStatistics();
+                triggerAlertNotification("Grade Documented", "The score has been successfully saved.", "✅");
             } catch (error) {
-                console.error('Error saving grade:', error);
-                triggerAlertNotification('Error', 'Failed to save grade: ' + error.message, '❌');
+                console.error('Error saving score:', error);
+                buttonElement.disabled = false;
+                buttonElement.textContent = originalText;
+                triggerAlertNotification("Error", "Failed to save score. Please try again.", "❌");
             }
         }
 
@@ -802,9 +679,11 @@
         }
 
         async function executeDeletionWorkflow() {
+            closeConfirmDialog();
+
             try {
                 const response = await fetch(
-                    `${API_BASE_URL}/api/teachers/${currentTeacher._id}/assignments/${currentAssignment._id}`,
+                    `${API_BASE_URL}/api/teachers/${currentTeacher.id}/assignments/${currentAssignment._id}`,
                     {
                         method: 'DELETE',
                         headers: authHeaders()
@@ -830,7 +709,7 @@
         }
 
         function returnToHub() {
-            window.location.href = 'teacher-dashboard.html';
+            window.location.href = 'teacher-dashboard';
         }
 
         // Boot initialization on page load
