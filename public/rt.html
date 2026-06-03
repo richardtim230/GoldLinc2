@@ -2749,36 +2749,38 @@ async function commitAssignmentDeployment(event) {
       }
 
     } else if (type === 'QUESTION_BANK') {
-      // Get selected CBT
-      const cbtSelect = document.getElementById('asmModalCBT');
-      cbtId = cbtSelect ? cbtSelect.value : null;
 
-      if (!cbtId) {
+    const selectedCategory =
+        document.getElementById(
+            'asmBankCategorySelector'
+        ).value;
+
+    if (!selectedCategory) {
         throw new Error(
-          'Please select a CBT/Exam for this question bank assignment'
+            'Please select a question category'
         );
-      }
-
-      // Get selected questions
-      const selected =
-        document.querySelectorAll(
-          '#asmAllocationQuestionsContainer input[type="checkbox"]:checked'
-        );
-
-      if (selected.length === 0) {
-        throw new Error(
-          'Please select at least one question'
-        );
-      }
-
-      allocatedQuestions =
-        Array.from(selected).map(
-          cb => cb.value
-        );
-
-      assignmentBody =
-        'Question Bank Assignment';
     }
+
+    const selectedQuestions =
+        document.querySelectorAll(
+            '#asmAllocationQuestionsContainer input[type="checkbox"]:checked'
+        );
+
+    if (selectedQuestions.length === 0) {
+        throw new Error(
+            'Please select at least one question'
+        );
+    }
+
+    allocatedQuestions =
+        Array.from(selectedQuestions)
+             .map(cb => cb.value);
+
+    cbtId = selectedCategory;
+
+    assignmentBody =
+        'Question Bank Assignment';
+}
 
     const payload = {
       class: classId,
