@@ -844,19 +844,18 @@ function renderSubmissionsTable() {
         
         if (currentAssignment.type === 'QUESTION_BANK') {
             // For CBT assignments, check for answers
-            console.log('Submission answers:', submission.answers);
+            let answersArray = submission.answers;
             
-            // Handle both Map and Object formats
-            let answersObj = submission.answers;
-            if (answersObj instanceof Map) {
-                answersObj = Object.fromEntries(answersObj);
+            // Convert object to array if needed
+            if (answersArray && typeof answersArray === 'object' && !Array.isArray(answersArray)) {
+                answersArray = Object.values(answersArray);
             }
             
-            const hasAnswers = answersObj && typeof answersObj === 'object' && Object.keys(answersObj).length > 0;
+            const hasAnswers = answersArray && Array.isArray(answersArray) && answersArray.length > 0;
             
             if (hasAnswers) {
-                const answerCount = Object.keys(answersObj).length;
-                const answeredQuestions = Object.values(answersObj).filter(a => a !== null && a !== undefined && a !== '').length;
+                const answerCount = answersArray.length;
+                const answeredQuestions = answersArray.filter(a => a !== null && a !== undefined && a !== '').length;
                 deliverableCell = `<div class="text-[11px] text-slate-600 bg-slate-100 p-1.5 rounded border border-slate-200/60">
                     <span class="font-mono">✓ ${answeredQuestions}/${answerCount} Answered</span>
                 </div>`;
@@ -880,25 +879,19 @@ function renderSubmissionsTable() {
         let actionCell = '';
 
         if (currentAssignment.type === 'QUESTION_BANK') {
-            // Show automatic score for CBT
             if (hasScore) {
                 scoreCell = `<div class="text-center">
                     <div class="text-lg font-black text-emerald-600">${submission.score}</div>
                     <div class="text-[9px] text-slate-400 font-mono">Auto-graded</div>
                 </div>`;
-                actionCell = `<button onclick="viewStudentCBTAnswers('${submission._id}')" type="button" 
-                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-wide transition shadow-sm">
-                    View Answers
-                </button>`;
             } else {
                 scoreCell = `<div class="text-center text-slate-400 text-xs">Pending</div>`;
-                actionCell = `<button onclick="viewStudentCBTAnswers('${submission._id}')" type="button" 
-                        class="bg-slate-400 hover:bg-slate-500 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-wide transition shadow-sm">
-                    View Answers
-                </button>`;
             }
+            actionCell = `<button onclick="viewStudentCBTAnswers('${submission._id}')" type="button" 
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-wide transition shadow-sm">
+                View Answers
+            </button>`;
         } else {
-            // Manual scoring for file-based assignments
             scoreCell = `<input type="number" min="0" max="100" id="inlineScore-${submission._id}" value="${hasScore ? submission.score : ''}" placeholder="--" 
                    class="w-16 bg-slate-50 border border-slate-300 rounded-lg p-1 text-center font-bold text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition">`;
             actionCell = `<button onclick="commitInlineSubmissionScore(this, '${submission._id}')" type="button" 
@@ -921,7 +914,7 @@ function renderSubmissionsTable() {
         `;
         tableBody.appendChild(tr);
     });
-                    }
+}
 
 function viewStudentCBTAnswers(submissionId) {
     const submission = submissions.find(s => s._id === submissionId);
@@ -932,20 +925,17 @@ function viewStudentCBTAnswers(submissionId) {
 
     console.log('Viewing answers for submission:', submission);
 
-    // Convert Map to Object if needed
-    let answersObj = submission.answers;
-    if (answersObj instanceof Map) {
-        answersObj = Object.fromEntries(answersObj);
+    // Convert to array format if needed
+    let answersArray = submission.answers;
+    if (answersArray && typeof answersArray === 'object' && !Array.isArray(answersArray)) {
+        answersArray = Object.values(answersArray);
     }
 
     // Build a detailed view of answers
     let answerHTML = '<div class="space-y-4">';
     
-    if (answersObj && typeof answersObj === 'object' && Object.keys(answersObj).length > 0) {
-        const answerEntries = Object.entries(answersObj);
-        
-        answerEntries.forEach(([questionIndex, studentAnswer]) => {
-            const qIndex = parseInt(questionIndex);
+    if (answersArray && Array.isArray(answersArray) && answersArray.length > 0) {
+        answersArray.forEach((studentAnswer, qIndex) => {
             const answerLetter = studentAnswer !== null && studentAnswer !== undefined && studentAnswer !== '' 
                 ? String.fromCharCode(65 + parseInt(studentAnswer)) 
                 : 'Not Answered';
@@ -1007,13 +997,15 @@ function viewStudentCBTAnswers(submissionId) {
     };
 }
 
-// Restore alert modal to original state
 function restoreAlertModal() {
     if (window.alertCloseCallback) {
         window.alertCloseCallback();
     }
     closeAlertNotification();
 }
+
+
+
         async function commitInlineSubmissionScore(buttonElement, submissionId) {
             const scoreInput = document.getElementById(`inlineScore-${submissionId}`);
             if (!scoreInput) return;
