@@ -34,9 +34,65 @@
     </script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        
+        /* Spinner Styles */
+        .spinner {
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #0284c7;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .spinner-sm {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #0284c7;
+        }
+
+        /* Pulse animation for loading states */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* PDF/File preview styles */
+        .file-preview-container {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .file-icon {
+            font-size: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 </head>
 <body class="antialiased min-h-screen text-slate-800">
+
+    <!-- LOADING SPINNER OVERLAY -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-60 hidden backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 text-center max-w-xs mx-4">
+            <div class="flex justify-center mb-4">
+                <div class="spinner"></div>
+            </div>
+            <h3 class="text-sm font-black text-slate-900 uppercase tracking-wide">Loading Data</h3>
+            <p id="loadingStatus" class="text-xs text-slate-500 font-medium mt-2">Please wait while we fetch your information...</p>
+        </div>
+    </div>
 
     <!-- Top Navigation Bar Header -->
     <header class="bg-brand-900 text-white shadow-md border-b border-brand-800 sticky top-0 z-40">
@@ -89,7 +145,7 @@
                     </div>
                 </div>
                 <div class="flex gap-2 w-full sm:w-auto">
-                    <button onclick="requestAssignmentDeletion()" type="button" class="bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wide transition shadow-sm">
+                    <button onclick="requestAssignmentDeletion()" type="button" class="bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider transition shadow-sm">
                         Delete Task
                     </button>
                 </div>
@@ -132,7 +188,10 @@
                             <p id="viewAsmRoutingType" class="text-[10px] font-mono mt-0.5 font-bold uppercase tracking-wider text-slate-400">Type: Standard</p>
                         </div>
                         <div id="viewAsmMetaBodyContent" class="text-xs text-slate-600 font-medium leading-relaxed max-h-96 overflow-y-auto pr-1 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            Loading instructions...
+                            <div class="flex items-center justify-center space-x-2">
+                                <div class="spinner-sm"></div>
+                                <span>Loading instructions...</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -163,7 +222,14 @@
                                     </tr>
                                 </thead>
                                 <tbody id="viewAsmSubmissionsTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium">
-                                    <!-- Populated dynamically -->
+                                    <tr>
+                                        <td colspan="5" class="p-8 text-center">
+                                            <div class="flex items-center justify-center space-x-2">
+                                                <div class="spinner-sm"></div>
+                                                <span class="text-slate-400 text-xs">Loading submissions...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -193,11 +259,44 @@
             <h3 id="confirmTitle" class="text-sm font-black uppercase text-slate-900 tracking-wide">Confirm Action</h3>
             <p id="confirmMessage" class="text-xs text-slate-500 font-medium mt-2 leading-relaxed">Are you completely sure you want to proceed with this destructive operation?</p>
             <div class="grid grid-cols-2 gap-3 mt-5">
-                <button id="confirmCancelBtn" onclick="closeConfirmDialog()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-2.5 px-4 rounded-xl transition uppercase tracking-wide">
+                <button id="confirmCancelBtn" onclick="closeConfirmDialog()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-2.5 px-4 rounded-xl transition uppercase tracking-wider shadow-sm">
                     Cancel
                 </button>
                 <button id="confirmActionBtn" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition uppercase tracking-wider shadow-sm">
                     Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI MODAL 3: FILE PREVIEW MODAL -->
+    <div id="filePreviewModal" class="fixed inset-0 bg-slate-900/60 items-center justify-center z-50 flex hidden backdrop-blur-sm transition-all duration-300">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-96 shadow-xl border border-slate-200/80 mx-4 transform transition-all scale-95 opacity-0 duration-300 overflow-hidden flex flex-col" id="filePreviewBox">
+            <!-- Header -->
+            <div class="flex justify-between items-center p-5 border-b border-slate-100">
+                <div>
+                    <h3 id="previewFileName" class="text-sm font-black uppercase text-slate-900 tracking-wide">File Preview</h3>
+                    <p id="previewFileSize" class="text-[11px] text-slate-400 mt-1">Size: --</p>
+                </div>
+                <button onclick="closeFilePreview()" class="text-slate-400 hover:text-slate-600 font-bold text-2xl leading-none">×</button>
+            </div>
+
+            <!-- Preview Content -->
+            <div id="previewContent" class="flex-1 overflow-y-auto bg-slate-50 p-6">
+                <div class="text-center">
+                    <div class="text-4xl mb-3">📄</div>
+                    <p class="text-slate-500 text-xs">Loading preview...</p>
+                </div>
+            </div>
+
+            <!-- Footer Actions -->
+            <div class="flex gap-2 p-5 border-t border-slate-100 bg-white">
+                <button onclick="downloadCurrentFile()" class="flex-1 bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition uppercase tracking-wider shadow-sm flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Download
+                </button>
+                <button onclick="closeFilePreview()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-2.5 px-4 rounded-xl transition uppercase tracking-wider">
+                    Close
                 </button>
             </div>
         </div>
@@ -215,6 +314,50 @@
         let submissions = [];
         let classStudents = [];
         let activeConfirmCallback = null;
+        let currentPreviewFile = null;
+
+        // ============ UTILITY FUNCTIONS ============
+        function showLoadingSpinner(status = "Loading data...") {
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+            document.getElementById('loadingStatus').textContent = status;
+        }
+
+        function hideLoadingSpinner() {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+        }
+
+        function getFileIcon(filename) {
+            if (!filename) return '📄';
+            const ext = filename.split('.').pop().toLowerCase();
+            const icons = {
+                'pdf': '📕',
+                'doc': '📗', 'docx': '📗',
+                'xls': '📊', 'xlsx': '📊',
+                'ppt': '📈', 'pptx': '📈',
+                'jpg': '🖼️', 'jpeg': '🖼️', 'png': '🖼️', 'gif': '🖼️',
+                'txt': '📝',
+                'zip': '📦', 'rar': '📦',
+                'mp4': '🎬', 'avi': '🎬', 'mov': '🎬'
+            };
+            return icons[ext] || '📄';
+        }
+
+        function formatFileSize(bytes) {
+            if (!bytes) return '--';
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        function extractFileName(path) {
+            if (!path) return 'Unknown File';
+            if (typeof path === 'string') {
+                return path.split('/').pop().split('?')[0];
+            }
+            return path.filename || path.originalName || 'Unknown File';
+        }
 
         // ============ AUTH HEADERS ============
         function authHeaders() {
@@ -281,29 +424,128 @@
             }, 200);
         }
 
+        // ============ FILE PREVIEW FUNCTIONS ============
+        async function openFilePreview(fileUrl, fileName) {
+            if (!fileUrl) {
+                triggerAlertNotification('Error', 'File URL not available', '❌');
+                return;
+            }
+
+            currentPreviewFile = { url: fileUrl, name: fileName };
+            
+            const overlay = document.getElementById('filePreviewModal');
+            const box = document.getElementById('filePreviewBox');
+            const previewContent = document.getElementById('previewContent');
+
+            document.getElementById('previewFileName').textContent = extractFileName(fileName);
+            document.getElementById('previewFileSize').textContent = 'Size: Loading...';
+
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                box.classList.remove('scale-95', 'opacity-0');
+                box.classList.add('scale-100', 'opacity-100');
+            }, 10);
+
+            // Attempt to load preview
+            try {
+                const ext = extractFileName(fileName).split('.').pop().toLowerCase();
+                
+                if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+                    previewContent.innerHTML = `
+                        <div class="flex justify-center">
+                            <img src="${fileUrl}" alt="Preview" class="max-w-full max-h-96 rounded-lg shadow-md" onerror="document.getElementById('previewContent').innerHTML='<p class=\"text-slate-500\">Unable to load image preview</p>'">
+                        </div>
+                    `;
+                } else if (ext === 'pdf') {
+                    previewContent.innerHTML = `
+                        <div class="text-center">
+                            <div class="text-6xl mb-3">📕</div>
+                            <p class="text-slate-600 font-bold">PDF Document</p>
+                            <p class="text-slate-400 text-xs mt-2">Click download to view the full PDF</p>
+                        </div>
+                    `;
+                } else if (['txt', 'log'].includes(ext)) {
+                    const response = await fetch(fileUrl);
+                    const text = await response.text();
+                    previewContent.innerHTML = `
+                        <pre class="bg-slate-900 text-green-400 p-4 rounded-lg font-mono text-xs overflow-auto max-h-96">${text.slice(0, 1000)}</pre>
+                    `;
+                } else {
+                    previewContent.innerHTML = `
+                        <div class="text-center">
+                            <div class="text-6xl mb-3">${getFileIcon(fileName)}</div>
+                            <p class="text-slate-600 font-bold">${ext.toUpperCase()} File</p>
+                            <p class="text-slate-400 text-xs mt-2">Preview not available for this file type</p>
+                        </div>
+                    `;
+                }
+
+                document.getElementById('previewFileSize').textContent = 'Size: Available';
+            } catch (error) {
+                console.error('Error loading preview:', error);
+                previewContent.innerHTML = `
+                    <div class="text-center">
+                        <div class="text-6xl mb-3">❌</div>
+                        <p class="text-slate-600">Unable to load preview</p>
+                        <p class="text-slate-400 text-xs mt-2">Click download to open the file</p>
+                    </div>
+                `;
+            }
+        }
+
+        function closeFilePreview() {
+            const overlay = document.getElementById('filePreviewModal');
+            const box = document.getElementById('filePreviewBox');
+            
+            box.classList.remove('scale-100', 'opacity-100');
+            box.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                currentPreviewFile = null;
+            }, 200);
+        }
+
+        function downloadCurrentFile() {
+            if (!currentPreviewFile) return;
+            
+            const link = document.createElement('a');
+            link.href = currentPreviewFile.url;
+            link.download = extractFileName(currentPreviewFile.name) || 'download';
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
         // ============ INITIALIZATION ============
         async function initializeAssignmentView() {
             try {
+                showLoadingSpinner('Loading assignment view...');
+
                 // Get assignment ID from URL or sessionStorage
                 const urlParams = new URLSearchParams(window.location.search);
                 const assignmentId = urlParams.get('id');
                 const sessionData = sessionStorage.getItem('currentAssignmentData');
 
                 if (!assignmentId && !sessionData) {
+                    hideLoadingSpinner();
                     triggerAlertNotification('Error', 'No assignment selected', '❌');
                     setTimeout(() => returnToHub(), 2000);
                     return;
                 }
 
                 // LOAD TEACHER INFO FIRST
+                showLoadingSpinner('Loading teacher information...');
                 await loadTeacherInfo();
 
                 if (!currentTeacher || !currentTeacher.id) {
+                    hideLoadingSpinner();
                     triggerAlertNotification('Error', 'Failed to load teacher information', '❌');
                     return;
                 }
 
                 // THEN load assignment
+                showLoadingSpinner('Loading assignment data...');
                 if (sessionData) {
                     currentAssignment = JSON.parse(sessionData);
                     sessionStorage.removeItem('currentAssignmentData');
@@ -313,17 +555,24 @@
 
                 if (currentAssignment) {
                     renderAssignmentDetails();
+                    
                     // Load questions FIRST if QUESTION_BANK type
                     if (currentAssignment.type === 'QUESTION_BANK') {
+                        showLoadingSpinner('Loading exam questions...');
                         await loadQuestions();
                     }
+                    
                     // Then load submissions AND class students
+                    showLoadingSpinner('Loading submissions and class data...');
                     await loadSubmissions();
                     await loadClassStudents();
                     updateStatistics();
+                    
+                    hideLoadingSpinner();
                 }
             } catch (error) {
                 console.error('Initialization error:', error);
+                hideLoadingSpinner();
                 triggerAlertNotification('Error', 'Failed to load assignment', '❌');
             }
         }
@@ -384,88 +633,88 @@
                 document.getElementById('viewAsmMetaBodyContent').innerHTML = currentAssignment.description || 'No instructions provided';
             } else {
                 // For QUESTION_BANK, show loading message - questions will be loaded separately
-                document.getElementById('viewAsmMetaBodyContent').innerHTML = '<p class="text-slate-600">Loading questions...</p>';
+                document.getElementById('viewAsmMetaBodyContent').innerHTML = '<div class="flex items-center justify-center space-x-2"><div class="spinner-sm"></div><span>Loading questions...</span></div>';
             }
             
             document.getElementById('viewAsmRoutingType').textContent = `Type: ${currentAssignment.type || 'STANDARD'}`;
         }
 
         async function loadQuestions() {
-    try {
-        if (!currentAssignment) {
-            console.log('No assignment');
-            return;
-        }
-
-        console.log('Assignment type:', currentAssignment.type);
-        console.log('CBT ID:', currentAssignment.cbt);
-        console.log('Questions Allocated:', currentAssignment.questionsAllocated);
-
-        if (currentAssignment.type === 'QUESTION_BANK') {
-            let examId = currentAssignment.cbt;
-
-            // If no direct CBT ID, try to extract from questionsAllocated
-            if (!examId && currentAssignment.questionsAllocated && currentAssignment.questionsAllocated.length > 0) {
-                const allocated = currentAssignment.questionsAllocated[0];
-                // Format: "cbt_69307fd5a9335dea83b94d30_0"
-                const match = allocated.match(/cbt_([a-f0-9]+)_/);
-                if (match) {
-                    examId = match[1];
-                    console.log('Extracted exam ID from questionsAllocated:', examId);
+            try {
+                if (!currentAssignment) {
+                    console.log('No assignment');
+                    return;
                 }
+
+                console.log('Assignment type:', currentAssignment.type);
+                console.log('CBT ID:', currentAssignment.cbt);
+                console.log('Questions Allocated:', currentAssignment.questionsAllocated);
+
+                if (currentAssignment.type === 'QUESTION_BANK') {
+                    let examId = currentAssignment.cbt;
+
+                    // If no direct CBT ID, try to extract from questionsAllocated
+                    if (!examId && currentAssignment.questionsAllocated && currentAssignment.questionsAllocated.length > 0) {
+                        const allocated = currentAssignment.questionsAllocated[0];
+                        // Format: "cbt_69307fd5a9335dea83b94d30_0"
+                        const match = allocated.match(/cbt_([a-f0-9]+)_/);
+                        if (match) {
+                            examId = match[1];
+                            console.log('Extracted exam ID from questionsAllocated:', examId);
+                        }
+                    }
+
+                    if (!examId) {
+                        document.getElementById('viewAsmMetaBodyContent').innerHTML = '<p class="text-red-600">No exam ID found for this question bank</p>';
+                        console.log('No exam ID found');
+                        return;
+                    }
+
+                    console.log('Fetching exam from:', `${API_BASE_URL}/api/exam/${examId}`);
+                    
+                    const response = await fetch(
+                        `${API_BASE_URL}/api/exam/${examId}`,
+                        { headers: authHeaders() }
+                    );
+
+                    console.log('Exam response status:', response.status);
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error('Exam fetch error:', errorText);
+                        throw new Error(`Failed to load exam: ${response.status}`);
+                    }
+
+                    const examData = await response.json();
+                    console.log('Exam data:', examData);
+                    
+                    let questions = examData.questions || [];
+                    console.log('Questions count:', questions.length);
+                    
+                    // If questionsAllocated is specified, filter to only those questions
+                    if (currentAssignment.questionsAllocated && currentAssignment.questionsAllocated.length > 0) {
+                        console.log('Questions allocated:', currentAssignment.questionsAllocated);
+                        const allocatedIndices = currentAssignment.questionsAllocated.map(q => {
+                            const match = q.match(/_(\d+)$/);
+                            return match ? match[1] : null;
+                        }).filter(q => q !== null);
+                        
+                        console.log('Allocated indices:', allocatedIndices);
+                        questions = questions.filter((_, index) => 
+                            allocatedIndices.includes(index.toString())
+                        );
+                        console.log('Filtered questions count:', questions.length);
+                    }
+                    
+                    renderQuestionsPanel(questions);
+                } else {
+                    console.log('Not a QUESTION_BANK type');
+                }
+            } catch (error) {
+                console.error('Error loading questions:', error);
+                document.getElementById('viewAsmMetaBodyContent').innerHTML = `<p class="text-red-600">Failed to load questions: ${error.message}</p>`;
             }
-
-            if (!examId) {
-                document.getElementById('viewAsmMetaBodyContent').innerHTML = '<p class="text-red-600">No exam ID found for this question bank</p>';
-                console.log('No exam ID found');
-                return;
-            }
-
-            console.log('Fetching exam from:', `${API_BASE_URL}/api/exam/${examId}`);
-            
-            const response = await fetch(
-                `${API_BASE_URL}/api/exam/${examId}`,
-                { headers: authHeaders() }
-            );
-
-            console.log('Exam response status:', response.status);
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Exam fetch error:', errorText);
-                throw new Error(`Failed to load exam: ${response.status}`);
-            }
-
-            const examData = await response.json();
-            console.log('Exam data:', examData);
-            
-            let questions = examData.questions || [];
-            console.log('Questions count:', questions.length);
-            
-            // If questionsAllocated is specified, filter to only those questions
-            if (currentAssignment.questionsAllocated && currentAssignment.questionsAllocated.length > 0) {
-                console.log('Questions allocated:', currentAssignment.questionsAllocated);
-                const allocatedIndices = currentAssignment.questionsAllocated.map(q => {
-                    const match = q.match(/_(\d+)$/);
-                    return match ? match[1] : null;
-                }).filter(q => q !== null);
-                
-                console.log('Allocated indices:', allocatedIndices);
-                questions = questions.filter((_, index) => 
-                    allocatedIndices.includes(index.toString())
-                );
-                console.log('Filtered questions count:', questions.length);
-            }
-            
-            renderQuestionsPanel(questions);
-        } else {
-            console.log('Not a QUESTION_BANK type');
         }
-    } catch (error) {
-        console.error('Error loading questions:', error);
-        document.getElementById('viewAsmMetaBodyContent').innerHTML = `<p class="text-red-600">Failed to load questions: ${error.message}</p>`;
-    }
-}
 
         function renderQuestionsPanel(questions) {
             const contentDiv = document.getElementById('viewAsmMetaBodyContent');
@@ -592,21 +841,64 @@
                     ? `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center">Graded</span>`
                     : `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center">Pending Review</span>`;
 
-                const deliverableCell = submission.submissionFile
-                    ? `<div class="text-[11px] text-slate-600 bg-slate-100 p-1.5 rounded font-mono border border-slate-200/60 max-w-xs truncate" title="${submission.submissionFile}">📎 ${submission.submissionFile}</div>`
-                    : `<span class="text-slate-400 italic font-normal text-[11px]">No file submitted</span>`;
+                // Handle deliverable display
+                let deliverableCell = '';
+                
+                if (currentAssignment.type === 'QUESTION_BANK') {
+                    // For CBT assignments, show student's answers
+                    if (submission.answers && typeof submission.answers === 'object') {
+                        const answerCount = Object.keys(submission.answers).length;
+                        const answeredQuestions = Object.values(submission.answers).filter(a => a !== null && a !== undefined).length;
+                        deliverableCell = `<div class="text-[11px] text-slate-600 bg-slate-100 p-1.5 rounded border border-slate-200/60">
+                            <span class="font-mono">✓ ${answeredQuestions}/${answerCount} Answered</span>
+                        </div>`;
+                    } else {
+                        deliverableCell = `<span class="text-slate-400 italic font-normal text-[11px]">No answers submitted</span>`;
+                    }
+                } else {
+                    // For file-based assignments, show the file with preview/download
+                    if (submission.submissionFile) {
+                        const fileName = extractFileName(submission.submissionFile);
+                        const fileIcon = getFileIcon(fileName);
+                        deliverableCell = `<button onclick="openFilePreview('${submission.submissionFile || ''}', '${fileName}')" class="text-[11px] text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 p-1.5 rounded font-mono border border-blue-200 max-w-xs truncate transition cursor-pointer" title="${fileName}">
+                            ${fileIcon} ${fileName}
+                        </button>`;
+                    } else {
+                        deliverableCell = `<span class="text-slate-400 italic font-normal text-[11px]">No file submitted</span>`;
+                    }
+                }
 
-                const scoreInput = `
-                    <input type="number" min="0" max="100" id="inlineScore-${submission._id}" value="${hasScore ? submission.score : ''}" placeholder="--" 
-                           class="w-16 bg-slate-50 border border-slate-300 rounded-lg p-1 text-center font-bold text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition">
-                `;
+                // Handle score and action display
+                let scoreCell = '';
+                let actionCell = '';
 
-                const actionBtn = `
-                    <button onclick="commitInlineSubmissionScore(this, '${submission._id}')" type="button" 
+                if (currentAssignment.type === 'QUESTION_BANK') {
+                    // Show automatic score for CBT
+                    if (hasScore) {
+                        scoreCell = `<div class="text-center">
+                            <div class="text-lg font-black text-emerald-600">${submission.score}</div>
+                            <div class="text-[9px] text-slate-400 font-mono">Auto-graded</div>
+                        </div>`;
+                        actionCell = `<button onclick="viewStudentCBTAnswers(this, '${submission._id}')" type="button" 
+                                class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-wide transition shadow-sm">
+                            View Answers
+                        </button>`;
+                    } else {
+                        scoreCell = `<div class="text-center text-slate-400">Pending</div>`;
+                        actionCell = `<button onclick="viewStudentCBTAnswers(this, '${submission._id}')" type="button" 
+                                class="bg-slate-400 hover:bg-slate-500 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-wide transition shadow-sm">
+                            View Answers
+                        </button>`;
+                    }
+                } else {
+                    // Manual scoring for file-based assignments
+                    scoreCell = `<input type="number" min="0" max="100" id="inlineScore-${submission._id}" value="${hasScore ? submission.score : ''}" placeholder="--" 
+                           class="w-16 bg-slate-50 border border-slate-300 rounded-lg p-1 text-center font-bold text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition">`;
+                    actionCell = `<button onclick="commitInlineSubmissionScore(this, '${submission._id}')" type="button" 
                             class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-wide transition shadow-sm">
                         Save Mark
-                    </button>
-                `;
+                    </button>`;
+                }
 
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50/80 transition-all text-slate-700";
@@ -617,11 +909,78 @@
                     </td>
                     <td class="p-3">${statusBadge}</td>
                     <td class="p-3">${deliverableCell}</td>
-                    <td class="p-3 text-center">${scoreInput}</td>
-                    <td class="p-3 text-center">${actionBtn}</td>
+                    <td class="p-3 text-center">${scoreCell}</td>
+                    <td class="p-3 text-center">${actionCell}</td>
                 `;
                 tableBody.appendChild(tr);
             });
+        }
+
+        function viewStudentCBTAnswers(buttonElement, submissionId) {
+            const submission = submissions.find(s => s._id === submissionId);
+            if (!submission) return;
+
+            // Build a detailed view of answers
+            let answerHTML = '<div class="space-y-4">';
+            
+            if (submission.answers && typeof submission.answers === 'object') {
+                const answerEntries = Object.entries(submission.answers);
+                
+                answerEntries.forEach(([questionIndex, studentAnswer]) => {
+                    const qIndex = parseInt(questionIndex);
+                    answerHTML += `
+                        <div class="border border-slate-300 rounded-lg p-3 bg-white">
+                            <p class="font-bold text-slate-900 text-sm mb-2">Q${qIndex + 1}</p>
+                            <div class="pl-2 space-y-1">
+                                <p class="text-xs text-slate-600">
+                                    <span class="font-bold">Student Answer:</span> 
+                                    <span class="bg-blue-50 border border-blue-200 px-2 py-0.5 rounded text-blue-800 font-mono">
+                                        ${studentAnswer !== null && studentAnswer !== undefined ? String.fromCharCode(65 + studentAnswer) : 'Not Answered'}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                answerHTML += '<p class="text-slate-600 text-sm">No answer data available</p>';
+            }
+
+            answerHTML += '</div>';
+
+            // Show in alert modal with the answers
+            document.getElementById('modalTitle').textContent = `${submission.studentName}'s CBT Answers`;
+            document.getElementById('modalMessage').textContent = `Score: ${submission.score || 'Pending'} / 100`;
+            
+            const overlay = document.getElementById('customAlertModal');
+            const box = document.getElementById('customAlertBox');
+            
+            // Replace the modal content temporarily
+            const originalContent = box.innerHTML;
+            box.innerHTML = `
+                <div class="text-left max-h-96 overflow-y-auto mb-4">
+                    <h3 class="text-sm font-black uppercase text-slate-900 tracking-wide mb-2">${submission.studentName}'s CBT Answers</h3>
+                    <p class="text-xs text-slate-500 font-medium mb-4">Score: <span class="font-bold text-emerald-600">${submission.score || 'Pending'}</span> / 100</p>
+                    ${answerHTML}
+                </div>
+                <button onclick="closeAlertNotification()" class="mt-5 w-full bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition uppercase tracking-wider">
+                    Close
+                </button>
+            `;
+            
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                box.classList.remove('scale-95', 'opacity-0');
+                box.classList.add('scale-100', 'opacity-100');
+            }, 10);
+
+            // Restore original content when closing
+            const originalCloseAlert = window.closeAlertNotification;
+            window.closeAlertNotification = function() {
+                box.innerHTML = originalContent;
+                originalCloseAlert();
+                window.closeAlertNotification = originalCloseAlert;
+            };
         }
 
         async function commitInlineSubmissionScore(buttonElement, submissionId) {
