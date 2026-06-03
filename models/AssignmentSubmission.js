@@ -4,11 +4,10 @@ const AssignmentSubmissionSchema = new mongoose.Schema({
   assignment: { type: mongoose.Schema.Types.ObjectId, ref: 'Assignment', required: true },
   student: { type: mongoose.Schema.Types.ObjectId, ref: 'Student', required: true },
   submissionFile: { url: String, name: String },
-  // For CBT/QUESTION_BANK assignments - Maps question index to answer index
+  // Store student answers as an array (question index = array index)
   answers: {
-    type: Map,
-    of: mongoose.Schema.Types.Mixed,
-    default: new Map()
+    type: [mongoose.Schema.Types.Mixed],
+    default: []
   },
   submittedAt: { type: Date, default: Date.now },
   status: { type: String, enum: ['Pending', 'Submitted', 'Reviewed', 'Overdue'], default: 'Submitted' },
