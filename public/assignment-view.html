@@ -840,22 +840,23 @@ function renderSubmissionsTable() {
             ? `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center">Graded</span>`
             : `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center">Pending Review</span>`;
 
-        // Handle deliverable display
         let deliverableCell = '';
         
         if (currentAssignment.type === 'QUESTION_BANK') {
-            // For CBT assignments, check for answers more carefully
-            console.log('Checking submission answers:', submission);
-            console.log('Answers object:', submission.answers);
+            // For CBT assignments, check for answers
+            console.log('Submission answers:', submission.answers);
             
-            // Check if answers exist and is not empty
-            const hasAnswers = submission.answers && 
-                               (typeof submission.answers === 'object') && 
-                               Object.keys(submission.answers).length > 0;
+            // Handle both Map and Object formats
+            let answersObj = submission.answers;
+            if (answersObj instanceof Map) {
+                answersObj = Object.fromEntries(answersObj);
+            }
+            
+            const hasAnswers = answersObj && typeof answersObj === 'object' && Object.keys(answersObj).length > 0;
             
             if (hasAnswers) {
-                const answerCount = Object.keys(submission.answers).length;
-                const answeredQuestions = Object.values(submission.answers).filter(a => a !== null && a !== undefined && a !== '').length;
+                const answerCount = Object.keys(answersObj).length;
+                const answeredQuestions = Object.values(answersObj).filter(a => a !== null && a !== undefined && a !== '').length;
                 deliverableCell = `<div class="text-[11px] text-slate-600 bg-slate-100 p-1.5 rounded border border-slate-200/60">
                     <span class="font-mono">✓ ${answeredQuestions}/${answerCount} Answered</span>
                 </div>`;
@@ -864,10 +865,10 @@ function renderSubmissionsTable() {
             }
         } else {
             // For file-based assignments, show the file with preview/download
-            if (submission.submissionFile) {
-                const fileName = extractFileName(submission.submissionFile);
+            if (submission.submissionFile && submission.submissionFile.url) {
+                const fileName = submission.submissionFile.name || extractFileName(submission.submissionFile.url);
                 const fileIcon = getFileIcon(fileName);
-                deliverableCell = `<button onclick="openFilePreview('${submission.submissionFile.replace(/'/g, "\\'")}', '${fileName.replace(/'/g, "\\'")}'); return false;" class="text-[11px] text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 p-1.5 rounded font-mono border border-blue-200 max-w-xs truncate transition cursor-pointer" title="${fileName}">
+                deliverableCell = `<button onclick="openFilePreview('${submission.submissionFile.url.replace(/'/g, "\\'")}', '${fileName.replace(/'/g, "\\'")}'); return false;" class="text-[11px] text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 p-1.5 rounded font-mono border border-blue-200 max-w-xs truncate transition cursor-pointer" title="${fileName}">
                     ${fileIcon} ${fileName}
                 </button>`;
             } else {
@@ -875,7 +876,6 @@ function renderSubmissionsTable() {
             }
         }
 
-        // Handle score and action display
         let scoreCell = '';
         let actionCell = '';
 
@@ -891,7 +891,7 @@ function renderSubmissionsTable() {
                     View Answers
                 </button>`;
             } else {
-                scoreCell = `<div class="text-center text-slate-400">Pending</div>`;
+                scoreCell = `<div class="text-center text-slate-400 text-xs">Pending</div>`;
                 actionCell = `<button onclick="viewStudentCBTAnswers('${submission._id}')" type="button" 
                         class="bg-slate-400 hover:bg-slate-500 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-wide transition shadow-sm">
                     View Answers
@@ -921,9 +921,9 @@ function renderSubmissionsTable() {
         `;
         tableBody.appendChild(tr);
     });
-}
+                    }
 
-        function viewStudentCBTAnswers(submissionId) {
+function viewStudentCBTAnswers(submissionId) {
     const submission = submissions.find(s => s._id === submissionId);
     if (!submission) {
         triggerAlertNotification('Error', 'Submission not found', '❌');
@@ -932,16 +932,24 @@ function renderSubmissionsTable() {
 
     console.log('Viewing answers for submission:', submission);
 
+    // Convert Map to Object if needed
+    let answersObj = submission.answers;
+    if (answersObj instanceof Map) {
+        answersObj = Object.fromEntries(answersObj);
+    }
+
     // Build a detailed view of answers
     let answerHTML = '<div class="space-y-4">';
     
-    if (submission.answers && typeof submission.answers === 'object' && Object.keys(submission.answers).length > 0) {
-        const answerEntries = Object.entries(submission.answers);
+    if (answersObj && typeof answersObj === 'object' && Object.keys(answersObj).length > 0) {
+        const answerEntries = Object.entries(answersObj);
         
         answerEntries.forEach(([questionIndex, studentAnswer]) => {
             const qIndex = parseInt(questionIndex);
-            const answerLetter = studentAnswer !== null && studentAnswer !== undefined ? String.fromCharCode(65 + studentAnswer) : 'Not Answered';
-            const answerClass = studentAnswer !== null && studentAnswer !== undefined 
+            const answerLetter = studentAnswer !== null && studentAnswer !== undefined && studentAnswer !== '' 
+                ? String.fromCharCode(65 + parseInt(studentAnswer)) 
+                : 'Not Answered';
+            const answerClass = studentAnswer !== null && studentAnswer !== undefined && studentAnswer !== '' 
                 ? 'bg-blue-50 border border-blue-200 text-blue-800' 
                 : 'bg-red-50 border border-red-200 text-red-800';
             
@@ -951,7 +959,7 @@ function renderSubmissionsTable() {
                     <div class="pl-2 space-y-1">
                         <p class="text-xs text-slate-600">
                             <span class="font-bold">Student Answer:</span> 
-                            <span class="${answerClass} px-2 py-0.5 rounded font-mono">
+                            <span class="${answerClass} px-2 py-0.5 rounded font-mono font-bold">
                                 ${answerLetter}
                             </span>
                         </p>
@@ -999,14 +1007,13 @@ function renderSubmissionsTable() {
     };
 }
 
-// Add this function to restore the alert modal
+// Restore alert modal to original state
 function restoreAlertModal() {
     if (window.alertCloseCallback) {
         window.alertCloseCallback();
     }
     closeAlertNotification();
 }
-
         async function commitInlineSubmissionScore(buttonElement, submissionId) {
             const scoreInput = document.getElementById(`inlineScore-${submissionId}`);
             if (!scoreInput) return;
