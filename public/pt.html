@@ -360,7 +360,79 @@
                 </div>
             </div>
         </div>
+<!-- Find this section in pt.html and replace it -->
 
+<!-- RIGHT AREA: REGISTRY DISPATCHES & DIRECT GATEWAY ANCHORS (1/3 width) -->
+<aside class="space-y-8">
+    
+    <!-- FEES STATUS CARD -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+        <div class="flex items-center space-x-4">
+            <div class="p-3 bg-blue-50 rounded-xl text-blue-600 shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                </svg>
+            </div>
+            <div class="flex-grow">
+                <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Fees Status</p>
+                <p class="text-2xl font-black text-slate-900 mt-1" id="feesStatus">₦0.00</p>
+                <span class="inline-flex items-center bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full mt-1.5" id="feesStatusBadge">
+                    <span class="w-1.5 h-1.5 bg-emerald-600 rounded-full mr-1.5"></span>
+                    Cleared
+                </span>
+            </div>
+        </div>
+
+        <!-- Action Button Container -->
+        <div id="feesStatusContainer" class="mt-4 flex gap-2">
+            <!-- Button will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <!-- BULLETIN DISPATCH BOARD CARD -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+        <div>
+            <h3 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Registry Dispatch Board</h3>
+            <p class="text-xs text-slate-500">Official real-time updates from management desks.</p>
+        </div>
+        <div class="space-y-4 divide-y divide-slate-100">
+            <div class="pt-0 space-y-1.5">
+                <span class="inline-block text-[9px] font-black tracking-wider uppercase bg-rose-50 border border-rose-100 text-rose-700 px-2 py-0.5 rounded-md">Urgent Notice</span>
+                <h4 class="text-xs font-bold text-slate-900">Mid-Term Intermission Break</h4>
+                <p class="text-[11px] text-slate-500 leading-relaxed">The campus compound will close for midterm recess starting next Wednesday. Terminal lessons resume the subsequent Monday.</p>
+            </div>
+            <div class="pt-4 space-y-1.5">
+                <span class="inline-block text-[9px] font-black tracking-wider uppercase bg-brand-50 border border-brand-100 text-brand-700 px-2 py-0.5 rounded-md">Event Desk</span>
+                <h4 class="text-xs font-bold text-slate-900">Open-Day Lesson Matrix Inspection</h4>
+                <p class="text-[11px] text-slate-500 leading-relaxed">Parents are welcome to inspect physical lesson cards and consult directly with module tutors from 10:00 AM.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PREMIUM GATEWAY ACTION ANCHOR BOX -->
+    <div class="bg-gradient-to-br from-brand-900 to-brand-950 rounded-2xl shadow-xl p-6 text-white space-y-4 relative overflow-hidden border border-brand-800">
+        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-brand-800/20 rounded-full blur-xl pointer-events-none"></div>
+        <div>
+            <h3 class="text-sm font-bold uppercase tracking-wider font-serif">Registry Gateways</h3>
+            <p class="text-[11px] text-brand-100/70">Secure automated operations pipelines.</p>
+        </div>
+        <div class="space-y-2 text-xs font-bold">
+            <button onclick="handleFeesAction(currentSelectedStudent, false)" class="w-full text-left bg-brand-800/60 hover:bg-brand-800 p-3 rounded-xl border border-brand-700/40 flex items-center justify-between group transition">
+                <span>Pay School Fees</span>
+                <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </button>
+            <button onclick="alert('Opening encrypted communication thread...')" class="w-full text-left bg-brand-800/60 hover:bg-brand-800 p-3 rounded-xl border border-brand-700/40 flex items-center justify-between group transition">
+                <span>Message Form Tutor Desk</span>
+                <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+</aside>
     </main>
 
 <script>
@@ -781,7 +853,10 @@ function updateStudentInfoDisplay(student) {
     document.getElementById('attendanceNote').textContent = 'Current term';
 
     const outstanding = feesStats.outstanding || 0;
-    document.getElementById('feesStatus').textContent = formatCurrency(outstanding);
+    const isFeesCleared = outstanding === 0;
+
+    // Update fees display with button
+    updateFeesDisplay(student._id, outstanding, isFeesCleared);
 
     document.getElementById('caAverage').textContent = (academicStats.averageScore || 0).toFixed(1);
     document.getElementById('caRanking').textContent = 'Recent average';
