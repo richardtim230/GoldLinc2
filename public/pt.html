@@ -19,9 +19,9 @@
                         brand: {
                             50: '#f0f9ff',
                             100: '#e0f2fe',
-                            500: '#0284c7', // Primary Sky Blue
-                            800: '#075985', // Accent Deep Blue
-                            900: '#0c4a6e', // Dark Crest
+                            500: '#0284c7',
+                            800: '#075985',
+                            900: '#0c4a6e',
                         },
                         gold: {
                             400: '#fbbf24',
@@ -38,19 +38,82 @@
         }
     </script>
     <style>
-        /* Smooth Custom Parabolic Curve Top for Mobile Bottom Sheet Nav */
         .parabolic-top {
             border-top-left-radius: 50% 40px;
             border-top-right-radius: 50% 40px;
         }
-        /* Custom scrollbar aesthetics for elegant interfaces */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Loading Spinner */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .spinner-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .spinner-ring {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #0284c7;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .spinner-text {
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .spinner-status {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
     </style>
 </head>
-<body class="bg-[#f8fafc] text-slate-800 font-sans antialiased min-h-screen flex flex-col md:flex-row overflow-x-hidden">
+<body class="bg-[#f8fafc] text-slate-800 font-sans antialiased min-h-screen flex flex-col md:flex-row overflow-x-hidden" onload="initializeDashboard()">
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner-container">
+            <div class="spinner-ring"></div>
+            <div class="spinner-text">
+                <div id="spinnerMainText">Loading Dashboard</div>
+                <div id="spinnerStatus" class="spinner-status">Initializing system...</div>
+            </div>
+        </div>
+    </div>
 
     <!-- 1. DESKTOP PERMANENT LEFT SIDEBAR PANEL -->
     <aside class="hidden md:flex flex-col w-72 bg-brand-900 text-white shrink-0 shadow-2xl relative z-30 border-r border-brand-800">
@@ -68,9 +131,8 @@
         <!-- Sibling Multi-Ward Switcher Node -->
         <div class="p-4 mx-4 my-5 bg-brand-800/50 rounded-2xl border border-brand-500/30 backdrop-blur-sm">
             <label class="block text-[10px] font-bold text-brand-500 uppercase tracking-wider mb-1.5 px-1">Active Ward Account</label>
-            <select class="w-full bg-brand-900 border border-brand-800 rounded-xl text-xs font-bold text-white focus:ring-1 focus:ring-brand-500 cursor-pointer py-2 px-3">
-                <option value="ward-1">Samuel Adeniyi (Secondary)</option>
-                <option value="ward-2">Deborah Adeniyi (Primary)</option>
+            <select id="wardSelector" onchange="switchWard()" class="w-full bg-brand-900 border border-brand-800 rounded-xl text-xs font-bold text-white focus:ring-1 focus:ring-brand-500 cursor-pointer py-2 px-3">
+                <option value="">Select Student</option>
             </select>
         </div>
 
@@ -78,16 +140,20 @@
         <nav class="flex-grow px-4 space-y-1.5">
             <p class="text-[10px] font-bold text-brand-500 uppercase tracking-widest px-3 mb-2">Control Workspace</p>
             <a href="#" class="flex items-center px-4 py-3 text-sm font-semibold rounded-xl bg-gradient-to-r from-brand-800 to-brand-500 text-white shadow-md transition-all">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"/></svg>
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                 Main Dashboard
             </a>
             <a href="results.html" class="flex items-center px-4 py-3 text-sm font-medium text-brand-100 hover:text-white hover:bg-brand-800/40 rounded-xl transition-all">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                 Result Sheet Archive
             </a>
             <a href="#" onclick="alert('Launching secure financial gateway links...')" class="flex items-center px-4 py-3 text-sm font-medium text-brand-100 hover:text-white hover:bg-brand-800/40 rounded-xl transition-all">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
                 Tuition Ledger & Receipts
+            </a>
+            <a href="#" onclick="logoutUser()" class="flex items-center px-4 py-3 text-sm font-medium text-brand-100 hover:text-white hover:bg-brand-800/40 rounded-xl transition-all">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Logout
             </a>
         </nav>
 
@@ -104,44 +170,40 @@
             <span class="font-serif font-bold text-sm tracking-wide">Gold & Linc</span>
         </div>
         <button type="button" onclick="openBottomNav()" class="flex items-center space-x-1.5 bg-brand-800 border border-brand-500/40 px-3 py-1.5 rounded-xl text-xs font-bold text-white transition active:scale-95">
-            <span>Menu Options</span>
+            <span>Menu</span>
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
     </header>
 
     <!-- 3. MOBILE INTERACTIVE BOTTOM SHEET DRAWER OVERLAY MODULE -->
     <div id="bottomDrawerOverlay" onclick="closeBottomNav(event)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden transition-opacity duration-300 opacity-0">
-        <div id="bottomDrawerCard" class="absolute bottom-0 inset-x-0 bg-brand-900 text-white parabolic-top transform translate-y-full transition-transform duration-300 border-t-2 border-gold-400 p-6 pt-12 space-y-6 max-h-[85vh] overflow-y-auto">
-            <!-- Decorative Slide Handle Indicator -->
+        <div id="bottomDrawerCard" class="absolute bottom-0 inset-x-0 bg-brand-900 text-white parabolic-top transform translate-y-full transition-transform duration-300 border-t-2 border-gold-400 p-6">
             <div class="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-brand-800 rounded-full"></div>
             
-            <div class="text-center">
-                <p class="font-serif text-lg font-bold">Portal Navigation Options</p>
-                <p class="text-[11px] text-brand-500 font-medium">Mr. Festus Adeniyi — Connected ID parent_4082</p>
+            <div class="text-center mb-4">
+                <p class="font-serif text-lg font-bold" id="mobileParentName">Parent Name</p>
+                <p class="text-[11px] text-brand-500 font-medium">Connected Parent Portal</p>
             </div>
 
-            <!-- Ward Picker Filter Inside Mobile Draw Block -->
-            <div class="bg-brand-800 p-4 rounded-2xl border border-brand-500/30">
-                <label class="block text-[10px] font-bold text-brand-500 uppercase tracking-wider mb-2">Switch Active Target Student</label>
-                <select class="w-full bg-brand-900 border border-brand-800 rounded-xl text-sm font-bold text-white py-2.5 px-3">
-                    <option value="ward-1">Samuel Adeniyi (Secondary Track)</option>
-                    <option value="ward-2">Deborah Adeniyi (Primary Stream)</option>
+            <div class="bg-brand-800 p-4 rounded-2xl border border-brand-500/30 mb-4">
+                <label class="block text-[10px] font-bold text-brand-500 uppercase tracking-wider mb-2">Switch Active Ward</label>
+                <select id="mobileWardSelector" onchange="switchWard()" class="w-full bg-brand-900 border border-brand-800 rounded-xl text-sm font-bold text-white py-2.5 px-3">
+                    <option value="">Select Student</option>
                 </select>
             </div>
 
-            <!-- Vertical Command Options Inside Mobile Drawer Context -->
             <div class="grid grid-cols-1 gap-2 text-sm font-bold">
                 <a href="#" onclick="closeBottomNav(null)" class="w-full bg-brand-800 hover:bg-brand-500 p-4 rounded-xl flex items-center justify-between border border-brand-500/20">
-                    <span class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-gold-400 mr-2"></span>Main Dashboard Home</span>
-                    <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    <span class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-gold-400 mr-2"></span>Main Dashboard</span>
+                    <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </a>
                 <a href="results.html" class="w-full bg-brand-800 hover:bg-brand-500 p-4 rounded-xl flex items-center justify-between border border-brand-500/20">
-                    <span class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-2"></span>Result Checking Portal</span>
-                    <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    <span class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-2"></span>Results Portal</span>
+                    <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </a>
-                <button onclick="alert('Routing to payment engines...')" class="w-full text-left bg-brand-800 hover:bg-brand-500 p-4 rounded-xl flex items-center justify-between border border-brand-500/20">
-                    <span class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-2"></span>Pay Ancillary Event Levies</span>
-                    <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <button onclick="logoutUser()" class="w-full text-left bg-brand-800 hover:bg-brand-500 p-4 rounded-xl flex items-center justify-between border border-brand-500/20">
+                    <span class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-2"></span>Logout</span>
+                    <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </button>
             </div>
         </div>
@@ -150,8 +212,7 @@
     <!-- 4. MAIN CENTRAL CONTENT DESK INTERFACE -->
     <main class="flex-grow p-4 sm:p-6 lg:p-8 space-y-8 max-w-7xl mx-auto w-full overflow-hidden">
         
-        <!-- WELCOME BANNER COMPONENT CONTEXT -->
-                <!-- TWO-COLUMN DATA MATRIX: PARENT & STUDENT PROFILE GRID CARDS -->
+        <!-- TWO-COLUMN DATA MATRIX: PARENT & STUDENT PROFILE GRID CARDS -->
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             
             <!-- CARD 1: PARENT REGISTRY PROFILE -->
@@ -167,15 +228,14 @@
                         <span class="text-xs font-bold uppercase tracking-widest text-brand-500">Parent Registry Profile</span>
                     </div>
                     
-                    <!-- Parent Detail Grid Elements -->
                     <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 text-xs">
                         <div>
                             <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Full Name</p>
-                            <p class="text-sm font-bold text-slate-900 mt-0.5">Mr. Festus A. Adeniyi</p>
+                            <p class="text-sm font-bold text-slate-900 mt-0.5" id="parentFullName">--</p>
                         </div>
                         <div>
                             <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Parent ID</p>
-                            <p class="text-sm font-mono font-bold text-slate-900 mt-0.5">parent_4082</p>
+                            <p class="text-sm font-mono font-bold text-slate-900 mt-0.5" id="parentId">--</p>
                         </div>
                         <div>
                             <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Portal Access</p>
@@ -195,218 +255,396 @@
                         <div class="p-2 bg-brand-50 rounded-xl text-brand-900">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
                             </svg>
                         </div>
                         <span class="text-xs font-bold uppercase tracking-widest text-brand-500">Active Student Ledger</span>
                     </div>
 
-                    <!-- Student Detail Grid Elements -->
                     <div class="grid grid-cols-2 gap-4 sm:grid-cols-4 text-xs">
                         <div>
                             <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Full Name</p>
-                            <p class="text-sm font-bold text-slate-900 mt-0.5">Samuel Adeniyi</p>
+                            <p class="text-sm font-bold text-slate-900 mt-0.5" id="studentFullName">--</p>
                         </div>
                         <div>
-                            <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Class Track</p>
-                            <p class="text-sm font-bold text-slate-900 mt-0.5">Secondary Track</p>
+                            <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Class</p>
+                            <p class="text-sm font-bold text-slate-900 mt-0.5" id="studentClass">--</p>
                         </div>
                         <div>
                             <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Registration No</p>
-                            <p class="text-sm font-mono font-bold text-slate-900 mt-0.5">GLS/2024/048</p>
+                            <p class="text-sm font-mono font-bold text-slate-900 mt-0.5" id="studentRegNo">--</p>
                         </div>
                         <div>
                             <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Student ID</p>
-                            <p class="text-sm font-mono font-bold text-slate-900 mt-0.5">stud_9912_x</p>
+                            <p class="text-sm font-mono font-bold text-slate-900 mt-0.5" id="studentId">--</p>
                         </div>
                     </div>
                 </div>
             </div>
 
         </section>
-
 
         <!-- METRIC STATUS GRID BARS -->
         <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-150 p-5 flex items-center space-x-4 hover:shadow-md transition">
-                <div class="p-3 bg-emerald-50 rounded-xl text-emerald-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+                <div class="p-3 bg-emerald-50 rounded-xl text-emerald-600"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg></div>
                 <div>
                     <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Term Attendance</p>
-                    <p class="text-lg font-black text-slate-900 mt-0.5">96.4%</p>
-                    <p class="text-[10px] text-emerald-600 font-bold">2 Absences Registered</p>
+                    <p class="text-lg font-black text-slate-900 mt-0.5" id="attendance">--</p>
+                    <p class="text-[10px] text-emerald-600 font-bold" id="attendanceNote">Loading...</p>
                 </div>
             </div>
             <div class="bg-white rounded-2xl shadow-sm border border-slate-150 p-5 flex items-center space-x-4 hover:shadow-md transition">
-                <div class="p-3 bg-brand-50 rounded-xl text-brand-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+                <div class="p-3 bg-brand-50 rounded-xl text-brand-600"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"/></svg></div>
                 <div>
-                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Ledger Balance</p>
-                    <p class="text-lg font-black text-slate-900 mt-0.5">₦0.00</p>
-                    <span class="inline-flex bg-emerald-100 text-emerald-800 text-[9px] font-black px-2 py-0.5 rounded-full uppercase">Cleared Account</span>
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Fees Status</p>
+                    <p class="text-lg font-black text-slate-900 mt-0.5" id="feesStatus">--</p>
+                    <span class="inline-flex bg-emerald-100 text-emerald-800 text-[9px] font-black px-2 py-0.5 rounded-full uppercase mt-1">Cleared</span>
                 </div>
             </div>
             <div class="bg-white rounded-2xl shadow-sm border border-slate-150 p-5 flex items-center space-x-4 hover:shadow-md transition">
-                <div class="p-3 bg-indigo-50 rounded-xl text-indigo-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10a2 2 0 01-2 2h-2a2 2 0 01-2-2zm9 0V4a2 2 0 00-2-2h-2a2 2 0 00-2 2v15a2 2 0 002 2h2a2 2 0 002-2z"/></svg></div>
+                <div class="p-3 bg-indigo-50 rounded-xl text-indigo-600"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg></div>
                 <div>
-                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">CA Evaluation Average</p>
-                    <p class="text-lg font-black text-slate-900 mt-0.5">78.2%</p>
-                    <p class="text-[10px] text-brand-600 font-bold">Class Standing: 4th</p>
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">CA Average</p>
+                    <p class="text-lg font-black text-slate-900 mt-0.5" id="caAverage">--</p>
+                    <p class="text-[10px] text-brand-600 font-bold" id="caRanking">Loading...</p>
                 </div>
             </div>
             <div class="bg-white rounded-2xl shadow-sm border border-slate-150 p-5 flex items-center space-x-4 hover:shadow-md transition">
-                <div class="p-3 bg-amber-50 rounded-xl text-gold-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.244a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+                <div class="p-3 bg-amber-50 rounded-xl text-gold-600"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H3a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V6a1 1 0 00-1-1h3a1 1 0 000-2 2 2 0 01-2-2V3a1 1 0 10-2 0v1a1 1 0 01-1 1H9V5a1 1 0 01-1-1 1 1 0 00-2 0v1a1 1 0 01-1 1H4z" clip-rule="evenodd"/></svg></div>
                 <div>
-                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Transit Routing</p>
-                    <p class="text-sm font-bold text-slate-900 mt-0.5 truncate">Testing Ground Route</p>
-                    <span class="inline-flex bg-slate-100 text-slate-700 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">On Campus</span>
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Session</p>
+                    <p class="text-sm font-bold text-slate-900 mt-0.5">2025/2026</p>
+                    <span class="inline-flex bg-slate-100 text-slate-700 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase mt-1">Active</span>
                 </div>
             </div>
         </section>
 
-        <!-- SPLIT COLUMN LAYOUT DESK MATRIX -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <!-- LEFT AREA: DETAILED GRADE LEDGER TABLE & ASSIGNMENTS TRACKS (2/3 width) -->
-            <section class="lg:col-span-2 space-y-8">
-                
-                <!-- PREMIUM EVALUATION TABLE CARD -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="p-5 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white flex items-center justify-between">
-                        <div>
-                            <h3 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Continuous Assessment Gradebook</h3>
-                            <p class="text-xs text-slate-500">Live term performance values compiled by faculty heads.</p>
-                        </div>
-                        <a href="results.html" class="inline-flex items-center text-xs font-bold text-brand-500 hover:text-brand-900 group">
-                            Full Term Portal
-                            <svg class="w-3.5 h-3.5 ml-1 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                        </a>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead>
-                                <tr class="bg-slate-50 text-slate-400 font-extrabold border-b border-slate-100 uppercase tracking-wider">
-                                    <th class="p-4 pl-6">Subject Area</th>
-                                    <th class="p-4 text-center">CA Marks (40)</th>
-                                    <th class="p-4 text-center">Exam Marks (60)</th>
-                                    <th class="p-4 text-center">Total Cumulative</th>
-                                    <th class="p-4 pr-6 text-center">Performance Rating</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
-                                <tr class="hover:bg-slate-50/60 transition">
-                                    <td class="p-4 pl-6 font-bold text-brand-900">Mathematics Core Track</td>
-                                    <td class="p-4 text-center font-mono">34</td>
-                                    <td class="p-4 text-center font-mono">48</td>
-                                    <td class="p-4 text-center font-bold text-slate-900 font-mono">82</td>
-                                    <td class="p-4 pr-6 text-center"><span class="bg-emerald-50 text-emerald-700 font-bold px-2.5 py-1 rounded-xl border border-emerald-100">A - Excellent</span></td>
-                                </tr>
-                                <tr class="hover:bg-slate-50/60 transition">
-                                    <td class="p-4 pl-6 font-bold text-brand-900">English Language & Rhetoric</td>
-                                    <td class="p-4 text-center font-mono">29</td>
-                                    <td class="p-4 text-center font-mono">45</td>
-                                    <td class="p-4 text-center font-bold text-slate-900 font-mono">74</td>
-                                    <td class="p-4 pr-6 text-center"><span class="bg-sky-50 text-sky-700 font-bold px-2.5 py-1 rounded-xl border border-sky-100">B - Very Good</span></td>
-                                </tr>
-                                <tr class="hover:bg-slate-50/60 transition">
-                                    <td class="p-4 pl-6 font-bold text-brand-900">Chemistry Principles (CHM)</td>
-                                    <td class="p-4 text-center font-mono">31</td>
-                                    <td class="p-4 text-center font-mono">52</td>
-                                    <td class="p-4 text-center font-bold text-slate-900 font-mono">83</td>
-                                    <td class="p-4 pr-6 text-center"><span class="bg-emerald-50 text-emerald-700 font-bold px-2.5 py-1 rounded-xl border border-emerald-100">A - Excellent</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+        <!-- GRADES TABLE -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-5 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+                <h3 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Academic Performance Summary</h3>
+                <p class="text-xs text-slate-500 mt-1">Live term performance compiled by faculty.</p>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-400 font-extrabold border-b border-slate-100 uppercase tracking-wider">
+                            <th class="p-4 pl-6">Subject</th>
+                            <th class="p-4 text-center">CA Marks</th>
+                            <th class="p-4 text-center">Exam Marks</th>
+                            <th class="p-4 text-center">Total</th>
+                            <th class="p-4 pr-6 text-center">Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gradesTableBody" class="divide-y divide-slate-100 font-medium text-slate-700">
+                        <tr>
+                            <td colspan="5" class="p-8 text-center">
+                                <div class="text-slate-400">Select a student to view grades</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ASSIGNMENTS SECTION -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+            <div>
+                <h3 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Active Assignments & Projects</h3>
+                <p class="text-xs text-slate-500">Track homework tasks and project deadlines.</p>
+            </div>
+            <div id="assignmentsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-center">
+                    <p class="text-slate-400">Select a student to view assignments</p>
                 </div>
-
-                <!-- ASSIGNMENTS TASK RADAR MODULE -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
-                    <div>
-                        <h3 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Active Assignments & Project Logs</h3>
-                        <p class="text-xs text-slate-500">Track homework tasks and project deadlines.</p>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="p-4 bg-amber-50/40 border border-amber-100 rounded-2xl flex flex-col justify-between">
-                            <div>
-                                <span class="text-[9px] font-black uppercase tracking-widest bg-amber-100 text-amber-800 px-2 py-0.5 rounded-lg">Chemistry Task</span>
-                                <h4 class="text-sm font-bold text-slate-900 mt-2">Organic Synthesis Exercise</h4>
-                                <p class="text-xs text-slate-500 mt-1">Submit test manual entries on functional groups and alkane chains.</p>
-                            </div>
-                            <p class="text-[10px] font-bold text-amber-700 uppercase tracking-wide mt-4 flex items-center">
-                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                Due Tomorrow Morning
-                            </p>
-                        </div>
-                        <div class="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl flex flex-col justify-between">
-                            <div>
-                                <span class="text-[9px] font-black uppercase tracking-widest bg-slate-200 text-slate-700 px-2 py-0.5 rounded-lg">English Essay</span>
-                                <h4 class="text-sm font-bold text-slate-900 mt-2">Creative Narrative Chapter</h4>
-                                <p class="text-xs text-slate-500 mt-1">Complete descriptive composition covering regional historical frameworks.</p>
-                            </div>
-                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wide mt-4 flex items-center">
-                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                Due in 4 Days
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-            </section>
-
-            <!-- RIGHT AREA: REGISTRY DISPATCHES & DIRECT GATEWAY ANCHORS (1/3 width) -->
-            <aside class="space-y-8">
-                
-                <!-- BULLETIN DISPATCH BOARD CARD -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
-                    <div>
-                        <h3 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Registry Dispatch Board</h3>
-                        <p class="text-xs text-slate-500">Official real-time updates from management desks.</p>
-                    </div>
-                    <div class="space-y-4 divide-y divide-slate-100">
-                        <div class="pt-0 space-y-1.5">
-                            <span class="inline-block text-[9px] font-black tracking-wider uppercase bg-rose-50 border border-rose-100 text-rose-700 px-2 py-0.5 rounded-md">Urgent Notice</span>
-                            <h4 class="text-xs font-bold text-slate-900">Mid-Term Intermission Break</h4>
-                            <p class="text-[11px] text-slate-500 leading-relaxed">The campus compound will close for midterm recess starting next Wednesday. Terminal lessons resume the subsequent Monday.</p>
-                        </div>
-                        <div class="pt-4 space-y-1.5">
-                            <span class="inline-block text-[9px] font-black tracking-wider uppercase bg-brand-50 border border-brand-100 text-brand-700 px-2 py-0.5 rounded-md">Event Desk</span>
-                            <h4 class="text-xs font-bold text-slate-900">Open-Day Lesson Matrix Inspection</h4>
-                            <p class="text-[11px] text-slate-500 leading-relaxed">Parents are welcome to inspect physical lesson cards and consult directly with module tutors from 10:00 AM.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PREMIUM GATEWAY ACTION ANCHOR BOX -->
-                <div class="bg-gradient-to-br from-brand-900 to-brand-950 rounded-2xl shadow-xl p-6 text-white space-y-4 relative overflow-hidden border border-brand-800">
-                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-brand-800/20 rounded-full blur-xl pointer-events-none"></div>
-                    <div>
-                        <h3 class="text-sm font-bold uppercase tracking-wider font-serif">Registry Gateways</h3>
-                        <p class="text-[11px] text-brand-100/70">Secure automated operations pipelines.</p>
-                    </div>
-                    <div class="space-y-2 text-xs font-bold">
-                        <button onclick="alert('Launching secure financial gateway...')" class="w-full text-left bg-brand-800/60 hover:bg-brand-800 p-3 rounded-xl border border-brand-700/40 flex items-center justify-between transition-all group">
-                            <span>Pay Term Levies & Fees</span>
-                            <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                        </button>
-                        <button onclick="alert('Opening encrypted communication thread...')" class="w-full text-left bg-brand-800/60 hover:bg-brand-800 p-3 rounded-xl border border-brand-700/40 flex items-center justify-between transition-all group">
-                            <span>Message Form Tutor Desk</span>
-                            <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                        </button>
-                    </div>
-                </div>
-
-            </aside>
+            </div>
         </div>
 
     </main>
 
-    <!-- JS Control Handlers for Premium Mobile Drawer Architecture -->
     <script>
+        // ============ API CONFIGURATION ============
+        const API_BASE_URL = "https://goldlincschools.onrender.com";
+        
+        // ============ STATE MANAGEMENT ============
+        let parentData = null;
+        let children = [];
+        let selectedChildId = null;
+        let selectedChild = null;
+
+        // ============ UTILITY FUNCTIONS ============
+        function showLoadingSpinner(message = 'Loading Dashboard', status = 'Initializing system...') {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                document.getElementById('spinnerMainText').textContent = message;
+                document.getElementById('spinnerStatus').textContent = status;
+                overlay.classList.remove('hidden');
+            }
+        }
+
+        function hideLoadingSpinner() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        }
+
+        function updateLoadingStatus(status) {
+            const statusEl = document.getElementById('spinnerStatus');
+            if (statusEl) {
+                statusEl.textContent = status;
+            }
+        }
+
+        function getAuthHeaders() {
+            const token = localStorage.getItem('parentToken') || localStorage.getItem('token') || '';
+            return {
+                'Content-Type': 'application/json',
+                ...(token && { 'Authorization': `Bearer ${token}` })
+            };
+        }
+
+        // ============ INITIALIZATION ============
+        async function initializeDashboard() {
+            try {
+                showLoadingSpinner('Loading Parent Dashboard', 'Initializing system...');
+
+                // Check authentication
+                const token = localStorage.getItem('parentToken') || localStorage.getItem('token');
+                if (!token) {
+                    hideLoadingSpinner();
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Load parent info
+                updateLoadingStatus('Loading parent information...');
+                await loadParentInfo();
+
+                // Load children
+                updateLoadingStatus('Loading student data...');
+                await loadChildren();
+
+                // Select first child
+                if (children.length > 0) {
+                    selectedChildId = children[0]._id;
+                    selectedChild = children[0];
+                    updateLoadingStatus('Loading student grades...');
+                    await loadStudentGrades();
+                    await loadAssignments();
+                }
+
+                hideLoadingSpinner();
+
+            } catch (error) {
+                console.error('Initialization error:', error);
+                hideLoadingSpinner();
+                alert('Failed to load dashboard. Please try again.');
+            }
+        }
+
+        async function loadParentInfo() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/parents/me`, {
+                    headers: getAuthHeaders()
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        localStorage.removeItem('parentToken');
+                        localStorage.removeItem('token');
+                        window.location.href = 'login.html';
+                    }
+                    throw new Error('Failed to fetch parent info');
+                }
+
+                parentData = await response.json();
+                
+                // Update UI
+                document.getElementById('parentFullName').textContent = parentData.name || '--';
+                document.getElementById('parentId').textContent = parentData._id?.slice(-8) || '--';
+                document.getElementById('mobileParentName').textContent = parentData.name || 'Parent';
+
+            } catch (error) {
+                console.error('Error loading parent info:', error);
+                throw error;
+            }
+        }
+
+        async function loadChildren() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/parents/children`, {
+                    headers: getAuthHeaders()
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch children');
+
+                children = await response.json();
+
+                // Populate selectors
+                const wardSelector = document.getElementById('wardSelector');
+                const mobileWardSelector = document.getElementById('mobileWardSelector');
+
+                [wardSelector, mobileWardSelector].forEach(selector => {
+                    if (selector) {
+                        selector.innerHTML = '';
+                        children.forEach(child => {
+                            const option = document.createElement('option');
+                            option.value = child._id;
+                            option.textContent = `${child.name} (${child.class?.name || 'N/A'})`;
+                            selector.appendChild(option);
+                        });
+                        if (children.length > 0) {
+                            selector.value = children[0]._id;
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error loading children:', error);
+                children = [];
+            }
+        }
+
+        async function loadStudentGrades() {
+            try {
+                if (!selectedChildId) return;
+
+                const response = await fetch(`${API_BASE_URL}/api/parents/students/${selectedChildId}/grades`, {
+                    headers: getAuthHeaders()
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch grades');
+
+                const gradesData = await response.json();
+                renderGrades(gradesData);
+
+                // Update student info
+                if (selectedChild) {
+                    document.getElementById('studentFullName').textContent = selectedChild.name || '--';
+                    document.getElementById('studentClass').textContent = selectedChild.class?.name || '--';
+                    document.getElementById('studentRegNo').textContent = selectedChild.regNo || '--';
+                    document.getElementById('studentId').textContent = selectedChild._id?.slice(-8) || '--';
+                }
+
+            } catch (error) {
+                console.error('Error loading grades:', error);
+            }
+        }
+
+        function renderGrades(grades) {
+            const tbody = document.getElementById('gradesTableBody');
+            tbody.innerHTML = '';
+
+            if (!grades || grades.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">No grades available yet</td></tr>';
+                return;
+            }
+
+            grades.forEach(grade => {
+                const total = (grade.ca || 0) + (grade.exam || 0);
+                const gradeLetters = {
+                    A: 'A - Excellent',
+                    B: 'B - Very Good',
+                    C: 'C - Good',
+                    D: 'D - Fair',
+                    E: 'E - Poor',
+                    F: 'F - Fail'
+                };
+
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-slate-50/60 transition';
+                row.innerHTML = `
+                    <td class="p-4 pl-6 font-bold text-brand-900">${grade.subject}</td>
+                    <td class="p-4 text-center font-mono">${grade.ca || 0}</td>
+                    <td class="p-4 text-center font-mono">${grade.exam || 0}</td>
+                    <td class="p-4 text-center font-bold text-slate-900 font-mono">${total}</td>
+                    <td class="p-4 pr-6 text-center"><span class="bg-emerald-50 text-emerald-700 font-bold px-2.5 py-1 rounded-xl border border-emerald-100">${gradeLetters[grade.grade] || 'N/A'}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        async function loadAssignments() {
+            try {
+                if (!selectedChildId) return;
+
+                const response = await fetch(`${API_BASE_URL}/api/parents/students/${selectedChildId}/assignments`, {
+                    headers: getAuthHeaders()
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch assignments');
+
+                const assignments = await response.json();
+                renderAssignments(assignments);
+
+            } catch (error) {
+                console.error('Error loading assignments:', error);
+            }
+        }
+
+        function renderAssignments(assignments) {
+            const container = document.getElementById('assignmentsContainer');
+            container.innerHTML = '';
+
+            if (!assignments || assignments.length === 0) {
+                container.innerHTML = '<div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-center col-span-full"><p class="text-slate-400">No assignments available</p></div>';
+                return;
+            }
+
+            assignments.slice(0, 4).forEach(assignment => {
+                const dueDate = new Date(assignment.dueDate);
+                const isOverdue = dueDate < new Date();
+                
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-2xl flex flex-col justify-between ${isOverdue ? 'bg-red-50 border border-red-100' : 'bg-amber-50/40 border border-amber-100'}`;
+                card.innerHTML = `
+                    <div>
+                        <span class="text-[9px] font-black uppercase tracking-widest ${isOverdue ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'} px-2 py-0.5 rounded-lg">${assignment.subject}</span>
+                        <h4 class="text-sm font-bold text-slate-900 mt-2">${assignment.title}</h4>
+                        <p class="text-xs text-slate-500 mt-1">${assignment.description?.slice(0, 50) || 'No description'}...</p>
+                    </div>
+                    <p class="text-[10px] font-bold ${isOverdue ? 'text-red-700' : 'text-amber-700'} uppercase tracking-wide mt-4 flex items-center">
+                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v2h16V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h12a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>
+                        Due ${dueDate.toLocaleDateString()}
+                    </p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function switchWard() {
+            const selector = document.getElementById('wardSelector');
+            const mobileSelector = document.getElementById('mobileWardSelector');
+            
+            const childId = selector.value || mobileSelector.value;
+            if (!childId) return;
+
+            selectedChildId = childId;
+            selectedChild = children.find(c => c._id === childId);
+
+            if (selector.value !== childId) selector.value = childId;
+            if (mobileSelector.value !== childId) mobileSelector.value = childId;
+
+            loadStudentGrades();
+            loadAssignments();
+        }
+
+        function logoutUser() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('parentToken');
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // ============ MOBILE NAVIGATION ============
         const overlay = document.getElementById('bottomDrawerOverlay');
         const card = document.getElementById('bottomDrawerCard');
 
         function openBottomNav() {
             overlay.classList.remove('hidden');
-            // Allow display change to compile before introducing class transitions
             setTimeout(() => {
                 overlay.classList.remove('opacity-0');
                 card.classList.remove('translate-y-full');
@@ -414,12 +652,9 @@
         }
 
         function closeBottomNav(event) {
-            // Trigger close sequence only if background canvas is targeted or explicitly bypassed
             if (!event || event.target === overlay) {
                 overlay.classList.add('opacity-0');
                 card.classList.add('translate-y-full');
-                
-                // Completely hide containers from accessibility tree once transitions complete
                 setTimeout(() => {
                     overlay.classList.add('hidden');
                 }, 300);
