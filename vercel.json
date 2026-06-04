@@ -16,6 +16,7 @@
         { "source": "/dashboard", "destination": "/buyer_dash.html" },
             { "source": "/admissions", "destination": "/admissions.html" },
     { "source": "/teacher-dashboard", "destination": "/rt.html" },
+      { "source": "/parent-dashboard", "destination": "/pt.html" },
         { "source": "/schedule-visit", "destination": "/schedule.html" }
     
     
