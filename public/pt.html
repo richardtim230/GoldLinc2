@@ -363,7 +363,7 @@
 
     </main>
 
-    <script>
+<script>
 // ============ API CONFIGURATION ============
 const API_BASE = window.API_BASE || "https://goldlincschools.onrender.com/api";
 const token = localStorage.getItem('parentToken') || localStorage.getItem('token');
@@ -372,6 +372,7 @@ const token = localStorage.getItem('parentToken') || localStorage.getItem('token
 let parentData = null;
 let allStudents = [];
 let currentSelectedStudent = null;
+let currentGradeTerm = 1;
 
 // ============ INITIALIZATION ============
 async function initializeDashboard() {
@@ -448,7 +449,7 @@ function getAuthHeaders() {
 // ============ DATA LOADING ============
 
 /**
- * Load Parent Data - matches working pattern
+ * Load Parent Data
  */
 async function loadParentData() {
     try {
@@ -496,10 +497,15 @@ function updateParentUI() {
     document.getElementById('parentFullName').textContent = parentData.name || '--';
     document.getElementById('parentId').textContent = parentData._id?.slice(-8) || '--';
     document.getElementById('mobileParentName').textContent = parentData.name || 'Parent';
+
+    // Update welcome name
+    const firstName = parentData.name?.split(' ')[0] || 'Parent';
+    const welcomeEl = document.querySelector('[id*="welcome"]');
+    if (welcomeEl) welcomeEl.textContent = firstName;
 }
 
 /**
- * Load Students List - matches working pattern
+ * Load Students List
  */
 async function loadStudents() {
     try {
@@ -515,12 +521,141 @@ async function loadStudents() {
         // Populate ward selectors
         populateWardSelectors();
 
+        // Update dashboard cards
+        updateDashboardCards();
+
+        // Render children list
+        renderChildrenList();
+
         return allStudents;
 
     } catch (err) {
         console.error('❌ Error loading students:', err);
         throw err;
     }
+}
+
+/**
+ * Update Dashboard Cards
+ */
+function updateDashboardCards() {
+    const summary = parentData.dashboardSummary || {};
+
+    const childrenCountEl = document.getElementById('childrenCount');
+    if (childrenCountEl) {
+        childrenCountEl.textContent = summary.totalChildren || allStudents.length || 0;
+    }
+
+    const pendingFeesEl = document.getElementById('pendingFeesCount');
+    if (pendingFeesEl) {
+        pendingFeesEl.textContent = summary.allStudentsPending || 0;
+    }
+
+    const avgAttendanceEl = document.getElementById('avgAttendance');
+    if (avgAttendanceEl) {
+        avgAttendanceEl.textContent = (summary.averageAttendance || 0) + '%';
+    }
+
+    const avgGradeEl = document.getElementById('avgGrade');
+    if (avgGradeEl) {
+        avgGradeEl.textContent = (summary.averageGrade || 0).toFixed(1);
+    }
+
+    console.log('✓ Dashboard cards updated:', summary);
+}
+
+/**
+ * Render Children List
+ */
+function renderChildrenList() {
+    const container = document.getElementById('childrenList');
+    if (!container) return;
+
+    if (!allStudents || allStudents.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">👶</div>
+                <div class="empty-title">No children assigned</div>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = allStudents.map(child => {
+        const academicStats = child.academicStats || {};
+        const attendanceStats = child.attendanceStats || {};
+        const feesStats = child.feesStats || {};
+
+        // Calculate total fees from byTerm
+        let totalFeesAmount = 0;
+        if (feesStats.byTerm) {
+            Object.values(feesStats.byTerm).forEach(term => {
+                totalFeesAmount += term.total || 0;
+            });
+        }
+
+        const outstanding = feesStats.outstanding || 0;
+        const isFeesCleared = outstanding === 0;
+        const feesButtonText = isFeesCleared ? '📄 View Receipt' : '💳 Pay Fees';
+        const feesButtonClass = isFeesCleared ? 'btn-secondary' : 'btn-primary';
+
+        return `
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-user"></i>
+                        ${child.name}
+                    </div>
+                    <span class="badge badge-info">${child.class || 'N/A'}</span>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px;">
+                    <!-- Student Details -->
+                    <div>
+                        <div style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 4px;">Student ID</div>
+                        <div style="font-weight: 600;">${child.student_id || 'N/A'}</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 4px;">Reg No</div>
+                        <div style="font-weight: 600;">${child.regNo || 'N/A'}</div>
+                    </div>
+                    
+                    <!-- Academic Stats -->
+                    <div>
+                        <div style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 4px;">Average Grade</div>
+                        <div style="font-weight: 600; color: var(--primary);">${academicStats.averageScore || 0.0}</div>
+                    </div>
+                    
+                    <!-- Attendance Stats -->
+                    <div>
+                        <div style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 4px;">Attendance</div>
+                        <div style="font-weight: 600; color: var(--success);">${attendanceStats.averageAttendancePercentage || 0}%</div>
+                    </div>
+                    
+                    <!-- Fees Stats -->
+                    <div>
+                        <div style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 4px;">Total Fees</div>
+                        <div style="font-weight: 600; color: var(--primary);">${formatCurrency(totalFeesAmount)}</div>
+                    </div>
+                    
+                    <!-- Outstanding Fees -->
+                    <div>
+                        <div style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 4px;">Outstanding</div>
+                        <div style="font-weight: 600; color: ${isFeesCleared ? 'var(--success)' : 'var(--danger)'};">${formatCurrency(outstanding)}</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn btn-primary btn-sm" onclick="switchToStudent('${child._id}')">
+                        <i class="fas fa-eye"></i> View Details
+                    </button>
+                    <button class="btn ${feesButtonClass} btn-sm" onclick="handleFeesAction('${child._id}', ${isFeesCleared})">
+                        <i class="fas ${isFeesCleared ? 'fa-file-invoice' : 'fa-credit-card'}"></i> ${feesButtonText}
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
 /**
@@ -545,19 +680,49 @@ function populateWardSelectors() {
             selector.value = allStudents[0]._id;
         }
 
-        selector.addEventListener('change', async (e) => {
-            currentSelectedStudent = e.target.value;
-            // Sync both selectors
-            [wardSelector, mobileWardSelector].forEach(sel => {
-                if (sel && sel.value !== currentSelectedStudent) {
-                    sel.value = currentSelectedStudent;
-                }
-            });
-            await loadStudentDetails();
+        selector.addEventListener('change', (e) => {
+            const newStudentId = e.target.value;
+            console.log('Ward selector changed to:', newStudentId);
+            switchToStudent(newStudentId);
         });
     });
 
     console.log('✓ Ward selectors populated');
+}
+
+/**
+ * Switch to Student - FIXED
+ */
+async function switchToStudent(studentId) {
+    if (!studentId) {
+        console.warn('No student ID provided');
+        return;
+    }
+
+    console.log('🔄 Switching to student:', studentId);
+
+    currentSelectedStudent = studentId;
+
+    // Sync both selectors
+    const wardSelector = document.getElementById('wardSelector');
+    const mobileWardSelector = document.getElementById('mobileWardSelector');
+
+    if (wardSelector && wardSelector.value !== studentId) {
+        wardSelector.value = studentId;
+    }
+    if (mobileWardSelector && mobileWardSelector.value !== studentId) {
+        mobileWardSelector.value = studentId;
+    }
+
+    try {
+        showLoadingSpinner('Loading Student Data', 'Fetching details...');
+        await loadStudentDetails();
+        hideLoadingSpinner();
+    } catch (err) {
+        console.error('❌ Error switching student:', err);
+        hideLoadingSpinner();
+        alert('Failed to load student details: ' + err.message);
+    }
 }
 
 /**
@@ -575,7 +740,7 @@ async function loadStudentDetails() {
         // Find selected student
         const student = allStudents.find(s => s._id === currentSelectedStudent);
         if (!student) {
-            console.warn('Student not found');
+            console.warn('Student not found in allStudents array');
             return;
         }
 
@@ -587,6 +752,11 @@ async function loadStudentDetails() {
 
         // Load assignments
         await loadStudentAssignments(student._id);
+
+        // Load fees summary
+        await loadFeesSummary();
+
+        console.log('✅ Student details loaded successfully');
 
     } catch (err) {
         console.error('❌ Error loading student details:', err);
@@ -610,20 +780,21 @@ function updateStudentInfoDisplay(student) {
     document.getElementById('attendance').textContent = (attendanceStats.averageAttendancePercentage || 0) + '%';
     document.getElementById('attendanceNote').textContent = 'Current term';
 
-    document.getElementById('feesStatus').textContent = formatCurrency(feesStats.outstanding || 0);
+    const outstanding = feesStats.outstanding || 0;
+    document.getElementById('feesStatus').textContent = formatCurrency(outstanding);
 
     document.getElementById('caAverage').textContent = (academicStats.averageScore || 0).toFixed(1);
     document.getElementById('caRanking').textContent = 'Recent average';
 }
 
 /**
- * Load Student Grades - matches working pattern
+ * Load Student Grades
  */
 async function loadStudentGrades(studentId) {
     try {
         console.log('📊 Loading grades for student:', studentId);
 
-        const url = `${API_BASE}/parents/me/students/${studentId}/grades?term=1`;
+        const url = `${API_BASE}/parents/me/students/${studentId}/grades?term=${currentGradeTerm}`;
         console.log('🔗 Fetching from:', url);
 
         const res = await fetch(url, {
@@ -643,6 +814,7 @@ async function loadStudentGrades(studentId) {
         });
 
         renderGradesTable(data.records || []);
+        updateGradeStatistics(data);
 
     } catch (err) {
         console.error('❌ Error loading grades:', err);
@@ -695,6 +867,38 @@ function renderGradesTable(records) {
         `;
         tbody.appendChild(row);
     });
+}
+
+/**
+ * Update Grade Statistics
+ */
+function updateGradeStatistics(data) {
+    const records = data.records || [];
+
+    if (records.length === 0) {
+        const elements = ['overallGPA', 'highestScore', 'averageScore', 'lowestScore'];
+        elements.forEach(el => {
+            const elem = document.getElementById(el);
+            if (elem) elem.textContent = '0';
+        });
+        return;
+    }
+
+    const scores = records.map(r => (r.ca1 || 0) + (r.ca2 || 0) + (r.exam || 0));
+    const average = (scores.reduce((a, b) => a + b, 0) / records.length).toFixed(1);
+
+    if (document.getElementById('overallGPA')) {
+        document.getElementById('overallGPA').textContent = (average / 20).toFixed(2);
+    }
+    if (document.getElementById('highestScore')) {
+        document.getElementById('highestScore').textContent = Math.max(...scores);
+    }
+    if (document.getElementById('averageScore')) {
+        document.getElementById('averageScore').textContent = Math.round(average);
+    }
+    if (document.getElementById('lowestScore')) {
+        document.getElementById('lowestScore').textContent = Math.min(...scores);
+    }
 }
 
 /**
@@ -774,6 +978,214 @@ function renderAssignments(assignments) {
 }
 
 /**
+ * Load Fees Summary
+ */
+async function loadFeesSummary() {
+    try {
+        console.log('💰 Loading fees summary...');
+
+        if (!allStudents || allStudents.length === 0) {
+            console.warn('No students to load fees for');
+            renderFeesTable([]);
+            return;
+        }
+
+        // Aggregate fees from all students
+        let allFees = [];
+        let totalPaid = 0;
+        let totalOutstanding = 0;
+        let totalAmount = 0;
+
+        allStudents.forEach(student => {
+            const feesStats = student.feesStats || {};
+            
+            // From feesStats.byTerm
+            if (feesStats.byTerm && Object.keys(feesStats.byTerm).length > 0) {
+                Object.entries(feesStats.byTerm).forEach(([term, termFees]) => {
+                    const termTotal = termFees.total || 0;
+                    const termPaid = termFees.paid || 0;
+                    const termPending = termFees.pending || 0;
+
+                    allFees.push({
+                        childName: student.name,
+                        childId: student._id,
+                        type: `${term} - School Fees`,
+                        amount: termTotal,
+                        status: termPaid > 0 ? 'Partial' : 'Pending',
+                        date: null,
+                        term: term,
+                        paid: termPaid,
+                        pending: termPending
+                    });
+
+                    totalAmount += termTotal;
+                    totalPaid += termPaid;
+                    totalOutstanding += termPending;
+                });
+            }
+
+            // From student.fees array
+            if (student.fees && Array.isArray(student.fees) && student.fees.length > 0) {
+                student.fees.forEach(fee => {
+                    allFees.push({
+                        childName: student.name,
+                        childId: student._id,
+                        type: fee.type || 'School Fee',
+                        amount: fee.amount || 0,
+                        status: fee.status || 'Pending',
+                        date: fee.date,
+                        term: fee.term || 'General',
+                        paid: (fee.status === 'paid' || fee.status === 'Paid') ? fee.amount : 0,
+                        pending: (fee.status === 'pending' || fee.status === 'Pending') ? fee.amount : 0
+                    });
+
+                    totalAmount += fee.amount || 0;
+                    if (fee.status === 'paid' || fee.status === 'Paid') {
+                        totalPaid += fee.amount || 0;
+                    } else {
+                        totalOutstanding += fee.amount || 0;
+                    }
+                });
+            }
+        });
+
+        console.log('📊 Fees Summary:', {
+            totalFees: allFees.length,
+            totalAmount,
+            totalPaid,
+            totalOutstanding
+        });
+
+        // Update fees cards
+        updateFeesSummaryCards(totalPaid, totalOutstanding, totalAmount);
+
+        // Render fees table
+        renderFeesTable(allFees);
+
+    } catch (err) {
+        console.error('❌ Error loading fees:', err);
+    }
+}
+
+/**
+ * Update Fees Summary Cards
+ */
+function updateFeesSummaryCards(paid, outstanding, total) {
+    const feesSection = document.getElementById('fees-section');
+    if (!feesSection) {
+        console.warn('Fees section not found');
+        return;
+    }
+
+    const cards = feesSection.querySelectorAll('.stat-card');
+    
+    if (cards.length >= 1) {
+        cards[0].innerHTML = `
+            <div class="stat-value">${formatCurrency(paid)}</div>
+            <div class="stat-label">Total Paid</div>
+        `;
+    }
+    if (cards.length >= 2) {
+        cards[1].innerHTML = `
+            <div class="stat-value">${formatCurrency(outstanding)}</div>
+            <div class="stat-label">Outstanding</div>
+        `;
+    }
+    if (cards.length >= 3) {
+        cards[2].innerHTML = `
+            <div class="stat-value">${formatCurrency(total)}</div>
+            <div class="stat-label">Total Fees</div>
+        `;
+    }
+}
+
+/**
+ * Render Fees Table
+ */
+function renderFeesTable(fees) {
+    const tbody = document.querySelector('#feesTable tbody');
+    if (!tbody) {
+        console.warn('Fees table tbody not found');
+        return;
+    }
+
+    if (!fees || fees.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 40px;">
+                    <div style="font-size: 2rem; margin-bottom: 12px;">📭</div>
+                    <div style="font-weight: 600; font-size: 1.1rem; color: var(--gray-900);">No Fees Assigned</div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = fees.map((fee, idx) => {
+        const statusClass = (fee.status || '').toLowerCase().replace(/\s+/g, '');
+        let statusBadgeClass = 'badge-warning';
+        
+        if (statusClass === 'paid') {
+            statusBadgeClass = 'badge-success';
+        } else if (statusClass === 'partial') {
+            statusBadgeClass = 'badge-info';
+        } else if (statusClass === 'pending') {
+            statusBadgeClass = 'badge-warning';
+        }
+
+        return `
+            <tr>
+                <td>
+                    <strong style="color: var(--primary);">${fee.childName || 'N/A'}</strong>
+                    <br>
+                    <small style="color: var(--gray-600);">${fee.term || 'General'}</small>
+                </td>
+                <td>${fee.type || 'School Fee'}</td>
+                <td style="font-weight: 600; color: var(--primary);">${formatCurrency(fee.amount || 0)}</td>
+                <td>
+                    <span class="badge ${statusBadgeClass}" style="display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.8rem;">
+                        ${fee.status || 'Pending'}
+                    </span>
+                </td>
+                <td>
+                    ${fee.date ? new Date(fee.date).toLocaleDateString() : '—'}
+                </td>
+                <td>
+                    <button class="btn btn-primary btn-sm" onclick="handleFeePayment('${fee.childId}')" style="padding: 6px 12px; font-size: 0.85rem;">
+                        <i class="fas fa-credit-card"></i> Pay
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// ============ FEES HANDLING ============
+
+/**
+ * Handle Fees Action (Pay or View Receipt)
+ */
+function handleFeesAction(studentId, isCleared) {
+    if (isCleared) {
+        console.log('📄 Viewing receipt for student:', studentId);
+        window.location.href = `fees-receipt.html?studentId=${studentId}`;
+    } else {
+        console.log('💳 Processing payment for student:', studentId);
+        window.location.href = `fees-payment.html?studentId=${studentId}`;
+    }
+}
+
+/**
+ * Handle Fee Payment
+ */
+function handleFeePayment(studentId) {
+    console.log('💳 Processing fee payment for:', studentId);
+    window.location.href = `fees-payment.html?studentId=${studentId}`;
+}
+
+// ============ UTILITY FUNCTIONS ============
+
+/**
  * Format Currency
  */
 function formatCurrency(value) {
@@ -784,13 +1196,27 @@ function formatCurrency(value) {
 }
 
 /**
+ * Switch Grade Term
+ */
+async function switchGradeTerm(term) {
+    currentGradeTerm = term;
+    
+    // Update active tab
+    document.querySelectorAll('.tabs .tab').forEach((tab, idx) => {
+        tab.classList.toggle('active', idx === term - 1);
+    });
+
+    await loadStudentGrades(currentSelectedStudent);
+}
+
+/**
  * Logout User
  */
 function logoutUser() {
     if (confirm('Are you sure you want to logout?')) {
         localStorage.removeItem('parentToken');
         localStorage.removeItem('token');
-        window.location.href = 'login.html';
+        window.location.href = 'login';
     }
 }
 
@@ -816,31 +1242,8 @@ function closeBottomNav(event) {
     }
 }
 
-/**
- * Switch Ward
- */
-async function switchWard() {
-    const selector = document.getElementById('wardSelector');
-    const mobileSelector = document.getElementById('mobileWardSelector');
-
-    const childId = selector?.value || mobileSelector?.value;
-    if (!childId) {
-        console.warn('No child selected');
-        return;
-    }
-
-    currentSelectedStudent = childId;
-
-    // Sync both selectors
-    if (selector && selector.value !== childId) selector.value = childId;
-    if (mobileSelector && mobileSelector.value !== childId) mobileSelector.value = childId;
-
-    console.log('Switched to student:', childId);
-    await loadStudentDetails();
-}
-
 // ============ DOM READY ============
 document.addEventListener('DOMContentLoaded', initializeDashboard);
-    </script>
+</script>
 </body>
 </html>
