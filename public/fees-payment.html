@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pay School Fees | Gold and Linc Schools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2647a6;
+            --primary-dark: #1e3a8a;
+            --primary-light: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #0ea5e9;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Loading Spinner */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .spinner-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .spinner-ring {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #0284c7;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .spinner-text {
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        /* Container */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-content h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .header-content p {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--gray-100);
+            border: none;
+            border-radius: 8px;
+            color: var(--gray-700);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: var(--gray-200);
+            color: var(--gray-900);
+        }
+
+        /* Grid Layout */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        /* Card */
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--gray-200);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .card-icon.primary {
+            background: rgba(38, 71, 166, 0.1);
+            color: var(--primary);
+        }
+
+        .card-icon.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .card-icon.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .card-subtitle {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(38, 71, 166, 0.1);
+        }
+
+        .form-input:disabled {
+            background: var(--gray-100);
+            color: var(--gray-500);
+            cursor: not-allowed;
+        }
+
+        /* Info Box */
+        .info-box {
+            padding: 16px;
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .info-box strong {
+            color: var(--success);
+        }
+
+        .info-box.warning {
+            background: rgba(245, 158, 11, 0.05);
+            border-color: rgba(245, 158, 11, 0.2);
+        }
+
+        .info-box.warning strong {
+            color: var(--warning);
+        }
+
+        .info-box.error {
+            background: rgba(239, 68, 68, 0.05);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .info-box.error strong {
+            color: var(--danger);
+        }
+
+        /* Amount Display */
+        .amount-display {
+            text-align: center;
+            padding: 20px;
+            background: var(--gray-50);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .amount-label {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .amount-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--gray-900);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-full {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 0.85rem;
+        }
+
+        /* Button Group */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .button-group .btn {
+            flex: 1;
+        }
+
+        /* Student Info */
+        .student-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        /* Fees Table */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--gray-100);
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 0.9rem;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--gray-200);
+            font-size: 0.95rem;
+        }
+
+        tbody tr:hover {
+            background: var(--gray-50);
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .badge-paid {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .badge-partial {
+            background: rgba(14, 165, 233, 0.1);
+            color: var(--info);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray-600);
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.6;
+        }
+
+        .empty-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        /* Alert */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-info {
+            background: #e0f2fe;
+            color: #0c4a6e;
+            border: 1px solid #bae6fd;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .student-info {
+                grid-template-columns: 1fr;
+            }
+
+            .amount-value {
+                font-size: 2rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .button-group .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner-container">
+            <div class="spinner-ring"></div>
+            <div class="spinner-text">Processing Payment...</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1>💳 School Fees Payment</h1>
+                <p>Make payment for school fees and manage your account</p>
+            </div>
+            <a href="pt.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <!-- Alerts -->
+        <div id="alertContainer"></div>
+
+        <!-- Grid Content -->
+        <div class="grid-2">
+            <!-- Student Information -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon primary">👤</div>
+                    <div>
+                        <div class="card-title">Student Information</div>
+                        <div class="card-subtitle">Basic details</div>
+                    </div>
+                </div>
+
+                <div class="student-info">
+                    <div class="info-item">
+                        <span class="info-label">Full Name</span>
+                        <span class="info-value" id="studentName">--</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Class</span>
+                        <span class="info-value" id="studentClass">--</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Registration No</span>
+                        <span class="info-value" id="studentRegNo">--</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Student ID</span>
+                        <span class="info-value" id="studentId">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Summary -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon success">💰</div>
+                    <div>
+                        <div class="card-title">Payment Summary</div>
+                        <div class="card-subtitle">Amount due</div>
+                    </div>
+                </div>
+
+                <div class="amount-display">
+                    <div class="amount-label">Total Outstanding</div>
+                    <div class="amount-value" id="totalOutstanding">₦0.00</div>
+                </div>
+
+                <div class="info-box">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Please select fees below to pay</strong> and the total will be calculated automatically.
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.9rem;">
+                    <div>
+                        <span style="color: var(--gray-600);">Total Fees</span>
+                        <div style="font-weight: 600; font-size: 1.1rem;" id="totalAmount">₦0.00</div>
+                    </div>
+                    <div>
+                        <span style="color: var(--gray-600);">Already Paid</span>
+                        <div style="font-weight: 600; font-size: 1.1rem; color: var(--success);" id="totalPaid">₦0.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fees Selection -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon warning">📋</div>
+                <div>
+                    <div class="card-title">Outstanding Fees</div>
+                    <div class="card-subtitle">Select fees to pay</div>
+                </div>
+            </div>
+
+            <div id="feesContent">
+                <!-- Fees will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon primary">🏦</div>
+                <div>
+                    <div class="card-title">Payment Method</div>
+                    <div class="card-subtitle">Choose how to pay</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Select Payment Method</label>
+                <select id="paymentMethod" class="form-select">
+                    <option value="">-- Choose Payment Method --</option>
+                    <option value="card">💳 Credit/Debit Card</option>
+                    <option value="bank_transfer">🏦 Bank Transfer</option>
+                    <option value="ussd">📱 USSD (Mobile)</option>
+                    <option value="wallet">💵 Online Wallet</option>
+                </select>
+            </div>
+
+            <div id="paymentMethodDetails"></div>
+        </div>
+
+        <!-- Payment Button -->
+        <div class="button-group">
+            <a href="pt.html" class="btn btn-secondary btn-full">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+            <button id="payBtn" class="btn btn-primary btn-full" onclick="processPayment()">
+                <i class="fas fa-lock"></i> Proceed to Payment
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ============ CONFIGURATION ============
+        const API_BASE = window.API_BASE || "https://goldlincschools.onrender.com/api";
+        const token = localStorage.getItem('parentToken') || localStorage.getItem('token');
+
+        // ============ STATE ============
+        let studentData = null;
+        let selectedFees = [];
+        let totalPayableAmount = 0;
+
+        // ============ INITIALIZATION ============
+        async function initializePaymentPage() {
+            console.log('🚀 Initializing Payment Page...');
+
+            // Check authentication
+            if (!token) {
+                showAlert('Authentication required. Redirecting to login...', 'error');
+                setTimeout(() => window.location.href = 'login.html', 2000);
+                return;
+            }
+
+            try {
+                showLoadingSpinner(true);
+
+                // Get student ID from URL
+                const params = new URLSearchParams(window.location.search);
+                const studentId = params.get('studentId');
+
+                if (!studentId) {
+                    showAlert('Invalid student ID. Redirecting...', 'error');
+                    setTimeout(() => window.location.href = 'pt.html', 2000);
+                    return;
+                }
+
+                // Load student data
+                await loadStudentData(studentId);
+
+                // Load fees
+                await loadStudentFees(studentId);
+
+                // Setup event listeners
+                setupEventListeners();
+
+                showLoadingSpinner(false);
+
+            } catch (err) {
+                console.error('❌ Initialization error:', err);
+                showAlert('Failed to load payment page: ' + err.message, 'error');
+                showLoadingSpinner(false);
+            }
+        }
+
+        // ============ LOADING ============
+        function showLoadingSpinner(show = true) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                if (show) {
+                    overlay.classList.remove('hidden');
+                } else {
+                    overlay.classList.add('hidden');
+                }
+            }
+        }
+
+        // ============ AUTH ============
+        function getAuthHeaders() {
+            return {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
+        }
+
+        // ============ DATA LOADING ============
+
+        /**
+         * Load Student Data
+         */
+        async function loadStudentData(studentId) {
+            try {
+                console.log('📥 Loading student data...');
+
+                // Get from parent data (from session storage or re-fetch)
+                const parentDataStr = sessionStorage.getItem('parentData');
+                if (parentDataStr) {
+                    const parentData = JSON.parse(parentDataStr);
+                    studentData = parentData.students?.find(s => s._id === studentId);
+                }
+
+                // If not found in session, fetch fresh parent data
+                if (!studentData) {
+                    const res = await fetch(`${API_BASE}/parents/me`, {
+                        headers: getAuthHeaders()
+                    });
+
+                    if (!res.ok) throw new Error('Failed to fetch parent data');
+
+                    const parentData = await res.json();
+                    sessionStorage.setItem('parentData', JSON.stringify(parentData));
+                    studentData = parentData.students?.find(s => s._id === studentId);
+                }
+
+                if (!studentData) {
+                    throw new Error('Student not found');
+                }
+
+                console.log('✅ Student data loaded:', studentData.name);
+
+                // Update UI
+                updateStudentInfoDisplay();
+
+            } catch (err) {
+                console.error('❌ Error loading student data:', err);
+                throw err;
+            }
+        }
+
+        /**
+         * Update Student Info Display
+         */
+        function updateStudentInfoDisplay() {
+            document.getElementById('studentName').textContent = studentData.name || '--';
+            document.getElementById('studentClass').textContent = studentData.class || '--';
+            document.getElementById('studentRegNo').textContent = studentData.regNo || '--';
+            document.getElementById('studentId').textContent = studentData._id?.slice(-8) || '--';
+        }
+
+        /**
+         * Load Student Fees
+         */
+        async function loadStudentFees(studentId) {
+            try {
+                console.log('💰 Loading fees for student:', studentId);
+
+                const feesStats = studentData.feesStats || {};
+                let allFees = [];
+                let totalAmount = 0;
+                let totalPaid = 0;
+
+                // From byTerm structure
+                if (feesStats.byTerm) {
+                    Object.entries(feesStats.byTerm).forEach(([term, termFees]) => {
+                        const termTotal = termFees.total || 0;
+                        const termPaid = termFees.paid || 0;
+                        const termPending = termFees.pending || 0;
+
+                        if (termPending > 0) {
+                            allFees.push({
+                                id: `${studentId}-${term}`,
+                                term: term,
+                                type: `${term} - School Fees`,
+                                amount: termTotal,
+                                paid: termPaid,
+                                pending: termPending,
+                                status: termPaid > 0 ? 'Partial' : 'Pending'
+                            });
+                        }
+
+                        totalAmount += termTotal;
+                        totalPaid += termPaid;
+                    });
+                }
+
+                // From fees array
+                if (studentData.fees && Array.isArray(studentData.fees)) {
+                    studentData.fees.forEach(fee => {
+                        const feeAmount = fee.amount || 0;
+                        const isPaid = (fee.status === 'paid' || fee.status === 'Paid');
+
+                        if (!isPaid && feeAmount > 0) {
+                            allFees.push({
+                                id: fee._id || `fee-${Date.now()}`,
+                                term: fee.term || 'General',
+                                type: fee.type || 'School Fee',
+                                amount: feeAmount,
+                                paid: 0,
+                                pending: feeAmount,
+                                status: 'Pending'
+                            });
+                        }
+
+                        totalAmount += feeAmount;
+                        if (isPaid) totalPaid += feeAmount;
+                    });
+                }
+
+                console.log('✅ Fees loaded:', {
+                    count: allFees.length,
+                    totalAmount,
+                    totalPaid,
+                    outstanding: totalAmount - totalPaid
+                });
+
+                // Update display
+                updateFeesSummary(totalAmount, totalPaid);
+                renderFeesTable(allFees);
+
+            } catch (err) {
+                console.error('❌ Error loading fees:', err);
+                showAlert('Failed to load fees: ' + err.message, 'error');
+            }
+        }
+
+        /**
+         * Update Fees Summary
+         */
+        function updateFeesSummary(totalAmount, totalPaid) {
+            const outstanding = totalAmount - totalPaid;
+
+            document.getElementById('totalAmount').textContent = formatCurrency(totalAmount);
+            document.getElementById('totalPaid').textContent = formatCurrency(totalPaid);
+            document.getElementById('totalOutstanding').textContent = formatCurrency(outstanding);
+
+            // Update payable amount
+            updatePayableAmount();
+        }
+
+        /**
+         * Render Fees Table
+         */
+        function renderFeesTable(fees) {
+            const container = document.getElementById('feesContent');
+
+            if (!fees || fees.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">✅</div>
+                        <div class="empty-title">No Outstanding Fees</div>
+                        <p>All fees are paid up. Congratulations!</p>
+                    </div>
+                `;
+                document.getElementById('payBtn').disabled = true;
+                return;
+            }
+
+            const html = `
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 30px;">
+                                    <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()" class="checkbox">
+                                </th>
+                                <th>Term/Type</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${fees.map(fee => `
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="fee-checkbox" data-fee-id="${fee.id}" data-amount="${fee.pending}" onchange="updatePayableAmount()" class="checkbox">
+                                    </td>
+                                    <td>
+                                        <strong>${fee.term}</strong>
+                                        <br>
+                                        <small style="color: var(--gray-600);">${fee.type}</small>
+                                    </td>
+                                    <td>
+                                        <strong>${formatCurrency(fee.amount)}</strong>
+                                        <br>
+                                        <small style="color: var(--gray-600);">Pending: ${formatCurrency(fee.pending)}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-${fee.status.toLowerCase()}">
+                                            ${fee.status}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm" onclick="toggleFeeSelection('${fee.id}', ${fee.pending})">
+                                            Select
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // ============ FEE SELECTION ============
+
+        /**
+         * Toggle Fee Selection
+         */
+        function toggleFeeSelection(feeId, amount) {
+            const checkbox = document.querySelector(`input[data-fee-id="${feeId}"]`);
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                updatePayableAmount();
+            }
+        }
+
+        /**
+         * Toggle Select All
+         */
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const feeCheckboxes = document.querySelectorAll('.fee-checkbox');
+
+            feeCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+
+            updatePayableAmount();
+        }
+
+        /**
+         * Update Payable Amount
+         */
+        function updatePayableAmount() {
+            const feeCheckboxes = document.querySelectorAll('.fee-checkbox:checked');
+            selectedFees = [];
+            totalPayableAmount = 0;
+
+            feeCheckboxes.forEach(checkbox => {
+                const feeId = checkbox.dataset.feeId;
+                const amount = parseFloat(checkbox.dataset.amount);
+
+                selectedFees.push(feeId);
+                totalPayableAmount += amount;
+            });
+
+            document.getElementById('totalOutstanding').textContent = formatCurrency(totalPayableAmount);
+
+            // Enable/disable pay button
+            document.getElementById('payBtn').disabled = selectedFees.length === 0;
+
+            console.log('Selected fees:', selectedFees, 'Total:', totalPayableAmount);
+        }
+
+        // ============ PAYMENT METHOD ============
+
+        /**
+         * Setup Event Listeners
+         */
+        function setupEventListeners() {
+            const paymentMethodSelect = document.getElementById('paymentMethod');
+            paymentMethodSelect.addEventListener('change', (e) => {
+                renderPaymentMethodDetails(e.target.value);
+            });
+        }
+
+        /**
+         * Render Payment Method Details
+         */
+        function renderPaymentMethodDetails(method) {
+            const container = document.getElementById('paymentMethodDetails');
+
+            const details = {
+                'card': `
+                    <div class="form-group">
+                        <label class="form-label">Card Number</label>
+                        <input type="text" class="form-input" placeholder="1234 5678 9012 3456" readonly>
+                        <small style="color: var(--gray-600);">Payment gateway integration required</small>
+                    </div>
+                `,
+                'bank_transfer': `
+                    <div class="info-box">
+                        <strong>Bank Transfer Details</strong>
+                        <p style="margin-top: 8px;">
+                            <strong>Bank Name:</strong> Gold & Linc Bank<br>
+                            <strong>Account Number:</strong> 0123456789<br>
+                            <strong>Account Name:</strong> Gold and Linc Schools<br>
+                            <strong>Amount:</strong> ${formatCurrency(totalPayableAmount)}<br>
+                            <strong>Reference:</strong> ${studentData._id?.slice(-8) || 'REF'}
+                        </p>
+                    </div>
+                `,
+                'ussd': `
+                    <div class="info-box">
+                        <strong>USSD Payment Code</strong>
+                        <p style="margin-top: 8px;">
+                            Dial: <strong>*898*01*${studentData._id?.slice(-6) || '000001'}#</strong><br>
+                            Amount: ${formatCurrency(totalPayableAmount)}<br>
+                            Follow the prompts to complete payment
+                        </p>
+                    </div>
+                `,
+                'wallet': `
+                    <div class="form-group">
+                        <label class="form-label">Wallet Provider</label>
+                        <select class="form-select">
+                            <option>-- Select Wallet --</option>
+                            <option>Google Pay</option>
+                            <option>Apple Pay</option>
+                            <option>School Wallet</option>
+                        </select>
+                    </div>
+                `,
+                '': ''
+            };
+
+            container.innerHTML = details[method] || '';
+        }
+
+        // ============ PAYMENT PROCESSING ============
+
+        /**
+         * Process Payment
+         */
+        async function processPayment() {
+            try {
+                if (selectedFees.length === 0) {
+                    showAlert('Please select at least one fee to pay', 'warning');
+                    return;
+                }
+
+                const paymentMethod = document.getElementById('paymentMethod').value;
+                if (!paymentMethod) {
+                    showAlert('Please select a payment method', 'warning');
+                    return;
+                }
+
+                showLoadingSpinner(true);
+
+                // In a real application, this would process the payment
+                console.log('💳 Processing payment:', {
+                    studentId: studentData._id,
+                    selectedFees,
+                    totalPayableAmount,
+                    paymentMethod
+                });
+
+                // Simulate payment processing
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                showLoadingSpinner(false);
+
+                // Show success message
+                showAlert('Payment request submitted! Please complete payment to finalize.', 'success');
+
+                // Redirect to confirmation
+                setTimeout(() => {
+                    window.location.href = `fees-receipt.html?studentId=${studentData._id}&amount=${totalPayableAmount}&method=${paymentMethod}`;
+                }, 2000);
+
+            } catch (err) {
+                console.error('❌ Payment error:', err);
+                showAlert('Payment failed: ' + err.message, 'error');
+                showLoadingSpinner(false);
+            }
+        }
+
+        // ============ UTILITY ============
+
+        /**
+         * Format Currency
+         */
+        function formatCurrency(value) {
+            return '₦' + (value || 0).toLocaleString('en-NG', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        /**
+         * Show Alert
+         */
+        function showAlert(message, type = 'info') {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+
+            container.appendChild(alert);
+
+            setTimeout(() => alert.remove(), 5000);
+        }
+
+        // ============ DOM READY ============
+        document.addEventListener('DOMContentLoaded', initializePaymentPage);
+    </script>
+</body>
+</html>
