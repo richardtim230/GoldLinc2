@@ -364,302 +364,483 @@
     </main>
 
     <script>
-        // ============ API CONFIGURATION ============
-        const API_BASE_URL = "https://goldlincschools.onrender.com";
-        
-        // ============ STATE MANAGEMENT ============
-        let parentData = null;
-        let children = [];
-        let selectedChildId = null;
-        let selectedChild = null;
+// ============ API CONFIGURATION ============
+const API_BASE = window.API_BASE || "https://goldlincschools.onrender.com/api";
+const token = localStorage.getItem('parentToken') || localStorage.getItem('token');
 
-        // ============ UTILITY FUNCTIONS ============
-        function showLoadingSpinner(message = 'Loading Dashboard', status = 'Initializing system...') {
-            const overlay = document.getElementById('loadingOverlay');
-            if (overlay) {
-                document.getElementById('spinnerMainText').textContent = message;
-                document.getElementById('spinnerStatus').textContent = status;
-                overlay.classList.remove('hidden');
-            }
+// ============ GLOBAL STATE ============
+let parentData = null;
+let allStudents = [];
+let currentSelectedStudent = null;
+
+// ============ INITIALIZATION ============
+async function initializeDashboard() {
+    console.log('🚀 Initializing Parent Dashboard...');
+
+    // Check authentication
+    if (!token) {
+        console.warn('⚠️ No token found, redirecting to login...');
+        window.location.href = 'login.html';
+        return;
+    }
+
+    try {
+        showLoadingSpinner('Loading Parent Dashboard', 'Initializing system...');
+
+        // Load parent info
+        updateLoadingStatus('Loading parent information...');
+        await loadParentData();
+
+        // Load students
+        updateLoadingStatus('Loading student data...');
+        await loadStudents();
+
+        if (allStudents.length > 0) {
+            currentSelectedStudent = allStudents[0]._id;
+            updateLoadingStatus('Loading student details...');
+            await loadStudentDetails();
+        } else {
+            console.warn('⚠️ No students found');
         }
 
-        function hideLoadingSpinner() {
-            const overlay = document.getElementById('loadingOverlay');
-            if (overlay) {
-                setTimeout(() => overlay.classList.add('hidden'), 300);
-            }
-        }
+        hideLoadingSpinner();
+        console.log('✅ Dashboard initialization complete');
 
-        function updateLoadingStatus(status) {
-            const statusEl = document.getElementById('spinnerStatus');
-            if (statusEl) {
-                statusEl.textContent = status;
-            }
-        }
+    } catch (err) {
+        console.error('❌ Dashboard initialization error:', err);
+        hideLoadingSpinner();
+        alert('Failed to initialize dashboard: ' + err.message);
+    }
+}
 
-        function getAuthHeaders() {
-            const token = localStorage.getItem('parentToken') || localStorage.getItem('token') || '';
-            return {
-                'Content-Type': 'application/json',
-                ...(token && { 'Authorization': `Bearer ${token}` })
-            };
-        }
+// ============ LOADING SPINNER ============
+function showLoadingSpinner(message = 'Loading Dashboard', status = 'Initializing system...') {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        document.getElementById('spinnerMainText').textContent = message;
+        document.getElementById('spinnerStatus').textContent = status;
+        overlay.classList.remove('hidden');
+    }
+}
 
-        // ============ INITIALIZATION ============
-        async function initializeDashboard() {
-            try {
-                showLoadingSpinner('Loading Parent Dashboard', 'Initializing system...');
+function hideLoadingSpinner() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        setTimeout(() => overlay.classList.add('hidden'), 300);
+    }
+}
 
-                // Check authentication
-                const token = localStorage.getItem('parentToken') || localStorage.getItem('token');
-                if (!token) {
-                    hideLoadingSpinner();
-                    window.location.href = 'login.html';
-                    return;
-                }
+function updateLoadingStatus(status) {
+    const statusEl = document.getElementById('spinnerStatus');
+    if (statusEl) {
+        statusEl.textContent = status;
+    }
+}
 
-                // Load parent info
-                updateLoadingStatus('Loading parent information...');
-                await loadParentInfo();
+// ============ AUTH HEADERS ============
+function getAuthHeaders() {
+    return {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+    };
+}
 
-                // Load children
-                updateLoadingStatus('Loading student data...');
-                await loadChildren();
+// ============ DATA LOADING ============
 
-                // Select first child
-                if (children.length > 0) {
-                    selectedChildId = children[0]._id;
-                    selectedChild = children[0];
-                    updateLoadingStatus('Loading student grades...');
-                    await loadStudentGrades();
-                    await loadAssignments();
-                }
+/**
+ * Load Parent Data - matches working pattern
+ */
+async function loadParentData() {
+    try {
+        console.log('📥 Loading parent data from /parents/me...');
 
-                hideLoadingSpinner();
+        const res = await fetch(`${API_BASE}/parents/me`, {
+            method: 'GET',
+            headers: getAuthHeaders()
+        });
 
-            } catch (error) {
-                console.error('Initialization error:', error);
-                hideLoadingSpinner();
-                alert('Failed to load dashboard. Please try again.');
-            }
-        }
-
-        async function loadParentInfo() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/parents/me`, {
-                    headers: getAuthHeaders()
-                });
-
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        localStorage.removeItem('parentToken');
-                        localStorage.removeItem('token');
-                        window.location.href = 'login.html';
-                    }
-                    throw new Error('Failed to fetch parent info');
-                }
-
-                parentData = await response.json();
-                
-                // Update UI
-                document.getElementById('parentFullName').textContent = parentData.name || '--';
-                document.getElementById('parentId').textContent = parentData._id?.slice(-8) || '--';
-                document.getElementById('mobileParentName').textContent = parentData.name || 'Parent';
-
-            } catch (error) {
-                console.error('Error loading parent info:', error);
-                throw error;
-            }
-        }
-
-        async function loadChildren() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/parents/children`, {
-                    headers: getAuthHeaders()
-                });
-
-                if (!response.ok) throw new Error('Failed to fetch children');
-
-                children = await response.json();
-
-                // Populate selectors
-                const wardSelector = document.getElementById('wardSelector');
-                const mobileWardSelector = document.getElementById('mobileWardSelector');
-
-                [wardSelector, mobileWardSelector].forEach(selector => {
-                    if (selector) {
-                        selector.innerHTML = '';
-                        children.forEach(child => {
-                            const option = document.createElement('option');
-                            option.value = child._id;
-                            option.textContent = `${child.name} (${child.class?.name || 'N/A'})`;
-                            selector.appendChild(option);
-                        });
-                        if (children.length > 0) {
-                            selector.value = children[0]._id;
-                        }
-                    }
-                });
-
-            } catch (error) {
-                console.error('Error loading children:', error);
-                children = [];
-            }
-        }
-
-        async function loadStudentGrades() {
-            try {
-                if (!selectedChildId) return;
-
-                const response = await fetch(`${API_BASE_URL}/api/parents/students/${selectedChildId}/grades`, {
-                    headers: getAuthHeaders()
-                });
-
-                if (!response.ok) throw new Error('Failed to fetch grades');
-
-                const gradesData = await response.json();
-                renderGrades(gradesData);
-
-                // Update student info
-                if (selectedChild) {
-                    document.getElementById('studentFullName').textContent = selectedChild.name || '--';
-                    document.getElementById('studentClass').textContent = selectedChild.class?.name || '--';
-                    document.getElementById('studentRegNo').textContent = selectedChild.regNo || '--';
-                    document.getElementById('studentId').textContent = selectedChild._id?.slice(-8) || '--';
-                }
-
-            } catch (error) {
-                console.error('Error loading grades:', error);
-            }
-        }
-
-        function renderGrades(grades) {
-            const tbody = document.getElementById('gradesTableBody');
-            tbody.innerHTML = '';
-
-            if (!grades || grades.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">No grades available yet</td></tr>';
-                return;
-            }
-
-            grades.forEach(grade => {
-                const total = (grade.ca || 0) + (grade.exam || 0);
-                const gradeLetters = {
-                    A: 'A - Excellent',
-                    B: 'B - Very Good',
-                    C: 'C - Good',
-                    D: 'D - Fair',
-                    E: 'E - Poor',
-                    F: 'F - Fail'
-                };
-
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-slate-50/60 transition';
-                row.innerHTML = `
-                    <td class="p-4 pl-6 font-bold text-brand-900">${grade.subject}</td>
-                    <td class="p-4 text-center font-mono">${grade.ca || 0}</td>
-                    <td class="p-4 text-center font-mono">${grade.exam || 0}</td>
-                    <td class="p-4 text-center font-bold text-slate-900 font-mono">${total}</td>
-                    <td class="p-4 pr-6 text-center"><span class="bg-emerald-50 text-emerald-700 font-bold px-2.5 py-1 rounded-xl border border-emerald-100">${gradeLetters[grade.grade] || 'N/A'}</span></td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        async function loadAssignments() {
-            try {
-                if (!selectedChildId) return;
-
-                const response = await fetch(`${API_BASE_URL}/api/parents/students/${selectedChildId}/assignments`, {
-                    headers: getAuthHeaders()
-                });
-
-                if (!response.ok) throw new Error('Failed to fetch assignments');
-
-                const assignments = await response.json();
-                renderAssignments(assignments);
-
-            } catch (error) {
-                console.error('Error loading assignments:', error);
-            }
-        }
-
-        function renderAssignments(assignments) {
-            const container = document.getElementById('assignmentsContainer');
-            container.innerHTML = '';
-
-            if (!assignments || assignments.length === 0) {
-                container.innerHTML = '<div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-center col-span-full"><p class="text-slate-400">No assignments available</p></div>';
-                return;
-            }
-
-            assignments.slice(0, 4).forEach(assignment => {
-                const dueDate = new Date(assignment.dueDate);
-                const isOverdue = dueDate < new Date();
-                
-                const card = document.createElement('div');
-                card.className = `p-4 rounded-2xl flex flex-col justify-between ${isOverdue ? 'bg-red-50 border border-red-100' : 'bg-amber-50/40 border border-amber-100'}`;
-                card.innerHTML = `
-                    <div>
-                        <span class="text-[9px] font-black uppercase tracking-widest ${isOverdue ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'} px-2 py-0.5 rounded-lg">${assignment.subject}</span>
-                        <h4 class="text-sm font-bold text-slate-900 mt-2">${assignment.title}</h4>
-                        <p class="text-xs text-slate-500 mt-1">${assignment.description?.slice(0, 50) || 'No description'}...</p>
-                    </div>
-                    <p class="text-[10px] font-bold ${isOverdue ? 'text-red-700' : 'text-amber-700'} uppercase tracking-wide mt-4 flex items-center">
-                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v2h16V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h12a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>
-                        Due ${dueDate.toLocaleDateString()}
-                    </p>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function switchWard() {
-            const selector = document.getElementById('wardSelector');
-            const mobileSelector = document.getElementById('mobileWardSelector');
-            
-            const childId = selector.value || mobileSelector.value;
-            if (!childId) return;
-
-            selectedChildId = childId;
-            selectedChild = children.find(c => c._id === childId);
-
-            if (selector.value !== childId) selector.value = childId;
-            if (mobileSelector.value !== childId) mobileSelector.value = childId;
-
-            loadStudentGrades();
-            loadAssignments();
-        }
-
-        function logoutUser() {
-            if (confirm('Are you sure you want to logout?')) {
+        if (!res.ok) {
+            if (res.status === 401) {
                 localStorage.removeItem('parentToken');
                 localStorage.removeItem('token');
                 window.location.href = 'login.html';
+                return;
             }
+            throw new Error(`HTTP ${res.status}: ${res.statusText}`);
         }
 
-        // ============ MOBILE NAVIGATION ============
-        const overlay = document.getElementById('bottomDrawerOverlay');
-        const card = document.getElementById('bottomDrawerCard');
+        parentData = await res.json();
 
-        function openBottomNav() {
-            overlay.classList.remove('hidden');
-            setTimeout(() => {
-                overlay.classList.remove('opacity-0');
-                card.classList.remove('translate-y-full');
-            }, 20);
+        console.log('✅ Parent data loaded:', {
+            name: parentData.name,
+            email: parentData.email,
+            studentCount: parentData.students?.length || 0
+        });
+
+        // Update UI with parent info
+        updateParentUI();
+        return parentData;
+
+    } catch (err) {
+        console.error('❌ Error loading parent data:', err);
+        throw err;
+    }
+}
+
+/**
+ * Update Parent UI Elements
+ */
+function updateParentUI() {
+    if (!parentData) return;
+
+    document.getElementById('parentFullName').textContent = parentData.name || '--';
+    document.getElementById('parentId').textContent = parentData._id?.slice(-8) || '--';
+    document.getElementById('mobileParentName').textContent = parentData.name || 'Parent';
+}
+
+/**
+ * Load Students List - matches working pattern
+ */
+async function loadStudents() {
+    try {
+        console.log('📥 Loading students...');
+
+        // Extract students from parent data
+        allStudents = parentData.students || [];
+
+        console.log(`✅ ${allStudents.length} students loaded:`, 
+            allStudents.map(s => ({ name: s.name, id: s._id }))
+        );
+
+        // Populate ward selectors
+        populateWardSelectors();
+
+        return allStudents;
+
+    } catch (err) {
+        console.error('❌ Error loading students:', err);
+        throw err;
+    }
+}
+
+/**
+ * Populate Ward Selectors
+ */
+function populateWardSelectors() {
+    const wardSelector = document.getElementById('wardSelector');
+    const mobileWardSelector = document.getElementById('mobileWardSelector');
+
+    [wardSelector, mobileWardSelector].forEach(selector => {
+        if (!selector) return;
+
+        selector.innerHTML = '';
+        allStudents.forEach(student => {
+            const option = document.createElement('option');
+            option.value = student._id;
+            option.textContent = `${student.name} (${student.class || 'N/A'})`;
+            selector.appendChild(option);
+        });
+
+        if (allStudents.length > 0) {
+            selector.value = allStudents[0]._id;
         }
 
-        function closeBottomNav(event) {
-            if (!event || event.target === overlay) {
-                overlay.classList.add('opacity-0');
-                card.classList.add('translate-y-full');
-                setTimeout(() => {
-                    overlay.classList.add('hidden');
-                }, 300);
-            }
+        selector.addEventListener('change', async (e) => {
+            currentSelectedStudent = e.target.value;
+            // Sync both selectors
+            [wardSelector, mobileWardSelector].forEach(sel => {
+                if (sel && sel.value !== currentSelectedStudent) {
+                    sel.value = currentSelectedStudent;
+                }
+            });
+            await loadStudentDetails();
+        });
+    });
+
+    console.log('✓ Ward selectors populated');
+}
+
+/**
+ * Load Student Details and Grades
+ */
+async function loadStudentDetails() {
+    try {
+        if (!currentSelectedStudent) {
+            console.warn('⚠️ No student selected');
+            return;
         }
+
+        console.log('📚 Loading details for student:', currentSelectedStudent);
+
+        // Find selected student
+        const student = allStudents.find(s => s._id === currentSelectedStudent);
+        if (!student) {
+            console.warn('Student not found');
+            return;
+        }
+
+        // Update student info display
+        updateStudentInfoDisplay(student);
+
+        // Load grades
+        await loadStudentGrades(student._id);
+
+        // Load assignments
+        await loadStudentAssignments(student._id);
+
+    } catch (err) {
+        console.error('❌ Error loading student details:', err);
+    }
+}
+
+/**
+ * Update Student Info Display
+ */
+function updateStudentInfoDisplay(student) {
+    document.getElementById('studentFullName').textContent = student.name || '--';
+    document.getElementById('studentClass').textContent = student.class || '--';
+    document.getElementById('studentRegNo').textContent = student.regNo || '--';
+    document.getElementById('studentId').textContent = student._id?.slice(-8) || '--';
+
+    // Update metrics
+    const academicStats = student.academicStats || {};
+    const attendanceStats = student.attendanceStats || {};
+    const feesStats = student.feesStats || {};
+
+    document.getElementById('attendance').textContent = (attendanceStats.averageAttendancePercentage || 0) + '%';
+    document.getElementById('attendanceNote').textContent = 'Current term';
+
+    document.getElementById('feesStatus').textContent = formatCurrency(feesStats.outstanding || 0);
+
+    document.getElementById('caAverage').textContent = (academicStats.averageScore || 0).toFixed(1);
+    document.getElementById('caRanking').textContent = 'Recent average';
+}
+
+/**
+ * Load Student Grades - matches working pattern
+ */
+async function loadStudentGrades(studentId) {
+    try {
+        console.log('📊 Loading grades for student:', studentId);
+
+        const url = `${API_BASE}/parents/me/students/${studentId}/grades?term=1`;
+        console.log('🔗 Fetching from:', url);
+
+        const res = await fetch(url, {
+            headers: getAuthHeaders()
+        });
+
+        if (!res.ok) {
+            console.warn(`⚠️ Grades not available: ${res.status}`);
+            renderGradesTable([]);
+            return;
+        }
+
+        const data = await res.json();
+        console.log('✅ Grades loaded:', {
+            recordCount: data.recordCount,
+            records: data.records?.length || 0
+        });
+
+        renderGradesTable(data.records || []);
+
+    } catch (err) {
+        console.error('❌ Error loading grades:', err);
+        renderGradesTable([]);
+    }
+}
+
+/**
+ * Render Grades Table
+ */
+function renderGradesTable(records) {
+    const tbody = document.getElementById('gradesTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+
+    if (!records || records.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="p-8 text-center text-slate-400">
+                    <div class="text-slate-400">No grades available yet</div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    records.forEach(record => {
+        const ca1 = parseFloat(record.ca1) || 0;
+        const ca2 = parseFloat(record.ca2) || 0;
+        const exam = parseFloat(record.exam) || 0;
+        const total = ca1 + ca2 + exam;
+
+        let gradeLetters = 'N/A';
+        if (total >= 70) gradeLetters = 'A - Excellent';
+        else if (total >= 60) gradeLetters = 'B - Very Good';
+        else if (total >= 50) gradeLetters = 'C - Good';
+        else if (total >= 45) gradeLetters = 'D - Fair';
+        else if (total >= 40) gradeLetters = 'E - Poor';
+        else gradeLetters = 'F - Fail';
+
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-slate-50/60 transition';
+        row.innerHTML = `
+            <td class="p-4 pl-6 font-bold text-brand-900">${record.subject || 'Unknown'}</td>
+            <td class="p-4 text-center font-mono">${ca1}</td>
+            <td class="p-4 text-center font-mono">${exam}</td>
+            <td class="p-4 text-center font-bold text-slate-900 font-mono">${total}</td>
+            <td class="p-4 pr-6 text-center"><span class="bg-emerald-50 text-emerald-700 font-bold px-2.5 py-1 rounded-xl border border-emerald-100">${gradeLetters}</span></td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+/**
+ * Load Student Assignments
+ */
+async function loadStudentAssignments(studentId) {
+    try {
+        console.log('📋 Loading assignments for student:', studentId);
+
+        const url = `${API_BASE}/parents/me/students/${studentId}/assignments`;
+        console.log('🔗 Fetching from:', url);
+
+        const res = await fetch(url, {
+            headers: getAuthHeaders()
+        });
+
+        if (!res.ok) {
+            console.warn(`⚠️ Assignments not available: ${res.status}`);
+            renderAssignments([]);
+            return;
+        }
+
+        const data = await res.json();
+        const assignments = Array.isArray(data) ? data : (data.assignments || []);
+
+        console.log('✅ Assignments loaded:', assignments.length);
+        renderAssignments(assignments);
+
+    } catch (err) {
+        console.error('❌ Error loading assignments:', err);
+        renderAssignments([]);
+    }
+}
+
+/**
+ * Render Assignments
+ */
+function renderAssignments(assignments) {
+    const container = document.getElementById('assignmentsContainer');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    if (!assignments || assignments.length === 0) {
+        container.innerHTML = `
+            <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-center col-span-full">
+                <p class="text-slate-400">No assignments available</p>
+            </div>
+        `;
+        return;
+    }
+
+    assignments.slice(0, 4).forEach(assignment => {
+        const dueDate = new Date(assignment.dueDate);
+        const now = new Date();
+        const isOverdue = dueDate < now;
+
+        const card = document.createElement('div');
+        card.className = `p-4 rounded-2xl flex flex-col justify-between ${isOverdue ? 'bg-red-50 border border-red-100' : 'bg-amber-50/40 border border-amber-100'}`;
+        card.innerHTML = `
+            <div>
+                <span class="text-[9px] font-black uppercase tracking-widest ${isOverdue ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'} px-2 py-0.5 rounded-lg">
+                    ${assignment.subject || 'Assignment'}
+                </span>
+                <h4 class="text-sm font-bold text-slate-900 mt-2">${assignment.title || 'Untitled'}</h4>
+                <p class="text-xs text-slate-500 mt-1">${assignment.description?.slice(0, 50) || 'No description'}...</p>
+            </div>
+            <p class="text-[10px] font-bold ${isOverdue ? 'text-red-700' : 'text-amber-700'} uppercase tracking-wide mt-4 flex items-center">
+                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v2h16V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h12a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                </svg>
+                Due ${dueDate.toLocaleDateString()}
+            </p>
+        `;
+        container.appendChild(card);
+    });
+}
+
+/**
+ * Format Currency
+ */
+function formatCurrency(value) {
+    return '₦' + (value || 0).toLocaleString('en-NG', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+/**
+ * Logout User
+ */
+function logoutUser() {
+    if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('parentToken');
+        localStorage.removeItem('token');
+        window.location.href = 'login.html';
+    }
+}
+
+// ============ MOBILE NAVIGATION ============
+const overlay = document.getElementById('bottomDrawerOverlay');
+const card = document.getElementById('bottomDrawerCard');
+
+function openBottomNav() {
+    overlay.classList.remove('hidden');
+    setTimeout(() => {
+        overlay.classList.remove('opacity-0');
+        card.classList.remove('translate-y-full');
+    }, 20);
+}
+
+function closeBottomNav(event) {
+    if (!event || event.target === overlay) {
+        overlay.classList.add('opacity-0');
+        card.classList.add('translate-y-full');
+        setTimeout(() => {
+            overlay.classList.add('hidden');
+        }, 300);
+    }
+}
+
+/**
+ * Switch Ward
+ */
+async function switchWard() {
+    const selector = document.getElementById('wardSelector');
+    const mobileSelector = document.getElementById('mobileWardSelector');
+
+    const childId = selector?.value || mobileSelector?.value;
+    if (!childId) {
+        console.warn('No child selected');
+        return;
+    }
+
+    currentSelectedStudent = childId;
+
+    // Sync both selectors
+    if (selector && selector.value !== childId) selector.value = childId;
+    if (mobileSelector && mobileSelector.value !== childId) mobileSelector.value = childId;
+
+    console.log('Switched to student:', childId);
+    await loadStudentDetails();
+}
+
+// ============ DOM READY ============
+document.addEventListener('DOMContentLoaded', initializeDashboard);
     </script>
 </body>
 </html>
