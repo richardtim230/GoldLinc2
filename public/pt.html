@@ -1066,6 +1066,9 @@ async function loadRecentResults(studentId) {
 /**
  * Render Recent Results Table (Top 5)
  */
+/**
+ * Render Recent Results Table (Top 5) - FIXED
+ */
 function renderRecentResults(records) {
     const tbody = document.getElementById('recentResultsTableBody');
     if (!tbody) return;
@@ -1087,15 +1090,37 @@ function renderRecentResults(records) {
     const topFive = records.slice(0, 5);
 
     topFive.forEach((record, index) => {
-        const score = parseFloat(record.score || record.total || 0);
-        let gradeLetters = 'N/A';
+        // ✅ FIX: Calculate total score from component scores
+        const ca1 = parseFloat(record.ca1 || record.ca1_score || 0);
+        const ca2 = parseFloat(record.ca2 || record.ca2_score || 0);
+        const exam = parseFloat(record.exam || record.exam_score || 0);
         
-        if (score >= 70) gradeLetters = 'A';
-        else if (score >= 60) gradeLetters = 'B';
-        else if (score >= 50) gradeLetters = 'C';
-        else if (score >= 45) gradeLetters = 'D';
-        else if (score >= 40) gradeLetters = 'E';
-        else gradeLetters = 'F';
+        // If score is 0, calculate from components
+        let score = parseFloat(record.score || record.total || 0);
+        if (score === 0 && (ca1 > 0 || ca2 > 0 || exam > 0)) {
+            score = ca1 + ca2 + exam;
+        }
+        
+        console.log(`📊 Result ${index}:`, {
+            subject: record.subject,
+            ca1,
+            ca2,
+            exam,
+            score,
+            grade: record.grade
+        });
+
+        let gradeLetters = record.grade || 'N/A';
+        
+        // If grade is empty/N/A, calculate from score
+        if (!gradeLetters || gradeLetters === 'N/A' || gradeLetters === '') {
+            if (score >= 70) gradeLetters = 'A';
+            else if (score >= 60) gradeLetters = 'B';
+            else if (score >= 50) gradeLetters = 'C';
+            else if (score >= 45) gradeLetters = 'D';
+            else if (score >= 40) gradeLetters = 'E';
+            else gradeLetters = 'F';
+        }
 
         const row = document.createElement('tr');
         row.className = 'hover:bg-slate-50/60 transition';
