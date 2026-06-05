@@ -231,7 +231,146 @@ feesStats: {
     res.status(500).json({ error: error.message });
   }
 });
+// Add these new routes to your existing routes/parents.js file
 
+/**
+ * GET /parents/me/students/:studentId/results
+ * Get recent results (top 5) for a specific student
+ */
+router.get('/me/students/:studentId/results', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    } catch (err) {
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
+
+    const parent = await Parent.findById(decoded._id);
+    if (!parent) {
+      return res.status(404).json({ error: 'Parent not found' });
+    }
+
+    // Verify parent has access to this student
+    if (!parent.studentIds.includes(req.params.studentId)) {
+      return res.status(403).json({ error: 'Access denied to this student' });
+    }
+
+    const Result = require('../models/Result');
+    
+    // Get the most recent results (limit to top 5)
+    const results = await Result.find({ student: req.params.studentId })
+      .populate('subject', 'name')
+      .populate('session', 'name')
+      .populate('term', 'name')
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .lean();
+
+    // Transform results for frontend
+    const transformedResults = results.map(result => ({
+      _id: result._id,
+      subject: result.subject?.name || 'Unknown',
+      score: result.score || 0,
+      total: result.score || 0,
+      ca1: result.ca1_score || 0,
+      ca2: result.ca2_score || 0,
+      exam: result.exam_score || 0,
+      grade: result.grade || 'N/A',
+      remarks: result.remarks || '',
+      session: result.session?.name || '',
+      term: result.term?.name || '',
+      status: result.status || 'Published'
+    }));
+
+    res.json({
+      success: true,
+      results: transformedResults,
+      recordCount: transformedResults.length,
+      session: results.length > 0 ? results[0].session?.name : '',
+      term: results.length > 0 ? results[0].term?.name : ''
+    });
+
+  } catch (error) {
+    console.error('Error getting student results:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /parents/me/students/:studentId/assignments
+ * Get active assignments for a specific student
+ */
+router.get('/me/students/:studentId/assignments', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    } catch (err) {
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
+
+    const parent = await Parent.findById(decoded._id);
+    if (!parent) {
+      return res.status(404).json({ error: 'Parent not found' });
+    }
+
+    // Verify parent has access to this student
+    if (!parent.studentIds.includes(req.params.studentId)) {
+      return res.status(403).json({ error: 'Access denied to this student' });
+    }
+
+    const Assignment = require('../models/Assignment');
+    
+    // Get assignments where this student is assigned, due date is in future (or near past)
+    const assignments = await Assignment.find({
+      assignedTo: req.params.studentId,
+      dueDate: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } // Last 7 days + future
+    })
+      .populate('subject', 'name')
+      .populate('teacher', 'name')
+      .sort({ dueDate: 1 })
+      .lean();
+
+    // Transform assignments for frontend
+    const transformedAssignments = assignments.map(assignment => ({
+      _id: assignment._id,
+      title: assignment.title || 'Untitled Assignment',
+      description: assignment.description || 'No description provided',
+      subject: assignment.subject?.name || 'Unknown Subject',
+      teacher: assignment.teacher?.name || 'Unknown Teacher',
+      dueDate: assignment.dueDate,
+      deadline: assignment.dueDate,
+      createdAt: assignment.createdAt,
+      files: assignment.files || [],
+      status: new Date(assignment.dueDate) < new Date() ? 'Overdue' : 'Active'
+    }));
+
+    res.json({
+      success: true,
+      assignments: transformedAssignments,
+      recordCount: transformedAssignments.length
+    });
+
+  } catch (error) {
+    console.error('Error getting student assignments:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
 /**
  * GET /parents/me/students/:studentId/grades
  * Get detailed grades for a specific student
