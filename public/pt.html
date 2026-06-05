@@ -459,7 +459,6 @@
 
         </aside>
     </main>
-
 <script>
 // ============ API CONFIGURATION ============
 const API_BASE = window.API_BASE || "https://goldlincschools.onrender.com/api";
@@ -766,7 +765,7 @@ function renderChildrenList() {
 }
 
 /**
- * Populate Ward Selectors
+ * Populate Ward Selectors - FIXED VERSION
  */
 function populateWardSelectors() {
     const wardSelector = document.getElementById('wardSelector');
@@ -775,7 +774,16 @@ function populateWardSelectors() {
     [wardSelector, mobileWardSelector].forEach(selector => {
         if (!selector) return;
 
+        // Remove all existing options
         selector.innerHTML = '';
+        
+        // Add default option
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Select Student';
+        selector.appendChild(defaultOption);
+
+        // Add student options
         allStudents.forEach(student => {
             const option = document.createElement('option');
             option.value = student._id;
@@ -783,22 +791,38 @@ function populateWardSelectors() {
             selector.appendChild(option);
         });
 
+        // Set initial value
         if (allStudents.length > 0) {
             selector.value = allStudents[0]._id;
         }
-
-        selector.addEventListener('change', (e) => {
-            const newStudentId = e.target.value;
-            console.log('Ward selector changed to:', newStudentId);
-            switchToStudent(newStudentId);
-        });
     });
+
+    // Attach change event listeners AFTER all population is done
+    if (wardSelector) {
+        wardSelector.onchange = function() {
+            const newStudentId = this.value;
+            if (newStudentId) {
+                console.log('🔄 Ward selector changed to:', newStudentId);
+                switchToStudent(newStudentId);
+            }
+        };
+    }
+
+    if (mobileWardSelector) {
+        mobileWardSelector.onchange = function() {
+            const newStudentId = this.value;
+            if (newStudentId) {
+                console.log('🔄 Mobile ward selector changed to:', newStudentId);
+                switchToStudent(newStudentId);
+            }
+        };
+    }
 
     console.log('✓ Ward selectors populated');
 }
 
 /**
- * Switch to Student
+ * Switch to Student - MAIN SWITCHING FUNCTION
  */
 async function switchToStudent(studentId) {
     if (!studentId) {
@@ -808,16 +832,24 @@ async function switchToStudent(studentId) {
 
     console.log('🔄 Switching to student:', studentId);
 
+    // Prevent unnecessary re-loading if already selected
+    if (currentSelectedStudent === studentId) {
+        console.log('ℹ️ Student already selected, skipping reload');
+        return;
+    }
+
     currentSelectedStudent = studentId;
 
-    // Sync both selectors
+    // Sync BOTH selectors to the same value
     const wardSelector = document.getElementById('wardSelector');
     const mobileWardSelector = document.getElementById('mobileWardSelector');
 
-    if (wardSelector && wardSelector.value !== studentId) {
+    console.log('🔗 Syncing selectors to:', studentId);
+    
+    if (wardSelector) {
         wardSelector.value = studentId;
     }
-    if (mobileWardSelector && mobileWardSelector.value !== studentId) {
+    if (mobileWardSelector) {
         mobileWardSelector.value = studentId;
     }
 
@@ -825,6 +857,7 @@ async function switchToStudent(studentId) {
         showLoadingSpinner('Loading Student Data', 'Fetching details...');
         await loadStudentDetails();
         hideLoadingSpinner();
+        console.log('✅ Student switched successfully');
     } catch (err) {
         console.error('❌ Error switching student:', err);
         hideLoadingSpinner();
@@ -833,7 +866,7 @@ async function switchToStudent(studentId) {
 }
 
 /**
- * Switch Ward (for compatibility)
+ * Switch Ward (compatibility function)
  */
 async function switchWard() {
     const wardSelector = document.getElementById('wardSelector');
@@ -996,7 +1029,6 @@ async function loadRecentResults(studentId) {
     try {
         console.log('📋 Loading recent results for student:', studentId);
 
-        // Try to fetch results from an endpoint or use grades data
         const url = `${API_BASE}/parents/me/students/${studentId}/results`;
         console.log('🔗 Fetching results from:', url);
 
@@ -1006,7 +1038,6 @@ async function loadRecentResults(studentId) {
 
         if (!res.ok) {
             console.warn(`⚠️ Results not available: ${res.status}`);
-            // Fallback: use grades data if available
             renderRecentResults([]);
             return;
         }
@@ -1260,7 +1291,7 @@ function logoutUser() {
 }
 
 /**
- * Mobile Navigation
+ * Mobile Navigation - Open
  */
 function openBottomNav() {
     const overlay = document.getElementById('bottomDrawerOverlay');
@@ -1274,6 +1305,9 @@ function openBottomNav() {
     }
 }
 
+/**
+ * Mobile Navigation - Close
+ */
 function closeBottomNav(event) {
     if (event && event.target !== document.getElementById('bottomDrawerOverlay')) {
         return;
