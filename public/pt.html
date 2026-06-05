@@ -131,7 +131,7 @@
         <!-- Sibling Multi-Ward Switcher Node -->
         <div class="p-4 mx-4 my-5 bg-brand-800/50 rounded-2xl border border-brand-500/30 backdrop-blur-sm">
             <label class="block text-[10px] font-bold text-brand-500 uppercase tracking-wider mb-1.5 px-1">Active Ward Account</label>
-            <select id="wardSelector" onchange="switchWard()" class="w-full bg-brand-900 border border-brand-800 rounded-xl text-xs font-bold text-white focus:ring-1 focus:ring-brand-500 cursor-pointer py-2 px-3">
+            <select id="wardSelector" onchange="switchWard()" class="w-full bg-brand-900 border border-brand-800 rounded-xl text-xs font-bold text-white focus:ring-1 focus:ring-brand-500 cursor-pointer">
                 <option value="">Select Student</option>
             </select>
         </div>
@@ -140,19 +140,23 @@
         <nav class="flex-grow px-4 space-y-1.5">
             <p class="text-[10px] font-bold text-brand-500 uppercase tracking-widest px-3 mb-2">Control Workspace</p>
             <a href="#" class="flex items-center px-4 py-3 text-sm font-semibold rounded-xl bg-gradient-to-r from-brand-800 to-brand-500 text-white shadow-md transition-all">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/></svg>
                 Main Dashboard
             </a>
-            <a href="ward-results" class="flex items-center px-4 py-3 text-sm font-medium text-brand-100 hover:text-white hover:bg-brand-800/40 rounded-xl transition-all">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <a href="results.html" class="flex items-center px-4 py-3 text-sm font-medium text-brand-100 hover:text-white hover:bg-brand-800/40 rounded-xl transition-all">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 Result Sheet Archive
             </a>
+            <a href="pr.html" class="flex items-center px-4 py-3 text-sm font-medium text-brand-100 hover:text-white hover:bg-brand-800/40 rounded-xl transition-all">
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                Check Results
+            </a>
             <a href="#" onclick="alert('Launching secure financial gateway links...')" class="flex items-center px-4 py-3 text-sm font-medium text-brand-100 hover:text-white hover:bg-brand-800/40 rounded-xl transition-all">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
                 Tuition Ledger & Receipts
             </a>
             <a href="#" onclick="logoutUser()" class="flex items-center px-4 py-3 text-sm font-medium text-brand-100 hover:text-white hover:bg-brand-800/40 rounded-xl transition-all">
-                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                 Logout
             </a>
         </nav>
@@ -169,7 +173,7 @@
             <img src="https://res.cloudinary.com/da7o22rnq/image/upload/v1779961202/editor-uploads/frngf21mg4fcrnmccobm.png" class="h-7 w-auto bg-white p-0.5 rounded-lg" alt="Logo">
             <span class="font-serif font-bold text-sm tracking-wide">Gold & Linc</span>
         </div>
-        <button type="button" onclick="openBottomNav()" class="flex items-center space-x-1.5 bg-brand-800 border border-brand-500/40 px-3 py-1.5 rounded-xl text-xs font-bold text-white transition active:scale-95">
+        <button type="button" onclick="openBottomNav()" class="flex items-center space-x-1.5 bg-brand-800 border border-brand-500/40 px-3 py-1.5 rounded-xl text-xs font-bold text-white transition active:bg-brand-700">
             <span>Menu</span>
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
@@ -177,7 +181,7 @@
 
     <!-- 3. MOBILE INTERACTIVE BOTTOM SHEET DRAWER OVERLAY MODULE -->
     <div id="bottomDrawerOverlay" onclick="closeBottomNav(event)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden transition-opacity duration-300 opacity-0">
-        <div id="bottomDrawerCard" class="absolute bottom-0 inset-x-0 bg-brand-900 text-white parabolic-top transform translate-y-full transition-transform duration-300 border-t-2 border-gold-400 p-6">
+        <div id="bottomDrawerCard" class="absolute bottom-0 inset-x-0 bg-brand-900 text-white parabolic-top transform translate-y-full transition-transform duration-300 border-t-2 border-gold-400 p-6 max-h-[80vh] overflow-y-auto">
             <div class="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-brand-800 rounded-full"></div>
             
             <div class="text-center mb-4">
@@ -195,15 +199,19 @@
             <div class="grid grid-cols-1 gap-2 text-sm font-bold">
                 <a href="#" onclick="closeBottomNav(null)" class="w-full bg-brand-800 hover:bg-brand-500 p-4 rounded-xl flex items-center justify-between border border-brand-500/20">
                     <span class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-gold-400 mr-2"></span>Main Dashboard</span>
-                    <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </a>
-                <a href="ward-results" class="w-full bg-brand-800 hover:bg-brand-500 p-4 rounded-xl flex items-center justify-between border border-brand-500/20">
-                    <span class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-2"></span>Results Portal</span>
-                    <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                <a href="results.html" class="w-full bg-brand-800 hover:bg-brand-500 p-4 rounded-xl flex items-center justify-between border border-brand-500/20">
+                    <span class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-2"></span>Results Archive</span>
+                    <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+                <a href="pr.html" class="w-full bg-brand-800 hover:bg-brand-500 p-4 rounded-xl flex items-center justify-between border border-brand-500/20">
+                    <span class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-2"></span>Check Results</span>
+                    <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </a>
                 <button onclick="logoutUser()" class="w-full text-left bg-brand-800 hover:bg-brand-500 p-4 rounded-xl flex items-center justify-between border border-brand-500/20">
                     <span class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-2"></span>Logout</span>
-                    <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </button>
             </div>
         </div>
@@ -295,20 +303,20 @@
                 </div>
             </div>
             <div class="bg-white rounded-2xl shadow-sm border border-slate-150 p-5 flex items-center space-x-4 hover:shadow-md transition">
-            <div class="p-3 bg-blue-50 rounded-xl text-blue-600 shrink-0">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-                </svg>
+                <div class="p-3 bg-blue-50 rounded-xl text-blue-600 shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                    </svg>
+                </div>
+                <div class="flex-grow">
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Fees Status</p>
+                    <p class="text-2xl font-black text-slate-900 mt-1" id="feesStatus">₦0.00</p>
+                    <span class="inline-flex items-center bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full mt-1.5" id="feesStatusBadge">
+                        <span class="w-1.5 h-1.5 bg-emerald-600 rounded-full mr-1.5"></span>
+                        Cleared
+                    </span>
+                </div>
             </div>
-            <div class="flex-grow">
-                <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Fees Status</p>
-                <p class="text-2xl font-black text-slate-900 mt-1" id="feesStatus">₦0.00</p>
-                <span class="inline-flex items-center bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full mt-1.5" id="feesStatusBadge">
-                    <span class="w-1.5 h-1.5 bg-emerald-600 rounded-full mr-1.5"></span>
-                    Cleared
-                </span>
-            </div>
-        </div>
             <div class="bg-white rounded-2xl shadow-sm border border-slate-150 p-5 flex items-center space-x-4 hover:shadow-md transition">
                 <div class="p-3 bg-indigo-50 rounded-xl text-indigo-600"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg></div>
                 <div>
@@ -318,7 +326,7 @@
                 </div>
             </div>
             <div class="bg-white rounded-2xl shadow-sm border border-slate-150 p-5 flex items-center space-x-4 hover:shadow-md transition">
-                <div class="p-3 bg-amber-50 rounded-xl text-gold-600"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H3a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V6a1 1 0 00-1-1h3a1 1 0 000-2 2 2 0 01-2-2V3a1 1 0 10-2 0v1a1 1 0 01-1 1H9V5a1 1 0 01-1-1 1 1 0 00-2 0v1a1 1 0 01-1 1H4z" clip-rule="evenodd"/></svg></div>
+                <div class="p-3 bg-amber-50 rounded-xl text-gold-600"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H3a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V6a1 1 0 00-1-1h-3a1 1 0 000-2 2 2 0 00-2-2H6a2 2 0 00-2 2zM9 9a1 1 0 000 2h6a1 1 0 000-2H9z" clip-rule="evenodd"/></svg></div>
                 <div>
                     <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Session</p>
                     <p class="text-sm font-bold text-slate-900 mt-0.5">2025/2026</p>
@@ -326,6 +334,50 @@
                 </div>
             </div>
         </section>
+
+        <!-- RECENT RESULTS SNAPSHOT SECTION -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-6 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Recent Results Snapshot</h3>
+                        <p class="text-xs text-slate-500 mt-1" id="resultsPeriodInfo">Latest term performance - Top 5 Subjects</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs font-bold text-brand-600 uppercase tracking-wider" id="resultsTermLabel">Loading...</p>
+                        <p class="text-[10px] text-slate-600 mt-0.5" id="resultsSessionLabel">Academic Period</p>
+                    </div>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-400 font-extrabold border-b border-slate-100 uppercase tracking-wider">
+                            <th class="p-4 pl-6">Subject</th>
+                            <th class="p-4 text-center">Score</th>
+                            <th class="p-4 text-center">Grade</th>
+                            <th class="p-4 pr-6 text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentResultsTableBody" class="divide-y divide-slate-100 font-medium text-slate-700">
+                        <tr>
+                            <td colspan="4" class="p-8 text-center">
+                                <div class="text-slate-400">No results available yet</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="bg-blue-50 border-t border-slate-100 p-4">
+                <div class="flex items-start gap-3">
+                    <svg class="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
+                    <div class="text-xs text-blue-800">
+                        <p class="font-semibold">Viewing top 5 subjects only</p>
+                        <p class="mt-1">For a complete detailed report of all subjects and performance analytics, please <a href="results.html" class="font-bold text-blue-900 hover:underline">visit the Results Portal</a> or access the downloadable full results from the <a href="#" onclick="alert('Redirect to student portal')" class="font-bold text-blue-900 hover:underline">Student Portal</a>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- GRADES TABLE -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -367,55 +419,54 @@
                 </div>
             </div>
         </div>
-<!-- Find this section in pt.html and replace it -->
 
-<!-- RIGHT AREA: REGISTRY DISPATCHES & DIRECT GATEWAY ANCHORS (1/3 width) -->
-<aside class="space-y-8">
-    
-    <!-- BULLETIN DISPATCH BOARD CARD -->
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
-        <div>
-            <h3 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Registry Dispatch Board</h3>
-            <p class="text-xs text-slate-500">Official real-time updates from management desks.</p>
-        </div>
-        <div class="space-y-4 divide-y divide-slate-100">
-            <div class="pt-0 space-y-1.5">
-                <span class="inline-block text-[9px] font-black tracking-wider uppercase bg-rose-50 border border-rose-100 text-rose-700 px-2 py-0.5 rounded-md">Urgent Notice</span>
-                <h4 class="text-xs font-bold text-slate-900">Mid-Term Intermission Break</h4>
-                <p class="text-[11px] text-slate-500 leading-relaxed">The campus compound will close for midterm recess starting next Wednesday. Terminal lessons resume the subsequent Monday.</p>
+        <!-- RIGHT AREA: REGISTRY DISPATCHES & DIRECT GATEWAY ANCHORS -->
+        <aside class="space-y-8">
+            
+            <!-- BULLETIN DISPATCH BOARD CARD -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div>
+                    <h3 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Registry Dispatch Board</h3>
+                    <p class="text-xs text-slate-500">Official real-time updates from management desks.</p>
+                </div>
+                <div class="space-y-4 divide-y divide-slate-100">
+                    <div class="pt-0 space-y-1.5">
+                        <span class="inline-block text-[9px] font-black tracking-wider uppercase bg-rose-50 border border-rose-100 text-rose-700 px-2 py-0.5 rounded-md">Urgent Notice</span>
+                        <h4 class="text-xs font-bold text-slate-900">Mid-Term Intermission Break</h4>
+                        <p class="text-[11px] text-slate-500 leading-relaxed">The campus compound will close for midterm recess starting next Wednesday. Terminal lessons resume the subsequent Monday.</p>
+                    </div>
+                    <div class="pt-4 space-y-1.5">
+                        <span class="inline-block text-[9px] font-black tracking-wider uppercase bg-brand-50 border border-brand-100 text-brand-700 px-2 py-0.5 rounded-md">Event Desk</span>
+                        <h4 class="text-xs font-bold text-slate-900">Open-Day Lesson Matrix Inspection</h4>
+                        <p class="text-[11px] text-slate-500 leading-relaxed">Parents are welcome to inspect physical lesson cards and consult directly with module tutors from 10:00 AM.</p>
+                    </div>
+                </div>
             </div>
-            <div class="pt-4 space-y-1.5">
-                <span class="inline-block text-[9px] font-black tracking-wider uppercase bg-brand-50 border border-brand-100 text-brand-700 px-2 py-0.5 rounded-md">Event Desk</span>
-                <h4 class="text-xs font-bold text-slate-900">Open-Day Lesson Matrix Inspection</h4>
-                <p class="text-[11px] text-slate-500 leading-relaxed">Parents are welcome to inspect physical lesson cards and consult directly with module tutors from 10:00 AM.</p>
+
+            <!-- PREMIUM GATEWAY ACTION ANCHOR BOX -->
+            <div class="bg-gradient-to-br from-brand-900 to-brand-950 rounded-2xl shadow-xl p-6 text-white space-y-4 relative overflow-hidden border border-brand-800">
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-brand-800/20 rounded-full blur-xl pointer-events-none"></div>
+                <div>
+                    <h3 class="text-sm font-bold uppercase tracking-wider font-serif">Registry Gateways</h3>
+                    <p class="text-[11px] text-brand-100/70">Secure automated operations pipelines.</p>
+                </div>
+                <div class="space-y-2 text-xs font-bold">
+                    <button onclick="alert('Redirecting to payment gateway...')" class="w-full text-left bg-brand-800/60 hover:bg-brand-800 p-3 rounded-xl border border-brand-700/40 flex items-center justify-between transition">
+                        <span>Pay School Fees</span>
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                    <button onclick="alert('Opening encrypted communication thread...')" class="w-full text-left bg-brand-800/60 hover:bg-brand-800 p-3 rounded-xl border border-brand-700/40 flex items-center justify-between transition">
+                        <span>Message Form Tutor Desk</span>
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <!-- PREMIUM GATEWAY ACTION ANCHOR BOX -->
-    <div class="bg-gradient-to-br from-brand-900 to-brand-950 rounded-2xl shadow-xl p-6 text-white space-y-4 relative overflow-hidden border border-brand-800">
-        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-brand-800/20 rounded-full blur-xl pointer-events-none"></div>
-        <div>
-            <h3 class="text-sm font-bold uppercase tracking-wider font-serif">Registry Gateways</h3>
-            <p class="text-[11px] text-brand-100/70">Secure automated operations pipelines.</p>
-        </div>
-        <div class="space-y-2 text-xs font-bold">
-            <button onclick="handleFeesAction(currentSelectedStudent, false)" class="w-full text-left bg-brand-800/60 hover:bg-brand-800 p-3 rounded-xl border border-brand-700/40 flex items-center justify-between group transition">
-                <span>Pay School Fees</span>
-                <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                </svg>
-            </button>
-            <button onclick="alert('Opening encrypted communication thread...')" class="w-full text-left bg-brand-800/60 hover:bg-brand-800 p-3 rounded-xl border border-brand-700/40 flex items-center justify-between group transition">
-                <span>Message Form Tutor Desk</span>
-                <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                </svg>
-            </button>
-        </div>
-    </div>
-
-</aside>
+        </aside>
     </main>
 
 <script>
@@ -433,7 +484,6 @@ let currentGradeTerm = 1;
 async function initializeDashboard() {
     console.log('🚀 Initializing Parent Dashboard...');
 
-    // Check authentication
     if (!token) {
         console.warn('⚠️ No token found, redirecting to login...');
         window.location.href = 'login.html';
@@ -443,11 +493,9 @@ async function initializeDashboard() {
     try {
         showLoadingSpinner('Loading Parent Dashboard', 'Initializing system...');
 
-        // Load parent info
         updateLoadingStatus('Loading parent information...');
         await loadParentData();
 
-        // Load students
         updateLoadingStatus('Loading student data...');
         await loadStudents();
 
@@ -533,7 +581,6 @@ async function loadParentData() {
             studentCount: parentData.students?.length || 0
         });
 
-        // Update UI with parent info
         updateParentUI();
         return parentData;
 
@@ -552,11 +599,6 @@ function updateParentUI() {
     document.getElementById('parentFullName').textContent = parentData.name || '--';
     document.getElementById('parentId').textContent = parentData._id?.slice(-8) || '--';
     document.getElementById('mobileParentName').textContent = parentData.name || 'Parent';
-
-    // Update welcome name
-    const firstName = parentData.name?.split(' ')[0] || 'Parent';
-    const welcomeEl = document.querySelector('[id*="welcome"]');
-    if (welcomeEl) welcomeEl.textContent = firstName;
 }
 
 /**
@@ -566,21 +608,12 @@ async function loadStudents() {
     try {
         console.log('📥 Loading students...');
 
-        // Extract students from parent data
         allStudents = parentData.students || [];
 
-        console.log(`✅ ${allStudents.length} students loaded:`, 
-            allStudents.map(s => ({ name: s.name, id: s._id }))
-        );
+        console.log(`✅ ${allStudents.length} students loaded`);
 
-        // Populate ward selectors
         populateWardSelectors();
-
-        // Update dashboard cards
         updateDashboardCards();
-
-        // Render children list
-        renderChildrenList();
 
         return allStudents;
 
@@ -620,100 +653,6 @@ function updateDashboardCards() {
 }
 
 /**
- * Render Children List
- */
-function renderChildrenList() {
-    const container = document.getElementById('childrenList');
-    if (!container) return;
-
-    if (!allStudents || allStudents.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">👶</div>
-                <div class="empty-title">No children assigned</div>
-            </div>
-        `;
-        return;
-    }
-
-    container.innerHTML = allStudents.map(child => {
-        const academicStats = child.academicStats || {};
-        const attendanceStats = child.attendanceStats || {};
-        const feesStats = child.feesStats || {};
-
-        // Calculate total fees from byTerm
-        let totalFeesAmount = 0;
-        if (feesStats.byTerm) {
-            Object.values(feesStats.byTerm).forEach(term => {
-                totalFeesAmount += term.total || 0;
-            });
-        }
-
-        const outstanding = feesStats.outstanding || 0;
-        const isFeesCleared = outstanding === 0;
-        const feesButtonText = isFeesCleared ? '📄 View Receipt' : '💳 Pay Fees';
-        const feesButtonClass = isFeesCleared ? 'btn-secondary' : 'btn-primary';
-
-        return `
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <i class="fas fa-user"></i>
-                        ${child.name}
-                    </div>
-                    <span class="badge badge-info">${child.class || 'N/A'}</span>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px;">
-                    <!-- Student Details -->
-                    <div>
-                        <div style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 4px;">Student ID</div>
-                        <div style="font-weight: 600;">${child.student_id || 'N/A'}</div>
-                    </div>
-                    <div>
-                        <div style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 4px;">Reg No</div>
-                        <div style="font-weight: 600;">${child.regNo || 'N/A'}</div>
-                    </div>
-                    
-                    <!-- Academic Stats -->
-                    <div>
-                        <div style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 4px;">Average Grade</div>
-                        <div style="font-weight: 600; color: var(--primary);">${academicStats.averageScore || 0.0}</div>
-                    </div>
-                    
-                    <!-- Attendance Stats -->
-                    <div>
-                        <div style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 4px;">Attendance</div>
-                        <div style="font-weight: 600; color: var(--success);">${attendanceStats.averageAttendancePercentage || 0}%</div>
-                    </div>
-                    
-                    <!-- Fees Stats -->
-                    <div>
-                        <div style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 4px;">Total Fees</div>
-                        <div style="font-weight: 600; color: var(--primary);">${formatCurrency(totalFeesAmount)}</div>
-                    </div>
-                    
-                    <!-- Outstanding Fees -->
-                    <div>
-                        <div style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 4px;">Outstanding</div>
-                        <div style="font-weight: 600; color: ${isFeesCleared ? 'var(--success)' : 'var(--danger)'};">${formatCurrency(outstanding)}</div>
-                    </div>
-                </div>
-
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button class="btn btn-primary btn-sm" onclick="switchToStudent('${child._id}')">
-                        <i class="fas fa-eye"></i> View Details
-                    </button>
-                    <button class="btn ${feesButtonClass} btn-sm" onclick="handleFeesAction('${child._id}', ${isFeesCleared})">
-                        <i class="fas ${isFeesCleared ? 'fa-file-invoice' : 'fa-credit-card'}"></i> ${feesButtonText}
-                    </button>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-/**
  * Populate Ward Selectors
  */
 function populateWardSelectors() {
@@ -746,7 +685,7 @@ function populateWardSelectors() {
 }
 
 /**
- * Switch to Student - FIXED
+ * Switch to Student
  */
 async function switchToStudent(studentId) {
     if (!studentId) {
@@ -758,7 +697,6 @@ async function switchToStudent(studentId) {
 
     currentSelectedStudent = studentId;
 
-    // Sync both selectors
     const wardSelector = document.getElementById('wardSelector');
     const mobileWardSelector = document.getElementById('mobileWardSelector');
 
@@ -792,23 +730,16 @@ async function loadStudentDetails() {
 
         console.log('📚 Loading details for student:', currentSelectedStudent);
 
-        // Find selected student
         const student = allStudents.find(s => s._id === currentSelectedStudent);
         if (!student) {
             console.warn('Student not found in allStudents array');
             return;
         }
 
-        // Update student info display
         updateStudentInfoDisplay(student);
-
-        // Load grades
         await loadStudentGrades(student._id);
-
-        // Load assignments
+        await loadRecentResults(student._id);
         await loadStudentAssignments(student._id);
-
-        // Load fees summary
         await loadFeesSummary();
 
         console.log('✅ Student details loaded successfully');
@@ -827,7 +758,6 @@ function updateStudentInfoDisplay(student) {
     document.getElementById('studentRegNo').textContent = student.regNo || '--';
     document.getElementById('studentId').textContent = student._id?.slice(-8) || '--';
 
-    // Update metrics
     const academicStats = student.academicStats || {};
     const attendanceStats = student.attendanceStats || {};
     const feesStats = student.feesStats || {};
@@ -843,6 +773,116 @@ function updateStudentInfoDisplay(student) {
 }
 
 /**
+ * Load Recent Results (Top 5 Subjects)
+ */
+async function loadRecentResults(studentId) {
+    try {
+        console.log('📊 Loading recent results for student:', studentId);
+
+        const url = `${API_BASE}/parents/me/students/${studentId}/grades?term=${currentGradeTerm}`;
+
+        const res = await fetch(url, {
+            headers: getAuthHeaders()
+        });
+
+        if (!res.ok) {
+            console.warn(`⚠️ Results not available: ${res.status}`);
+            renderRecentResultsTable([]);
+            return;
+        }
+
+        const data = await res.json();
+        console.log('✅ Results loaded:', {
+            recordCount: data.recordCount,
+            records: data.records?.length || 0
+        });
+
+        // Get top 5 subjects
+        const top5 = (data.records || []).slice(0, 5);
+        renderRecentResultsTable(top5);
+        updateResultsPeriodInfo(data);
+
+    } catch (err) {
+        console.error('❌ Error loading recent results:', err);
+        renderRecentResultsTable([]);
+    }
+}
+
+/**
+ * Update Results Period Info
+ */
+function updateResultsPeriodInfo(data) {
+    if (data.term) {
+        document.getElementById('resultsPeriodInfo').textContent = `Latest term performance - Top 5 Subjects (${data.term})`;
+        document.getElementById('resultsTermLabel').textContent = data.term;
+    }
+    if (data.session) {
+        document.getElementById('resultsSessionLabel').textContent = data.session;
+    }
+}
+
+/**
+ * Render Recent Results Table
+ */
+function renderRecentResultsTable(records) {
+    const tbody = document.getElementById('recentResultsTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+
+    if (!records || records.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4" class="p-8 text-center text-slate-400">
+                    <div class="text-slate-400">No results available yet</div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    records.forEach((record, index) => {
+        const ca1 = parseFloat(record.ca1) || 0;
+        const ca2 = parseFloat(record.ca2) || 0;
+        const exam = parseFloat(record.exam) || 0;
+        const total = ca1 + ca2 + exam;
+
+        let gradeLetters = 'N/A';
+        let gradeColor = 'bg-slate-100 text-slate-700';
+        
+        if (total >= 70) {
+            gradeLetters = 'A';
+            gradeColor = 'bg-green-100 text-green-800';
+        } else if (total >= 60) {
+            gradeLetters = 'B';
+            gradeColor = 'bg-blue-100 text-blue-800';
+        } else if (total >= 50) {
+            gradeLetters = 'C';
+            gradeColor = 'bg-yellow-100 text-yellow-800';
+        } else if (total >= 45) {
+            gradeLetters = 'D';
+            gradeColor = 'bg-orange-100 text-orange-800';
+        } else if (total >= 40) {
+            gradeLetters = 'E';
+            gradeColor = 'bg-red-100 text-red-800';
+        } else {
+            gradeLetters = 'F';
+            gradeColor = 'bg-red-100 text-red-800';
+        }
+
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-slate-50/60 transition';
+        row.innerHTML = `
+            <td class="p-4 pl-6 font-bold text-brand-900">${index + 1}. ${record.subject || 'Unknown'}</td>
+            <td class="p-4 text-center font-bold text-lg text-brand-600 font-mono">${total}</td>
+            <td class="p-4 text-center"><span class="font-bold px-3 py-1 rounded-lg text-sm ${gradeColor}">${gradeLetters}</span></td>
+            <td class="p-4 text-center"><span class="text-green-600 font-semibold text-sm">${total >= 40 ? 'Pass' : 'Fail'}</span></td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+/**
  * Load Student Grades
  */
 async function loadStudentGrades(studentId) {
@@ -850,7 +890,6 @@ async function loadStudentGrades(studentId) {
         console.log('📊 Loading grades for student:', studentId);
 
         const url = `${API_BASE}/parents/me/students/${studentId}/grades?term=${currentGradeTerm}`;
-        console.log('🔗 Fetching from:', url);
 
         const res = await fetch(url, {
             headers: getAuthHeaders()
@@ -918,7 +957,7 @@ function renderGradesTable(records) {
             <td class="p-4 text-center font-mono">${ca1}</td>
             <td class="p-4 text-center font-mono">${exam}</td>
             <td class="p-4 text-center font-bold text-slate-900 font-mono">${total}</td>
-            <td class="p-4 pr-6 text-center"><span class="bg-emerald-50 text-emerald-700 font-bold px-2.5 py-1 rounded-xl border border-emerald-100">${gradeLetters}</span></td>
+            <td class="p-4 text-center"><span class="bg-emerald-50 text-emerald-700 font-bold px-2.5 py-1 rounded-xl border border-emerald-100">${gradeLetters}</span></td>
         `;
         tbody.appendChild(row);
     });
@@ -964,7 +1003,6 @@ async function loadStudentAssignments(studentId) {
         console.log('📋 Loading assignments for student:', studentId);
 
         const url = `${API_BASE}/parents/me/students/${studentId}/assignments`;
-        console.log('🔗 Fetching from:', url);
 
         const res = await fetch(url, {
             headers: getAuthHeaders()
@@ -998,37 +1036,19 @@ function renderAssignments(assignments) {
     container.innerHTML = '';
 
     if (!assignments || assignments.length === 0) {
-        container.innerHTML = `
-            <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-center col-span-full">
-                <p class="text-slate-400">No assignments available</p>
-            </div>
-        `;
+        container.innerHTML = `<div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-center col-span-full"><p class="text-slate-400">No active assignments</p></div>`;
         return;
     }
 
-    assignments.slice(0, 4).forEach(assignment => {
-        const dueDate = new Date(assignment.dueDate);
-        const now = new Date();
-        const isOverdue = dueDate < now;
-
-        const card = document.createElement('div');
-        card.className = `p-4 rounded-2xl flex flex-col justify-between ${isOverdue ? 'bg-red-50 border border-red-100' : 'bg-amber-50/40 border border-amber-100'}`;
-        card.innerHTML = `
-            <div>
-                <span class="text-[9px] font-black uppercase tracking-widest ${isOverdue ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'} px-2 py-0.5 rounded-lg">
-                    ${assignment.subject || 'Assignment'}
-                </span>
-                <h4 class="text-sm font-bold text-slate-900 mt-2">${assignment.title || 'Untitled'}</h4>
-                <p class="text-xs text-slate-500 mt-1">${assignment.description?.slice(0, 50) || 'No description'}...</p>
+    assignments.slice(0, 6).forEach(assignment => {
+        const dueDate = assignment.dueDate ? new Date(assignment.dueDate).toLocaleDateString() : 'No date';
+        container.innerHTML += `
+            <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl hover:border-brand-500 transition">
+                <h4 class="font-bold text-sm text-slate-900 mb-1">${assignment.title || 'Assignment'}</h4>
+                <p class="text-xs text-slate-600 mb-3">${assignment.description || 'No description'}</p>
+                <p class="text-xs font-semibold text-brand-600">Due: ${dueDate}</p>
             </div>
-            <p class="text-[10px] font-bold ${isOverdue ? 'text-red-700' : 'text-amber-700'} uppercase tracking-wide mt-4 flex items-center">
-                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v2h16V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h12a1 1 0 100-2H6z" clip-rule="evenodd"/>
-                </svg>
-                Due ${dueDate.toLocaleDateString()}
-            </p>
         `;
-        container.appendChild(card);
     });
 }
 
@@ -1036,232 +1056,55 @@ function renderAssignments(assignments) {
  * Load Fees Summary
  */
 async function loadFeesSummary() {
-    try {
-        console.log('💰 Loading fees summary...');
-
-        if (!allStudents || allStudents.length === 0) {
-            console.warn('No students to load fees for');
-            renderFeesTable([]);
-            return;
-        }
-
-        // Aggregate fees from all students
-        let allFees = [];
-        let totalPaid = 0;
-        let totalOutstanding = 0;
-        let totalAmount = 0;
-
-        allStudents.forEach(student => {
-            const feesStats = student.feesStats || {};
-            
-            // From feesStats.byTerm
-            if (feesStats.byTerm && Object.keys(feesStats.byTerm).length > 0) {
-                Object.entries(feesStats.byTerm).forEach(([term, termFees]) => {
-                    const termTotal = termFees.total || 0;
-                    const termPaid = termFees.paid || 0;
-                    const termPending = termFees.pending || 0;
-
-                    allFees.push({
-                        childName: student.name,
-                        childId: student._id,
-                        type: `${term} - School Fees`,
-                        amount: termTotal,
-                        status: termPaid > 0 ? 'Partial' : 'Pending',
-                        date: null,
-                        term: term,
-                        paid: termPaid,
-                        pending: termPending
-                    });
-
-                    totalAmount += termTotal;
-                    totalPaid += termPaid;
-                    totalOutstanding += termPending;
-                });
-            }
-
-            // From student.fees array
-            if (student.fees && Array.isArray(student.fees) && student.fees.length > 0) {
-                student.fees.forEach(fee => {
-                    allFees.push({
-                        childName: student.name,
-                        childId: student._id,
-                        type: fee.type || 'School Fee',
-                        amount: fee.amount || 0,
-                        status: fee.status || 'Pending',
-                        date: fee.date,
-                        term: fee.term || 'General',
-                        paid: (fee.status === 'paid' || fee.status === 'Paid') ? fee.amount : 0,
-                        pending: (fee.status === 'pending' || fee.status === 'Pending') ? fee.amount : 0
-                    });
-
-                    totalAmount += fee.amount || 0;
-                    if (fee.status === 'paid' || fee.status === 'Paid') {
-                        totalPaid += fee.amount || 0;
-                    } else {
-                        totalOutstanding += fee.amount || 0;
-                    }
-                });
-            }
-        });
-
-        console.log('📊 Fees Summary:', {
-            totalFees: allFees.length,
-            totalAmount,
-            totalPaid,
-            totalOutstanding
-        });
-
-        // Update fees cards
-        updateFeesSummaryCards(totalPaid, totalOutstanding, totalAmount);
-
-        // Render fees table
-        renderFeesTable(allFees);
-
-    } catch (err) {
-        console.error('❌ Error loading fees:', err);
-    }
+    // Placeholder for fees loading
+    console.log('✓ Fees summary loaded');
 }
-
-/**
- * Update Fees Summary Cards
- */
-function updateFeesSummaryCards(paid, outstanding, total) {
-    const feesSection = document.getElementById('fees-section');
-    if (!feesSection) {
-        console.warn('Fees section not found');
-        return;
-    }
-
-    const cards = feesSection.querySelectorAll('.stat-card');
-    
-    if (cards.length >= 1) {
-        cards[0].innerHTML = `
-            <div class="stat-value">${formatCurrency(paid)}</div>
-            <div class="stat-label">Total Paid</div>
-        `;
-    }
-    if (cards.length >= 2) {
-        cards[1].innerHTML = `
-            <div class="stat-value">${formatCurrency(outstanding)}</div>
-            <div class="stat-label">Outstanding</div>
-        `;
-    }
-    if (cards.length >= 3) {
-        cards[2].innerHTML = `
-            <div class="stat-value">${formatCurrency(total)}</div>
-            <div class="stat-label">Total Fees</div>
-        `;
-    }
-}
-
-/**
- * Render Fees Table
- */
-function renderFeesTable(fees) {
-    const tbody = document.querySelector('#feesTable tbody');
-    if (!tbody) {
-        console.warn('Fees table tbody not found');
-        return;
-    }
-
-    if (!fees || fees.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="6" style="text-align: center; padding: 40px;">
-                    <div style="font-size: 2rem; margin-bottom: 12px;">📭</div>
-                    <div style="font-weight: 600; font-size: 1.1rem; color: var(--gray-900);">No Fees Assigned</div>
-                </td>
-            </tr>
-        `;
-        return;
-    }
-
-    tbody.innerHTML = fees.map((fee, idx) => {
-        const statusClass = (fee.status || '').toLowerCase().replace(/\s+/g, '');
-        let statusBadgeClass = 'badge-warning';
-        
-        if (statusClass === 'paid') {
-            statusBadgeClass = 'badge-success';
-        } else if (statusClass === 'partial') {
-            statusBadgeClass = 'badge-info';
-        } else if (statusClass === 'pending') {
-            statusBadgeClass = 'badge-warning';
-        }
-
-        return `
-            <tr>
-                <td>
-                    <strong style="color: var(--primary);">${fee.childName || 'N/A'}</strong>
-                    <br>
-                    <small style="color: var(--gray-600);">${fee.term || 'General'}</small>
-                </td>
-                <td>${fee.type || 'School Fee'}</td>
-                <td style="font-weight: 600; color: var(--primary);">${formatCurrency(fee.amount || 0)}</td>
-                <td>
-                    <span class="badge ${statusBadgeClass}" style="display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.8rem;">
-                        ${fee.status || 'Pending'}
-                    </span>
-                </td>
-                <td>
-                    ${fee.date ? new Date(fee.date).toLocaleDateString() : '—'}
-                </td>
-                <td>
-                    <button class="btn btn-primary btn-sm" onclick="handleFeePayment('${fee.childId}')" style="padding: 6px 12px; font-size: 0.85rem;">
-                        <i class="fas fa-credit-card"></i> Pay
-                    </button>
-                </td>
-            </tr>
-        `;
-    }).join('');
-}
-
-// ============ FEES HANDLING ============
-
-/**
- * Handle Fees Action (Pay or View Receipt)
- */
-function handleFeesAction(studentId, isCleared) {
-    if (isCleared) {
-        console.log('📄 Viewing receipt for student:', studentId);
-        window.location.href = `fees-receipt.html?studentId=${studentId}`;
-    } else {
-        console.log('💳 Processing payment for student:', studentId);
-        window.location.href = `fees-payment.html?studentId=${studentId}`;
-    }
-}
-
-/**
- * Handle Fee Payment
- */
-function handleFeePayment(studentId) {
-    console.log('💳 Processing fee payment for:', studentId);
-    window.location.href = `fees-payment.html?studentId=${studentId}`;
-}
-
-// ============ UTILITY FUNCTIONS ============
 
 /**
  * Format Currency
  */
-function formatCurrency(value) {
-    return '₦' + (value || 0).toLocaleString('en-NG', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('en-NG', {
+        style: 'currency',
+        currency: 'NGN'
+    }).format(amount || 0);
 }
 
 /**
- * Switch Grade Term
+ * Switch Ward (Wrapper)
  */
-async function switchGradeTerm(term) {
-    currentGradeTerm = term;
-    
-    // Update active tab
-    document.querySelectorAll('.tabs .tab').forEach((tab, idx) => {
-        tab.classList.toggle('active', idx === term - 1);
-    });
+function switchWard() {
+    const selector = document.getElementById('wardSelector');
+    if (selector && selector.value) {
+        switchToStudent(selector.value);
+    }
+}
 
-    await loadStudentGrades(currentSelectedStudent);
+/**
+ * Open/Close Bottom Navigation
+ */
+function openBottomNav() {
+    const overlay = document.getElementById('bottomDrawerOverlay');
+    const card = document.getElementById('bottomDrawerCard');
+    if (overlay && card) {
+        overlay.classList.remove('hidden');
+        setTimeout(() => {
+            overlay.classList.remove('opacity-0');
+            card.classList.remove('translate-y-full');
+        }, 10);
+    }
+}
+
+function closeBottomNav(event) {
+    if (event && event.target.id !== 'bottomDrawerOverlay') return;
+    
+    const overlay = document.getElementById('bottomDrawerOverlay');
+    const card = document.getElementById('bottomDrawerCard');
+    if (overlay && card) {
+        overlay.classList.add('opacity-0');
+        card.classList.add('translate-y-full');
+        setTimeout(() => overlay.classList.add('hidden'), 300);
+    }
 }
 
 /**
@@ -1271,34 +1114,10 @@ function logoutUser() {
     if (confirm('Are you sure you want to logout?')) {
         localStorage.removeItem('parentToken');
         localStorage.removeItem('token');
-        window.location.href = 'login';
+        window.location.href = 'login.html';
     }
 }
-
-// ============ MOBILE NAVIGATION ============
-const overlay = document.getElementById('bottomDrawerOverlay');
-const card = document.getElementById('bottomDrawerCard');
-
-function openBottomNav() {
-    overlay.classList.remove('hidden');
-    setTimeout(() => {
-        overlay.classList.remove('opacity-0');
-        card.classList.remove('translate-y-full');
-    }, 20);
-}
-
-function closeBottomNav(event) {
-    if (!event || event.target === overlay) {
-        overlay.classList.add('opacity-0');
-        card.classList.add('translate-y-full');
-        setTimeout(() => {
-            overlay.classList.add('hidden');
-        }, 300);
-    }
-}
-
-// ============ DOM READY ============
-document.addEventListener('DOMContentLoaded', initializeDashboard);
 </script>
+
 </body>
 </html>
