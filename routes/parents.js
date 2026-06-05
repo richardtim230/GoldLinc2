@@ -231,11 +231,9 @@ feesStats: {
     res.status(500).json({ error: error.message });
   }
 });
-// Add these new routes to your existing routes/parents.js file
-
 /**
  * GET /parents/me/students/:studentId/results
- * Get recent results (top 5) for a specific student
+ * Get recent results (top 5) for a specific student - FIXED
  */
 router.get('/me/students/:studentId/results', async (req, res) => {
   try {
@@ -274,21 +272,42 @@ router.get('/me/students/:studentId/results', async (req, res) => {
       .limit(5)
       .lean();
 
-    // Transform results for frontend
-    const transformedResults = results.map(result => ({
-      _id: result._id,
-      subject: result.subject?.name || 'Unknown',
-      score: result.score || 0,
-      total: result.score || 0,
-      ca1: result.ca1_score || 0,
-      ca2: result.ca2_score || 0,
-      exam: result.exam_score || 0,
-      grade: result.grade || 'N/A',
-      remarks: result.remarks || '',
-      session: result.session?.name || '',
-      term: result.term?.name || '',
-      status: result.status || 'Published'
-    }));
+    // Transform results for frontend - FIXED to handle score calculation
+    const transformedResults = results.map(result => {
+      // Calculate total score from component scores
+      const ca1 = result.ca1_score || 0;
+      const ca2 = result.ca2_score || 0;
+      const exam = result.exam_score || 0;
+      const totalScore = result.score || (ca1 + ca2 + exam) || 0;
+
+      // Calculate grade if not provided
+      let grade = result.grade;
+      if (!grade || grade === '') {
+        if (totalScore >= 70) grade = 'A';
+        else if (totalScore >= 60) grade = 'B';
+        else if (totalScore >= 50) grade = 'C';
+        else if (totalScore >= 45) grade = 'D';
+        else if (totalScore >= 40) grade = 'E';
+        else grade = 'F';
+      }
+
+      return {
+        _id: result._id,
+        subject: result.subject?.name || 'Unknown',
+        score: totalScore,
+        total: totalScore,
+        ca1: ca1,
+        ca2: ca2,
+        exam: exam,
+        grade: grade,
+        remarks: result.remarks || '',
+        session: result.session?.name || '',
+        term: result.term?.name || '',
+        status: result.status || 'Published'
+      };
+    });
+
+    console.log('📊 Transformed results:', transformedResults);
 
     res.json({
       success: true,
