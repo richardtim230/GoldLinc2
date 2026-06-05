@@ -1267,15 +1267,27 @@ async function loadFeesSummary() {
     }
 }
 
+// ============ FEES HANDLING ============
+
 /**
- * Handle Fees Action
+ * Handle Fees Action (Pay or View Receipt)
  */
 function handleFeesAction(studentId, isCleared) {
     if (isCleared) {
-        alert('Viewing payment receipts...');
+        console.log('📄 Viewing receipt for student:', studentId);
+        window.location.href = `fees-receipt.html?studentId=${studentId}`;
     } else {
-        alert('Opening payment gateway...');
+        console.log('💳 Processing payment for student:', studentId);
+        window.location.href = `fees-payment.html?studentId=${studentId}`;
     }
+}
+
+/**
+ * Handle Fee Payment
+ */
+function handleFeePayment(studentId) {
+    console.log('💳 Processing fee payment for:', studentId);
+    window.location.href = `fees-payment.html?studentId=${studentId}`;
 }
 
 /**
