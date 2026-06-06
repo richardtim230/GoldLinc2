@@ -1,21 +1,3 @@
-// ✅ ADD THIS NEW HELPER FUNCTION after the determineAcademicStatus function
-
-/**
- * Calculate overall grade based on percentage using grade scale
- */
-function calculateGradeFromPercentage(percentage) {
-  const pct = parseFloat(percentage);
-  
-  if (pct >= 85) return 'A1';
-  else if (pct >= 75) return 'B2';
-  else if (pct >= 70) return 'B3';
-  else if (pct >= 65) return 'C4';
-  else if (pct >= 60) return 'C5';
-  else if (pct >= 50) return 'C6';
-  else if (pct >= 45) return 'D7';
-  else if (pct >= 40) return 'E8';
-  else return 'F9';
-}
 // Helper: Format date
 function formatDate(dateStr) {
   if (!dateStr) return '-';
@@ -94,6 +76,21 @@ function calculateAttendancePercentage(attendance) {
   
   if (total === 0) return 0;
   return ((present / total) * 100).toFixed(1);
+}
+
+// ✅ NEW: Calculate overall grade based on percentage using grade scale
+function calculateGradeFromPercentage(percentage) {
+  const pct = parseFloat(percentage);
+  
+  if (pct >= 85) return 'A1';
+  else if (pct >= 75) return 'B2';
+  else if (pct >= 70) return 'B3';
+  else if (pct >= 65) return 'C4';
+  else if (pct >= 60) return 'C5';
+  else if (pct >= 50) return 'C6';
+  else if (pct >= 45) return 'D7';
+  else if (pct >= 40) return 'E8';
+  else return 'F9';
 }
 
 // ✅ NEW: Safely extract remark from various possible sources
@@ -309,8 +306,12 @@ function populateReport() {
   // ✅ Determine Academic Status
   const academicStatus = determineAcademicStatus(percentage, failCount);
 
+  // ✅ Calculate overall grade based on percentage
+  const overallGrade = calculateGradeFromPercentage(percentage);
+
   console.log('📊 Calculated values:');
   console.log('   - Percentage:', percentage);
+  console.log('   - Overall Grade:', overallGrade);
   console.log('   - Attendance Rate:', attendancePercentage);
   console.log('   - Academic Status:', academicStatus);
   console.log('   - Pass Count:', passCount);
@@ -370,21 +371,21 @@ function populateReport() {
   statusElement.textContent = statusText;
   statusElement.className = `pass-status ${statusClass}`;
 
-// ✅ Populate NEW profile stats
-const overallGrade = calculateGradeFromPercentage(percentage);
-document.getElementById('overallPercentage').textContent = percentage + '%';
-document.getElementById('overallGrade').textContent = overallGrade;
-document.getElementById('attendanceRate').textContent = attendancePercentage + '%';
-document.getElementById('academicStatus').textContent = academicStatus;
+  // ✅ Populate NEW profile stats with calculated grade
+  document.getElementById('overallPercentage').textContent = percentage + '%';
+  document.getElementById('overallGrade').textContent = overallGrade;
+  document.getElementById('attendanceRate').textContent = attendancePercentage + '%';
+  document.getElementById('academicStatus').textContent = academicStatus;
+
   // Populate performance summary
   document.getElementById('totalObtained').textContent = totalScore.toFixed(1);
   document.getElementById('totalObtainable').textContent = totalObtainable;
   document.getElementById('totalSubjectsPerf').textContent = results.length;
   document.getElementById('percentagePerf').textContent = percentage + '%';
 
-// ✅ Calculate overall grade based on percentage
-const overallGrade = calculateGradeFromPercentage(percentage);
-document.getElementById('gradePerf').textContent = overallGrade;
+  // Get overall grade (using calculated grade)
+  document.getElementById('gradePerf').textContent = overallGrade;
+
   // Position (kept for compatibility)
   const position = data.studentPosition ? `${data.studentPosition}` : `-`;
   document.getElementById('positionPerf').textContent = position;
