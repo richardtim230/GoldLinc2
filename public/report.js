@@ -1,3 +1,21 @@
+// ✅ ADD THIS NEW HELPER FUNCTION after the determineAcademicStatus function
+
+/**
+ * Calculate overall grade based on percentage using grade scale
+ */
+function calculateGradeFromPercentage(percentage) {
+  const pct = parseFloat(percentage);
+  
+  if (pct >= 85) return 'A1';
+  else if (pct >= 75) return 'B2';
+  else if (pct >= 70) return 'B3';
+  else if (pct >= 65) return 'C4';
+  else if (pct >= 60) return 'C5';
+  else if (pct >= 50) return 'C6';
+  else if (pct >= 45) return 'D7';
+  else if (pct >= 40) return 'E8';
+  else return 'F9';
+}
 // Helper: Format date
 function formatDate(dateStr) {
   if (!dateStr) return '-';
@@ -352,22 +370,21 @@ function populateReport() {
   statusElement.textContent = statusText;
   statusElement.className = `pass-status ${statusClass}`;
 
-  // ✅ Populate NEW profile stats
-  document.getElementById('overallPercentage').textContent = percentage + '%';
-  document.getElementById('overallGrade').textContent = results.length > 0 ? results[0].grade : '-';
-  document.getElementById('attendanceRate').textContent = attendancePercentage + '%';
-  document.getElementById('academicStatus').textContent = academicStatus;
-
+// ✅ Populate NEW profile stats
+const overallGrade = calculateGradeFromPercentage(percentage);
+document.getElementById('overallPercentage').textContent = percentage + '%';
+document.getElementById('overallGrade').textContent = overallGrade;
+document.getElementById('attendanceRate').textContent = attendancePercentage + '%';
+document.getElementById('academicStatus').textContent = academicStatus;
   // Populate performance summary
   document.getElementById('totalObtained').textContent = totalScore.toFixed(1);
   document.getElementById('totalObtainable').textContent = totalObtainable;
   document.getElementById('totalSubjectsPerf').textContent = results.length;
   document.getElementById('percentagePerf').textContent = percentage + '%';
 
-  // Get overall grade
-  const overallGrade = results.length > 0 ? results[0].grade : '-';
-  document.getElementById('gradePerf').textContent = overallGrade;
-
+// ✅ Calculate overall grade based on percentage
+const overallGrade = calculateGradeFromPercentage(percentage);
+document.getElementById('gradePerf').textContent = overallGrade;
   // Position (kept for compatibility)
   const position = data.studentPosition ? `${data.studentPosition}` : `-`;
   document.getElementById('positionPerf').textContent = position;
