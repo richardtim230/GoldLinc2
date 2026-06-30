@@ -1197,22 +1197,244 @@ function updateGradebookProgress() {
         }
     }
 
-    async function createCollectionAPI(name) {
-        try {
-            const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections`, {
-                method: 'POST',
-                headers: authHeaders(),
-                body: JSON.stringify({ name: name })
-            });
-            if (!res.ok) throw new Error('Failed to create collection');
-            const data = await res.json();
-            return data.collection;
-        } catch (e) {
-            console.error('Error creating collection:', e);
-            return null;
-        }
+    async function createCollection() {
+    const collectionName = document.getElementById('newCollectionName').value.trim();
+    
+    if (!collectionName) {
+        showCustomModal({
+            title: 'Input Required',
+            message: 'Please enter a collection name (e.g., SS2 BIOLOGY TEST 1)',
+            type: 'alert',
+            icon: '⚠️'
+        });
+        return;
     }
 
+    // Show modal to select class and subject
+    showCollectionClassSubjectModal(collectionName);
+}
+
+function showCollectionClassSubjectModal(collectionName) {
+    const modalHTML = `
+        <div id="collectionModalOverlay" class="notification-overlay" onclick="if(event.target === this) closeCollectionModal()">
+            <div class="notification-card" style="max-width: 500px; text-align: left;">
+                <h3 style="text-align: center; margin-bottom: 20px; color: #1e293b;">Select Class & Subject</h3>
+                
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: 600; color: #475569; margin-bottom: 8px; font-size: 0.9rem;">
+                        Class <span style="color: #ef4444;">*</span>
+                    </label>
+                    <select id="collectionClassSelect" style="
+                        width: 100%;
+                        padding: 10px;
+                        border: 1px solid #cbd5e1;
+                        border-radius: 6px;
+                        font-size: 0.9rem;
+                        font-weight: 500;
+                        outline: none;
+                    ">
+                        <option value="">-- Select a Class --</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; color: #475569; margin-bottom: 8px; font-size: 0.9rem;">
+                        Subject <span style="color: #ef4444;">*</span>
+                    </label>
+                    <select id="collectionSubjectSelect" style="
+                        width: 100%;
+                        padding: 10px;
+                        border: 1px solid #cbd5e1;
+                        border-radius: 6px;
+                        font-size: 0.9rem;
+                        font-weight: 500;
+                        outline: none;
+                    ">
+                        <option value="">-- Select a Subject --</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button onclick="closeCollectionModal()" style="
+                        padding: 10px 20px;
+                        border: 1px solid #cbd5e1;
+                        background: #f8fafc;
+                        color: #475569;
+                        border-radius: 6px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        font-size: 0.9rem;
+                    ">
+                        Cancel
+                    </button>
+                    <button onclick="submitCollectionWithClassSubject('${collectionName}')" style="
+                        padding: 10px 20px;
+                        background: #2563eb;
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        font-size: 0.9rem;
+                    ">
+                        Create Collection
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Remove existing modal if any
+    const existingModal = document.getElementById('collectionModalOverlay');
+    if (existingModal) existingModal.remove();
+
+    // Insert modal into page
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Populate classes
+    populateCollectionClasses();
+}
+
+async function populateCollectionClasses() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/classes`, {
+            headers: authHeaders()
+        });
+        
+        const classes = await response.json();
+        const classSelect = document.getElementById('collectionClassSelect');
+        
+        if (Array.isArray(classes)) {
+            classes.forEach(cls => {
+                const option = document.createElement('option');
+                option.value = cls._id;
+                option.textContent = cls.name || cls.className;
+                classSelect.appendChild(option);
+            });
+        }
+
+        // Load subjects when class is selected
+        classSelect.addEventListener('change', populateCollectionSubjects);
+
+    } catch (error) {
+        console.error('Error loading classes:', error);
+        showCustomModal({
+            title: 'Error',
+            message: 'Failed to load classes',
+            type: 'alert',
+            icon: '❌'
+        });
+    }
+}
+
+async function populateCollectionSubjects() {
+    const classId = document.getElementById('collectionClassSelect').value;
+    const subjectSelect = document.getElementById('collectionSubjectSelect');
+    
+    // Clear previous subjects
+    subjectSelect.innerHTML = '<option value="">-- Select a Subject --</option>';
+
+    if (!classId) return;
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/subjects`, {
+            headers: authHeaders()
+        });
+        
+        const subjects = await response.json();
+        
+        if (Array.isArray(subjects)) {
+            subjects.forEach(subj => {
+                const option = document.createElement('option');
+                option.value = subj._id || subj.id;
+                option.textContent = subj.name;
+                subjectSelect.appendChild(option);
+            });
+        }
+
+    } catch (error) {
+        console.error('Error loading subjects:', error);
+    }
+}
+
+async function submitCollectionWithClassSubject(collectionName) {
+    const classId = document.getElementById('collectionClassSelect').value;
+    const subjectId = document.getElementById('collectionSubjectSelect').value;
+
+    if (!classId || !subjectId) {
+        showCustomModal({
+            title: 'Selection Required',
+            message: 'Please select both a class and a subject.',
+            type: 'alert',
+            icon: '⚠️'
+        });
+        return;
+    }
+
+    closeCollectionModal();
+
+    try {
+        showLoadingSpinner('Creating Collection', 'Processing...');
+        
+        // Using your existing API endpoint
+        const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections`, {
+            method: 'POST',
+            headers: authHeaders(),
+            body: JSON.stringify({ 
+                name: collectionName,
+                class: classId,
+                subject: subjectId
+            })
+        });
+
+        if (!res.ok) {
+            const errorData = await res.json();
+            hideLoadingSpinner();
+            showCustomModal({
+                title: 'Creation Failed',
+                message: errorData.error || 'Failed to create collection. Please try again.',
+                type: 'alert',
+                icon: '❌'
+            });
+            return;
+        }
+
+        const data = await res.json();
+        hideLoadingSpinner();
+
+        // Clear input
+        document.getElementById('newCollectionName').value = '';
+
+        // Show success
+        showCustomModal({
+            title: 'Collection Created',
+            message: `"${collectionName}" has been created successfully.`,
+            type: 'success',
+            icon: '✅'
+        });
+
+        // Reload collections
+        loadCollections();
+
+    } catch (error) {
+        hideLoadingSpinner();
+        console.error('Collection creation error:', error);
+        showCustomModal({
+            title: 'Error',
+            message: 'Network error: ' + error.message,
+            type: 'alert',
+            icon: '⚠️'
+        });
+    }
+}
+
+function closeCollectionModal() {
+    const modal = document.getElementById('collectionModalOverlay');
+    if (modal) {
+        modal.classList.add('hidden');
+        setTimeout(() => modal.remove(), 200);
+    }
+}
     async function addQuestionToCollectionAPI(collectionId, questionData) {
         try {
             const res = await fetch(
