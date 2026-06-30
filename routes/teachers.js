@@ -18,7 +18,7 @@ const AssignmentSubmission = require('../models/AssignmentSubmission');
 const Session = require('../models/Session');
 const Term = require('../models/Term');
 // GET /api/teachers/me - Get own teacher profile + classes + subjects
-console.log(JSON.stringify(req.body, null, 2));
+
 router.get('/me', teacherAuth, async (req, res) => {
   const teacher = req.staff;
   if (!teacher || teacher.access_level !== 'Teacher') return res.status(404).json({ error: "Teacher not found" });
