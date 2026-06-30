@@ -6,13 +6,12 @@ const optionSchema = new mongoose.Schema({
 }, { _id: true });
 
 const questionSchema = new mongoose.Schema({
-  id: { type: String, required: true, unique: true },
-  text: { type: String, required: true }, // HTML/Rich text
-  imageUrl: { type: String },
+  text: { type: String, required: true },
+  imageUrl: String,
   options: { type: [optionSchema], required: true },
-  explanation: { type: String }, // Optional explanation/rationale
+  explanation: String,
   createdAt: { type: Date, default: Date.now }
-}, { _id: false });
+});
 
 const collectionSchema = new mongoose.Schema({
   name: { type: String, required: true },
