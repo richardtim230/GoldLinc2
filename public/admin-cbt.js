@@ -106,7 +106,11 @@ document.querySelectorAll('.cbt-nav-link').forEach(link => {
 });
 
 // ============ UTILITY FUNCTIONS ============
-
+function setActiveCBTTab(section) {
+    document.querySelectorAll('.cbt-nav-link').forEach(link => {
+        link.classList.toggle('active', link.dataset.section === section);
+    });
+}
 // Copy to clipboard helper
 function copyToClipboard(text, btn = null) {
   navigator.clipboard.writeText(text).then(() => {
@@ -245,7 +249,8 @@ window.showScheduleExam = showScheduleExam;
 
 // 2. Upload Exam
 async function showUploadExam() {
-  document.getElementById('pageTitle').textContent = 'Upload New Exam';
+    setActiveCBTTab('upload');
+    document.getElementById('pageTitle').textContent = 'Upload New Exam';
   const classes = await fetch('https://goldlincschools.onrender.com/api/classes', {
     headers: getAuthHeaders()
   }).then(r => r.json()).catch(() => []);
@@ -587,6 +592,7 @@ async function showUploadExam() {
 
 // 3. Schedule Exam - WITH EXAM CODE GENERATION & CHECKBOX SELECTION
 async function showScheduleExam() {
+    setActiveCBTTab('schedule');
   document.getElementById('pageTitle').textContent = 'Schedule & Merge Exams';
   document.getElementById('contentArea').innerHTML = `
     <h2 class="text-2xl font-bold mb-6 text-[#22305a]">Schedule & Merge Exams</h2>
