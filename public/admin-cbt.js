@@ -235,7 +235,9 @@ window.showScheduleExam = showScheduleExam;
 // 2. Upload Exam
 async function showUploadExam() {
   document.getElementById('pageTitle').textContent = 'Upload New Exam';
-  const classes = await fetch('https://goldlincschools.onrender.com/api/classes').then(r => r.json()).catch(() => []);
+  const classes = await fetch('https://goldlincschools.onrender.com/api/classes', {
+  headers: getAuthHeaders()
+}).then(r => r.json()).catch(() => []);
   const subjects = await fetch('https://goldlincschools.onrender.com/api/subjects').then(r => r.json()).catch(() => []);
   document.getElementById('contentArea').innerHTML = `
     <h2 class="text-2xl font-bold mb-6 text-[#22305a]">Upload New Exam</h2>
