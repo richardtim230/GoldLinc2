@@ -1117,26 +1117,58 @@ router.patch('/:id/collections/:collectionId/questions/:questionId', teacherAuth
     if (String(req.params.id) !== String(req.staff._id)) {
       return res.status(403).json({ error: "Forbidden" });
     }
+
     const { text, options, imageUrl, explanation } = req.body;
 
     const collection = await Collection.findById(req.params.collectionId);
-    if (!collection) return res.status(404).json({ error: "Collection not found" });
+
+    if (!collection) {
+      return res.status(404).json({ error: "Collection not found" });
+    }
+
     if (String(collection.teacher) !== String(req.staff._id)) {
       return res.status(403).json({ error: "Forbidden" });
     }
 
-    const questionIndex = collection.questions.findIndex(q => q.id === req.params.questionId);
-    if (questionIndex === -1) return res.status(404).json({ error: "Question not found" });
+    // Find question using MongoDB _id
+    const question = collection.questions.id(req.params.questionId);
 
-    if (text !== undefined) collection.questions[questionIndex].text = text;
-    if (options !== undefined) collection.questions[questionIndex].options = options;
-    if (imageUrl !== undefined) collection.questions[questionIndex].imageUrl = imageUrl;
-    if (explanation !== undefined) collection.questions[questionIndex].explanation = explanation;
+    if (!question) {
+      return res.status(404).json({ error: "Question not found" });
+    }
+
+    if (text !== undefined) {
+      question.text = text;
+    }
+
+    if (options !== undefined) {
+      // Remove any _id values from the frontend
+      question.options = options.map(opt => ({
+        text: opt.text,
+        isCorrect: !!opt.isCorrect
+      }));
+    }
+
+    if (imageUrl !== undefined) {
+      question.imageUrl = imageUrl || "";
+    }
+
+    if (explanation !== undefined) {
+      question.explanation = explanation || "";
+    }
 
     await collection.save();
-    res.json({ question: collection.questions[questionIndex] });
+
+    res.json({
+      success: true,
+      question
+    });
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({
+      error: err.message
+    });
   }
 });
 
