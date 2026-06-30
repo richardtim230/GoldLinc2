@@ -1,5 +1,14 @@
 // ============ PAGE INITIALIZATION & UI LOGIC ============
 
+// Authentication helper - gets token from localStorage
+function getAuthHeaders() {
+  const token = localStorage.getItem('authToken');
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` })
+  };
+}
+
 // Spinner overlay logic
 document.addEventListener('DOMContentLoaded', () => {
   const spinner = document.getElementById('pageSpinnerOverlay');
@@ -149,7 +158,9 @@ function showExams() {
 }
 
 async function loadExamsTable() {
-  const exams = await fetch('https://goldlincschools.onrender.com/api/exam').then(r => r.json()).catch(() => []);
+  const exams = await fetch('https://goldlincschools.onrender.com/api/exam', {
+    headers: getAuthHeaders()
+  }).then(r => r.json()).catch(() => []);
   
   const loader = document.getElementById('examsLoading');
   const container = document.getElementById('examsContainer');
@@ -236,9 +247,11 @@ window.showScheduleExam = showScheduleExam;
 async function showUploadExam() {
   document.getElementById('pageTitle').textContent = 'Upload New Exam';
   const classes = await fetch('https://goldlincschools.onrender.com/api/classes', {
-  headers: getAuthHeaders()
-}).then(r => r.json()).catch(() => []);
-  const subjects = await fetch('https://goldlincschools.onrender.com/api/subjects').then(r => r.json()).catch(() => []);
+    headers: getAuthHeaders()
+  }).then(r => r.json()).catch(() => []);
+  const subjects = await fetch('https://goldlincschools.onrender.com/api/subjects', {
+    headers: getAuthHeaders()
+  }).then(r => r.json()).catch(() => []);
   document.getElementById('contentArea').innerHTML = `
     <h2 class="text-2xl font-bold mb-6 text-[#22305a]">Upload New Exam</h2>
     <form id="uploadExamForm" class="space-y-6 max-w-3xl">
@@ -271,7 +284,7 @@ async function showUploadExam() {
         <div id="questionsList" class="space-y-4"></div>
         <button type="button" class="cbt-btn mt-4" id="addQuestionBtn"><i class="fa fa-plus mr-2"></i> Add Question</button>
       </div>
-      <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-6 rounded-lg transition-all"><i class="fa fa-upload mr-2"></i> Upload Exam</button>
+      <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-6 rounded-lg transition-all"><i class="fa fa-upload mr-2"></i>Upload Exam</button>
     </form>
     <div id="uploadExamMsg" class="mt-6"></div>
   `;
@@ -294,7 +307,7 @@ async function showUploadExam() {
         <div class="flex items-end gap-4 mb-4">
           <div class="flex-1">
             <label class="block text-gray-700 font-semibold mb-2">Score:</label>
-            <input type="number" min="1" value="${q.score || 1}" class="score-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Score" />
+            <input type="number" min="1" value="${q.score || 1}" class="score-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Points for this question"/>
           </div>
         </div>
         <label class="block text-gray-700 font-semibold mb-3">Options:</label>
@@ -439,7 +452,11 @@ async function showUploadExam() {
       if (!file) return;
       const formData = new FormData();
       formData.append('image', file);
-      const res = await fetch('https://goldlincschools.onrender.com/api/upload/image', { method: 'POST', body: formData });
+      const res = await fetch('https://goldlincschools.onrender.com/api/upload/image', { 
+        method: 'POST', 
+        body: formData,
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}` }
+      });
       const data = await res.json();
       if(data.url){
         const range = quill.getSelection();
@@ -540,7 +557,7 @@ async function showUploadExam() {
       try {
         const res = await fetch('https://goldlincschools.onrender.com/api/exam', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getAuthHeaders(),
           body: JSON.stringify(payload)
         });
 
@@ -581,7 +598,9 @@ async function showScheduleExam() {
     </div>
   `;
 
-  const exams = await fetch('https://goldlincschools.onrender.com/api/exam').then(r => r.json()).catch(() => []);
+  const exams = await fetch('https://goldlincschools.onrender.com/api/exam', {
+    headers: getAuthHeaders()
+  }).then(r => r.json()).catch(() => []);
 
   document.getElementById('contentArea').innerHTML = `
     <h2 class="text-2xl font-bold mb-6 text-[#22305a]">Schedule & Merge Exams</h2>
@@ -597,11 +616,11 @@ async function showScheduleExam() {
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="form-group">
           <label class="block text-gray-700 font-semibold mb-2">New Exam Title <span class="text-red-500">*</span></label>
-          <input type="text" name="mergedTitle" id="mergedTitle" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+          <input type="text" name="mergedTitle" id="mergedTitle" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter merged exam title"/>
         </div>
         <div class="form-group">
           <label class="block text-gray-700 font-semibold mb-2">Duration (minutes) <span class="text-red-500">*</span></label>
-          <input type="number" name="duration" id="mergedDuration" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" min="1" required />
+          <input type="number" name="duration" id="mergedDuration" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Total duration"/>
         </div>
       </div>
       <div class="form-group">
@@ -614,13 +633,13 @@ async function showScheduleExam() {
           <code id="generatedExamCode" class="flex-1 bg-white px-4 py-2 rounded-lg font-bold text-blue-700 border border-blue-300">
             -
           </code>
-          <button type="button" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition" onclick="copyToClipboard(document.getElementById('generatedExamCode').textContent, this)">
+          <button type="button" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition" onclick="copyToClipboard(document.getElementById('generatedExamCode').textContent)">
             <i class="fa fa-copy mr-2"></i> Copy
           </button>
         </div>
         <small class="block mt-3 text-gray-600"><i class="fa fa-lightbulb mr-1"></i>This code will be generated when you schedule the exam.</small>
       </div>
-      <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-6 rounded-lg transition-all flex items-center justify-center" id="schedule-submit-btn">
+      <button type="submit" id="schedule-submit-btn" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-6 rounded-lg transition-all flex items-center justify-center">
         <i class="fa fa-calendar mr-2"></i> <span>Schedule Merged Exam</span>
         <span id="schedule-submit-spinner" style="display:none;" class="ml-2"><i class="fa fa-spinner fa-spin"></i></span>
       </button>
@@ -664,7 +683,9 @@ async function showScheduleExam() {
     previewDiv.innerHTML = `<div class="flex items-center text-blue-600 font-semibold py-6"><i class="fa fa-spinner fa-spin mr-2"></i> Merging questions...</div>`;
 
     const questionSets = await Promise.all(selected.map(id =>
-      fetch(`https://goldlincschools.onrender.com/api/exam/${id}`).then(r => r.json())
+      fetch(`https://goldlincschools.onrender.com/api/exam/${id}`, {
+        headers: getAuthHeaders()
+      }).then(r => r.json())
     ));
 
     mergedQuestions = [];
@@ -709,7 +730,9 @@ async function showScheduleExam() {
       return;
     }
 
-    const firstExam = await fetch(`https://goldlincschools.onrender.com/api/exam/${selected[0]}`).then(r => r.json());
+    const firstExam = await fetch(`https://goldlincschools.onrender.com/api/exam/${selected[0]}`, {
+      headers: getAuthHeaders()
+    }).then(r => r.json());
     const classId = firstExam.class || firstExam.classId;
     const subjectId = firstExam.subject || firstExam.subjectId;
 
@@ -730,7 +753,7 @@ async function showScheduleExam() {
     try {
       const res = await fetch('https://goldlincschools.onrender.com/api/exam/merge', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(payload)
       });
       const data = await res.json();
@@ -799,7 +822,9 @@ async function showResults() {
     </div>
   `;
 
-  const results = await fetch('https://goldlincschools.onrender.com/api/result').then(r => r.json()).catch(() => []);
+  const results = await fetch('https://goldlincschools.onrender.com/api/result', {
+    headers: getAuthHeaders()
+  }).then(r => r.json()).catch(() => []);
   
   const loader = document.getElementById('resultsLoading');
   const container = document.getElementById('resultsContainer');
@@ -1088,7 +1113,9 @@ async function showStudentActivity() {
       </div>
     </div>
   `;
-  const acts = await fetch('https://goldlincschools.onrender.com/api/activity').then(r => r.json()).catch(() => []);
+  const acts = await fetch('https://goldlincschools.onrender.com/api/activity', {
+    headers: getAuthHeaders()
+  }).then(r => r.json()).catch(() => []);
   
   if (!Array.isArray(acts) || acts.length === 0) {
     document.getElementById('contentArea').innerHTML = `
@@ -1147,7 +1174,9 @@ async function showStudentActivity() {
 // ============ ACTION HANDLERS ============
 
 window.viewExam = async function(id) {
-  const ex = await fetch(`https://goldlincschools.onrender.com/api/exam/${id}`).then(r=>r.json());
+  const ex = await fetch(`https://goldlincschools.onrender.com/api/exam/${id}`, {
+    headers: getAuthHeaders()
+  }).then(r=>r.json());
   if(ex.error){alert(ex.error); return;}
   
   const codeDisplay = ex.examCode 
@@ -1173,7 +1202,7 @@ window.viewExam = async function(id) {
         <div><b class="text-gray-700">Class:</b> <span class="text-gray-900">${ex.className}</span></div>
         <div><b class="text-gray-700">Subject:</b> <span class="text-gray-900">${ex.subjectName}</span></div>
         <div><b class="text-gray-700">Duration:</b> <span class="text-gray-900">${ex.duration} mins</span></div>
-        <div><b class="text-gray-700">Status:</b> <span class="px-3 py-1 rounded-full text-xs font-semibold ${ex.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${ex.status}</span></div>
+        <div><b class="text-gray-700">Status:</b> <span class="px-3 py-1 rounded-full text-xs font-semibold ${ex.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${ex.status || 'Draft'}</span></div>
         <div><b class="text-gray-700">Scheduled:</b> <span class="text-gray-900">${ex.scheduledFor ? new Date(ex.scheduledFor).toLocaleString() : '-'}</span></div>
       </div>
       ${codeDisplay}
@@ -1190,7 +1219,7 @@ window.viewExam = async function(id) {
             ${(q.options||[]).map((o,oi)=>`<li class="${(Array.isArray(q.answer) ? q.answer.includes(oi) : oi==q.answer)?'text-green-700 font-bold bg-green-50 px-2 py-1 rounded':''}">${o.value || o}</li>`).join('')}
             </ol>
           </div>
-          <div class="ml-4 mt-3 text-sm"><span class="font-semibold text-gray-700">Correct:</span> <b class="text-green-600">${Array.isArray(q.answer) ? q.answer.map(idx => String.fromCharCode(65 + idx)).join(', ') : String.fromCharCode(65 + (q.answer||0))}</b></div>
+          <div class="ml-4 mt-3 text-sm"><span class="font-semibold text-gray-700">Correct:</span> <b class="text-green-600">${Array.isArray(q.answer) ? q.answer.map(idx => String.fromCharCode(65 + idx)).join(', ') : String.fromCharCode(65 + (q.answer || 0))}</b></div>
         </div>
       `).join('') : ''}
     </div>
@@ -1198,7 +1227,9 @@ window.viewExam = async function(id) {
 }
 
 window.editExam = async function(id) {
-  const ex = await fetch(`https://goldlincschools.onrender.com/api/exam/${id}`).then(r=>r.json());
+  const ex = await fetch(`https://goldlincschools.onrender.com/api/exam/${id}`, {
+    headers: getAuthHeaders()
+  }).then(r=>r.json());
   if(ex.error){alert(ex.error); return;}
   alert('Edit Exam is not implemented for advanced question editor. Please delete and re-upload for now.');
   showExams();
@@ -1206,18 +1237,26 @@ window.editExam = async function(id) {
 
 window.deleteExam = async function(id) {
   if (!confirm('Delete this exam?')) return;
-  const res = await fetch(`https://goldlincschools.onrender.com/api/exam/${id}`,{method:'DELETE'}).then(r=>r.json());
+  const res = await fetch(`https://goldlincschools.onrender.com/api/exam/${id}`, {
+    method:'DELETE',
+    headers: getAuthHeaders()
+  }).then(r=>r.json());
   if(res.error){alert(res.error);} else {showExams();}
 }
 
 window.stopExam = async function(id) {
   if (!confirm('Stop this exam for all students?')) return;
-  await fetch(`https://goldlincschools.onrender.com/api/exam/${id}/stop`,{method:'POST'});
+  await fetch(`https://goldlincschools.onrender.com/api/exam/${id}/stop`, {
+    method:'POST',
+    headers: getAuthHeaders()
+  });
   showExams();
 }
 
 window.viewResult = async function(id) {
-  const r = await fetch(`https://goldlincschools.onrender.com/api/result/${id}`).then(r=>r.json());
+  const r = await fetch(`https://goldlincschools.onrender.com/api/result/${id}`, {
+    headers: getAuthHeaders()
+  }).then(r=>r.json());
   if(r.error){alert(r.error); return;}
   document.getElementById('contentArea').innerHTML = `
     <div class="mb-6">
@@ -1246,7 +1285,10 @@ window.viewResult = async function(id) {
 
 window.deleteResult = async function(id) {
   if (!confirm('Delete this result?')) return;
-  const res = await fetch(`https://goldlincschools.onrender.com/api/result/${id}`, { method: 'DELETE' }).then(r => r.json()).catch(() => ({}));
+  const res = await fetch(`https://goldlincschools.onrender.com/api/result/${id}`, { 
+    method: 'DELETE',
+    headers: getAuthHeaders()
+  }).then(r => r.json()).catch(() => ({}));
   if (res.error) {
     alert(res.error);
   } else {
@@ -1255,7 +1297,9 @@ window.deleteResult = async function(id) {
 }
 
 window.viewActivity = async function(id) {
-  const a = await fetch(`https://goldlincschools.onrender.com/api/activity/${id}`).then(r=>r.json());
+  const a = await fetch(`https://goldlincschools.onrender.com/api/activity/${id}`, {
+    headers: getAuthHeaders()
+  }).then(r=>r.json());
   if(a.error){alert(a.error); return;}
   document.getElementById('contentArea').innerHTML = `
     <div class="mb-6">
@@ -1267,7 +1311,7 @@ window.viewActivity = async function(id) {
         <div><b class="text-gray-700">Student:</b> <span class="text-gray-900">${a.studentName}</span></div>
         <div><b class="text-gray-700">Class:</b> <span class="text-gray-900">${a.className}</span></div>
         <div><b class="text-gray-700">Exam:</b> <span class="text-gray-900">${a.examTitle}</span></div>
-        <div><b class="text-gray-700">Status:</b> <span class="px-3 py-1 rounded-full text-xs font-semibold ${a.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${a.status}</span></div>
+        <div><b class="text-gray-700">Status:</b> <span class="px-3 py-1 rounded-full text-xs font-semibold ${a.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${a.status || 'Pending'}</span></div>
         <div><b class="text-gray-700">Started:</b> <span class="text-gray-900 text-sm">${a.startedAt ? new Date(a.startedAt).toLocaleString() : '-'}</span></div>
         <div><b class="text-gray-700">Finished:</b> <span class="text-gray-900 text-sm">${a.finishedAt ? new Date(a.finishedAt).toLocaleString() : '-'}</span></div>
       </div>
