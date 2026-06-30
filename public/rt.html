@@ -1197,7 +1197,7 @@ function updateGradebookProgress() {
         }
     }
 
-    async function createCollection() {
+async function createCollection() {
     const collectionName = document.getElementById('newCollectionName').value.trim();
     
     if (!collectionName) {
@@ -1376,31 +1376,18 @@ async function submitCollectionWithClassSubject(collectionName) {
     try {
         showLoadingSpinner('Creating Collection', 'Processing...');
         
-        // Using your existing API endpoint
-        const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections`, {
-            method: 'POST',
-            headers: authHeaders(),
-            body: JSON.stringify({ 
-                name: collectionName,
-                class: classId,
-                subject: subjectId
-            })
-        });
+        const collection = await createCollectionAPI(collectionName, classId, subjectId);
+        hideLoadingSpinner();
 
-        if (!res.ok) {
-            const errorData = await res.json();
-            hideLoadingSpinner();
+        if (!collection) {
             showCustomModal({
                 title: 'Creation Failed',
-                message: errorData.error || 'Failed to create collection. Please try again.',
+                message: 'Failed to create collection. Please try again.',
                 type: 'alert',
                 icon: '❌'
             });
             return;
         }
-
-        const data = await res.json();
-        hideLoadingSpinner();
 
         // Clear input
         document.getElementById('newCollectionName').value = '';
@@ -1435,6 +1422,31 @@ function closeCollectionModal() {
         setTimeout(() => modal.remove(), 200);
     }
 }
+
+// Updated API function to accept class and subject
+async function createCollectionAPI(name, classId, subjectId) {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections`, {
+            method: 'POST',
+            headers: authHeaders(),
+            body: JSON.stringify({ 
+                name: name,
+                class: classId,
+                subject: subjectId
+            })
+        });
+        if (!res.ok) throw new Error('Failed to create collection');
+        const data = await res.json();
+        return data.collection;
+    } catch (e) {
+        console.error('Error creating collection:', e);
+        return null;
+    }
+}
+                    
+
+
+
     async function addQuestionToCollectionAPI(collectionId, questionData) {
         try {
             const res = await fetch(
