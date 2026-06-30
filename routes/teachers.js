@@ -18,6 +18,7 @@ const AssignmentSubmission = require('../models/AssignmentSubmission');
 const Session = require('../models/Session');
 const Term = require('../models/Term');
 // GET /api/teachers/me - Get own teacher profile + classes + subjects
+console.log(JSON.stringify(req.body, null, 2));
 router.get('/me', teacherAuth, async (req, res) => {
   const teacher = req.staff;
   if (!teacher || teacher.access_level !== 'Teacher') return res.status(404).json({ error: "Teacher not found" });
@@ -1055,39 +1056,58 @@ router.post('/:id/collections', teacherAuth, async (req, res) => {
   }
 });
 
-// POST /api/teachers/:id/collections/:collectionId/questions - Add question to collection
 router.post('/:id/collections/:collectionId/questions', teacherAuth, async (req, res) => {
   try {
     if (String(req.params.id) !== String(req.staff._id)) {
       return res.status(403).json({ error: "Forbidden" });
     }
+
     const { text, options, imageUrl, explanation } = req.body;
-    
-    if (!text || !options || options.length === 0) {
-      return res.status(400).json({ error: "Question text and options are required" });
+
+    if (!text || !Array.isArray(options) || options.length === 0) {
+      return res.status(400).json({
+        error: "Question text and options are required"
+      });
     }
 
     const collection = await Collection.findById(req.params.collectionId);
-    if (!collection) return res.status(404).json({ error: "Collection not found" });
+
+    if (!collection) {
+      return res.status(404).json({ error: "Collection not found" });
+    }
+
     if (String(collection.teacher) !== String(req.staff._id)) {
       return res.status(403).json({ error: "Forbidden" });
     }
 
+    // Remove any _id fields coming from the frontend
+    const cleanedOptions = options.map(opt => ({
+      text: opt.text,
+      isCorrect: !!opt.isCorrect
+    }));
+
     const question = {
-      id: `question_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       text,
-      options,
-      imageUrl: imageUrl || null,
-      explanation: explanation || null,
+      options: cleanedOptions,
+      imageUrl: imageUrl || "",
+      explanation: explanation || "",
       createdAt: new Date()
     };
 
     collection.questions.push(question);
+
     await collection.save();
-    
-    res.status(201).json({ question });
+
+    res.status(201).json({
+      success: true,
+      question: collection.questions[collection.questions.length - 1]
+    });
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({
+      error: err.message
+    });
   }
 });
 
