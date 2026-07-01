@@ -1642,6 +1642,7 @@ async function createCollectionAPI(name, classId, subjectId) {
         updateLoadingStatus('Rendering dashboard components...');
         renderOverview();
         renderCollections();
+        populateCollectionSelects();
         renderAssignments();
         renderStudents();
         renderGradebook();
