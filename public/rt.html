@@ -299,18 +299,41 @@
         <div id="panel-assessments" class="space-y-6 hidden">
             <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
                 
-                <div id="collectionControlHeader" class="flex flex-col sm:flex-row justify-between sm:items-start gap-4 border-b border-slate-100 pb-4">
-                    <div>
-                        <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Question Bank Categorization Deck</h2>
-                        <p class="text-xs text-slate-500">Isolate focus tracks to run standard objective items evaluation updates safely.</p>
-                    </div>
-                    <div class="flex gap-2 items-center w-full sm:w-auto">
-                        <input type="text" id="newCollectionName" placeholder="e.g., SS2 BIOLOGY TEST 1" class="bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold p-2 focus:bg-white focus:ring-1 focus:ring-brand-500">
-                        <button onclick="createCollection()" class="bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2 rounded-xl uppercase tracking-wider transition whitespace-nowrap">
-                            Create Collection
-                        </button>
-                    </div>
-                </div>
+                <div id="collectionControlHeader" class="flex flex-col gap-4 border-b border-slate-100 pb-4">
+    <div>
+        <h2 class="text-sm font-bold text-brand-900 uppercase tracking-wider">Question Bank Categorization Deck</h2>
+        <p class="text-xs text-slate-500">Isolate focus tracks to run standard objective items evaluation updates safely.</p>
+    </div>
+    
+    <!-- Collection Creation Form -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
+        <!-- Collection Name -->
+        <div class="md:col-span-2">
+            <input type="text" id="newCollectionName" placeholder="e.g., SS2 BIOLOGY TEST 1" class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold p-2.5 focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
+        </div>
+        
+        <!-- Class Select -->
+        <div>
+            <select id="collectionClassSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2.5 focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
+                <option value="">Select Class</option>
+            </select>
+        </div>
+        
+        <!-- Subject Select -->
+        <div>
+            <select id="collectionSubjectSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 p-2.5 focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none">
+                <option value="">Select Subject</option>
+            </select>
+        </div>
+        
+        <!-- Create Button -->
+        <div>
+            <button onclick="createCollection()" class="w-full bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl uppercase tracking-wider transition whitespace-nowrap">
+                Create Collection
+            </button>
+        </div>
+    </div>
+</div>
 
                 <div id="collectionsContainer" class="space-y-4"></div>
             </div>
@@ -3079,7 +3102,120 @@ function openAssignmentModal() {
             container.appendChild(questionDiv);
         });
     }
+// ============ POPULATE CLASS AND SUBJECT SELECTS ============
+function populateCollectionSelects() {
+    const classSelect = document.getElementById('collectionClassSelect');
+    const subjectSelect = document.getElementById('collectionSubjectSelect');
+    
+    // Clear existing options (keep placeholder)
+    classSelect.innerHTML = '<option value="">Select Class</option>';
+    subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+    
+    // Populate class select
+    if (teacher && teacher.assignedClasses && Array.isArray(teacher.assignedClasses)) {
+        teacher.assignedClasses.forEach(cls => {
+            const option = document.createElement('option');
+            option.value = cls.id || cls._id || cls;
+            option.textContent = cls.name || cls;
+            classSelect.appendChild(option);
+        });
+    }
+    
+    // Populate subject select
+    if (teacher && teacher.subjects && Array.isArray(teacher.subjects)) {
+        teacher.subjects.forEach(subj => {
+            const option = document.createElement('option');
+            option.value = subj.id || subj._id || subj;
+            option.textContent = subj.name || subj;
+            subjectSelect.appendChild(option);
+        });
+    }
+}
 
+// ============ CREATE COLLECTION FUNCTION ============
+async function createCollection() {
+    const nameInput = document.getElementById('newCollectionName');
+    const classSelect = document.getElementById('collectionClassSelect');
+    const subjectSelect = document.getElementById('collectionSubjectSelect');
+    
+    const collectionName = nameInput.value.trim();
+    const selectedClass = classSelect.value;
+    const selectedSubject = subjectSelect.value;
+    
+    if (!collectionName) {
+        showCustomModal({
+            title: 'Input Required',
+            message: 'Please enter a collection name.',
+            type: 'alert',
+            icon: '⚠️'
+        });
+        return;
+    }
+    
+    if (!selectedClass) {
+        showCustomModal({
+            title: 'Class Selection Required',
+            message: 'Please select a class for this collection.',
+            type: 'alert',
+            icon: '⚠️'
+        });
+        return;
+    }
+    
+    if (!selectedSubject) {
+        showCustomModal({
+            title: 'Subject Selection Required',
+            message: 'Please select a subject for this collection.',
+            type: 'alert',
+            icon: '⚠️'
+        });
+        return;
+    }
+    
+    try {
+        showLoadingSpinner('Creating Collection', 'Setting up question bank...');
+        
+        const payload = {
+            name: collectionName,
+            classId: selectedClass,
+            subjectId: selectedSubject,
+            teacherId: teacher?.id || teacher?._id
+        };
+        
+        const response = await fetch(`${API_BASE_URL}/api/collections`, {
+            method: 'POST',
+            headers: authHeaders(),
+            body: JSON.stringify(payload)
+        });
+        
+        if (!response.ok) throw new Error('Failed to create collection');
+        
+        const result = await response.json();
+        activeIsolatedCollectionId = result.id || result._id;
+        
+        showCustomModal({
+            title: 'Success',
+            message: 'Collection created successfully!',
+            type: 'success',
+            icon: '✓'
+        });
+        
+        nameInput.value = '';
+        classSelect.value = '';
+        subjectSelect.value = '';
+        
+        await loadCollections();
+        hideLoadingSpinner();
+    } catch (error) {
+        hideLoadingSpinner();
+        showCustomModal({
+            title: 'Error',
+            message: `Failed to create collection: ${error.message}`,
+            type: 'error',
+            icon: '✕'
+        });
+    }
+}
     
 async function commitAssignmentDeployment(event) {
   if (event) event.preventDefault();
