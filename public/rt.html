@@ -2579,7 +2579,9 @@ function updateStudentRow(studentId, studentName, results) {
                 throw new Error('Collection not found');
             }
 
-            const question = collection.questions.find(q => q.id === questionId);
+            const question = collection.questions.find(
+    q => (q._id || q.id)?.toString() === questionId.toString()
+);
             if (!question) {
                 throw new Error('Question not found');
             }
