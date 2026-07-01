@@ -3185,7 +3185,7 @@ async function createCollection() {
             teacherId: teacher?.id || teacher?._id
         };
         
-        const response = await fetch(`${API_BASE_URL}/api/collections`, {
+        const response = await fetch(`${API_BASE_URL}/api/teachers/${encodeURIComponent(teacher.id)}/collections`, {
             method: 'POST',
             headers: authHeaders(),
             body: JSON.stringify(payload)
