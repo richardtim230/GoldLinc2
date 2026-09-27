@@ -176,9 +176,9 @@
             border: 1px solid #e2e8f0;
         }
         .action-btn:hover { background-color: #f1f5f9; color: #0f172a; }
-        .action-btn.edit:hover { color: #2563eb; bg-color: #eff6ff; border-color: #bfdbfe; }
-        .action-btn.publish:hover { color: #16a34a; bg-color: #f0fdf4; border-color: #bbf7d0; }
-        .action-btn.delete:hover { color: #dc2626; bg-color: #fef2f2; border-color: #fecaca; }
+        .action-btn.edit:hover { color: #2563eb; background-color: #eff6ff; border-color: #bfdbfe; }
+        .action-btn.publish:hover { color: #16a34a; background-color: #f0fdf4; border-color: #bbf7d0; }
+        .action-btn.delete:hover { color: #dc2626; background-color: #fef2f2; border-color: #fecaca; }
 
         .empty-state {
             padding: 3rem 1.5rem;
@@ -584,7 +584,7 @@
     <!-- Flowbite JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
 
-    <!-- Complete Unaltered Backend JS Logic -->
+    <!-- Corrected JavaScript Logic -->
     <script>
         // ============ API CONFIGURATION ============
         const API_BASE_URL = "https://goldlincschools.onrender.com";
@@ -655,14 +655,17 @@
                 showSpinner();
                 const res = await fetch(`${API_BASE_URL}/api/results`, { headers: authHeaders() });
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                allResults = await res.json();
+                const data = await res.json();
+                
+                // Ensure allResults is always an array
+                allResults = Array.isArray(data) ? data : (data.results || data.data || []);
                 console.log('Fetched results:', allResults);
                 return allResults;
             } catch (err) {
                 console.error('Error fetching results:', err);
                 showStatus('Error fetching results: ' + err.message, 'error');
                 return [];
-            } font-finally {
+            } finally {
                 hideSpinner();
             }
         }
@@ -730,10 +733,10 @@
             const search = document.getElementById('searchStudentInput').value.toLowerCase();
 
             filteredResults = allResults.filter(r => {
-                const sessionMatch = !session || (r.session && r.session.name === session);
-                const termMatch = !term || (r.term && r.term.name === term);
-                const classMatch = !className || (r.class && r.class.name === className);
-                const subjectMatch = !subject || (r.subject && r.subject.name === subject);
+                const sessionMatch = !session || (r.session && (r.session.name === session || r.session === session));
+                const termMatch = !term || (r.term && (r.term.name === term || r.term === term));
+                const classMatch = !className || (r.class && (r.class.name === className || r.class === className));
+                const subjectMatch = !subject || (r.subject && (r.subject.name === subject || r.subject === subject));
                 const searchMatch = !search || 
                     (r.student && r.student.name && r.student.name.toLowerCase().includes(search)) ||
                     (r.student && r.student.student_id && r.student.student_id.includes(search));
@@ -749,7 +752,7 @@
         function renderResults() {
             const display = document.getElementById('resultsDisplay');
 
-            if (filteredResults.length === 0) {
+            if (!filteredResults || filteredResults.length === 0) {
                 display.innerHTML = `
                     <div class="results-table-container">
                         <div class="empty-state">
@@ -766,8 +769,8 @@
             // Group results by session and term
             const grouped = {};
             filteredResults.forEach(r => {
-                const sessionName = (r.session && r.session.name) || 'Unknown Session';
-                const termName = (r.term && r.term.name) || 'Unknown Term';
+                const sessionName = (r.session && r.session.name) || r.session || 'Unknown Session';
+                const termName = (r.term && r.term.name) || r.term || 'Unknown Term';
                 const key = `${sessionName} - ${termName}`;
 
                 if (!grouped[key]) {
@@ -808,14 +811,13 @@
                             <tbody>
                 `;
 
-                groupResults.forEach((r, idx) => {
+                groupResults.forEach((r) => {
                     const total = calculateResultTotal(r);
-                    const { grade, remark } = getGradeAndRemark(total);
-                    const studentId = r.student && r.student._id ? r.student._id : '';
+                    const { grade } = getGradeAndRemark(total);
                     const studentName = (r.student && (r.student.name || (r.student.firstname + ' ' + r.student.surname).trim())) || 'Unknown';
                     const studentNo = (r.student && r.student.student_id) || '—';
-                    const className = (r.class && r.class.name) || '—';
-                    const subjectName = (r.subject && r.subject.name) || '—';
+                    const className = (r.class && r.class.name) || r.class || '—';
+                    const subjectName = (r.subject && r.subject.name) || r.subject || '—';
                     const status = r.status === 'Published' ? 'Published' : 'Draft';
                     const statusClass = status === 'Published' ? 'status-published' : 'status-draft';
                     const position = r.subject_position || '—';
@@ -863,7 +865,6 @@
 
             display.innerHTML = html;
             updateResultsSummary();
-            attachDetailsRowHandlers();
         }
 
         // ============ SELECTION HANDLERS ============
@@ -905,9 +906,9 @@
             const { grade, remark } = getGradeAndRemark(total);
 
             document.getElementById('editResultId').value = result._id;
-            document.getElementById('editStudentName').value = (result.student && result.student.name) || '';
-            document.getElementById('editSubjectName').value = (result.subject && result.subject.name) || '';
-            document.getElementById('editClassName').value = (result.class && result.class.name) || '';
+            document.getElementById('editStudentName').value = (result.student && (result.student.name || (result.student.firstname + ' ' + result.student.surname))) || '';
+            document.getElementById('editSubjectName').value = (result.subject && result.subject.name) || result.subject || '';
+            document.getElementById('editClassName').value = (result.class && result.class.name) || result.class || '';
             document.getElementById('editStatus').value = result.status || 'Draft';
             document.getElementById('editCA1').value = result.ca1_score || '';
             document.getElementById('editCA2').value = result.ca2_score || '';
@@ -956,7 +957,7 @@
             try {
                 await deleteResult(currentResultToDelete);
                 allResults = allResults.filter(r => r._id !== currentResultToDelete);
-                filterResults({ preventDefault: () => {} });
+                filterResults();
                 closeModal('deleteResultModal');
                 showStatus('Result deleted successfully', 'success');
             } catch (err) {
@@ -971,7 +972,7 @@
                 await publishResult(currentResultToPublish);
                 const result = allResults.find(r => r._id === currentResultToPublish);
                 if (result) result.status = 'Published';
-                filterResults({ preventDefault: () => {} });
+                filterResults();
                 closeModal('publishResultModal');
                 showStatus('Result published successfully', 'success');
             } catch (err) {
@@ -1010,7 +1011,7 @@
                     result.remarks = remark;
                 }
 
-                filterResults({ preventDefault: () => {} });
+                filterResults();
                 closeModal('editResultModal');
                 showStatus('Result updated successfully', 'success');
             } catch (err) {
@@ -1037,21 +1038,20 @@
                 `${total} results (${published} published, ${draft} draft)`;
         }
 
-        function attachDetailsRowHandlers() {
-            // Details row expansion handling if needed
-        }
-
         // ============ INITIALIZATION ============
         async function init() {
             try {
                 showSpinner();
                 await fetchAllResults();
                 
+                // Set filteredResults to contain all loaded results initially
+                filteredResults = [...allResults];
+
                 // Populate dropdowns
-                const sessions = [...new Set(allResults.map(r => r.session?.name).filter(Boolean))];
-                const terms = [...new Set(allResults.map(r => r.term?.name).filter(Boolean))];
-                const classes = [...new Set(allResults.map(r => r.class?.name).filter(Boolean))];
-                const subjects = [...new Set(allResults.map(r => r.subject?.name).filter(Boolean))];
+                const sessions = [...new Set(allResults.map(r => r.session?.name || r.session).filter(Boolean))];
+                const terms = [...new Set(allResults.map(r => r.term?.name || r.term).filter(Boolean))];
+                const classes = [...new Set(allResults.map(r => r.class?.name || r.class).filter(Boolean))];
+                const subjects = [...new Set(allResults.map(r => r.subject?.name || r.subject).filter(Boolean))];
 
                 const sessionSelect = document.getElementById('sessionSelect');
                 sessions.sort().forEach(s => {
@@ -1129,7 +1129,7 @@
                         if (result) result.status = 'Published';
                     }
                     selectedResults.clear();
-                    filterResults({ preventDefault: () => {} });
+                    filterResults();
                     showStatus(`Selected results published successfully`, 'success');
                 } catch (err) {
                     showStatus('Error publishing results: ' + err.message, 'error');
@@ -1150,7 +1150,7 @@
                         allResults = allResults.filter(r => r._id !== resultId);
                     }
                     selectedResults.clear();
-                    filterResults({ preventDefault: () => {} });
+                    filterResults();
                     showStatus(`Selected results deleted successfully`, 'success');
                 } catch (err) {
                     showStatus('Error deleting results: ' + err.message, 'error');
