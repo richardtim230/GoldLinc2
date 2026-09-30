@@ -2,7 +2,6 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
-const mongoose = require('mongoose');
 const Staff = require('../models/Staff');
 const Assignment = require('../models/Assignment');
 const Notification = require('../models/Notification');
@@ -18,35 +17,6 @@ const Collection = require('../models/Collection');
 const AssignmentSubmission = require('../models/AssignmentSubmission');
 const Session = require('../models/Session');
 const Term = require('../models/Term');
-function getTeacherSchoolId(req) {
-  const schoolId = req.staff?.schoolId;
-  if (!schoolId || !mongoose.Types.ObjectId.isValid(schoolId)) {
-    throw new Error('Teacher is not linked to a valid school.');
-  }
-  return new mongoose.Types.ObjectId(schoolId);
-}
-
-function ensureOwnTeacher(req, res) {
-  if (!req.staff || String(req.params.id) !== String(req.staff._id)) {
-    res.status(403).json({ error: 'Forbidden' });
-    return false;
-  }
-  return true;
-}
-
-async function backfillLegacyTeacherAssignments(teacherId, schoolId) {
-  await Assignment.updateMany(
-    {
-      teacher: teacherId,
-      $or: [
-        { schoolId: { $exists: false } },
-        { schoolId: null }
-      ]
-    },
-    { $set: { schoolId } }
-  );
-}
-
 // GET /api/teachers/me - Get own teacher profile + classes + subjects
 
 router.get('/me', teacherAuth, async (req, res) => {
@@ -253,25 +223,11 @@ router.get('/students', teacherAuth, async (req, res) => {
 // GET /api/teachers/:id/assignments
 router.get('/:id/assignments', teacherAuth, async (req, res) => {
   try {
-    if (!ensureOwnTeacher(req, res)) return;
-
-    const schoolId = getTeacherSchoolId(req);
-
-    // Backfill assignments created before schoolId was introduced.
-    await backfillLegacyTeacherAssignments(req.staff._id, schoolId);
-
-    const assignments = await Assignment.find({
-      schoolId,
-      teacher: req.staff._id
-    })
-      .populate({ path: 'class', select: 'name schoolId' })
-      .populate({ path: 'subject', select: 'name schoolId' })
-      .populate({ path: 'cbt' })
-      .sort({ dueDate: 1, createdAt: -1 });
-
+    const assignments = await Assignment.find({ teacher: req.params.id })
+      .populate({ path: 'class', select: 'name' }) // ensures .class.name is available
+      .sort({ dueDate: 1 });
     res.json({ assignments });
   } catch (err) {
-    console.error('Error fetching teacher assignments:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -279,83 +235,24 @@ router.get('/:id/assignments', teacherAuth, async (req, res) => {
 // POST /api/teachers/:id/assignments
 router.post('/:id/assignments', teacherAuth, async (req, res) => {
   try {
-    if (!ensureOwnTeacher(req, res)) return;
+    const { title, description, class: classId, subject, type, dueDate, cbt, questionsAllocated } = req.body;
+    const teacherId = req.params.id;
 
-    const schoolId = getTeacherSchoolId(req);
-    const {
-      title,
-      description,
-      class: classId,
-      subject,
-      type,
-      dueDate,
-      cbt,
-      questionsAllocated
-    } = req.body;
-
-    const teacherId = req.staff._id;
-
+    // Validate required fields
     if (!title || !classId || !subject || !dueDate) {
-      return res.status(400).json({
-        error: 'Missing required fields: title, class, subject, dueDate'
+      return res.status(400).json({ 
+        error: 'Missing required fields: title, class, subject, dueDate' 
       });
     }
 
-    if (!mongoose.Types.ObjectId.isValid(classId) ||
-        !mongoose.Types.ObjectId.isValid(subject)) {
-      return res.status(400).json({
-        error: 'Invalid class or subject ID.'
-      });
-    }
-
+    // If type is QUESTION_BANK, cbt is required
     if (type === 'QUESTION_BANK' && !cbt) {
-      return res.status(400).json({
-        error: 'CBT ID is required for QUESTION_BANK type assignments. Please select an exam first.'
+      return res.status(400).json({ 
+        error: 'CBT ID is required for QUESTION_BANK type assignments. Please select an exam first.' 
       });
-    }
-
-    const cls = await Class.findOne({
-      _id: classId,
-      schoolId,
-      teachers: teacherId
-    });
-
-    if (!cls) {
-      return res.status(403).json({
-        error: 'Class not found or not assigned to this teacher in this school.'
-      });
-    }
-
-    const subjectDoc = await Subject.findOne({
-      _id: subject,
-      schoolId
-    });
-
-    if (!subjectDoc) {
-      return res.status(404).json({
-        error: 'Subject not found in this school.'
-      });
-    }
-
-    if (cbt) {
-      if (!mongoose.Types.ObjectId.isValid(cbt)) {
-        return res.status(400).json({ error: 'Invalid CBT ID.' });
-      }
-
-      const cbtDoc = await CBT.findOne({
-        _id: cbt,
-        teacher: teacherId
-      });
-
-      if (!cbtDoc) {
-        return res.status(404).json({
-          error: 'CBT exam not found or not owned by this teacher.'
-        });
-      }
     }
 
     const assignment = new Assignment({
-      schoolId,
       title,
       description: description || '',
       class: classId,
@@ -363,18 +260,12 @@ router.post('/:id/assignments', teacherAuth, async (req, res) => {
       type: type || 'STANDARD',
       dueDate,
       cbt: cbt || null,
-      questionsAllocated: Array.isArray(questionsAllocated) ? questionsAllocated : [],
-      teacher: teacherId,
-      createdBy: teacherId
+      questionsAllocated: questionsAllocated || [],
+      teacher: teacherId
     });
 
     await assignment.save();
-
-    await assignment.populate([
-      { path: 'subject', select: 'name schoolId' },
-      { path: 'class', select: 'name schoolId' },
-      { path: 'cbt' }
-    ]);
+    await assignment.populate(['subject', 'class', 'cbt']);
 
     res.status(201).json({
       success: true,
@@ -382,7 +273,6 @@ router.post('/:id/assignments', teacherAuth, async (req, res) => {
       assignment
     });
   } catch (err) {
-    console.error('Error creating assignment:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -524,29 +414,9 @@ router.post('/classes/:classId/subjects', teacherAuth, async (req, res) => {
 // PATCH /api/teachers/:id/assignments/:assignmentId/submissions/:submissionId
 router.patch('/:id/assignments/:assignmentId/submissions/:submissionId', teacherAuth, async (req, res) => {
   try {
-    if (!ensureOwnTeacher(req, res)) return;
-
-    const schoolId = getTeacherSchoolId(req);
-
-    const assignment = await Assignment.findOne({
-      _id: req.params.assignmentId,
-      schoolId,
-      teacher: req.staff._id
-    });
-
-    if (!assignment) {
-      return res.status(404).json({
-        error: 'Assignment not found or not owned by teacher.'
-      });
-    }
-
     const { score } = req.body;
-
-    const submission = await AssignmentSubmission.findOneAndUpdate(
-      {
-        _id: req.params.submissionId,
-        assignment: assignment._id
-      },
+    const submission = await AssignmentSubmission.findByIdAndUpdate(
+      req.params.submissionId,
       { score, status: 'Graded' },
       { new: true }
     );
@@ -558,67 +428,11 @@ router.patch('/:id/assignments/:assignmentId/submissions/:submissionId', teacher
 // PATCH /api/teachers/:id/assignments/:assignmentId - Update assignment
 router.patch('/:id/assignments/:assignmentId', teacherAuth, async (req, res) => {
   try {
-    if (!ensureOwnTeacher(req, res)) return;
-
-    const schoolId = getTeacherSchoolId(req);
-
-    const allowedUpdates = {};
-    const allowedFields = [
-      'title',
-      'description',
-      'type',
-      'questionsAllocated',
-      'cbt',
-      'subject',
-      'assignedTo',
-      'class',
-      'files',
-      'dueDate'
-    ];
-
-    for (const field of allowedFields) {
-      if (req.body[field] !== undefined) {
-        allowedUpdates[field] = req.body[field];
-      }
-    }
-
-    if (allowedUpdates.class) {
-      const cls = await Class.findOne({
-        _id: allowedUpdates.class,
-        schoolId,
-        teachers: req.staff._id
-      });
-      if (!cls) {
-        return res.status(403).json({
-          error: 'Class not found or not assigned to this teacher.'
-        });
-      }
-    }
-
-    if (allowedUpdates.subject) {
-      const subjectDoc = await Subject.findOne({
-        _id: allowedUpdates.subject,
-        schoolId
-      });
-      if (!subjectDoc) {
-        return res.status(404).json({
-          error: 'Subject not found in this school.'
-        });
-      }
-    }
-
     const assignment = await Assignment.findOneAndUpdate(
-      {
-        _id: req.params.assignmentId,
-        schoolId,
-        teacher: req.staff._id
-      },
-      allowedUpdates,
-      { new: true, runValidators: true }
-    )
-      .populate('subject', 'name schoolId')
-      .populate('class', 'name schoolId')
-      .populate('cbt');
+      { _id: req.params.assignmentId, teacher: req.params.id },
+      req.body,
+      { new: true }
+    );
     if (!assignment) return res.status(404).json({ error: "Assignment not found or not owned by teacher." });
     res.json({ success: true, assignment });
   } catch (err) {
@@ -653,15 +467,7 @@ router.patch('/:id/collections/:collectionId', teacherAuth, async (req, res) => 
 // DELETE /api/teachers/:id/assignments/:assignmentId - Delete assignment
 router.delete('/:id/assignments/:assignmentId', teacherAuth, async (req, res) => {
   try {
-    if (!ensureOwnTeacher(req, res)) return;
-
-    const schoolId = getTeacherSchoolId(req);
-
-    const assignment = await Assignment.findOneAndDelete({
-      _id: req.params.assignmentId,
-      schoolId,
-      teacher: req.staff._id
-    });
+    const assignment = await Assignment.findOneAndDelete({ _id: req.params.assignmentId, teacher: req.params.id });
     if (!assignment) return res.status(404).json({ error: "Assignment not found or not owned by teacher." });
     res.json({ success: true });
   } catch (err) {
@@ -1022,15 +828,9 @@ router.get(
         });
       }
 
-      const schoolId = getTeacherSchoolId(req);
-
-      await backfillLegacyTeacherAssignments(req.staff._id, schoolId);
-
-      const assignment = await Assignment.findOne({
-        _id: req.params.assignmentId,
-        schoolId,
-        teacher: req.staff._id
-      });
+      const assignment = await Assignment.findById(
+        req.params.assignmentId
+      );
 
       if (!assignment) {
         return res.status(404).json({
